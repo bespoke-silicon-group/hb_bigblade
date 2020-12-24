@@ -163,7 +163,7 @@ module testbench();
 
 
     bsg_ruche_buffer #(
-      .width_p($bits(bsg_manycore_link_sif_s))
+      .width_p($bits(bsg_manycore_ruche_x_link_sif_s))
       ,.ruche_factor_p(hb_ruche_factor_X_gp)
       ,.ruche_stage_p(0)
       ,.harden_p(0)
@@ -173,7 +173,7 @@ module testbench();
     );
 
     bsg_ruche_buffer #(
-      .width_p($bits(bsg_manycore_link_sif_s))
+      .width_p($bits(bsg_manycore_ruche_x_link_sif_s))
       ,.ruche_factor_p(hb_ruche_factor_X_gp)
       ,.ruche_stage_p(2)
       ,.harden_p(0)
@@ -231,7 +231,32 @@ module testbench();
     ,.wh_link_sif_o(north_test_mem_wh_link_lo)
   );
 
-  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin
+  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin: n_wh
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(0)
+    ) n_abuf_w (
+      .i(north_wh_link_sif_lo[W][i])
+      ,.o(north_test_mem_wh_link_li[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+    );
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(1)
+    ) n_abuf_e (
+      .i(north_test_mem_wh_link_lo[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+      ,.o(north_wh_link_sif_li[W][i])
+    );
+
+
+  /*
     if (i == 0) begin
        assign north_test_mem_wh_link_li[i] = north_wh_link_sif_lo[W][i];
        assign north_wh_link_sif_li[W][i] = north_test_mem_wh_link_lo[i];
@@ -240,6 +265,7 @@ module testbench();
        assign north_test_mem_wh_link_li[i] = ~north_wh_link_sif_lo[W][i];
        assign north_wh_link_sif_li[W][i] = ~north_test_mem_wh_link_lo[i];
     end
+  */
   end
 
   wh_link_sif_s [wh_ruche_factor_gp-1:0] south_test_mem_wh_link_li;
@@ -265,7 +291,31 @@ module testbench();
     ,.wh_link_sif_o(south_test_mem_wh_link_lo)
   );
 
-  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin
+  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin: s_wh
+
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(0)
+    ) s_abuf_w (
+      .i(south_wh_link_sif_lo[W][i])
+      ,.o(south_test_mem_wh_link_li[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+    );
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(1)
+    ) s_abuf_e (
+      .i(south_test_mem_wh_link_lo[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+      ,.o(south_wh_link_sif_li[W][i])
+    );
+/*
     if (i == 0) begin
        assign south_test_mem_wh_link_li[i] = south_wh_link_sif_lo[W][i];
        assign south_wh_link_sif_li[W][i] = south_test_mem_wh_link_lo[i];
@@ -274,6 +324,7 @@ module testbench();
        assign south_test_mem_wh_link_li[i] = ~south_wh_link_sif_lo[W][i];
        assign south_wh_link_sif_li[W][i] = ~south_test_mem_wh_link_lo[i];
     end
+*/
   end
 
 

@@ -109,6 +109,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_ruche_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_ruche_buffer.v
+  $bsg_manycore_dir/v/bsg_ruche_anti_buffer.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
