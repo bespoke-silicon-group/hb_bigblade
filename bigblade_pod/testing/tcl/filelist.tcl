@@ -25,6 +25,8 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
 
+  $basejump_stl_dir/bsg_misc/bsg_inv.v
+  $basejump_stl_dir/bsg_misc/bsg_buf.v
   $basejump_stl_dir/bsg_misc/bsg_dff.v
   $basejump_stl_dir/bsg_misc/bsg_dff_en.v
   $basejump_stl_dir/bsg_misc/bsg_dff_reset.v
@@ -106,6 +108,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_ruche_link_sif_tieoff.v
+  $bsg_manycore_dir/v/bsg_ruche_buffer.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v

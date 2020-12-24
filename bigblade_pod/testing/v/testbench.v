@@ -161,9 +161,26 @@ module testbench();
     assign io_hor_link_sif_li[i][E] = hor_link_sif_lo[W][i];
     assign hor_link_sif_li[W][i] = io_hor_link_sif_lo[i][E];
 
-    //
-    assign ruche_link_li[W][i][1] = io_ruche_link_lo[i][E];
-    assign io_ruche_link_li[i][E] = ~ruche_link_lo[W][i][1];
+
+    bsg_ruche_buffer #(
+      .width_p($bits(bsg_manycore_link_sif_s))
+      ,.ruche_factor_p(hb_ruche_factor_X_gp)
+      ,.ruche_stage_p(0)
+      ,.harden_p(0)
+    ) rb_e (
+      .i(io_ruche_link_lo[i][E])
+      ,.o(ruche_link_li[W][i][1])
+    );
+
+    bsg_ruche_buffer #(
+      .width_p($bits(bsg_manycore_link_sif_s))
+      ,.ruche_factor_p(hb_ruche_factor_X_gp)
+      ,.ruche_stage_p(2)
+      ,.harden_p(0)
+    ) rb_w (
+      .i(ruche_link_lo[W][i][1])
+      ,.o(io_ruche_link_li[i][E])
+    );
   end
 
 
@@ -362,6 +379,7 @@ module testbench();
       .link_data_width_p(wh_flit_width_gp)
       ,.ruche_factor_p(wh_ruche_factor_gp)
       ,.ruche_stage_p(j)
+      ,.west_not_east_p(0)
     ) north_wh_e_tieoff (
       .clk_i(clk)
       ,.reset_i(reset_r)
@@ -373,6 +391,7 @@ module testbench();
       .link_data_width_p(wh_flit_width_gp)
       ,.ruche_factor_p(wh_ruche_factor_gp)
       ,.ruche_stage_p(j)
+      ,.west_not_east_p(0)
     ) south_wh_e_tieoff (
       .clk_i(clk)
       ,.reset_i(reset_r)

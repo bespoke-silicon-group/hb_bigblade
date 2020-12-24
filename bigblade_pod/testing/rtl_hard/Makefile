@@ -87,10 +87,10 @@ VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
 # BUILD DEFS
-#build: $(SIMV) $(SIMV_DEBUG)
-build: $(SIMV_DEBUG)
+build: $(SIMV) $(SIMV_DEBUG)
+#build: $(SIMV_DEBUG)
 
-$(SIMV): filelist tag_trace_rom copy_machine
+$(SIMV): filelist copy_machine
 	$(VCS) $(VCS_OPTIONS) -o $@ -l out/vcs.log -Mdir=out/csrc
 
 $(SIMV_DEBUG): filelist copy_machine
@@ -103,10 +103,6 @@ copy_machine:
 filelist: test_repo
 	mkdir -p out/
 	/usr/bin/tclsh bsg_config.tcl
-
-tag_trace_rom:
-	python $(TAG_TRACE_DIR)/ext_clk_trace.py > $(TAG_TRACE_DIR)/ext_clk_trace.tr
-	python $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $(TAG_TRACE_DIR)/ext_clk_trace.tr bsg_tag_boot_rom > $(TAG_TRACE_DIR)/bsg_tag_boot_rom.v
 
 	
 test_repo:
