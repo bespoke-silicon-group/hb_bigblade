@@ -66,7 +66,6 @@ set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
-ungroup [get_cells cache/tag_hit_pe/*] -flatten
 
 
 # derating
