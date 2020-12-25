@@ -10,6 +10,7 @@ set TESTING_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_pkg.v

@@ -1,7 +1,7 @@
 BSG_CADENV_DIR 				 = $(abspath ../../bsg_cadenv)
 BSG_OUT_DIR            = $(abspath ./out)
 SIMV  	   		         = $(abspath ./out/simv)
-SIMV_DEBUG  	   		   = $(abspath ./out/simv-debug)
+SIMV-DEBUG  	   		   = $(abspath ./out/simv-debug)
 
 include $(BSG_CADENV_DIR)/cadenv.mk
 
@@ -45,6 +45,7 @@ VCS_OPTIONS += +vc
 VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
 VCS_OPTIONS += -diag timescale
+#VCS_OPTIONS += -o $(BSG_OUT_DIR)/simv
 VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
 VCS_OPTIONS += +warn=all,noOPD,noTMR
@@ -87,13 +88,12 @@ VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
 # BUILD DEFS
-build: $(SIMV) $(SIMV_DEBUG)
-#build: $(SIMV_DEBUG)
+build: $(SIMV) $(SIMV-DEBUG)
 
 $(SIMV): filelist copy_machine
 	$(VCS) $(VCS_OPTIONS) -o $@ -l out/vcs.log -Mdir=out/csrc
 
-$(SIMV_DEBUG): filelist copy_machine
+$(SIMV-DEBUG): filelist copy_machine
 	$(VCS) $(VCS_OPTIONS) -debug_pp +vcs+vcdpluson -o $@ -l out/vcs-debug.log -Mdir=out/csrc-debug
 	
 copy_machine:
@@ -113,9 +113,6 @@ test_repo:
 	ln -nsf $(BSG_DESIGNS_TARGET_DIR) $(TESTING_BSG_DESIGNS_TARGET_DIR)
 	ln -nsf $(BSG_DESIGNS_DIR) $(TESTING_BSG_DESIGNS_DIR)
 	ln -nsf $(BOARD_DIR) $(TESTING_BOARD_DIR)
-
-dve:
-	$(DVE) -full64 -vpd out/vcdplus.vpd
 
 clean:
 	rm -rf out/
