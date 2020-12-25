@@ -13,6 +13,7 @@ package bsg_chip_pkg;
   parameter hb_addr_width_gp   = 28; // word addr
   parameter hb_data_width_gp   = 32;
 
+
   parameter hb_dmem_size_gp           = 1024;
   parameter hb_icache_entries_gp      = 1024;
   parameter hb_icache_tag_width_gp    = 12;
@@ -31,7 +32,7 @@ package bsg_chip_pkg;
   parameter wh_cid_width_gp       = `BSG_SAFE_CLOG2(wh_ruche_factor_gp);
   parameter wh_flit_width_gp      = vcache_dma_data_width_gp;
   parameter wh_cord_width_gp      = hb_x_cord_width_gp;
-  parameter wh_len_width_gp       = 4; // TODO: calculate based on block size
+  parameter wh_len_width_gp       = `BSG_SAFE_CLOG2(1+(vcache_block_size_in_words_gp*vcache_data_width_gp/vcache_dma_data_width_gp)); // header + addr + data
 
 
 endpackage
