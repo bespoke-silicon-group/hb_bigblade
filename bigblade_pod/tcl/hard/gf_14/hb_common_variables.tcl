@@ -43,7 +43,7 @@ set top_vcache_lly      [expr $tile_array_lly+($tile_height+$tile_y_space)*$HB_N
 
 # core area dimension
 set core_height         [expr $top_vcache_lly + $vcache_height + (0.75*$grid_height)]
-set core_width          [expr $tile_array_lly + $HB_NUM_TILES_X_P*($tile_width+$tile_x_space)]
+set core_width          [expr $tile_array_llx + $HB_NUM_TILES_X_P*($tile_width+$tile_x_space)]
 
 # distance between tile and ruche buffer RP groups
 set RB_RP_X_OFFSET      [expr 16*[unit_width]]
