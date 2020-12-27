@@ -1,6 +1,42 @@
 source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
 
 
+
+proc place_ruche_pins_k1_k3 {pins start_y x going_up} {
+  set i 0
+  set curr_y $start_y
+
+  while {$i < [sizeof_collection $pins]} {
+
+    set pin [index_collection $pins $i]
+
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K1"
+    } else {
+      set layer "K3"
+    }
+
+    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
+      set_individual_pin_constraints -pins $pin -allowed_layers $layer -location "$x $curr_y"
+      incr i
+    } else {
+      set check_below [bsg_pins_check_location $x [expr $curr_y - 0.128] $layer]
+      set check_above [bsg_pins_check_location $x [expr $curr_y + 0.128] $layer]
+      if {$check_below == 1 || $check_above == 1} {
+        set_individual_pin_constraints -pins $pin -allowed_layers $layer -location "$x $curr_y"
+        incr i
+      }
+    }
+    if {$going_up == 1} {
+      set curr_y [expr $curr_y + 0.128]
+    } else {
+      set curr_y [expr $curr_y - 0.128]
+    }
+  }
+}
+
+
 ### MANYCORE TILE PIN PLACE   #########################
 set master_tile   [get_cells "pod/mc/y_0__x_0__tile"]
 set tile_llx      [get_attribute $master_tile boundary_bounding_box.ll_x]
@@ -131,8 +167,8 @@ set_individual_pin_constraints -pins $reset_pin -allowed_layers "K4" -location "
 
 # my cord
 set cord_pins [list]
-append_to_collection cord_pins [get_pins -of $master_tile -filter "my_*_i*"]
-append_to_collection cord_pins [get_pins -of $master_tile -filter "pod_*_i*"]
+append_to_collection cord_pins [get_pins -of $master_tile -filter "name=~my_*_i*"]
+append_to_collection cord_pins [get_pins -of $master_tile -filter "name=~pod_*_i*"]
 place_pins_k2_k4 $cord_pins [expr $tile_llx+(0.128*882)] $tile_lly
 
 

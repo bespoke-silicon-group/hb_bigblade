@@ -1,9 +1,42 @@
 source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
 
 
+proc place_wh_pins_k1_k3 {pins start_y x} {
+  set i 0
+  set curr_y $start_y
+  set count 0
+
+
+  while {$i < [sizeof_collection $pins]} {
+
+    set pin [index_collection $pins $i]
+
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K1"
+    } else {
+      set layer "K3"
+    }
+
+    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
+      set_individual_pin_constraints -pins $pin -allowed_layers $layer -location "$x $curr_y"
+      incr i
+      incr count
+    }
+
+    if {$count == 2} {
+      set curr_y [expr $curr_y + 0.128*2]
+      set count 0
+    }
+
+    set curr_y [expr $curr_y + 0.128]
+  }
+
+}
+
 
 #### VCACHE PIN PLACEMENT #################################
-set master_vcache [get_cell "pod/vc_y_3__vc_x_0__vc"]
+set master_vcache [get_cell "pod/north_vc_row/vc_x_0__vc"]
 set vcache_llx  [get_attribute $master_vcache boundary_bounding_box.ll_x]
 set vcache_lly  [get_attribute $master_vcache boundary_bounding_box.ll_y]
 set vcache_urx  [get_attribute $master_vcache boundary_bounding_box.ur_x]

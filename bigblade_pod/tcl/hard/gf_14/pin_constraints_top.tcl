@@ -2,7 +2,103 @@ source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
 
 
 ##### local proc ####################
-proc get_hor_link_idx {side, y, idx} {
+
+proc place_ports_k2_k4 {pins start_x y} {
+  set curr_x $start_x
+  set i 0
+
+  while {$i < [sizeof_collection $pins]} {
+    set pin [index_collection $pins $i]
+
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K2"
+    } else {
+      set layer "K4"
+    }
+
+    if { [bsg_pins_check_location $curr_x $y $layer] == 1 } {
+      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$curr_x $y"
+      incr i
+    }
+
+    set curr_x [expr $curr_x + 0.128]
+  }
+}
+
+
+proc place_ruche_ports_k1_k3 {pins start_y x going_up} {
+  set i 0
+  set curr_y $start_y
+
+  while {$i < [sizeof_collection $pins]} {
+
+    set pin [index_collection $pins $i]
+
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K1"
+    } else {
+      set layer "K3"
+    }
+
+    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
+      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$x $curr_y"
+      incr i
+    } else {
+      set check_below [bsg_pins_check_location $x [expr $curr_y - 0.128] $layer]
+      set check_above [bsg_pins_check_location $x [expr $curr_y + 0.128] $layer]
+      if {$check_below == 1 || $check_above == 1} {
+        set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$x $curr_y"
+        incr i
+      }
+    }
+    if {$going_up == 1} {
+      set curr_y [expr $curr_y + 0.128]
+    } else {
+      set curr_y [expr $curr_y - 0.128]
+    }
+  }
+}
+
+
+proc place_wh_ports_k1_k3 {pins start_y x} {
+  set i 0
+  set curr_y $start_y
+  set count 0
+
+
+  while {$i < [sizeof_collection $pins]} {
+
+    set pin [index_collection $pins $i]
+
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K1"
+    } else {
+      set layer "K3"
+    }
+
+    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
+      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$x $curr_y"
+      incr i
+      incr count
+    }
+
+    if {$count == 2} {
+      set curr_y [expr $curr_y + 0.128*2]
+      set count 0
+    }
+
+    set curr_y [expr $curr_y + 0.128]
+  }
+
+}
+
+
+
+proc get_hor_link_idx {side y idx} {
+  source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
   # side is either "E" or "W"
   # y == tile coord
   # idx pin idx
@@ -16,7 +112,8 @@ proc get_hor_link_idx {side, y, idx} {
   return $retval
 }
 
-proc get_hor_link_idx {side, x, idx} {
+proc get_ver_link_idx {side x idx} {
+  source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
   # side is either "N" or "S"
   # y == tile coord
   # idx pin idx
@@ -30,7 +127,8 @@ proc get_hor_link_idx {side, x, idx} {
   return $retval
 }
 
-proc get_ruche_link_idx {side, y, rf, idx} {
+proc get_ruche_link_idx {side y rf idx} {
+  source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
   # side is either "E" of "W"
   # y == tile coord
   # rf ruche factor
@@ -45,14 +143,15 @@ proc get_ruche_link_idx {side, y, rf, idx} {
   return $retval
 }
 
-proc get_wh_link_idx {side, rf, idx} {
+proc get_wh_link_idx {side rf idx} {
+  source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
   # side is either "E" or "W"
   # rf ruche factor
   # idx pin idx
   set retval -100000
   if {$side == "E"} {
     set retval [expr $HB_WH_RUCHE_FACTOR_P*$HB_WH_LINK_WIDTH_P]
-  } else if {$side == "W"} {
+  } elseif {$side == "W"} {
     set retval 0
   }
 
@@ -75,8 +174,8 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 # clock reset
 set clk_pin   [get_ports -filter "name=~clk_i"]
 set reset_pin [get_ports -filter "name=~reset_i"]
-set_individual_pin_constraints -pins $clk_pin   -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9312)] $vcache_ury"
-set_individual_pin_constraints -pins $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9316)] $vcache_ury"
+set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9312)] $vcache_ury"
+set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9316)] $vcache_ury"
 
 
 
@@ -121,8 +220,8 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
     append_to_collection east_in_pins [get_ports -filter "name=~hor_link_sif_i[${idx}]"]
   }
 
-  place_ruche_pins_k1_k3 $west_out_pins [expr $tile_lly+$TILE_WEST_OUTPUT_OFFSET] $core_llx 1
-  place_ruche_pins_k1_k3 $east_in_pins  [expr $tile_lly+$TILE_WEST_OUTPUT_OFFSET] $core_urx 1
+  place_ruche_ports_k1_k3 $west_out_pins [expr $tile_lly+$TILE_WEST_OUTPUT_OFFSET] $core_llx 1
+  place_ruche_ports_k1_k3 $east_in_pins  [expr $tile_lly+$TILE_WEST_OUTPUT_OFFSET] $core_urx 1
 
 
   # west input / east output
@@ -160,8 +259,8 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
     append_to_collection east_out_pins [get_ports -filter "name=~hor_link_sif_o[${idx}]"]
   }
 
-  place_ruche_pins_k1_k3 $west_in_pins  [expr $tile_lly+$TILE_WEST_INPUT_OFFSET] $core_llx 1
-  place_ruche_pins_k1_k3 $east_out_pins [expr $tile_lly+$TILE_WEST_INPUT_OFFSET] $core_urx 1
+  place_ruche_ports_k1_k3 $west_in_pins  [expr $tile_lly+$TILE_WEST_INPUT_OFFSET] $core_llx 1
+  place_ruche_ports_k1_k3 $east_out_pins [expr $tile_lly+$TILE_WEST_INPUT_OFFSET] $core_urx 1
 }
 
 
@@ -186,8 +285,8 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
     append_to_collection south_out_pins [get_ports -filter "name=~ver_link_sif_o[$idx]"]
   }
 
-  place_pins_k2_k4 $north_in_pins  [expr $tile_llx+$NORTH_INPUT_OFFSET] $core_ury
-  place_pins_k2_k4 $south_out_pins [expr $tile_llx+$NORTH_INPUT_OFFSET] $core_lly
+  place_ports_k2_k4 $north_in_pins  [expr $tile_llx+$NORTH_INPUT_OFFSET] $core_ury
+  place_ports_k2_k4 $south_out_pins [expr $tile_llx+$NORTH_INPUT_OFFSET] $core_lly
 
 
   ## north output // south input
@@ -202,8 +301,8 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
     append_to_collection south_in_pins [get_ports -filter "name=~ver_link_sif_i[$idx]"]
   }
 
-  place_pins_k2_k4 $north_out_pins [expr $tile_llx+$NORTH_OUTPUT_OFFSET] $core_ury
-  place_pins_k2_k4 $south_in_pins  [expr $tile_llx+$NORTH_OUTPUT_OFFSET] $core_lly
+  place_ports_k2_k4 $north_out_pins [expr $tile_llx+$NORTH_OUTPUT_OFFSET] $core_ury
+  place_ports_k2_k4 $south_in_pins  [expr $tile_llx+$NORTH_OUTPUT_OFFSET] $core_lly
 }
 
 
@@ -217,34 +316,34 @@ set west_out_pins [list]
 set east_in_pins [list]
 for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   set idx [get_wh_link_idx "W" 0 $i]
-  append_to_collection west_out_pins [get_ports -filter "name=~north_wh_link_o[$idx]"]
+  append_to_collection west_out_pins [get_ports -filter "name=~north_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "W" 1 $i]
-  append_to_collection west_out_pins [get_ports -filter "name=~north_wh_link_o[$idx]"]
+  append_to_collection west_out_pins [get_ports -filter "name=~north_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "E" 0 $i]
-  append_to_collection east_in_pins [get_ports -filter "name=~north_wh_link_i[$idx]"]
+  append_to_collection east_in_pins [get_ports -filter "name=~north_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "E" 1 $i]
-  append_to_collection east_in_pins [get_ports -filter "name=~north_wh_link_i[$idx]"]
+  append_to_collection east_in_pins [get_ports -filter "name=~north_wh_link_sif_i[$idx]"]
 }
 
-place_wh_pins_k1_k3 $west_out_pins [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_llx
-place_wh_pins_k1_k3 $east_in_pins  [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_urx
+place_wh_ports_k1_k3 $west_out_pins [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_llx
+place_wh_ports_k1_k3 $east_in_pins  [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_urx
 
 # west in // east out
 set west_in_pins [list]
 set east_out_pins [list]
 for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   set idx [get_wh_link_idx "W" 0 $i]
-  append_to_collection west_in_pins [get_ports -filter "name=~north_wh_link_i[$idx]"]
+  append_to_collection west_in_pins [get_ports -filter "name=~north_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "W" 1 $i]
-  append_to_collection west_in_pins [get_ports -filter "name=~north_wh_link_i[$idx]"]
+  append_to_collection west_in_pins [get_ports -filter "name=~north_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "E" 0 $i]
-  append_to_collection east_out_pins [get_ports -filter "name=~north_wh_link_o[$idx]"]
+  append_to_collection east_out_pins [get_ports -filter "name=~north_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "E" 1 $i]
-  append_to_collection east_out_pins [get_ports -filter "name=~north_wh_link_o[$idx]"]
+  append_to_collection east_out_pins [get_ports -filter "name=~north_wh_link_sif_o[$idx]"]
 }
 
-place_wh_pins_k1_k3 $west_in_pins  [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_llx
-place_wh_pins_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_urx
+place_wh_ports_k1_k3 $west_in_pins  [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_llx
+place_wh_ports_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_urx
 
 
 
@@ -257,34 +356,34 @@ set west_out_pins [list]
 set east_in_pins [list]
 for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   set idx [get_wh_link_idx "W" 0 $i]
-  append_to_collection west_out_pins [get_ports -filter "name=~south_wh_link_o[$idx]"]
+  append_to_collection west_out_pins [get_ports -filter "name=~south_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "W" 1 $i]
-  append_to_collection west_out_pins [get_ports -filter "name=~south_wh_link_o[$idx]"]
+  append_to_collection west_out_pins [get_ports -filter "name=~south_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "E" 0 $i]
-  append_to_collection east_in_pins [get_ports -filter "name=~south_wh_link_i[$idx]"]
+  append_to_collection east_in_pins [get_ports -filter "name=~south_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "E" 1 $i]
-  append_to_collection east_in_pins [get_ports -filter "name=~south_wh_link_i[$idx]"]
+  append_to_collection east_in_pins [get_ports -filter "name=~south_wh_link_sif_i[$idx]"]
 }
 
-place_wh_pins_k1_k3 $west_out_pins [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_llx
-place_wh_pins_k1_k3 $east_in_pins  [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_urx
+place_wh_ports_k1_k3 $west_out_pins [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_llx
+place_wh_ports_k1_k3 $east_in_pins  [expr $vcache_lly + $VCACHE_WEST_OUTPUT_OFFSET] $core_urx
 
 # west in // east out
 set west_in_pins [list]
 set east_out_pins [list]
 for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   set idx [get_wh_link_idx "W" 0 $i]
-  append_to_collection west_in_pins [get_ports -filter "name=~south_wh_link_i[$idx]"]
+  append_to_collection west_in_pins [get_ports -filter "name=~south_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "W" 1 $i]
-  append_to_collection west_in_pins [get_ports -filter "name=~south_wh_link_i[$idx]"]
+  append_to_collection west_in_pins [get_ports -filter "name=~south_wh_link_sif_i[$idx]"]
   set idx [get_wh_link_idx "E" 0 $i]
-  append_to_collection east_out_pins [get_ports -filter "name=~south_wh_link_o[$idx]"]
+  append_to_collection east_out_pins [get_ports -filter "name=~south_wh_link_sif_o[$idx]"]
   set idx [get_wh_link_idx "E" 1 $i]
-  append_to_collection east_out_pins [get_ports -filter "name=~south_wh_link_o[$idx]"]
+  append_to_collection east_out_pins [get_ports -filter "name=~south_wh_link_sif_o[$idx]"]
 }
 
-place_wh_pins_k1_k3 $west_in_pins  [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_llx
-place_wh_pins_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_urx
+place_wh_ports_k1_k3 $west_in_pins  [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_llx
+place_wh_ports_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET] $core_urx
 
 
 
@@ -293,17 +392,17 @@ place_wh_pins_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSET
 set north_vc_cord_pins [list]
 append_to_collection north_vc_cord_pins [get_ports "north_dest_wh_cord_i*"]
 append_to_collection north_vc_cord_pins [get_ports "north_vcache_pod_*_i*"]
-place_pins_k2_k4 $north_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_ury
+place_ports_k2_k4 $north_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_ury
 
 # south vcache cord
 set south_vc_cord_pins [list]
 append_to_collection south_vc_cord_pins [get_ports "south_dest_wh_cord_i*"]
 append_to_collection south_vc_cord_pins [get_ports "south_vcache_pod_*_i*"]
-place_pins_k2_k4 $south_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_lly
+place_ports_k2_k4 $south_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_lly
 
 
 # pod cord
 set pod_cord_pins [get_ports pod_*_i*]
-place_pins_k2_k4 $pod_cord_pins [expr $core_llx + (10500*0.128)] $core_lly
+place_ports_k2_k4 $pod_cord_pins [expr $core_llx + (10500*0.128)] $core_lly
 
 

@@ -43,7 +43,7 @@ set tag_mem_cell [get_cells -hier -of $master_vcache -filter "full_name=~$tag_me
 create_keepout_margin -type hard -outer "$margin_x $margin_y $margin_x $margin_y" $tag_mem_cell
 set_macro_relative_location -target_object $tag_mem_cell -target_corner bl -target_orientation MY \
                                                          -anchor_corner bl \
-                                                         -offset "$margin_x $margin_y"
+                                                         -offset "$margin_x [expr $margin_y*1]"
 
 set stat_mem_cell [get_cells -hier -of $master_vcache -filter "full_name=~$stat_mem_path"]
 create_keepout_margin -type hard -outer "$margin_x $margin_y $margin_x $margin_y" $stat_mem_cell
