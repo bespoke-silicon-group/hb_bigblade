@@ -49,4 +49,17 @@ set core_width          [expr $tile_array_llx + $HB_NUM_TILES_X_P*($tile_width+$
 set RB_RP_X_OFFSET      [expr 16*[unit_width]]
 
 
+
+# pin offsets
+set NORTH_INPUT_OFFSET          [expr (360*0.128)]
+set NORTH_OUTPUT_OFFSET         [expr (573*0.128)]
+
+set TILE_WEST_OUTPUT_OFFSET     [expr (0.128*32)]
+set TILE_WEST_INPUT_OFFSET      [expr (0.128*756)]
+
+set VCACHE_WEST_OUTPUT_OFFSET   [expr (302*0.128)]
+set VCACHE_WEST_INPUT_OFFSET    [expr (702*0.128)]
+
+
+
 puts "BSG-info: Completed script [info script]\n"
