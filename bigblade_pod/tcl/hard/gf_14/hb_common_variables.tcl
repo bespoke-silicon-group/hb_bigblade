@@ -55,7 +55,7 @@ set NORTH_INPUT_OFFSET          [expr (360*0.128)]
 set NORTH_OUTPUT_OFFSET         [expr (573*0.128)]
 
 set TILE_WEST_OUTPUT_OFFSET     [expr (0.128*32)]
-set TILE_WEST_INPUT_OFFSET      [expr (0.128*756)]
+set TILE_WEST_INPUT_OFFSET      [expr (0.128*792)]
 
 set VCACHE_WEST_OUTPUT_OFFSET   [expr (302*0.128)]
 set VCACHE_WEST_INPUT_OFFSET    [expr (702*0.128)]
