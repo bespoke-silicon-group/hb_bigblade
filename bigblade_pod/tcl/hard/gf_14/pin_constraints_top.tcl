@@ -174,8 +174,8 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 # clock reset
 set clk_pin   [get_ports -filter "name=~clk_i"]
 set reset_pin [get_ports -filter "name=~reset_i"]
-set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9312)] $vcache_ury"
-set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9316)] $vcache_ury"
+set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9306)] $vcache_ury"
+set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9310)] $vcache_ury"
 
 
 
