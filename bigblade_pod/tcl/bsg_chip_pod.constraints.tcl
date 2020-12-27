@@ -48,6 +48,10 @@ set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
 
 
 
+# ungrouping
+set_ungroup [get_cells pod/mc/link] true
+
+
 
 # derating
 set cells_to_derate [list]

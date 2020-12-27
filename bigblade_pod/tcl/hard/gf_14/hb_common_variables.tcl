@@ -48,7 +48,7 @@ set core_width          [expr $tile_array_llx + $HB_NUM_TILES_X_P*($tile_width+$
 # distance between tile and ruche buffer RP groups
 set RB_RP_X_OFFSET      [expr 16*[unit_width]]
 
-
+set TAPCELL_X_OFFSET    [expr 47*[unit_width]]
 
 # pin offsets
 set NORTH_INPUT_OFFSET          [expr (360*0.128)]
