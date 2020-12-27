@@ -30,6 +30,53 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
 }
 
 
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+  set tile_cell [get_cell "pod/north_vc_row/vc_x_${x}__vc"]
+  set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
+  set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
+  set tile_ury [get_attribute $tile_cell boundary_bounding_box.ur_y]
+
+
+  set llx $tile_urx
+  set lly $tile_lly
+  set urx [expr $llx + $vcache_x_space]
+  set ury $tile_ury
+  set search_bbox [list [list $llx $lly] [list $urx $ury]]
+  set search_bbox [bsg_expand_bbox $search_bbox 0.01]
+
+  set tap_cells [get_cells -filter "name=~tapfiller*" -within $search_bbox]
+  foreach_in_collection tap_cell $tap_cells {
+    set_attribute $tap_cell -name physical_status -value placed
+    set tap_cell_y [get_attribute $tap_cell boundary_bounding_box.ll_y]
+    move_objects $tap_cell -x [expr $llx+$TAPCELL_X_OFFSET] -y $tap_cell_y
+    set_attribute $tap_cell -name physical_status -value fixed
+  }
+}
+
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+  set tile_cell [get_cell "pod/south_vc_row/vc_x_${x}__vc"]
+  set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
+  set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
+  set tile_ury [get_attribute $tile_cell boundary_bounding_box.ur_y]
+
+
+  set llx $tile_urx
+  set lly $tile_lly
+  set urx [expr $llx + $vcache_x_space]
+  set ury $tile_ury
+  set search_bbox [list [list $llx $lly] [list $urx $ury]]
+  set search_bbox [bsg_expand_bbox $search_bbox 0.01]
+
+  set tap_cells [get_cells -filter "name=~tapfiller*" -within $search_bbox]
+  foreach_in_collection tap_cell $tap_cells {
+    set_attribute $tap_cell -name physical_status -value placed
+    set tap_cell_y [get_attribute $tap_cell boundary_bounding_box.ll_y]
+    move_objects $tap_cell -x [expr $llx+$TAPCELL_X_OFFSET] -y $tap_cell_y
+    set_attribute $tap_cell -name physical_status -value fixed
+  }
+}
+
+
 
 # placement blockage between tiles
 for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
@@ -66,7 +113,7 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # right side
   set xp1 [expr $x+1]
   set urx [get_attribute [get_cells "pod/north_vc_row/vc_x_${xp1}__vc"] boundary_bounding_box.ll_x]
-  set llx [expr $urx - (0.084*33)]
+  set llx [expr $urx - (0.084*46)]
   set boundary [list [list $llx $lly] [list $urx $ury]]
   create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_${y}_right"
 }
@@ -86,7 +133,7 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # right side
   set xp1 [expr $x+1]
   set urx [get_attribute [get_cells "pod/south_vc_row/vc_x_${xp1}__vc"] boundary_bounding_box.ll_x]
-  set llx [expr $urx - (0.084*33)]
+  set llx [expr $urx - (0.084*46)]
   set boundary [list [list $llx $lly] [list $urx $ury]]
   create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_${y}_right"
 }
