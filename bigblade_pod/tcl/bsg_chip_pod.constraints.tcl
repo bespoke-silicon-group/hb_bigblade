@@ -45,7 +45,10 @@ set_false_path -from [get_ports pod_*]
 # dont touch ruche buffers
 set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
 set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
-
+set_dont_touch [get_cells "pod/mc/rr*/inv_inv0"] true
+set_dont_touch [get_cells "pod/mc/rr*/bf_buf0"] true
+set_dont_touch [get_cells "pod/north_vc_row/rc*/inv_inv0"] true
+set_dont_touch [get_cells "pod/south_vc_row/rc*/inv_inv0"] true
 
 
 # ungrouping
