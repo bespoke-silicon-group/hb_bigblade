@@ -5,7 +5,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variable
 
 # bot vcache
 for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
-  set vcache_cell [get_cells "pod/south_vc_row/vc_x_${x}__vc"]
+  set vcache_cell [get_cells "pod_south_vc_row_vc_x_${x}__vc"]
   set llx [expr $bot_vcache_llx+($x*($vcache_width+$vcache_x_space))]
   set lly [expr $bot_vcache_lly]
   set urx [expr $llx + $vcache_width]
@@ -22,7 +22,7 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 # tile array
 for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
   for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
-    set tile_cell [get_cells "pod/mc/y_${y}__x_${x}__tile"]
+    set tile_cell [get_cells "pod_mc_y_${y}__x_${x}__tile"]
     
     set llx [expr ($tile_array_llx+($x*($tile_width+$tile_x_space)))]
     set lly [expr ($tile_array_lly+(($HB_NUM_TILES_Y_P-$y-1)*($tile_height+$tile_y_space)))]
@@ -38,7 +38,7 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
 
 # bot vcache
 for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
-  set vcache_cell [get_cells "pod/north_vc_row/vc_x_${x}__vc"]
+  set vcache_cell [get_cells "pod_north_vc_row_vc_x_${x}__vc"]
   set llx [expr $top_vcache_llx+($x*($vcache_width+$vcache_x_space))]
   set lly [expr $top_vcache_lly]
   set urx [expr $llx + $vcache_width]

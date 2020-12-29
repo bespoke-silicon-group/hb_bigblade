@@ -38,7 +38,7 @@ proc place_ruche_pins_k1_k3 {pins start_y x going_up} {
 
 
 ### MANYCORE TILE PIN PLACE   #########################
-set master_tile   [get_cells "pod/mc/y_0__x_0__tile"]
+set master_tile   [get_cells "pod_mc_y_0__x_0__tile"]
 set tile_llx      [get_attribute $master_tile boundary_bounding_box.ll_x]
 set tile_lly      [get_attribute $master_tile boundary_bounding_box.ll_y]
 set tile_urx      [get_attribute $master_tile boundary_bounding_box.ur_x]

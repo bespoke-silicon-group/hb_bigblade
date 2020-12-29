@@ -42,18 +42,31 @@ set_false_path -from [get_ports south_dest_wh_cord_i*]
 set_false_path -from [get_ports pod_*]
 
 
-# dont touch ruche buffers
-set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
-set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
-set_dont_touch [get_cells "pod/mc/rr*/inv_inv0"] true
-set_dont_touch [get_cells "pod/mc/rr*/bf_buf0"] true
-set_dont_touch [get_cells "pod/north_vc_row/rc*/inv_inv0"] true
-set_dont_touch [get_cells "pod/south_vc_row/rc*/inv_inv0"] true
-
-
 # ungrouping
-set_ungroup [get_cells pod/mc/link] true
+set_ungroup [get_cells "pod/mc/link"] true
+set_ungroup [get_cells "pod/mc/rr*"] true
+set_ungroup [get_cells "pod/north_vc_row/rc*"] true
+set_ungroup [get_cells "pod/south_vc_row/rc*"] true
+set_ungroup [get_cells "pod/north_vc_row"] true
+set_ungroup [get_cells "pod/south_vc_row"] true
+set_ungroup [get_cells "pod/mc"] true
+set_ungroup [get_cells "pod"] true
 
+# dont touch ruche buffers
+set hard_inv_cells [get_cells -hier -filter "name=~*hard_inv*"]
+set hard_buf_cells [get_cells -hier -filter "name=~*hard_buf*"]
+set_dont_touch $hard_inv_cells true
+set_dont_touch $hard_buf_cells true
+set_dont_touch [get_nets -of [get_pins -of $hard_inv_cells -filter "name==A"]] true
+set_dont_touch [get_nets -of [get_pins -of $hard_inv_cells -filter "name==Z"]] true
+set_dont_touch [get_nets -of [get_pins -of $hard_buf_cells -filter "name==A"]] true
+set_dont_touch [get_nets -of [get_pins -of $hard_buf_cells -filter "name==Z"]] true
+set_dont_touch [get_nets -of [get_pins "pod/mc/*tile/ruche_link_*"]] true
+set_dont_touch [get_nets -of [get_pins "pod/north_vc_row/*vc/wh_link_sif_*"]] true
+set_dont_touch [get_nets -of [get_pins "pod/south_vc_row/*vc/wh_link_sif_*"]] true
+set_dont_touch [get_nets -of [get_ports "north_wh_link_sif_*"]] true
+set_dont_touch [get_nets -of [get_ports "south_wh_link_sif_*"]] true
+set_dont_touch [get_nets -of [get_ports "ruche_link_*"]] true
 
 
 # derating

@@ -181,7 +181,7 @@ set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location 
 
 # tile hor links
 for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
-  set curr_tile [get_cells "pod/mc/y_${y}__x_0__tile"]
+  set curr_tile [get_cells "pod_mc_y_${y}__x_0__tile"]
   set tile_lly [get_attribute $curr_tile boundary_bounding_box.ll_y]
 
 
@@ -269,7 +269,7 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
 
 ## Ver links
 for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
-  set curr_tile [get_cells "pod/mc/y_0__x_${x}__tile"]
+  set curr_tile [get_cells "pod_mc_y_0__x_${x}__tile"]
   set tile_llx [get_attribute $curr_tile boundary_bounding_box.ll_x]
 
 
@@ -308,7 +308,7 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 
 
 # north vcache wh link
-set curr_vcache [get_cells "pod/north_vc_row/vc_x_0__vc"]
+set curr_vcache [get_cells "pod_north_vc_row_vc_x_0__vc"]
 set vcache_lly  [get_attribute $curr_vcache boundary_bounding_box.ll_y]
 
 # west out // east in
@@ -348,7 +348,7 @@ place_wh_ports_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSE
 
 
 # south vcache wh link
-set curr_vcache [get_cells "pod/south_vc_row/vc_x_0__vc"]
+set curr_vcache [get_cells "pod_south_vc_row_vc_x_0__vc"]
 set vcache_lly  [get_attribute $curr_vcache boundary_bounding_box.ll_y]
 
 # west out // east in

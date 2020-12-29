@@ -6,7 +6,7 @@ set margin_x [expr 6*[unit_width]]
 set margin_y [expr 1*[unit_height]]
 
 ## MANYCORE TILES
-set master_tile [get_cells "pod/mc/y_0__x_0__tile"]
+set master_tile [get_cells "pod_mc_y_0__x_0__tile"]
 set icache_path "*/proc/h_z/vcore/icache0/imem_0/macro_mem"
 set dmem_path   "*/proc/h_z/vcore/dmem/macro_mem"
 
@@ -26,7 +26,7 @@ set_macro_relative_location -target_object $dmem_cell -target_corner tr -target_
 
 
 # VCACHE TILE
-set master_vcache [get_cells "pod/north_vc_row/vc_x_0__vc"]
+set master_vcache [get_cells "pod_north_vc_row_vc_x_0__vc"]
 
 set data_mem_path "*/cache/data_mem/macro_mem"
 set tag_mem_path "*/cache/tag_mem/macro_mem"

@@ -36,7 +36,7 @@ proc place_wh_pins_k1_k3 {pins start_y x} {
 
 
 #### VCACHE PIN PLACEMENT #################################
-set master_vcache [get_cell "pod/north_vc_row/vc_x_0__vc"]
+set master_vcache [get_cell "pod_north_vc_row_vc_x_0__vc"]
 set vcache_llx  [get_attribute $master_vcache boundary_bounding_box.ll_x]
 set vcache_lly  [get_attribute $master_vcache boundary_bounding_box.ll_y]
 set vcache_urx  [get_attribute $master_vcache boundary_bounding_box.ur_x]
