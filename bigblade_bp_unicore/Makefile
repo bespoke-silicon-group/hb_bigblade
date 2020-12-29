@@ -35,7 +35,7 @@ bsg_packaging_commit :=master
 
 blackparrot_dir     :=$(THIS_DIR)/black-parrot
 blackparrot_url     :=$(GITHUB)black-parrot/black-parrot
-blackparrot_commit  :=tapeout_bp_rc5
+blackparrot_commit  :=tapeout_bigblade
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
