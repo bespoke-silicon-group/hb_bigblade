@@ -24,6 +24,9 @@ if { $DESIGN_NAME == "bsg_chip_pod" } {
   set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
   set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
 
+  set_dont_touch [get_nets -of [get_pins pod_mc_y_*__x_*__tile/ruche_link_*]] true
+  set_dont_touch [get_nets -of [get_pins pod_*_vc_row_vc_x_*__vc/wh_link_sif_*]] true
+
 } elseif { $DESIGN_NAME == "bsg_manycore_tile_ruche"} {
 
   # remove feedthrough buffers
