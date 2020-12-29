@@ -40,6 +40,7 @@ blackparrot_commit  :=tapeout_bigblade
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
 all: $(all_repos)
+	$(MAKE) -C $(blackparrot_dir) prep_lite
 
 %.repo:
 	-git clone $($*_url) $($*_dir)
