@@ -1,295 +1,138 @@
 `timescale 1ps/1ps
 
-`ifndef BLACKPARROT_CLK_PERIOD
-  `define BLACKPARROT_CLK_PERIOD 2100.0
-  `define BLACKPARROT_IO_DELAY 400.0
+`ifdef CORNER_SS
+  `define HB_SLOWDOWN_RATIO 256
+  `define HB_SPMD_RATIO 16
+  `define HB_CLK_PERIOD 1020
+  `define IO_MASTER_CLK_PERIOD 1724
+  `define ROUTER_CLK_PERIOD 1724
+  `define TAG_CLK_PERIOD 6896
+`else
+  `define HB_SLOWDOWN_RATIO 16
+  `define HB_SPMD_RATIO 1
+  `define HB_CLK_PERIOD 15000
+  `define IO_MASTER_CLK_PERIOD 1724
+  `define ROUTER_CLK_PERIOD 1724
+  `define TAG_CLK_PERIOD 6896
 `endif
 
 module bsg_gateway_chip
 
 import bsg_tag_pkg::*;
 import bsg_chip_pkg::*;
-
-import bp_common_pkg::*;
-import bp_common_aviary_pkg::*;
-import bp_common_rv64_pkg::*;
-import bp_be_pkg::*;
-import bp_cce_pkg::*;
-import bp_me_pkg::*;
 import bsg_noc_pkg::*;
-import bsg_wormhole_router_pkg::*;
 
-#(localparam bp_params_e bp_params_p = bp_cfg_gp `declare_bp_proc_params(bp_params_p)
-  `declare_bp_bedrock_mem_if_widths(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce))
-  ();
+`include "bsg_pinout_inverted.v"
 
 
   //////////////////////////////////////////////////
   //
   // Nonsynth Clock Generator(s)
   //
+  
+  // To speed up simulation, slow down manycore clock when programming tag_clients
+  logic manycore_clk_fast, manycore_clk_slow, manycore_clk_spmd, manycore_clk;
+  logic init_done_lo, loader_done_lo;
+  
+  assign manycore_clk = (init_done_lo)? ((loader_done_lo)? manycore_clk_fast : manycore_clk_spmd) : manycore_clk_slow;
+  
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD)) manycore_clk_fast_gen (.o(manycore_clk_fast));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD*`MANYCORE_SLOWDOWN_RATIO)) manycore_clk_slow_gen (.o(manycore_clk_slow));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD*`MANYCORE_SPMD_RATIO)) manycore_clk_spmd_gen (.o(manycore_clk_spmd));
+  
+  logic io_master_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_MASTER_CLK_PERIOD)) io_master_clk_gen (.o(io_master_clk));
 
-  logic blackparrot_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`BLACKPARROT_CLK_PERIOD)) blackparrot_clk_gen (.o(blackparrot_clk));
+  logic router_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`ROUTER_CLK_PERIOD)) router_clk_gen (.o(router_clk));
+
+  logic tag_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
+  
+  
+  //////////////////////////////////////////////////
+  //
+  // Gateway Core
+  //
+
+  logic [`NUM_ASIC-1:0] mc_reset_lo;
+  bsg_manycore_link_sif_s [`NUM_ASIC-1:0] links_sif_li, links_sif_lo;
+  
+  bsg_gateway_chip_core 
+   #(.num_asic_p(`NUM_ASIC)
+    ) gw_core
+    (.mc_clk_i       ( manycore_clk )
+    ,.mc_reset_o     ( mc_reset_lo )
+    ,.init_done_o    ( init_done_lo )
+    
+    ,.io_master_clk_i( io_master_clk )
+    ,.router_clk_i   ( router_clk )
+    ,.tag_clk_i      ( tag_clk )
+  
+    ,.mc_links_sif_i ( links_sif_lo )
+    ,.mc_links_sif_o ( links_sif_li )
+    
+    ,.ci_clk_i  ( p_ci_clk_i )
+    ,.ci_v_i    ( p_ci_v_i )
+    ,.ci_data_i ( {p_ci_8_i, p_ci_7_i, p_ci_6_i, p_ci_5_i, p_ci_4_i, p_ci_3_i, p_ci_2_i, p_ci_1_i, p_ci_0_i} )
+    ,.ci_tkn_o  ( p_ci_tkn_o )
+  
+    ,.ci2_clk_o ( p_ci2_clk_o )
+    ,.ci2_v_o   ( p_ci2_v_o )
+    ,.ci2_data_o( {p_ci2_8_o, p_ci2_7_o, p_ci2_6_o, p_ci2_5_o, p_ci2_4_o, p_ci2_3_o, p_ci2_2_o, p_ci2_1_o, p_ci2_0_o} )
+    ,.ci2_tkn_i ( p_ci2_tkn_i )
+  
+    ,.co_clk_i  ( p_co_clk_i )
+    ,.co_v_i    ( p_co_v_i )
+    ,.co_data_i ( {p_co_8_i, p_co_7_i, p_co_6_i, p_co_5_i, p_co_4_i, p_co_3_i, p_co_2_i, p_co_1_i, p_co_0_i} )
+    ,.co_tkn_o  ( p_co_tkn_o )
+  
+    ,.co2_clk_o ( p_co2_clk_o )
+    ,.co2_v_o   ( p_co2_v_o )
+    ,.co2_data_o( {p_co2_8_o, p_co2_7_o, p_co2_6_o, p_co2_5_o, p_co2_4_o, p_co2_3_o, p_co2_2_o, p_co2_1_o, p_co2_0_o} )
+    ,.co2_tkn_i ( p_co2_tkn_i )
+    
+    ,.tag_clk_o ( p_bsg_tag_clk_o )
+    ,.tag_en_o  ( {p_sel_2_o, p_bsg_tag_en_o} )
+    ,.tag_data_o( p_bsg_tag_data_o )
+  
+    ,.clk_a_o   ( p_clk_A_o )
+    ,.clk_b_o   ( p_clk_B_o )
+    ,.clk_c_o   ( p_clk_C_o )
+    );
+    
+    assign p_sel_0_o = 1'b0;
+    assign p_sel_1_o = 1'b0;
+
 
   //////////////////////////////////////////////////
   //
-  // Nonsynth Reset Generator(s)
+  // Manycore SPMD Loader
   //
-
-  logic blackparrot_reset;
-  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
-    blackparrot_reset_gen
-      (.clk_i(blackparrot_clk)
-      ,.async_reset_o(blackparrot_reset)
-      );
-
-  //////////////////////////////////////////////////
-  //
-  // Waveform Dump
-  //
-
-  initial
-    begin
-      $vcdpluson;
-      $vcdplusmemon;
-      $vcdplusautoflushon;
-    end
-
-  initial
-    begin
-      $assertoff();
-      @(posedge blackparrot_clk);
-      @(negedge blackparrot_reset);
-      $asserton();
-    end
-
-  logic trigger_saif;
-  initial
-    begin
-      $set_gate_level_monitoring("rtl_on");
-      $set_toggle_region(DUT);
-      @(posedge blackparrot_clk);
-      @(negedge blackparrot_reset);
-      @(posedge trigger_saif);
-      $toggle_start();
-    end
-
-  final
-    begin
-      $toggle_stop();
-      $toggle_report("run.saif", 1.0e-12, DUT);
-    end
-
-
-  //////////////////////////////////////////////////
-  //
-  // DUT
-  //
-  `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
-  bp_bedrock_cce_mem_msg_s io_cmd_lo;
-  logic io_cmd_v_lo, io_cmd_ready_li;
-  bp_bedrock_cce_mem_msg_s io_resp_li;
-  logic io_resp_v_li, io_resp_ready_lo;
-
-  bp_bedrock_cce_mem_msg_s io_cmd_li;
-  logic io_cmd_v_li, io_cmd_ready_lo;
-  bp_bedrock_cce_mem_msg_s io_resp_lo;
-  logic io_resp_v_lo, io_resp_ready_li;
-
-  bp_bedrock_cce_mem_msg_s dram_cmd_lo;
-  logic dram_cmd_v_lo, dram_cmd_ready_li;
-  bp_bedrock_cce_mem_msg_s dram_resp_li;
-  logic dram_resp_v_li, dram_resp_ready_lo;
-
-  `declare_bsg_ready_and_link_sif_s(io_noc_flit_width_p, bp_io_noc_ral_link_s);
-  `declare_bsg_ready_and_link_sif_s(mem_noc_flit_width_p, bp_mem_noc_ral_link_s);
-
-  bp_io_noc_ral_link_s proc_cmd_link_li, proc_cmd_link_lo;
-  bp_io_noc_ral_link_s proc_resp_link_li, proc_resp_link_lo;
-  bp_mem_noc_ral_link_s dram_cmd_link_lo, dram_resp_link_li;
-
-  // Delayed version of input signals
-  bp_io_noc_ral_link_s _proc_cmd_link_li, _proc_cmd_link_lo;
-  bp_io_noc_ral_link_s _proc_resp_link_li, _proc_resp_link_lo;
-  bp_mem_noc_ral_link_s _dram_cmd_link_lo, _dram_resp_link_li;
-
-  // Add delay to simulate realistic input delays 20% frequency
-  assign #`BLACKPARROT_IO_DELAY _proc_cmd_link_li  = proc_cmd_link_li;
-  assign #`BLACKPARROT_IO_DELAY _proc_resp_link_li = proc_resp_link_li;
-  assign #`BLACKPARROT_IO_DELAY _dram_resp_link_li = dram_resp_link_li;
-
-  bp_io_noc_ral_link_s stub_cmd_link_li, stub_resp_link_li;
-  bp_io_noc_ral_link_s stub_cmd_link_lo, stub_resp_link_lo;
-
-  assign stub_cmd_link_li = '0;
-  assign stub_resp_link_li = '0;
-
-  bsg_chip
-   DUT
-    (.core_clk_i(blackparrot_clk)
-     ,.core_reset_i(blackparrot_reset)
-
-     ,.coh_clk_i(blackparrot_clk)
-     ,.coh_reset_i(blackparrot_reset)
-
-     ,.io_clk_i(blackparrot_clk)
-     ,.io_reset_i(blackparrot_reset)
-
-     ,.mem_clk_i(blackparrot_clk)
-     ,.mem_reset_i(blackparrot_reset)
-
-     ,.my_did_i(io_noc_did_width_p'(1'b1))
-     ,.host_did_i('1)
-
-     ,.io_cmd_link_i({_proc_cmd_link_li, stub_cmd_link_li})
-     ,.io_cmd_link_o({proc_cmd_link_lo, stub_cmd_link_lo})
-
-     ,.io_resp_link_i({_proc_resp_link_li, stub_resp_link_li})
-     ,.io_resp_link_o({proc_resp_link_lo, stub_resp_link_lo})
-
-     ,.dram_cmd_link_o(dram_cmd_link_lo)
-     ,.dram_resp_link_i(_dram_resp_link_li)
-     );
-
-  bp_me_cce_to_mem_link_bidir
-   #(.bp_params_p(bp_params_p)
-     ,.num_outstanding_req_p(io_noc_max_credits_p)
-     ,.flit_width_p(io_noc_flit_width_p)
-     ,.cord_width_p(io_noc_cord_width_p)
-     ,.cid_width_p(io_noc_cid_width_p)
-     ,.len_width_p(io_noc_len_width_p)
-     )
-   host_link
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset)
-
-     ,.mem_cmd_i(io_cmd_lo)
-     ,.mem_cmd_v_i(io_cmd_v_lo & io_cmd_ready_li)
-     ,.mem_cmd_ready_o(io_cmd_ready_li)
-
-     ,.mem_resp_o(io_resp_li)
-     ,.mem_resp_v_o(io_resp_v_li)
-     ,.mem_resp_yumi_i(io_resp_ready_lo & io_resp_v_li)
-
-     ,.my_cord_i(io_noc_cord_width_p'('1))
-     ,.my_cid_i('0)
-     ,.dst_cord_i(io_noc_cord_width_p'(1'b1))
-     ,.dst_cid_i('0)
-
-     ,.mem_cmd_o(io_cmd_li)
-     ,.mem_cmd_v_o(io_cmd_v_li)
-     ,.mem_cmd_yumi_i(io_cmd_ready_lo & io_cmd_v_li)
-
-     ,.mem_resp_i(io_resp_lo)
-     ,.mem_resp_v_i(io_resp_v_lo & io_resp_ready_li)
-     ,.mem_resp_ready_o(io_resp_ready_li)
-
-     ,.cmd_link_i(proc_cmd_link_lo)
-     ,.cmd_link_o(proc_cmd_link_li)
-     ,.resp_link_i(proc_resp_link_lo)
-     ,.resp_link_o(proc_resp_link_li)
-     );
-
-  bp_me_cce_to_mem_link_client
-   #(.bp_params_p(bp_params_p)
-     ,.num_outstanding_req_p(mem_noc_max_credits_p)
-     ,.flit_width_p(mem_noc_flit_width_p)
-     ,.cord_width_p(mem_noc_cord_width_p)
-     ,.cid_width_p(mem_noc_cid_width_p)
-     ,.len_width_p(mem_noc_len_width_p)
-     )
-   dram_link
-    (.clk_i(blackparrot_clk)
-
-     ,.reset_i(blackparrot_reset)
   
-     ,.mem_cmd_o(dram_cmd_lo)
-     ,.mem_cmd_v_o(dram_cmd_v_lo)
-     ,.mem_cmd_yumi_i(dram_cmd_ready_li & dram_cmd_v_lo)
+  genvar i;
   
-     ,.mem_resp_i(dram_resp_li)
-     ,.mem_resp_v_i(dram_resp_v_li & dram_resp_ready_lo)
-     ,.mem_resp_ready_o(dram_resp_ready_lo)
-  
-     ,.cmd_link_i(dram_cmd_link_lo)
-     ,.resp_link_o(dram_resp_link_li)
-     );
+  for (i = 0; i < `NUM_ASIC; i++)
+  begin: multi_asic
 
-  bp_mem
-   #(.bp_params_p(bp_params_p)
-     ,.mem_offset_p(32'h80000000)
-     ,.mem_cap_in_bytes_p(2**25)
-     ,.mem_load_p(1)
-     ,.mem_file_p("prog.mem")
-     ,.dram_fixed_latency_p(100)
-     )
-   mem
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset)
+  bsg_nonsynth_manycore_io_complex #(
+    .addr_width_p( manycore_addr_width_gp )
+    ,.data_width_p( manycore_data_width_gp )
+    ,.load_id_width_p( manycore_load_id_width_gp )
+    ,.x_cord_width_p( manycore_x_cord_width_gp )
+    ,.y_cord_width_p( manycore_y_cord_width_gp )
 
-     ,.mem_cmd_i(dram_cmd_lo)
-     ,.mem_cmd_v_i(dram_cmd_v_lo & dram_cmd_v_lo)
-     ,.mem_cmd_ready_o(dram_cmd_ready_li)
+    ,.num_tiles_x_p(manycore_num_tiles_x_gp)
+    ,.num_tiles_y_p(manycore_num_tiles_y_gp)
 
-     ,.mem_resp_o(dram_resp_li)
-     ,.mem_resp_v_o(dram_resp_v_li)
-     ,.mem_resp_yumi_i(dram_resp_ready_lo & dram_resp_v_li)
+  ) manycore_io (
+    .clk_i(manycore_clk)
+    ,.reset_i(mc_reset_lo[i] | ~init_done_lo)
+    ,.loader_done_o(loader_done_lo)
+    ,.io_link_sif_i(links_sif_li[i])
+    ,.io_link_sif_o(links_sif_lo[i])
+  );
 
-     // TODO: Async clock?
-     ,.dram_clk_i(blackparrot_clk)
-     ,.dram_reset_i(blackparrot_reset)
-     );
-
-  logic [num_core_p-1:0] program_finish;
-  bp_nonsynth_host
-   #(.bp_params_p(bp_params_p))
-   host_mmio
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset)
-  
-     ,.io_cmd_i(io_cmd_li)
-     ,.io_cmd_v_i(io_cmd_v_li & io_cmd_ready_lo)
-     ,.io_cmd_ready_o(io_cmd_ready_lo)
-  
-     ,.io_resp_o(io_resp_lo)
-     ,.io_resp_v_o(io_resp_v_lo)
-     ,.io_resp_yumi_i(io_resp_ready_li & io_resp_v_lo)
-
-     ,.icache_trace_en_o()
-     ,.dcache_trace_en_o()
-     ,.lce_trace_en_o()
-     ,.cce_trace_en_o()
-     ,.dram_trace_en_o()
-     ,.vm_trace_en_o()
-     ,.cmt_trace_en_o()
-     ,.core_profile_en_o()
-     ,.branch_profile_en_o()
-     ,.pc_profile_en_o()
-     ,.cosim_en_o()
-     );
-
-  localparam cce_instr_ram_addr_width_lp = `BSG_SAFE_CLOG2(num_cce_instr_ram_els_p);
-  logic nbf_done_lo;
-  bp_nonsynth_nbf_loader
-    #(.bp_params_p(bp_params_p))
-    nbf_loader
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset)
-  
-     ,.lce_id_i('1)
-  
-     ,.io_cmd_o(io_cmd_lo)
-     ,.io_cmd_v_o(io_cmd_v_lo)
-     ,.io_cmd_yumi_i(io_cmd_ready_li & io_cmd_v_lo)
-  
-     ,.io_resp_i(io_resp_li)
-     ,.io_resp_v_i(io_resp_v_li)
-     ,.io_resp_ready_o(io_resp_ready_lo)
-
-     ,.done_o(nbf_done_lo)
-     );
-  assign trigger_saif = nbf_done_lo;
+  end
 
 endmodule
-
