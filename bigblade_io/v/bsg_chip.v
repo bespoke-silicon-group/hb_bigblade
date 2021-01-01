@@ -56,8 +56,8 @@ module bsg_chip
                   ,.lg_width_p( tag_lg_max_payload_width_gp )
                   )
     btm
-      (.clk_i      ( bsg_tag_clk_i_int )
-      ,.data_i     ( bsg_tag_en_i_int ? bsg_tag_data_i_int : 1'b0 )
+      (.clk_i      ( p_bsg_tag_clk_i )
+      ,.data_i     ( p_bsg_tag_en_i ? p_bsg_tag_data_i : 1'b0 )
       ,.en_i       ( 1'b1 )
       ,.clients_r_o( tag_lines_lo )
       );
@@ -82,7 +82,7 @@ module bsg_chip
       ,.ds_tag_lines_i          ( ds_tag_lines_lo )
       ,.sel_tag_lines_i         ( sel_tag_lines_lo )
 
-      ,.ext_clk_i({ clk_C_i_int, clk_B_i_int, clk_A_i_int })
+      ,.ext_clk_i({ p_clk_C_i, p_clk_B_i, p_clk_A_i })
 
       ,.clk_o({ mem_link_master_clk_lo, io_link_master_clk_lo, hb_clk_lo })
       );
@@ -91,9 +91,9 @@ module bsg_chip
   logic [1:0]  clk_out_sel;
   logic        clk_out;
 
-  assign clk_out_sel[0] = sel_0_i_int;
-  assign clk_out_sel[1] = sel_1_i_int;
-  assign clk_o_int      = clk_out;
+  assign clk_out_sel[0] = p_sel_0_i;
+  assign clk_out_sel[1] = p_sel_1_i;
+  assign p_clk_o      = clk_out;
 
   bsg_mux #(.width_p   ( 1 )
            ,.els_p     ( 4 )
@@ -143,16 +143,16 @@ module bsg_chip
   logic [19:0][8:0] bsg_link_data_lo;
 
 `define BSG_CHIP_LINK_HUB(i)                                         \
-    assign bsg_link_clk_li         [i] = bsg_link_in``i``_clk_i_int; \
-    assign bsg_link_v_li           [i] = bsg_link_in``i``_v_i_int;   \
-    assign bsg_link_in``i``_tkn_o_int  = bsg_link_tkn_lo[i];         \
-    assign bsg_link_out``i``_clk_o_int = bsg_link_clk_lo[i];         \
-    assign bsg_link_out``i``_v_o_int   = bsg_link_v_lo  [i];         \
-    assign bsg_link_tkn_li         [i] = bsg_link_out``i``_tkn_i_int;
+    assign bsg_link_clk_li         [i] = p_bsg_link_in``i``_clk_i; \
+    assign bsg_link_v_li           [i] = p_bsg_link_in``i``_v_i;   \
+    assign p_bsg_link_in``i``_tkn_o  = bsg_link_tkn_lo[i];         \
+    assign p_bsg_link_out``i``_clk_o = bsg_link_clk_lo[i];         \
+    assign p_bsg_link_out``i``_v_o   = bsg_link_v_lo  [i];         \
+    assign bsg_link_tkn_li         [i] = p_bsg_link_out``i``_tkn_i;
 
 `define BSG_CHIP_LINK_DATA_HUB(i, j)                                       \
-    assign bsg_link_data_li        [i][j] = bsg_link_in``i``_d``j``_i_int; \
-    assign bsg_link_out``i``_d``j``_o_int = bsg_link_data_lo[i][j];
+    assign bsg_link_data_li        [i][j] = p_bsg_link_in``i``_d``j``_i; \
+    assign p_bsg_link_out``i``_d``j``_o = bsg_link_data_lo[i][j];
 
   for (genvar i = 0; i < 20; i++)
   begin

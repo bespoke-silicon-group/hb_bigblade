@@ -1,20 +1,9 @@
 `timescale 1ps/1ps
 
-`ifdef CORNER_SS
-  `define HB_SLOWDOWN_RATIO 256
-  `define HB_SPMD_RATIO 16
-  `define HB_CLK_PERIOD 1020
-  `define IO_MASTER_CLK_PERIOD 1724
-  `define ROUTER_CLK_PERIOD 1724
-  `define TAG_CLK_PERIOD 6896
-`else
-  `define HB_SLOWDOWN_RATIO 16
-  `define HB_SPMD_RATIO 1
-  `define HB_CLK_PERIOD 15000
-  `define IO_MASTER_CLK_PERIOD 1724
-  `define ROUTER_CLK_PERIOD 1724
-  `define TAG_CLK_PERIOD 6896
-`endif
+`define HB_CLK_PERIOD 10000
+`define IO_LINK_MASTER_CLK_PERIOD 10000
+`define MEM_LINK_MASTER_CLK_PERIOD 10000
+`define TAG_CLK_PERIOD 20000
 
 module bsg_gateway_chip
 
@@ -30,109 +19,369 @@ import bsg_noc_pkg::*;
   // Nonsynth Clock Generator(s)
   //
   
-  // To speed up simulation, slow down manycore clock when programming tag_clients
-  logic manycore_clk_fast, manycore_clk_slow, manycore_clk_spmd, manycore_clk;
-  logic init_done_lo, loader_done_lo;
+  logic hb_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`HB_CLK_PERIOD)) hb_clk_gen (.o(hb_clk));
   
-  assign manycore_clk = (init_done_lo)? ((loader_done_lo)? manycore_clk_fast : manycore_clk_spmd) : manycore_clk_slow;
-  
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD)) manycore_clk_fast_gen (.o(manycore_clk_fast));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD*`MANYCORE_SLOWDOWN_RATIO)) manycore_clk_slow_gen (.o(manycore_clk_slow));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD*`MANYCORE_SPMD_RATIO)) manycore_clk_spmd_gen (.o(manycore_clk_spmd));
-  
-  logic io_master_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_MASTER_CLK_PERIOD)) io_master_clk_gen (.o(io_master_clk));
+  logic io_link_master_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_LINK_MASTER_CLK_PERIOD)) io_link_master_clk_gen (.o(io_link_master_clk));
 
-  logic router_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`ROUTER_CLK_PERIOD)) router_clk_gen (.o(router_clk));
+  logic mem_link_master_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MEM_LINK_MASTER_CLK_PERIOD)) mem_link_master_clk_gen (.o(mem_link_master_clk));
 
   logic tag_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
+
+  assign p_clk_a_o = hb_clk;
+  assign p_clk_b_o = io_link_master_clk;
+  assign p_clk_c_o = mem_link_master_clk;
+  assign p_bsg_tag_clk_o = ~tag_clk;
   
-  
+  assign p_sel_0_o = 1'b0;
+  assign p_sel_1_o = 1'b0;
+
   //////////////////////////////////////////////////
   //
-  // Gateway Core
+  // Nonsynth Reset Generator(s)
   //
 
-  logic [`NUM_ASIC-1:0] mc_reset_lo;
-  bsg_manycore_link_sif_s [`NUM_ASIC-1:0] links_sif_li, links_sif_lo;
+  logic tag_reset;
+  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
+    tag_reset_gen
+      (.clk_i(tag_clk)
+      ,.async_reset_o(tag_reset)
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Track Replay
+  //
+
+  localparam tag_trace_rom_addr_width_lp = 32;
+  localparam tag_trace_rom_data_width_lp = 28;
+
+  logic [tag_trace_rom_addr_width_lp-1:0] rom_addr_li;
+  logic [tag_trace_rom_data_width_lp-1:0] rom_data_lo;
+
+  logic [2:0] tag_trace_en_r_lo;
+  logic       tag_trace_done_lo;
+
+  // TAG TRACE ROM
+  bsg_tag_boot_rom #(.width_p( tag_trace_rom_data_width_lp )
+                    ,.addr_width_p( tag_trace_rom_addr_width_lp )
+                    )
+    tag_trace_rom
+      (.addr_i( rom_addr_li )
+      ,.data_o( rom_data_lo )
+      );
+
+  // TAG TRACE REPLAY
+  bsg_tag_trace_replay #(.rom_addr_width_p( tag_trace_rom_addr_width_lp )
+                        ,.rom_data_width_p( tag_trace_rom_data_width_lp )
+                        ,.num_masters_p( 3 )
+                        ,.num_clients_p( tag_num_clients_gp )
+                        ,.max_payload_width_p( tag_max_payload_width_gp )
+                        )
+    tag_trace_replay
+      (.clk_i   ( tag_clk )
+      ,.reset_i ( tag_reset    )
+      ,.en_i    ( 1'b1            )
+
+      ,.rom_addr_o( rom_addr_li )
+      ,.rom_data_i( rom_data_lo )
+
+      ,.valid_i ( 1'b0 )
+      ,.data_i  ( '0 )
+      ,.ready_o ()
+
+      ,.valid_o    ()
+      ,.en_r_o     ( tag_trace_en_r_lo )
+      ,.tag_data_o ( p_bsg_tag_data_o )
+      ,.yumi_i     ( 1'b1 )
+
+      ,.done_o  ( tag_trace_done_lo )
+      ,.error_o ()
+      ) ;
+
+  assign p_bsg_tag_en_o = tag_trace_en_r_lo[1];
   
-  bsg_gateway_chip_core 
-   #(.num_asic_p(`NUM_ASIC)
-    ) gw_core
-    (.mc_clk_i       ( manycore_clk )
-    ,.mc_reset_o     ( mc_reset_lo )
-    ,.init_done_o    ( init_done_lo )
-    
-    ,.io_master_clk_i( io_master_clk )
-    ,.router_clk_i   ( router_clk )
-    ,.tag_clk_i      ( tag_clk )
-  
-    ,.mc_links_sif_i ( links_sif_lo )
-    ,.mc_links_sif_o ( links_sif_li )
-    
-    ,.ci_clk_i  ( p_ci_clk_i )
-    ,.ci_v_i    ( p_ci_v_i )
-    ,.ci_data_i ( {p_ci_8_i, p_ci_7_i, p_ci_6_i, p_ci_5_i, p_ci_4_i, p_ci_3_i, p_ci_2_i, p_ci_1_i, p_ci_0_i} )
-    ,.ci_tkn_o  ( p_ci_tkn_o )
-  
-    ,.ci2_clk_o ( p_ci2_clk_o )
-    ,.ci2_v_o   ( p_ci2_v_o )
-    ,.ci2_data_o( {p_ci2_8_o, p_ci2_7_o, p_ci2_6_o, p_ci2_5_o, p_ci2_4_o, p_ci2_3_o, p_ci2_2_o, p_ci2_1_o, p_ci2_0_o} )
-    ,.ci2_tkn_i ( p_ci2_tkn_i )
-  
-    ,.co_clk_i  ( p_co_clk_i )
-    ,.co_v_i    ( p_co_v_i )
-    ,.co_data_i ( {p_co_8_i, p_co_7_i, p_co_6_i, p_co_5_i, p_co_4_i, p_co_3_i, p_co_2_i, p_co_1_i, p_co_0_i} )
-    ,.co_tkn_o  ( p_co_tkn_o )
-  
-    ,.co2_clk_o ( p_co2_clk_o )
-    ,.co2_v_o   ( p_co2_v_o )
-    ,.co2_data_o( {p_co2_8_o, p_co2_7_o, p_co2_6_o, p_co2_5_o, p_co2_4_o, p_co2_3_o, p_co2_2_o, p_co2_1_o, p_co2_0_o} )
-    ,.co2_tkn_i ( p_co2_tkn_i )
-    
-    ,.tag_clk_o ( p_bsg_tag_clk_o )
-    ,.tag_en_o  ( {p_sel_2_o, p_bsg_tag_en_o} )
-    ,.tag_data_o( p_bsg_tag_data_o )
-  
-    ,.clk_a_o   ( p_clk_A_o )
-    ,.clk_b_o   ( p_clk_B_o )
-    ,.clk_c_o   ( p_clk_C_o )
+  logic init_done_lo;
+  bsg_launch_sync_sync #(.width_p(1)) done_blss
+   (.iclk_i       ( tag_clk )
+    ,.iclk_reset_i( 1'b0 )
+    ,.oclk_i      ( hb_clk )
+    ,.iclk_data_i ( tag_trace_done_lo )
+    ,.iclk_data_o (  )
+    ,.oclk_data_o ( init_done_lo )
     );
-    
-    assign p_sel_0_o = 1'b0;
-    assign p_sel_1_o = 1'b0;
-
 
   //////////////////////////////////////////////////
   //
-  // Manycore SPMD Loader
+  // BSG Tag Master Instance (Copied from ASIC)
   //
+
+  // All tag lines from the btm
+  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
+
+  // // Tag lines for clock generators
+  // bsg_tag_s       async_reset_tag_lines_lo;
+  // bsg_tag_s [2:0] osc_tag_lines_lo;
+  // bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
+  // bsg_tag_s [2:0] ds_tag_lines_lo;
+  // bsg_tag_s [2:0] sel_tag_lines_lo;
+
+  // assign async_reset_tag_lines_lo = tag_lines_lo[0];
+  // assign osc_tag_lines_lo         = tag_lines_lo[3:1];
+  // assign osc_trigger_tag_lines_lo = tag_lines_lo[6:4];
+  // assign ds_tag_lines_lo          = tag_lines_lo[9:7];
+  // assign sel_tag_lines_lo         = tag_lines_lo[12:10];
+
+  // Tag lines for io
+  wire bsg_tag_s io_link_io_tag_lines_lo   [3:0]  = tag_lines_lo[16:13];
+  wire bsg_tag_s io_link_core_tag_lines_lo [3:0]  = tag_lines_lo[20:17];
+  wire bsg_tag_s mem_link_io_tag_lines_lo  [15:0] = tag_lines_lo[36:21];
+  wire bsg_tag_s mem_link_core_tag_lines_lo[15:0] = tag_lines_lo[52:37];
+
+  // Tag lines for HB
+  wire bsg_tag_s hb_tag_lines_lo                  = tag_lines_lo[53];
+
+  // BSG tag master instance
+  bsg_tag_master #(.els_p( tag_num_clients_gp )
+                  ,.lg_width_p( tag_lg_max_payload_width_gp )
+                  )
+    btm
+      (.clk_i      ( tag_clk )
+      ,.data_i     ( tag_trace_en_r_lo[0] ? tag_data_o : 1'b0 )
+      ,.en_i       ( 1'b1 )
+      ,.clients_r_o( tag_lines_lo )
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Client Instance
+  //
+
+  // Tag payload for hb control signals
+  typedef struct packed { 
+      logic reset;
+      logic [io_wh_cord_width_gp-1:0] cord;
+  } hb_tag_payload_s;
+
+  // Tag payload for manycore control signals
+  hb_tag_payload_s hb_tag_data_lo;
+  logic            hb_tag_new_data_lo;
+
+  bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
+    btc_hb
+      (.bsg_tag_i     ( hb_tag_lines_lo )
+      ,.recv_clk_i    ( hb_clk )
+      ,.recv_reset_i  ( 1'b0 )
+      ,.recv_new_r_o  ( hb_tag_new_data_lo )
+      ,.recv_data_r_o ( hb_tag_data_lo )
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Link Hub
+  //
+
+  logic [19:0] bsg_link_clk_li, bsg_link_v_li, bsg_link_tkn_lo;
+  logic [19:0][8:0] bsg_link_data_li;
+
+  logic [19:0] bsg_link_clk_lo, bsg_link_v_lo, bsg_link_tkn_li;
+  logic [19:0][8:0] bsg_link_data_lo;
+
+`define BSG_CHIP_LINK_HUB(i)                                         \
+    assign bsg_link_clk_li       [i] = p_bsg_link_out``i``_clk_i; \
+    assign bsg_link_v_li         [i] = p_bsg_link_out``i``_v_i;   \
+    assign p_bsg_link_out``i``_tkn_o = bsg_link_tkn_lo[i];         \
+    assign p_bsg_link_in``i``_clk_o  = bsg_link_clk_lo[i];         \
+    assign p_bsg_link_in``i``_v_o    = bsg_link_v_lo  [i];         \
+    assign bsg_link_tkn_li       [i] = p_bsg_link_in``i``_tkn_i;
+
+`define BSG_CHIP_LINK_DATA_HUB(i, j)                                       \
+    assign bsg_link_data_li     [i][j] = p_bsg_link_out``i``_d``j``_i; \
+    assign p_bsg_link_in``i``_d``j``_o = bsg_link_data_lo[i][j];
+
+  for (genvar i = 0; i < 20; i++)
+  begin
+    `BSG_CHIP_LINK_HUB(i)
+    for (genvar j = 0; j < 9; j++)
+      begin
+        `BSG_CHIP_LINK_DATA_HUB(i, j)
+      end
+  end
+
+  // Mapping physical links to logical links
+  logic [3:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
+  logic [3:0][8:0] io_link_data_li;
+  logic [3:0] io_link_clk_lo, io_link_v_lo, io_link_tkn_li;
+  logic [3:0][8:0] io_link_data_lo;
+
+  logic [15:0] mem_link_clk_li, mem_link_v_li, mem_link_tkn_lo;
+  logic [15:0][8:0] mem_link_data_li;
+  logic [15:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
+  logic [15:0][8:0] mem_link_data_lo;
+
+  // FIXME: ADD REAL MAPPING
+  localparam io_link_mapping_p [4]  = {11,10,1,0};
+  localparam mem_link_mapping_p[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
+
+`define BSG_CHIP_LINK_TYPE_HUB(typ, num)                                          \
+  for (genvar i = 0; i < ``num``; i++)                                            \
+  begin                                                                           \
+    assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_p[i]]; \
+    assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_p[i]]; \
+    assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_p[i]]; \
+    assign bsg_link_tkn_lo[``typ``_link_mapping_p[i]] = ``typ``_link_tkn_lo[i];   \
+                                                                                  \
+    assign bsg_link_clk_lo [``typ``_link_mapping_p[i]] = ``typ``_link_clk_lo [i]; \
+    assign bsg_link_v_lo   [``typ``_link_mapping_p[i]] = ``typ``_link_v_lo   [i]; \
+    assign bsg_link_data_lo[``typ``_link_mapping_p[i]] = ``typ``_link_data_lo[i]; \
+    assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_p[i]];   \
+  end
+
+  `BSG_CHIP_LINK_TYPE_HUB(io, 4)
+  `BSG_CHIP_LINK_TYPE_HUB(mem, 16)
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Chip IO
+  //
+
+  `declare_bsg_ready_and_link_sif_s(io_ct_width_gp, io_link_sif_s);
+  `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, mem_link_sif_s);
+
+  io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
+  io_link_sif_s [15:0] mem_links_li, mem_links_lo;
+
+  ct_link_sif_s [ct_num_in_gp-1:0] next_ct_links_li, next_ct_links_lo;
+  ct_link_sif_s [ct_num_in_gp-1:0] prev_ct_links_li, prev_ct_links_lo;
+
+  for (genvar i = 0; i < 4; i++)
+  begin: io_link
+    bsg_chip_io_links_ct_fifo 
+   #(.link_width_p                        ( io_link_width_gp         )
+    ,.link_channel_width_p                ( io_link_channel_width_gp )
+    ,.link_num_channels_p                 ( io_link_num_channels_gp  )
+    ,.link_lg_fifo_depth_p                ( io_link_lg_fifo_depth_gp )
+    ,.link_lg_credit_to_token_decimation_p( io_link_lg_credit_to_token_decimation_gp )
+    ,.link_use_extra_data_bit_p           ( io_link_use_extra_data_bit_gp )
+    ,.ct_bypass_p                         ( 0 )
+    ,.ct_width_p                          ( io_ct_width_gp )
+    ,.ct_num_in_p                         ( io_ct_num_in_gp )
+    ,.ct_remote_credits_p                 ( io_ct_remote_credits_gp )
+    ,.ct_use_pseudo_large_fifo_p          ( io_ct_use_pseudo_large_fifo_gp )
+    ,.ct_lg_credit_decimation_p           ( io_ct_lg_credit_decimation_gp )
+    ,.num_hops_p                          ( 2 )
+    ) link
+    (.core_clk_i ( hb_clk )
+    ,.io_clk_i   ( io_link_master_clk )
+   
+    ,.link_io_tag_lines_i   ( io_link_io_tag_lines_lo[i] )
+    ,.link_core_tag_lines_i ( io_link_core_tag_lines_lo[i] )
+   
+    ,.link_clk_i ( io_link_clk_li [i] )
+    ,.link_v_i   ( io_link_v_li   [i] )
+    ,.link_tkn_o ( io_link_tkn_lo [i] )
+    ,.link_data_i( io_link_data_li[i][io_link_channel_width_gp-1:0] )
+   
+    ,.link_clk_o ( io_link_clk_lo [i] )
+    ,.link_v_o   ( io_link_v_lo   [i] )
+    ,.link_tkn_i ( io_link_tkn_li [i] )
+    ,.link_data_o( io_link_data_lo[i][io_link_channel_width_gp-1:0] )
+   
+    ,.links_i    ( io_links_li[i] ) 
+    ,.links_o    ( io_links_lo[i] )
+    );
+  end
+
+  for (genvar i = 0; i < 16; i++)
+  begin: mem_link
+    bsg_chip_io_links_ct_fifo 
+   #(.link_width_p                        ( mem_link_width_gp         )
+    ,.link_channel_width_p                ( mem_link_channel_width_gp )
+    ,.link_num_channels_p                 ( mem_link_num_channels_gp  )
+    ,.link_lg_fifo_depth_p                ( mem_link_lg_fifo_depth_gp )
+    ,.link_lg_credit_to_token_decimation_p( mem_link_lg_credit_to_token_decimation_gp )
+    ,.link_use_extra_data_bit_p           ( mem_link_use_extra_data_bit_gp )
+    ,.ct_bypass_p                         ( 1 )
+    ,.num_hops_p                          ( 1 )
+    ) link
+    (.core_clk_i ( hb_clk )
+    ,.io_clk_i   ( mem_link_master_clk )
+   
+    ,.link_io_tag_lines_i   ( mem_link_io_tag_lines_lo[i] )
+    ,.link_core_tag_lines_i ( mem_link_core_tag_lines_lo[i] )
+   
+    ,.link_clk_i ( mem_link_clk_li [i] )
+    ,.link_v_i   ( mem_link_v_li   [i] )
+    ,.link_tkn_o ( mem_link_tkn_lo [i] )
+    ,.link_data_i( mem_link_data_li[i][mem_link_channel_width_gp-1:0] )
+
+    ,.link_clk_o ( mem_link_clk_lo [i] )
+    ,.link_v_o   ( mem_link_v_lo   [i] )
+    ,.link_tkn_i ( mem_link_tkn_li [i] )
+    ,.link_data_o( mem_link_data_lo[i][mem_link_channel_width_gp-1:0] )
+
+    ,.links_i    ( mem_links_li[i] ) 
+    ,.links_o    ( mem_links_lo[i] )
+    );
+  end
+
+  //////////////////////////////////////////////////
+  //
+  // Loopback Test Node
+  //
+  logic io_error_r;
+  logic [31:0] io_sent_r, io_received_r;
+
+  for (genvar i = 0; i < 4; i++)
+  begin: io_node
+    bsg_fifo_1r1w_small_hardened_test_node
+   #(.num_channels_p(io_link_num_channels_gp)
+    ,.channel_width_p(io_link_channel_width_gp)
+    ,.is_client_node_p(0)
+    ) node
+    (.node_clk_i  (hb_clk)
+    ,.node_reset_i(hb_tag_data_lo.reset)
+    ,.node_en_i   (1'b0)
+    
+    ,.error_o   (io_error_r)
+    ,.sent_o    (io_sent_r)
+    ,.received_o(io_received_r)
+     
+    ,.clk_i   (hb_clk)
+    ,.reset_i (hb_tag_data_lo.reset)
+    
+    ,.link_i(io_links_lo[i])
+    ,.link_o(io_links_li[i])
+    );
+  end
   
-  genvar i;
-  
-  for (i = 0; i < `NUM_ASIC; i++)
-  begin: multi_asic
+  logic mem_error_r;
+  logic [31:0] mem_sent_r, mem_received_r;
 
-  bsg_nonsynth_manycore_io_complex #(
-    .addr_width_p( manycore_addr_width_gp )
-    ,.data_width_p( manycore_data_width_gp )
-    ,.load_id_width_p( manycore_load_id_width_gp )
-    ,.x_cord_width_p( manycore_x_cord_width_gp )
-    ,.y_cord_width_p( manycore_y_cord_width_gp )
-
-    ,.num_tiles_x_p(manycore_num_tiles_x_gp)
-    ,.num_tiles_y_p(manycore_num_tiles_y_gp)
-
-  ) manycore_io (
-    .clk_i(manycore_clk)
-    ,.reset_i(mc_reset_lo[i] | ~init_done_lo)
-    ,.loader_done_o(loader_done_lo)
-    ,.io_link_sif_i(links_sif_li[i])
-    ,.io_link_sif_o(links_sif_lo[i])
-  );
-
+  for (genvar i = 0; i < 16; i++)
+  begin: mem_node
+    bsg_fifo_1r1w_small_hardened_test_node
+   #(.num_channels_p(mem_link_num_channels_gp)
+    ,.channel_width_p(mem_link_channel_width_gp)
+    ,.is_client_node_p(0)
+    ) node
+    (.node_clk_i  (hb_clk)
+    ,.node_reset_i(hb_tag_data_lo.reset)
+    ,.node_en_i   (1'b0)
+    
+    ,.error_o   (mem_error_r)
+    ,.sent_o    (mem_sent_r)
+    ,.received_o(mem_received_r)
+     
+    ,.clk_i   (hb_clk)
+    ,.reset_i (hb_tag_data_lo.reset)
+    
+    ,.link_i(mem_links_lo[i])
+    ,.link_o(mem_links_li[i])
+    );
   end
 
 endmodule
