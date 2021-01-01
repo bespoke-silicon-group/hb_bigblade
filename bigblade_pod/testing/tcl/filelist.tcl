@@ -116,7 +116,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
-  $bsg_manycore_dir/v/bsg_manycore_reg_id_parity_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
   $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
   $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v

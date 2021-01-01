@@ -3,7 +3,7 @@ puts "BSG-info: Running script [info script]\n"
 source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
 
 
-if {$DESIGN_NAME == "bsg_manycore_tile_ruche" } {
+if {$DESIGN_NAME == "bsg_manycore_tile_compute_ruche" } {
 
   set all_input_nets [list]
   set all_output_nets [list]

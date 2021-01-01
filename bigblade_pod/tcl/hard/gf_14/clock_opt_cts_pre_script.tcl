@@ -9,7 +9,7 @@ proc get_y_cord {obj} {
 }
 
 
-if { $DESIGN_NAME == "bsg_manycore_tile_ruche" } {
+if { $DESIGN_NAME == "bsg_manycore_tile_compute_ruche" } {
 
   source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
   source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_draw_wires.tcl

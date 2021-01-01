@@ -45,7 +45,7 @@ module bsg_chip_pod
   );
 
 
-  bsg_manycore_bigblade_pod #(
+  bsg_manycore_pod_ruche #(
     .num_tiles_x_p(hb_num_tiles_x_gp)
     ,.num_tiles_y_p(hb_num_tiles_y_gp)
     ,.pod_x_cord_width_p(hb_pod_x_cord_width_gp)

@@ -62,7 +62,7 @@ if { [sizeof $cells_to_derate] > 0 } {
 }
 
 # Ungroup
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_parity_decode"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
 set_ungroup [get_designs -filter "hdl_template==network_tx"] true
 set_ungroup [get_designs -filter "hdl_template==network_rx"] true

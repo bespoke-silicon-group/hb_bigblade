@@ -17,7 +17,7 @@ set pod_y_offset      [expr $grid_height*1]
 
 # shape of tiles
 set tile_width        [expr $grid_width*10.5]
-set tile_height       [expr $grid_height*33.50]
+set tile_height       [expr $grid_height*32.50]
 set vcache_width      [expr $grid_width*10.5]
 set vcache_height     [expr $grid_height*25.25]
 
@@ -51,11 +51,11 @@ set RB_RP_X_OFFSET      [expr 16*[unit_width]]
 set TAPCELL_X_OFFSET    [expr 47*[unit_width]]
 
 # pin offsets
-set NORTH_INPUT_OFFSET          [expr (360*0.128)]
+set NORTH_INPUT_OFFSET          [expr (324*0.128)]
 set NORTH_OUTPUT_OFFSET         [expr (573*0.128)]
 
-set TILE_WEST_OUTPUT_OFFSET     [expr (0.128*32)]
-set TILE_WEST_INPUT_OFFSET      [expr (0.128*792)]
+set TILE_WEST_OUTPUT_OFFSET     [expr (0.128*22)]
+set TILE_WEST_INPUT_OFFSET      [expr (0.128*747)]
 
 set VCACHE_WEST_OUTPUT_OFFSET   [expr (302*0.128)]
 set VCACHE_WEST_INPUT_OFFSET    [expr (702*0.128)]

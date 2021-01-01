@@ -27,7 +27,7 @@ if { $DESIGN_NAME == "bsg_chip_pod" } {
   set_dont_touch [get_nets -of [get_pins pod_mc_y_*__x_*__tile/ruche_link_*]] true
   set_dont_touch [get_nets -of [get_pins pod_*_vc_row_vc_x_*__vc/wh_link_sif_*]] true
 
-} elseif { $DESIGN_NAME == "bsg_manycore_tile_ruche"} {
+} elseif { $DESIGN_NAME == "bsg_manycore_tile_compute_ruche"} {
 
   # remove feedthrough buffers
   remove_buffers [get_cells FTB*]

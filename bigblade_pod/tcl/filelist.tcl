@@ -151,20 +151,20 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/imports/HardFloat/source/recFNToIN.v
   $bsg_manycore_dir/imports/HardFloat/source/RISCV/HardFloat_specialize.v
 
-  $bsg_manycore_dir/v/bsg_manycore_bigblade_pod.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_vcache_row.v
+  $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache_array.v
   $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
   $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
-  $bsg_manycore_dir/v/bsg_manycore_top_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_array_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
-  $bsg_manycore_dir/v/bsg_manycore_reg_id_parity_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
   $bsg_manycore_dir/v/bsg_manycore_link_async_to_wormhole.v
   $bsg_manycore_dir/v/bsg_manycore_vcache_blocking.v
   $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
   $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
