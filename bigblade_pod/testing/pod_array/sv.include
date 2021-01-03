@@ -50,9 +50,6 @@ $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $basejump_stl_dir/bsg_misc/bsg_dff_en_bypass.v
 
 
-
-
-
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
@@ -97,6 +94,7 @@ $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
@@ -163,5 +161,4 @@ $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
 
 
 
-$bsg_designs_target_dir/testing/v/bsg_nonsynth_wormhole_test_mem.v
 testbench.v
