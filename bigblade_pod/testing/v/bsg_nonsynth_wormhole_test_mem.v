@@ -3,17 +3,16 @@ module bsg_nonsynth_wormhole_test_mem
     , parameter vcache_block_size_in_words_p="inv"
     , parameter vcache_dma_data_width_p="inv"
     
-    , parameter num_tiles_x_p = "inv"
-    , parameter lg_num_tiles_x_lp = `BSG_SAFE_CLOG2(num_tiles_x_p)
+    , parameter num_vcaches_p = "inv" // how many vcaches are mapped to this test mem?
+    , parameter lg_num_vcaches_lp = `BSG_SAFE_CLOG2(num_vcaches_p)
     
-    , parameter wh_ruche_factor_p="inv"
     , parameter wh_cid_width_p="inv"
     , parameter wh_flit_width_p="inv"
     , parameter wh_cord_width_p="inv"
     , parameter wh_len_width_p="inv"
 
     , parameter data_len_lp = (vcache_data_width_p*vcache_block_size_in_words_p/vcache_dma_data_width_p)
-    , parameter mem_size_p = "inv"   // size of memory in bytes
+    , parameter int unsigned mem_size_p = "inv"   // size of memory in bytes
     , parameter mem_els_lp = mem_size_p/(vcache_dma_data_width_p/8)
     , parameter mem_addr_width_lp = `BSG_SAFE_CLOG2(mem_els_lp)
 
@@ -28,8 +27,8 @@ module bsg_nonsynth_wormhole_test_mem
     input clk_i
     , input reset_i
 
-    , input  [wh_ruche_factor_p-1:0][wh_link_sif_width_lp-1:0] wh_link_sif_i
-    , output [wh_ruche_factor_p-1:0][wh_link_sif_width_lp-1:0] wh_link_sif_o
+    , input  [wh_link_sif_width_lp-1:0] wh_link_sif_i
+    , output [wh_link_sif_width_lp-1:0] wh_link_sif_o
   );
 
  
@@ -50,29 +49,11 @@ module bsg_nonsynth_wormhole_test_mem
   assign mem_r_data = mem_r[mem_r_addr];
 
 
-  // wormhole concentrator
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_p, wh_link_sif_s);
-  wh_link_sif_s wh_conc_link_sif_li;
-  wh_link_sif_s wh_conc_link_sif_lo;
-
-
-  bsg_wormhole_concentrator #(
-    .flit_width_p(wh_flit_width_p)
-    ,.len_width_p(wh_len_width_p)
-    ,.cid_width_p(wh_cid_width_p)
-    ,.cord_width_p(wh_cord_width_p)
-    ,.num_in_p(wh_ruche_factor_p)
-  ) conc (
-    .clk_i(clk_i)
-    ,.reset_i(reset_i)
-
-    ,.links_i(wh_link_sif_i)
-    ,.links_o(wh_link_sif_o)
-
-    ,.concentrated_link_i(wh_conc_link_sif_li)
-    ,.concentrated_link_o(wh_conc_link_sif_lo)
-  );
-
+  wh_link_sif_s wh_link_sif_in;
+  wh_link_sif_s wh_link_sif_out;
+  assign wh_link_sif_in = wh_link_sif_i;
+  assign wh_link_sif_o = wh_link_sif_out;
 
   typedef struct packed {
     logic [wh_flit_width_p-(wh_cord_width_p*2)-1-wh_len_width_p-wh_cid_width_p-1:0] unused;
@@ -84,7 +65,7 @@ module bsg_nonsynth_wormhole_test_mem
   } wh_header_flit_s;
 
   wh_header_flit_s header_flit_in;
-  assign header_flit_in = wh_conc_link_sif_lo.data;
+  assign header_flit_in = wh_link_sif_in.data;
 
   logic clear_li;
   logic up_li;
@@ -126,7 +107,7 @@ module bsg_nonsynth_wormhole_test_mem
   assign header_flit_out.dest_cord = src_cord_r;
 
   always_comb begin
-    wh_conc_link_sif_li = '0;
+    wh_link_sif_out = '0;
     clear_li = 1'b0;
     up_li = 1'b0;
 
@@ -137,16 +118,16 @@ module bsg_nonsynth_wormhole_test_mem
     mem_state_n = mem_state_r;
  
     mem_we = 1'b0;
-    mem_w_data = wh_conc_link_sif_lo.data;
+    mem_w_data = wh_link_sif_in.data;
     mem_w_addr = {
-      src_cord_r[0+:lg_num_tiles_x_lp],
-      addr_r[block_offset_width_lp+:mem_addr_width_lp-lg_num_tiles_x_lp-count_width_lp],
+      src_cord_r[0+:lg_num_vcaches_lp],
+      addr_r[block_offset_width_lp+:mem_addr_width_lp-lg_num_vcaches_lp-count_width_lp],
       count_lo
     };
 
     mem_r_addr = {
-      src_cord_r[0+:lg_num_tiles_x_lp],
-      addr_r[block_offset_width_lp+:mem_addr_width_lp-lg_num_tiles_x_lp-count_width_lp],
+      src_cord_r[0+:lg_num_vcaches_lp],
+      addr_r[block_offset_width_lp+:mem_addr_width_lp-lg_num_vcaches_lp-count_width_lp],
       count_lo
     };
 
@@ -158,8 +139,8 @@ module bsg_nonsynth_wormhole_test_mem
       end
 
       READY: begin
-        wh_conc_link_sif_li.ready_and_rev = 1'b1;
-        if (wh_conc_link_sif_lo.v) begin
+        wh_link_sif_out.ready_and_rev = 1'b1;
+        if (wh_link_sif_in.v) begin
           write_not_read_n = header_flit_in.write_not_read;
           src_cord_n = header_flit_in.src_cord;
           cid_n = header_flit_in.cid;
@@ -168,9 +149,9 @@ module bsg_nonsynth_wormhole_test_mem
       end
       
       RECV_ADDR: begin
-        wh_conc_link_sif_li.ready_and_rev = 1'b1;
-        if (wh_conc_link_sif_lo.v) begin
-          addr_n = wh_conc_link_sif_lo.data;
+        wh_link_sif_out.ready_and_rev = 1'b1;
+        if (wh_link_sif_in.v) begin
+          addr_n = wh_link_sif_in.data;
           mem_state_n = write_not_read_r
             ? RECV_EVICT_DATA
             : SEND_FILL_HEADER;
@@ -178,8 +159,8 @@ module bsg_nonsynth_wormhole_test_mem
       end
 
       RECV_EVICT_DATA: begin
-        wh_conc_link_sif_li.ready_and_rev = 1'b1;
-        if (wh_conc_link_sif_lo.v) begin
+        wh_link_sif_out.ready_and_rev = 1'b1;
+        if (wh_link_sif_in.v) begin
           mem_we = 1'b1;
           up_li = (count_lo != data_len_lp-1);
           clear_li = (count_lo == data_len_lp-1);
@@ -190,17 +171,17 @@ module bsg_nonsynth_wormhole_test_mem
       end
 
       SEND_FILL_HEADER: begin
-        wh_conc_link_sif_li.v = 1'b1;
-        wh_conc_link_sif_li.data = header_flit_out;
-        if (wh_conc_link_sif_lo.ready_and_rev) begin
+        wh_link_sif_out.v = 1'b1;
+        wh_link_sif_out.data = header_flit_out;
+        if (wh_link_sif_in.ready_and_rev) begin
           mem_state_n = SEND_FILL_DATA;
         end
       end
 
       SEND_FILL_DATA: begin
-        wh_conc_link_sif_li.v = 1'b1;
-        wh_conc_link_sif_li.data = mem_r_data;
-        if (wh_conc_link_sif_lo.ready_and_rev) begin
+        wh_link_sif_out.v = 1'b1;
+        wh_link_sif_out.data = mem_r_data;
+        if (wh_link_sif_in.ready_and_rev) begin
           clear_li = (count_lo == data_len_lp-1);
           up_li = (count_lo != data_len_lp-1);
           mem_state_n = (count_lo == data_len_lp-1)

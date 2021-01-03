@@ -1,5 +1,7 @@
 package bsg_chip_pkg;
-
+  
+  `include "bsg_defines.v"
+  
   // manycore parameters
   // x_cord_width_gp = pod_x_cord_width_gp + hb_x_subcord_width_gp
   parameter hb_x_cord_width_gp = 7; // (global X)
@@ -13,6 +15,8 @@ package bsg_chip_pkg;
   parameter hb_addr_width_gp   = 28; // word addr
   parameter hb_data_width_gp   = 32;
 
+  parameter hb_num_pods_x_gp   = 4;
+  parameter hb_num_pods_y_gp   = 4;
 
   parameter hb_dmem_size_gp           = 1024;
   parameter hb_icache_entries_gp      = 1024;
@@ -27,6 +31,7 @@ package bsg_chip_pkg;
   parameter vcache_block_size_in_words_gp = 8;
   parameter vcache_size_gp = vcache_ways_gp*vcache_sets_gp*vcache_block_size_in_words_gp; // in # of words
   parameter vcache_dma_data_width_gp = hb_data_width_gp;
+
 
   parameter wh_ruche_factor_gp    = 2;
   parameter wh_cid_width_gp       = `BSG_SAFE_CLOG2(wh_ruche_factor_gp);
