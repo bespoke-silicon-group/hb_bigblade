@@ -31,9 +31,9 @@ import bsg_noc_pkg::*;
   logic tag_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
 
-  assign p_clk_a_o = hb_clk;
-  assign p_clk_b_o = io_link_master_clk;
-  assign p_clk_c_o = mem_link_master_clk;
+  assign p_clk_A_o = hb_clk;
+  assign p_clk_B_o = io_link_master_clk;
+  assign p_clk_C_o = mem_link_master_clk;
   assign p_bsg_tag_clk_o = ~tag_clk;
   
   assign p_sel_0_o = 1'b0;
@@ -123,18 +123,18 @@ import bsg_noc_pkg::*;
   // All tag lines from the btm
   bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
 
-  // // Tag lines for clock generators
-  // bsg_tag_s       async_reset_tag_lines_lo;
-  // bsg_tag_s [2:0] osc_tag_lines_lo;
-  // bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
-  // bsg_tag_s [2:0] ds_tag_lines_lo;
-  // bsg_tag_s [2:0] sel_tag_lines_lo;
+  // Tag lines for clock generators
+  bsg_tag_s       async_reset_tag_lines_lo;
+  bsg_tag_s [2:0] osc_tag_lines_lo;
+  bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
+  bsg_tag_s [2:0] ds_tag_lines_lo;
+  bsg_tag_s [2:0] sel_tag_lines_lo;
 
-  // assign async_reset_tag_lines_lo = tag_lines_lo[0];
-  // assign osc_tag_lines_lo         = tag_lines_lo[3:1];
-  // assign osc_trigger_tag_lines_lo = tag_lines_lo[6:4];
-  // assign ds_tag_lines_lo          = tag_lines_lo[9:7];
-  // assign sel_tag_lines_lo         = tag_lines_lo[12:10];
+  assign async_reset_tag_lines_lo = tag_lines_lo[0];
+  assign osc_tag_lines_lo         = tag_lines_lo[3:1];
+  assign osc_trigger_tag_lines_lo = tag_lines_lo[6:4];
+  assign ds_tag_lines_lo          = tag_lines_lo[9:7];
+  assign sel_tag_lines_lo         = tag_lines_lo[12:10];
 
   // Tag lines for io
   wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo    = tag_lines_lo[16:13];
@@ -356,6 +356,8 @@ import bsg_noc_pkg::*;
   //
   // Loopback Test Node
   //
+  logic node_en_lo;
+  
   logic [3:0][io_ct_num_in_gp-1:0] io_error_r;
   logic [3:0][io_ct_num_in_gp-1:0][31:0] io_sent_r, io_received_r;
 
@@ -370,7 +372,7 @@ import bsg_noc_pkg::*;
         ) node
         (.node_clk_i  (hb_clk)
         ,.node_reset_i(hb_tag_data_lo.reset)
-        ,.node_en_i   (tag_trace_done_lo)
+        ,.node_en_i   (node_en_lo)
         
         ,.error_o   (io_error_r[i][j])
         ,.sent_o    (io_sent_r[i][j])
@@ -397,7 +399,7 @@ import bsg_noc_pkg::*;
     ) node
     (.node_clk_i  (hb_clk)
     ,.node_reset_i(hb_tag_data_lo.reset)
-    ,.node_en_i   (tag_trace_done_lo)
+    ,.node_en_i   (node_en_lo)
     
     ,.error_o   (mem_error_r[i])
     ,.sent_o    (mem_sent_r[i])
@@ -409,6 +411,73 @@ import bsg_noc_pkg::*;
     ,.link_i(mem_links_lo[i])
     ,.link_o(mem_links_li[i])
     );
+  end
+
+  initial
+  begin
+    // Init
+    node_en_lo = 0;
+    #100000
+    
+    // Wait for bsg_tag initialization
+    @(posedge tag_trace_done_lo); #1;
+
+    // node enable
+    @(posedge hb_clk); #1;
+    node_en_lo = 1;
+    $display("node enable HIGH");
+    
+    $display("running tests...");
+    #50000000
+    $display("finished running tests");
+    
+    // node disable
+    @(posedge hb_clk); #1;
+    node_en_lo = 0;
+    $display("node enable LOW");
+    
+    #5000000
+
+    // verification
+    for (integer i = 0; i < 4; i++)
+      begin
+        for (integer j = 0; j < io_ct_num_in_gp; j++)
+          begin
+            assert(io_error_r[i][j] == 0)
+            else 
+              begin
+                $error("\nFAIL... Error in loopback IO node[%0d][%0d]", i, j);
+                $finish;
+              end
+            assert(io_sent_r[i][j] == io_received_r[i][j])
+            else 
+              begin
+                $error("\nFAIL... Loopback IO node[%0d][%0d] sent %0d packets but received only %0d", i, j, io_sent_r[i][j], io_received_r[i][j]);
+                $finish;
+              end
+            $display("Loopback IO node[%0d][%0d] sent and received %0d packets", i, j, io_sent_r[i][j]);
+          end
+      end
+      
+    for (integer i = 0; i < 16; i++)
+      begin
+        assert(mem_error_r[i] == 0)
+        else 
+          begin
+            $error("\nFAIL... Error in loopback MEM node[%0d]", i);
+            $finish;
+          end
+        assert(mem_sent_r[i] == mem_received_r[i])
+        else 
+          begin
+            $error("\nFAIL... Loopback MEM node[%0d] sent %0d packets but received only %0d", i, mem_sent_r[i], mem_received_r[i]);
+            $finish;
+          end
+        $display("Loopback MEM node[%0d] sent and received %0d packets", i, mem_sent_r[i]);
+      end
+
+    $display("\nPASS!\n");
+    $finish;
   end
 
 endmodule
