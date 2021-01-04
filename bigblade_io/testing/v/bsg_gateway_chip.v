@@ -191,31 +191,26 @@ import bsg_noc_pkg::*;
   logic [19:0] bsg_link_clk_lo, bsg_link_v_lo, bsg_link_tkn_li;
   logic [19:0][8:0] bsg_link_data_lo;
 
-`define BSG_GATEWAY_CHIP_LINK_HUB(i)                                         \
+`define BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, j)                      \
+    assign bsg_link_data_li[i][j] = p_bsg_link_out``i``_d``j``_i; \
+    assign p_bsg_link_in``i``_d``j``_o = bsg_link_data_lo[i][j];
+
+`define BSG_GATEWAY_CHIP_LINK_HUB(i)                              \
     assign bsg_link_clk_li       [i] = p_bsg_link_out``i``_clk_i; \
     assign bsg_link_v_li         [i] = p_bsg_link_out``i``_v_i;   \
-    assign p_bsg_link_out``i``_tkn_o = bsg_link_tkn_lo[i];         \
-    assign p_bsg_link_in``i``_clk_o  = bsg_link_clk_lo[i];         \
-    assign p_bsg_link_in``i``_v_o    = bsg_link_v_lo  [i];         \
-    assign bsg_link_tkn_li       [i] = p_bsg_link_in``i``_tkn_i; \
-    assign bsg_link_data_li     [i][0] = p_bsg_link_out``i``_d0_i; \
-    assign bsg_link_data_li     [i][1] = p_bsg_link_out``i``_d1_i; \
-    assign bsg_link_data_li     [i][2] = p_bsg_link_out``i``_d2_i; \
-    assign bsg_link_data_li     [i][3] = p_bsg_link_out``i``_d3_i; \
-    assign bsg_link_data_li     [i][4] = p_bsg_link_out``i``_d4_i; \
-    assign bsg_link_data_li     [i][5] = p_bsg_link_out``i``_d5_i; \
-    assign bsg_link_data_li     [i][6] = p_bsg_link_out``i``_d6_i; \
-    assign bsg_link_data_li     [i][7] = p_bsg_link_out``i``_d7_i; \
-    assign bsg_link_data_li     [i][8] = p_bsg_link_out``i``_d8_i; \
-    assign p_bsg_link_in``i``_d0_o = bsg_link_data_lo[i][0]; \
-    assign p_bsg_link_in``i``_d1_o = bsg_link_data_lo[i][1]; \
-    assign p_bsg_link_in``i``_d2_o = bsg_link_data_lo[i][2]; \
-    assign p_bsg_link_in``i``_d3_o = bsg_link_data_lo[i][3]; \
-    assign p_bsg_link_in``i``_d4_o = bsg_link_data_lo[i][4]; \
-    assign p_bsg_link_in``i``_d5_o = bsg_link_data_lo[i][5]; \
-    assign p_bsg_link_in``i``_d6_o = bsg_link_data_lo[i][6]; \
-    assign p_bsg_link_in``i``_d7_o = bsg_link_data_lo[i][7]; \
-    assign p_bsg_link_in``i``_d8_o = bsg_link_data_lo[i][8];
+    assign p_bsg_link_out``i``_tkn_o = bsg_link_tkn_lo[i];        \
+    assign p_bsg_link_in``i``_clk_o  = bsg_link_clk_lo[i];        \
+    assign p_bsg_link_in``i``_v_o    = bsg_link_v_lo  [i];        \
+    assign bsg_link_tkn_li       [i] = p_bsg_link_in``i``_tkn_i;  \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 0)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 1)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 2)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 3)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 4)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 5)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 6)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 7)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 8)
 
   `BSG_GATEWAY_CHIP_LINK_HUB( 0)
   `BSG_GATEWAY_CHIP_LINK_HUB( 1)
@@ -253,7 +248,7 @@ import bsg_noc_pkg::*;
   localparam int io_link_mapping_p [4]  = {11,10,1,0};
   localparam int mem_link_mapping_p[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
 
-`define BSG_CHIP_LINK_TYPE_HUB(typ, num)                                          \
+`define BSG_GATEWAY_CHIP_LINK_TYPE_HUB(typ, num)                                          \
   for (genvar i = 0; i < ``num``; i++)                                            \
   begin                                                                           \
     assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_p[i]]; \
@@ -267,8 +262,8 @@ import bsg_noc_pkg::*;
     assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_p[i]];   \
   end
 
-  `BSG_CHIP_LINK_TYPE_HUB(io, 4)
-  `BSG_CHIP_LINK_TYPE_HUB(mem, 16)
+  `BSG_GATEWAY_CHIP_LINK_TYPE_HUB(io, 4)
+  `BSG_GATEWAY_CHIP_LINK_TYPE_HUB(mem, 16)
 
   //////////////////////////////////////////////////
   //

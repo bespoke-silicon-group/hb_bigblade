@@ -140,6 +140,10 @@ module bsg_chip
   logic [19:0] bsg_link_clk_lo, bsg_link_v_lo, bsg_link_tkn_li;
   logic [19:0][8:0] bsg_link_data_lo;
 
+`define BSG_CHIP_LINK_HUB_DATA(i, j)                               \
+    assign bsg_link_data_li[i][j] = bsg_link_in``i``_d``j``_i_int; \
+    assign bsg_link_out``i``_d``j``_o_int = bsg_link_data_lo[i][j];
+
 `define BSG_CHIP_LINK_HUB(i)                                          \
     assign bsg_link_clk_li         [i] = bsg_link_in``i``_clk_i_int;  \
     assign bsg_link_v_li           [i] = bsg_link_in``i``_v_i_int;    \
@@ -147,24 +151,15 @@ module bsg_chip
     assign bsg_link_out``i``_clk_o_int = bsg_link_clk_lo[i];          \
     assign bsg_link_out``i``_v_o_int   = bsg_link_v_lo  [i];          \
     assign bsg_link_tkn_li         [i] = bsg_link_out``i``_tkn_i_int; \
-    assign bsg_link_data_li     [i][0] = bsg_link_in``i``_d0_i_int;   \
-    assign bsg_link_data_li     [i][1] = bsg_link_in``i``_d1_i_int;   \
-    assign bsg_link_data_li     [i][2] = bsg_link_in``i``_d2_i_int;   \
-    assign bsg_link_data_li     [i][3] = bsg_link_in``i``_d3_i_int;   \
-    assign bsg_link_data_li     [i][4] = bsg_link_in``i``_d4_i_int;   \
-    assign bsg_link_data_li     [i][5] = bsg_link_in``i``_d5_i_int;   \
-    assign bsg_link_data_li     [i][6] = bsg_link_in``i``_d6_i_int;   \
-    assign bsg_link_data_li     [i][7] = bsg_link_in``i``_d7_i_int;   \
-    assign bsg_link_data_li     [i][8] = bsg_link_in``i``_d8_i_int;   \
-    assign bsg_link_out``i``_d0_o_int  = bsg_link_data_lo[i][0];      \
-    assign bsg_link_out``i``_d1_o_int  = bsg_link_data_lo[i][1];      \
-    assign bsg_link_out``i``_d2_o_int  = bsg_link_data_lo[i][2];      \
-    assign bsg_link_out``i``_d3_o_int  = bsg_link_data_lo[i][3];      \
-    assign bsg_link_out``i``_d4_o_int  = bsg_link_data_lo[i][4];      \
-    assign bsg_link_out``i``_d5_o_int  = bsg_link_data_lo[i][5];      \
-    assign bsg_link_out``i``_d6_o_int  = bsg_link_data_lo[i][6];      \
-    assign bsg_link_out``i``_d7_o_int  = bsg_link_data_lo[i][7];      \
-    assign bsg_link_out``i``_d8_o_int  = bsg_link_data_lo[i][8];
+    `BSG_CHIP_LINK_HUB_DATA(i, 0)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 1)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 2)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 3)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 4)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 5)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 6)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 7)                                     \
+    `BSG_CHIP_LINK_HUB_DATA(i, 8)
 
   `BSG_CHIP_LINK_HUB( 0)
   `BSG_CHIP_LINK_HUB( 1)
