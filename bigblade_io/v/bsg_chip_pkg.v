@@ -43,6 +43,10 @@ package bsg_chip_pkg;
   localparam io_ct_lg_credit_decimation_gp  = `BSG_SAFE_CLOG2(io_ct_credit_decimation_gp/2+1);
   localparam io_ct_use_pseudo_large_fifo_gp = 1;
 
+  // FIXME: ADD REAL MAPPING
+  localparam int io_link_mapping_gp [4]  = {11,10,1,0};
+  localparam int mem_link_mapping_gp[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
+
   localparam io_wh_len_width_gp          = 2;
   localparam io_wh_cord_markers_pos_x_gp = 4;
   localparam io_wh_cord_width_gp         = io_wh_cord_markers_pos_x_gp;

@@ -244,22 +244,18 @@ import bsg_noc_pkg::*;
   logic [15:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
   logic [15:0][8:0] mem_link_data_lo;
 
-  // FIXME: ADD REAL MAPPING
-  localparam int io_link_mapping_p [4]  = {11,10,1,0};
-  localparam int mem_link_mapping_p[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
-
 `define BSG_GATEWAY_CHIP_LINK_TYPE_HUB(typ, num)                                          \
   for (genvar i = 0; i < ``num``; i++)                                            \
   begin                                                                           \
-    assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_p[i]]; \
-    assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_p[i]]; \
-    assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_p[i]]; \
-    assign bsg_link_tkn_lo[``typ``_link_mapping_p[i]] = ``typ``_link_tkn_lo[i];   \
+    assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_gp[i]]; \
+    assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_gp[i]]; \
+    assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_gp[i]]; \
+    assign bsg_link_tkn_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_tkn_lo[i];   \
                                                                                   \
-    assign bsg_link_clk_lo [``typ``_link_mapping_p[i]] = ``typ``_link_clk_lo [i]; \
-    assign bsg_link_v_lo   [``typ``_link_mapping_p[i]] = ``typ``_link_v_lo   [i]; \
-    assign bsg_link_data_lo[``typ``_link_mapping_p[i]] = ``typ``_link_data_lo[i]; \
-    assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_p[i]];   \
+    assign bsg_link_clk_lo [``typ``_link_mapping_gp[i]] = ``typ``_link_clk_lo [i]; \
+    assign bsg_link_v_lo   [``typ``_link_mapping_gp[i]] = ``typ``_link_v_lo   [i]; \
+    assign bsg_link_data_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_data_lo[i]; \
+    assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_gp[i]];   \
   end
 
   `BSG_GATEWAY_CHIP_LINK_TYPE_HUB(io, 4)
