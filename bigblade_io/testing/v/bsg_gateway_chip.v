@@ -62,6 +62,7 @@ import bsg_noc_pkg::*;
   logic [tag_trace_rom_addr_width_lp-1:0] rom_addr_li;
   logic [tag_trace_rom_data_width_lp-1:0] rom_data_lo;
 
+  logic       tag_trace_valid_lo;
   logic [2:0] tag_trace_en_r_lo;
   logic       tag_trace_done_lo;
 
@@ -93,16 +94,16 @@ import bsg_noc_pkg::*;
       ,.data_i  ( '0 )
       ,.ready_o ()
 
-      ,.valid_o    ()
+      ,.valid_o    ( tag_trace_valid_lo )
       ,.en_r_o     ( tag_trace_en_r_lo )
       ,.tag_data_o ( p_bsg_tag_data_o )
-      ,.yumi_i     ( 1'b1 )
+      ,.yumi_i     ( tag_trace_valid_lo )
 
       ,.done_o  ( tag_trace_done_lo )
       ,.error_o ()
       ) ;
 
-  assign p_bsg_tag_en_o = tag_trace_en_r_lo[1];
+  assign p_bsg_tag_en_o = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
   
   logic init_done_lo;
   bsg_launch_sync_sync #(.width_p(1)) done_blss
@@ -150,7 +151,7 @@ import bsg_noc_pkg::*;
                   )
     btm
       (.clk_i      ( tag_clk )
-      ,.data_i     ( tag_trace_en_r_lo[0] ? p_bsg_tag_data_o : 1'b0 )
+      ,.data_i     ( tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_bsg_tag_data_o : 1'b0 )
       ,.en_i       ( 1'b1 )
       ,.clients_r_o( tag_lines_lo )
       );
@@ -369,7 +370,7 @@ import bsg_noc_pkg::*;
         ) node
         (.node_clk_i  (hb_clk)
         ,.node_reset_i(hb_tag_data_lo.reset)
-        ,.node_en_i   (1'b0)
+        ,.node_en_i   (tag_trace_done_lo)
         
         ,.error_o   (io_error_r[i][j])
         ,.sent_o    (io_sent_r[i][j])
@@ -396,7 +397,7 @@ import bsg_noc_pkg::*;
     ) node
     (.node_clk_i  (hb_clk)
     ,.node_reset_i(hb_tag_data_lo.reset)
-    ,.node_en_i   (1'b0)
+    ,.node_en_i   (tag_trace_done_lo)
     
     ,.error_o   (mem_error_r[i])
     ,.sent_o    (mem_sent_r[i])
