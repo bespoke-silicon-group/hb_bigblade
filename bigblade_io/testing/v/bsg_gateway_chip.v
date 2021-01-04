@@ -244,14 +244,14 @@ import bsg_noc_pkg::*;
   logic [15:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
   logic [15:0][8:0] mem_link_data_lo;
 
-`define BSG_GATEWAY_CHIP_LINK_TYPE_HUB(typ, num)                                          \
-  for (genvar i = 0; i < ``num``; i++)                                            \
-  begin                                                                           \
+`define BSG_GATEWAY_CHIP_LINK_TYPE_HUB(typ, num)                                   \
+  for (genvar i = 0; i < ``num``; i++)                                             \
+  begin                                                                            \
     assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_gp[i]]; \
     assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_gp[i]]; \
     assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_gp[i]]; \
     assign bsg_link_tkn_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_tkn_lo[i];   \
-                                                                                  \
+                                                                                   \
     assign bsg_link_clk_lo [``typ``_link_mapping_gp[i]] = ``typ``_link_clk_lo [i]; \
     assign bsg_link_v_lo   [``typ``_link_mapping_gp[i]] = ``typ``_link_v_lo   [i]; \
     assign bsg_link_data_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_data_lo[i]; \
