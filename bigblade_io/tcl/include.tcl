@@ -8,7 +8,8 @@ set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
 set SVERILOG_INCLUDE_PATHS [join "
-
+  $bsg_packaging_dir/common/verilog
+  $bsg_packaging_dir/common/foundry/portable/verilog
   $bsg_designs_target_dir/v
   $basejump_stl_dir/bsg_misc
   $basejump_stl_dir/bsg_cache
