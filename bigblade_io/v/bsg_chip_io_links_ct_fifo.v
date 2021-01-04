@@ -132,14 +132,16 @@ import bsg_tag_pkg::*;
       );
 
   // DOWNSTREAM
-  logic ci_link_reset_lo;
-
-  bsg_sync_sync #(.width_p( 1 ))
-    downlink_io_reset_sync_sync
-      (.oclk_i      ( link_clk_i )
-      ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
-      ,.oclk_data_o ( ci_link_reset_lo )
-      );
+  logic [link_num_channels_p-1:0] downlink_reset_lo;
+  for (i = 0; i < link_num_channels_p; i++)
+  begin: down_bss
+    bsg_sync_sync #(.width_p( 1 ))
+      downlink_io_reset_sync_sync
+        (.oclk_i      ( link_clk_i[i] )
+        ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
+        ,.oclk_data_o ( downlink_reset_lo[i] )
+        );
+  end
 
   bsg_link_ddr_downstream #(.width_p( link_width_p )
                            ,.channel_width_p( link_channel_width_p )
@@ -152,7 +154,7 @@ import bsg_tag_pkg::*;
       (.core_clk_i        ( core_clk_i )
       ,.core_link_reset_i ( link_core_tag_data_lo.down_link_reset )
 
-      ,.io_link_reset_i ( ci_link_reset_lo )
+      ,.io_link_reset_i ( downlink_reset_lo )
 
       ,.core_data_o  ( link_data_lo )
       ,.core_valid_o ( link_v_lo )
