@@ -125,10 +125,10 @@ import bsg_tag_pkg::*;
       ,.io_link_reset_i     ( link_io_tag_data_lo.up_link_reset )
       ,.async_token_reset_i ( link_io_tag_data_lo.async_token_reset )
 
-      ,.io_clk_r_o   ( co_clk_o )
-      ,.io_data_r_o  ( co_data_o )
-      ,.io_valid_r_o ( co_v_o )
-      ,.token_clk_i  ( co_tkn_i )
+      ,.io_clk_r_o   ( link_clk_o )
+      ,.io_data_r_o  ( link_data_o )
+      ,.io_valid_r_o ( link_v_o )
+      ,.token_clk_i  ( link_tkn_i )
       );
 
   // DOWNSTREAM
@@ -136,7 +136,7 @@ import bsg_tag_pkg::*;
 
   bsg_sync_sync #(.width_p( 1 ))
     downlink_io_reset_sync_sync
-      (.oclk_i      ( ci_clk_i )
+      (.oclk_i      ( link_clk_i )
       ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
       ,.oclk_data_o ( ci_link_reset_lo )
       );
@@ -158,10 +158,10 @@ import bsg_tag_pkg::*;
       ,.core_valid_o ( link_v_lo )
       ,.core_yumi_i  ( ct_multi_yumi_lo )
 
-      ,.io_clk_i       ( ci_clk_i )
-      ,.io_data_i      ( ci_data_i )
-      ,.io_valid_i     ( ci_v_i )
-      ,.core_token_r_o ( ci_tkn_o )
+      ,.io_clk_i       ( link_clk_i )
+      ,.io_data_i      ( link_data_i )
+      ,.io_valid_i     ( link_v_i )
+      ,.core_token_r_o ( link_tkn_o )
       );
 
   // CHANNEL TUNNEL

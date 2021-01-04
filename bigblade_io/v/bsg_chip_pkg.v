@@ -37,7 +37,7 @@ package bsg_chip_pkg;
 
   localparam io_ct_num_in_gp                = 2;
   localparam io_ct_tag_width_gp             = `BSG_SAFE_CLOG2(io_ct_num_in_gp + 1);
-  localparam io_ct_width_gp                 = io_link_width_gp - ct_tag_width_gp;
+  localparam io_ct_width_gp                 = io_link_width_gp - io_ct_tag_width_gp;
   localparam io_ct_remote_credits_gp        = 64;
   localparam io_ct_credit_decimation_gp     = io_ct_remote_credits_gp/4;
   localparam io_ct_lg_credit_decimation_gp  = `BSG_SAFE_CLOG2(io_ct_credit_decimation_gp/2+1);

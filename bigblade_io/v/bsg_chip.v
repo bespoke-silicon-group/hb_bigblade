@@ -43,10 +43,10 @@ module bsg_chip
   assign sel_tag_lines_lo        [2:0]            = tag_lines_lo[12:10];
 
   // Tag lines for io
-  wire bsg_tag_s io_link_io_tag_lines_lo   [3:0]  = tag_lines_lo[16:13];
-  wire bsg_tag_s io_link_core_tag_lines_lo [3:0]  = tag_lines_lo[20:17];
-  wire bsg_tag_s mem_link_io_tag_lines_lo  [15:0] = tag_lines_lo[36:21];
-  wire bsg_tag_s mem_link_core_tag_lines_lo[15:0] = tag_lines_lo[52:37];
+  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo    = tag_lines_lo[16:13];
+  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo  = tag_lines_lo[20:17];
+  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo   = tag_lines_lo[36:21];
+  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo = tag_lines_lo[52:37];
 
   // Tag lines for HB
   wire bsg_tag_s hb_tag_lines_lo                  = tag_lines_lo[53];
@@ -148,20 +148,46 @@ module bsg_chip
     assign p_bsg_link_in``i``_tkn_o  = bsg_link_tkn_lo[i];         \
     assign p_bsg_link_out``i``_clk_o = bsg_link_clk_lo[i];         \
     assign p_bsg_link_out``i``_v_o   = bsg_link_v_lo  [i];         \
-    assign bsg_link_tkn_li         [i] = p_bsg_link_out``i``_tkn_i;
+    assign bsg_link_tkn_li         [i] = p_bsg_link_out``i``_tkn_i; \
+    assign bsg_link_data_li        [i][0] = p_bsg_link_in``i``_d0_i; \
+    assign bsg_link_data_li        [i][1] = p_bsg_link_in``i``_d1_i; \
+    assign bsg_link_data_li        [i][2] = p_bsg_link_in``i``_d2_i; \
+    assign bsg_link_data_li        [i][3] = p_bsg_link_in``i``_d3_i; \
+    assign bsg_link_data_li        [i][4] = p_bsg_link_in``i``_d4_i; \
+    assign bsg_link_data_li        [i][5] = p_bsg_link_in``i``_d5_i; \
+    assign bsg_link_data_li        [i][6] = p_bsg_link_in``i``_d6_i; \
+    assign bsg_link_data_li        [i][7] = p_bsg_link_in``i``_d7_i; \
+    assign bsg_link_data_li        [i][8] = p_bsg_link_in``i``_d8_i; \
+    assign p_bsg_link_out``i``_d0_o = bsg_link_data_lo[i][0]; \
+    assign p_bsg_link_out``i``_d1_o = bsg_link_data_lo[i][1]; \
+    assign p_bsg_link_out``i``_d2_o = bsg_link_data_lo[i][2]; \
+    assign p_bsg_link_out``i``_d3_o = bsg_link_data_lo[i][3]; \
+    assign p_bsg_link_out``i``_d4_o = bsg_link_data_lo[i][4]; \
+    assign p_bsg_link_out``i``_d5_o = bsg_link_data_lo[i][5]; \
+    assign p_bsg_link_out``i``_d6_o = bsg_link_data_lo[i][6]; \
+    assign p_bsg_link_out``i``_d7_o = bsg_link_data_lo[i][7]; \
+    assign p_bsg_link_out``i``_d8_o = bsg_link_data_lo[i][8];
 
-`define BSG_CHIP_LINK_DATA_HUB(i, j)                                       \
-    assign bsg_link_data_li        [i][j] = p_bsg_link_in``i``_d``j``_i; \
-    assign p_bsg_link_out``i``_d``j``_o = bsg_link_data_lo[i][j];
-
-  for (genvar i = 0; i < 20; i++)
-  begin
-    `BSG_CHIP_LINK_HUB(i)
-    for (genvar j = 0; j < 9; j++)
-      begin
-        `BSG_CHIP_LINK_DATA_HUB(i, j)
-      end
-  end
+  `BSG_CHIP_LINK_HUB( 0)
+  `BSG_CHIP_LINK_HUB( 1)
+  `BSG_CHIP_LINK_HUB( 2)
+  `BSG_CHIP_LINK_HUB( 3)
+  `BSG_CHIP_LINK_HUB( 4)
+  `BSG_CHIP_LINK_HUB( 5)
+  `BSG_CHIP_LINK_HUB( 6)
+  `BSG_CHIP_LINK_HUB( 7)
+  `BSG_CHIP_LINK_HUB( 8)
+  `BSG_CHIP_LINK_HUB( 9)
+  `BSG_CHIP_LINK_HUB(10)
+  `BSG_CHIP_LINK_HUB(11)
+  `BSG_CHIP_LINK_HUB(12)
+  `BSG_CHIP_LINK_HUB(13)
+  `BSG_CHIP_LINK_HUB(14)
+  `BSG_CHIP_LINK_HUB(15)
+  `BSG_CHIP_LINK_HUB(16)
+  `BSG_CHIP_LINK_HUB(17)
+  `BSG_CHIP_LINK_HUB(18)
+  `BSG_CHIP_LINK_HUB(19)
 
   // Mapping physical links to logical links
   logic [3:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
@@ -175,8 +201,8 @@ module bsg_chip
   logic [15:0][8:0] mem_link_data_lo;
 
   // FIXME: ADD REAL MAPPING
-  localparam io_link_mapping_p [4]  = {11,10,1,0};
-  localparam mem_link_mapping_p[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
+  localparam int io_link_mapping_p [4]  = {11,10,1,0};
+  localparam int mem_link_mapping_p[16] = {19,18,17,16,15,14,13,12,9,8,7,6,5,4,3,2};
 
 `define BSG_CHIP_LINK_TYPE_HUB(typ, num)                                          \
   for (genvar i = 0; i < ``num``; i++)                                            \
@@ -204,10 +230,7 @@ module bsg_chip
   `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, mem_link_sif_s);
 
   io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
-  io_link_sif_s [15:0] mem_links_li, mem_links_lo;
-
-  ct_link_sif_s [ct_num_in_gp-1:0] next_ct_links_li, next_ct_links_lo;
-  ct_link_sif_s [ct_num_in_gp-1:0] prev_ct_links_li, prev_ct_links_lo;
+  mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
 
   for (genvar i = 0; i < 4; i++)
   begin: io_link

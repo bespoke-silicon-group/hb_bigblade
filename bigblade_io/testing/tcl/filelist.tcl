@@ -113,7 +113,6 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
   $basejump_stl_dir/bsg_noc/bsg_noc_links.vh
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_generalized.v
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
@@ -131,7 +130,6 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/bsg_hb_pcb.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/prbs_any.v
-  $bsg_designs_target_dir/testing/v/test_bsg_data_gen.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
 "]
 

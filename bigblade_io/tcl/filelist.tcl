@@ -16,6 +16,7 @@ set SVERILOG_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_defines.v
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
@@ -32,11 +33,9 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_cache/bsg_cache_dma.v
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
-  $basejump_stl_dir/bsg_cache/bsg_cache_pkt_decode.v
   $basejump_stl_dir/bsg_cache/bsg_cache_sbuf_queue.v
   $basejump_stl_dir/bsg_cache/bsg_cache_sbuf.v
   $basejump_stl_dir/bsg_cache/bsg_cache.v
-  $basejump_stl_dir/bsg_cache/bsg_manycore_link_to_cache.v
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $bsg_designs_target_dir/v/bsg_clk_gen_osc.v
   $basejump_stl_dir/bsg_dataflow/bsg_1_to_n_tagged_fifo.v
@@ -123,22 +122,12 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_add_sub.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_classify.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_clz.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_cmp.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_f2i.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_i2f.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_mul.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_preprocess.v
-  $basejump_stl_dir/bsg_fpu/bsg_fpu_sticky.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
   $basejump_stl_dir/bsg_noc/bsg_noc_links.vh
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_generalized.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
@@ -148,7 +137,5 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
   $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
-  $bsg_designs_target_dir/v/vcache.v
-  $bsg_designs_target_dir/v/bsg_cache_dma_async_to_wormhole.v
 "]
 

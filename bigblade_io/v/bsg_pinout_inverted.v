@@ -2,7 +2,7 @@
   (
   // 20 full-duplex bsg_link interfaces, 480 pins
   // Output links
-  ,output p_bsg_link_in0_clk_o
+   output p_bsg_link_in0_clk_o
   ,output p_bsg_link_in0_v_o
   ,input  p_bsg_link_in0_tkn_i
   ,output p_bsg_link_in0_d0_o
@@ -263,7 +263,7 @@
   ,output p_bsg_link_in19_d8_o
 
   // Input links
-   input  p_bsg_link_out0_clk_i
+  ,input  p_bsg_link_out0_clk_i
   ,input  p_bsg_link_out0_v_i
   ,output p_bsg_link_out0_tkn_o
   ,input  p_bsg_link_out0_d0_i
