@@ -56,7 +56,7 @@ VCS_OPTIONS += -top bsg_config bsg_config.v
 ########################################
 
 BSG_TOP_SIM_MODULE = bsg_hb_pcb
-BSG_CHIP_INSTANCE_PATH = bsg_hb_pcb.IC
+BSG_CHIP_INSTANCE_PATH = bsg_hb_pcb.IC.ASIC
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
