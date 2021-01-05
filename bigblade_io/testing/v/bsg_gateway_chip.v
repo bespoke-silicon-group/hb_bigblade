@@ -1,0 +1,474 @@
+`timescale 1ps/1ps
+
+`define HB_CLK_PERIOD 10000
+`define IO_LINK_MASTER_CLK_PERIOD 10000
+`define MEM_LINK_MASTER_CLK_PERIOD 10000
+`define TAG_CLK_PERIOD 20000
+
+module bsg_gateway_chip
+
+import bsg_tag_pkg::*;
+import bsg_chip_pkg::*;
+import bsg_noc_pkg::*;
+
+`include "bsg_pinout_inverted.v"
+
+
+  //////////////////////////////////////////////////
+  //
+  // Nonsynth Clock Generator(s)
+  //
+  
+  logic hb_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`HB_CLK_PERIOD)) hb_clk_gen (.o(hb_clk));
+  
+  logic io_link_master_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_LINK_MASTER_CLK_PERIOD)) io_link_master_clk_gen (.o(io_link_master_clk));
+
+  logic mem_link_master_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MEM_LINK_MASTER_CLK_PERIOD)) mem_link_master_clk_gen (.o(mem_link_master_clk));
+
+  logic tag_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
+
+  assign p_clk_A_o = hb_clk;
+  assign p_clk_B_o = io_link_master_clk;
+  assign p_clk_C_o = mem_link_master_clk;
+  assign p_bsg_tag_clk_o = ~tag_clk;
+  
+  assign p_sel_0_o = 1'b0;
+  assign p_sel_1_o = 1'b0;
+
+  //////////////////////////////////////////////////
+  //
+  // Nonsynth Reset Generator(s)
+  //
+
+  logic tag_reset;
+  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
+    tag_reset_gen
+      (.clk_i(tag_clk)
+      ,.async_reset_o(tag_reset)
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Track Replay
+  //
+
+  localparam tag_trace_rom_addr_width_lp = 32;
+  localparam tag_trace_rom_data_width_lp = 28;
+
+  logic [tag_trace_rom_addr_width_lp-1:0] rom_addr_li;
+  logic [tag_trace_rom_data_width_lp-1:0] rom_data_lo;
+
+  logic       tag_trace_valid_lo;
+  logic [2:0] tag_trace_en_r_lo;
+  logic       tag_trace_done_lo;
+
+  // TAG TRACE ROM
+  bsg_tag_boot_rom #(.width_p( tag_trace_rom_data_width_lp )
+                    ,.addr_width_p( tag_trace_rom_addr_width_lp )
+                    )
+    tag_trace_rom
+      (.addr_i( rom_addr_li )
+      ,.data_o( rom_data_lo )
+      );
+
+  // TAG TRACE REPLAY
+  bsg_tag_trace_replay #(.rom_addr_width_p( tag_trace_rom_addr_width_lp )
+                        ,.rom_data_width_p( tag_trace_rom_data_width_lp )
+                        ,.num_masters_p( 3 )
+                        ,.num_clients_p( tag_num_clients_gp )
+                        ,.max_payload_width_p( tag_max_payload_width_gp )
+                        )
+    tag_trace_replay
+      (.clk_i   ( tag_clk )
+      ,.reset_i ( tag_reset    )
+      ,.en_i    ( 1'b1            )
+
+      ,.rom_addr_o( rom_addr_li )
+      ,.rom_data_i( rom_data_lo )
+
+      ,.valid_i ( 1'b0 )
+      ,.data_i  ( '0 )
+      ,.ready_o ()
+
+      ,.valid_o    ( tag_trace_valid_lo )
+      ,.en_r_o     ( tag_trace_en_r_lo )
+      ,.tag_data_o ( p_bsg_tag_data_o )
+      ,.yumi_i     ( tag_trace_valid_lo )
+
+      ,.done_o  ( tag_trace_done_lo )
+      ,.error_o ()
+      ) ;
+
+  assign p_bsg_tag_en_o = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
+  
+  logic init_done_lo;
+  bsg_launch_sync_sync #(.width_p(1)) done_blss
+   (.iclk_i       ( tag_clk )
+    ,.iclk_reset_i( 1'b0 )
+    ,.oclk_i      ( hb_clk )
+    ,.iclk_data_i ( tag_trace_done_lo )
+    ,.iclk_data_o (  )
+    ,.oclk_data_o ( init_done_lo )
+    );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Master Instance (Copied from ASIC)
+  //
+
+  // All tag lines from the btm
+  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
+
+  // Tag lines for clock generators
+  bsg_tag_s       async_reset_tag_lines_lo;
+  bsg_tag_s [2:0] osc_tag_lines_lo;
+  bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
+  bsg_tag_s [2:0] ds_tag_lines_lo;
+  bsg_tag_s [2:0] sel_tag_lines_lo;
+
+  assign async_reset_tag_lines_lo = tag_lines_lo[0];
+  assign osc_tag_lines_lo         = tag_lines_lo[3:1];
+  assign osc_trigger_tag_lines_lo = tag_lines_lo[6:4];
+  assign ds_tag_lines_lo          = tag_lines_lo[9:7];
+  assign sel_tag_lines_lo         = tag_lines_lo[12:10];
+
+  // Tag lines for io
+  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo    = tag_lines_lo[16:13];
+  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo  = tag_lines_lo[20:17];
+  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo   = tag_lines_lo[36:21];
+  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo = tag_lines_lo[52:37];
+
+  // Tag lines for HB
+  wire bsg_tag_s hb_tag_lines_lo                  = tag_lines_lo[53];
+
+  // BSG tag master instance
+  bsg_tag_master #(.els_p( tag_num_clients_gp )
+                  ,.lg_width_p( tag_lg_max_payload_width_gp )
+                  )
+    btm
+      (.clk_i      ( tag_clk )
+      ,.data_i     ( tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_bsg_tag_data_o : 1'b0 )
+      ,.en_i       ( 1'b1 )
+      ,.clients_r_o( tag_lines_lo )
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Client Instance
+  //
+
+  // Tag payload for hb control signals
+  typedef struct packed { 
+      logic reset;
+      logic [io_wh_cord_width_gp-1:0] cord;
+  } hb_tag_payload_s;
+
+  // Tag payload for manycore control signals
+  hb_tag_payload_s hb_tag_data_lo;
+  logic            hb_tag_new_data_lo;
+
+  bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
+    btc_hb
+      (.bsg_tag_i     ( hb_tag_lines_lo )
+      ,.recv_clk_i    ( hb_clk )
+      ,.recv_reset_i  ( 1'b0 )
+      ,.recv_new_r_o  ( hb_tag_new_data_lo )
+      ,.recv_data_r_o ( hb_tag_data_lo )
+      );
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Link Hub
+  //
+
+  logic [19:0] bsg_link_clk_li, bsg_link_v_li, bsg_link_tkn_lo;
+  logic [19:0][8:0] bsg_link_data_li;
+
+  logic [19:0] bsg_link_clk_lo, bsg_link_v_lo, bsg_link_tkn_li;
+  logic [19:0][8:0] bsg_link_data_lo;
+
+`define BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, j)                      \
+    assign bsg_link_data_li[i][j] = p_bsg_link_out``i``_d``j``_i; \
+    assign p_bsg_link_in``i``_d``j``_o = bsg_link_data_lo[i][j];
+
+`define BSG_GATEWAY_CHIP_LINK_HUB(i)                              \
+    assign bsg_link_clk_li       [i] = p_bsg_link_out``i``_clk_i; \
+    assign bsg_link_v_li         [i] = p_bsg_link_out``i``_v_i;   \
+    assign p_bsg_link_out``i``_tkn_o = bsg_link_tkn_lo[i];        \
+    assign p_bsg_link_in``i``_clk_o  = bsg_link_clk_lo[i];        \
+    assign p_bsg_link_in``i``_v_o    = bsg_link_v_lo  [i];        \
+    assign bsg_link_tkn_li       [i] = p_bsg_link_in``i``_tkn_i;  \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 0)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 1)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 2)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 3)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 4)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 5)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 6)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 7)                         \
+    `BSG_GATEWAY_CHIP_LINK_HUB_DATA(i, 8)
+
+  `BSG_GATEWAY_CHIP_LINK_HUB( 0)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 1)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 2)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 3)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 4)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 5)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 6)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 7)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 8)
+  `BSG_GATEWAY_CHIP_LINK_HUB( 9)
+  `BSG_GATEWAY_CHIP_LINK_HUB(10)
+  `BSG_GATEWAY_CHIP_LINK_HUB(11)
+  `BSG_GATEWAY_CHIP_LINK_HUB(12)
+  `BSG_GATEWAY_CHIP_LINK_HUB(13)
+  `BSG_GATEWAY_CHIP_LINK_HUB(14)
+  `BSG_GATEWAY_CHIP_LINK_HUB(15)
+  `BSG_GATEWAY_CHIP_LINK_HUB(16)
+  `BSG_GATEWAY_CHIP_LINK_HUB(17)
+  `BSG_GATEWAY_CHIP_LINK_HUB(18)
+  `BSG_GATEWAY_CHIP_LINK_HUB(19)
+
+  // Mapping physical links to logical links
+  logic [3:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
+  logic [3:0][8:0] io_link_data_li;
+  logic [3:0] io_link_clk_lo, io_link_v_lo, io_link_tkn_li;
+  logic [3:0][8:0] io_link_data_lo;
+
+  logic [15:0] mem_link_clk_li, mem_link_v_li, mem_link_tkn_lo;
+  logic [15:0][8:0] mem_link_data_li;
+  logic [15:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
+  logic [15:0][8:0] mem_link_data_lo;
+
+`define BSG_GATEWAY_CHIP_LINK_TYPE_HUB(typ, num)                                   \
+  for (genvar i = 0; i < ``num``; i++)                                             \
+  begin                                                                            \
+    assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_gp[i]]; \
+    assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_gp[i]]; \
+    assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_gp[i]]; \
+    assign bsg_link_tkn_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_tkn_lo[i];   \
+                                                                                   \
+    assign bsg_link_clk_lo [``typ``_link_mapping_gp[i]] = ``typ``_link_clk_lo [i]; \
+    assign bsg_link_v_lo   [``typ``_link_mapping_gp[i]] = ``typ``_link_v_lo   [i]; \
+    assign bsg_link_data_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_data_lo[i]; \
+    assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_gp[i]];   \
+  end
+
+  `BSG_GATEWAY_CHIP_LINK_TYPE_HUB(io, 4)
+  `BSG_GATEWAY_CHIP_LINK_TYPE_HUB(mem, 16)
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Chip IO
+  //
+
+  `declare_bsg_ready_and_link_sif_s(io_ct_width_gp, io_link_sif_s);
+  `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, mem_link_sif_s);
+
+  io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
+  mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
+
+  for (genvar i = 0; i < 4; i++)
+  begin: io_link
+    bsg_chip_io_links_ct_fifo 
+   #(.link_width_p                        ( io_link_width_gp         )
+    ,.link_channel_width_p                ( io_link_channel_width_gp )
+    ,.link_num_channels_p                 ( io_link_num_channels_gp  )
+    ,.link_lg_fifo_depth_p                ( io_link_lg_fifo_depth_gp )
+    ,.link_lg_credit_to_token_decimation_p( io_link_lg_credit_to_token_decimation_gp )
+    ,.link_use_extra_data_bit_p           ( io_link_use_extra_data_bit_gp )
+    ,.ct_bypass_p                         ( 0 )
+    ,.ct_width_p                          ( io_ct_width_gp )
+    ,.ct_num_in_p                         ( io_ct_num_in_gp )
+    ,.ct_remote_credits_p                 ( io_ct_remote_credits_gp )
+    ,.ct_use_pseudo_large_fifo_p          ( io_ct_use_pseudo_large_fifo_gp )
+    ,.ct_lg_credit_decimation_p           ( io_ct_lg_credit_decimation_gp )
+    ,.num_hops_p                          ( 2 )
+    ) link
+    (.core_clk_i ( hb_clk )
+    ,.io_clk_i   ( io_link_master_clk )
+   
+    ,.link_io_tag_lines_i   ( io_link_io_tag_lines_lo[i] )
+    ,.link_core_tag_lines_i ( io_link_core_tag_lines_lo[i] )
+   
+    ,.link_clk_i ( io_link_clk_li [i] )
+    ,.link_v_i   ( io_link_v_li   [i] )
+    ,.link_tkn_o ( io_link_tkn_lo [i] )
+    ,.link_data_i( io_link_data_li[i][io_link_channel_width_gp-1:0] )
+   
+    ,.link_clk_o ( io_link_clk_lo [i] )
+    ,.link_v_o   ( io_link_v_lo   [i] )
+    ,.link_tkn_i ( io_link_tkn_li [i] )
+    ,.link_data_o( io_link_data_lo[i][io_link_channel_width_gp-1:0] )
+   
+    ,.links_i    ( io_links_li[i] ) 
+    ,.links_o    ( io_links_lo[i] )
+    );
+  end
+
+  for (genvar i = 0; i < 16; i++)
+  begin: mem_link
+    bsg_chip_io_links_ct_fifo 
+   #(.link_width_p                        ( mem_link_width_gp         )
+    ,.link_channel_width_p                ( mem_link_channel_width_gp )
+    ,.link_num_channels_p                 ( mem_link_num_channels_gp  )
+    ,.link_lg_fifo_depth_p                ( mem_link_lg_fifo_depth_gp )
+    ,.link_lg_credit_to_token_decimation_p( mem_link_lg_credit_to_token_decimation_gp )
+    ,.link_use_extra_data_bit_p           ( mem_link_use_extra_data_bit_gp )
+    ,.ct_bypass_p                         ( 1 )
+    ,.num_hops_p                          ( 1 )
+    ) link
+    (.core_clk_i ( hb_clk )
+    ,.io_clk_i   ( mem_link_master_clk )
+   
+    ,.link_io_tag_lines_i   ( mem_link_io_tag_lines_lo[i] )
+    ,.link_core_tag_lines_i ( mem_link_core_tag_lines_lo[i] )
+   
+    ,.link_clk_i ( mem_link_clk_li [i] )
+    ,.link_v_i   ( mem_link_v_li   [i] )
+    ,.link_tkn_o ( mem_link_tkn_lo [i] )
+    ,.link_data_i( mem_link_data_li[i][mem_link_channel_width_gp-1:0] )
+
+    ,.link_clk_o ( mem_link_clk_lo [i] )
+    ,.link_v_o   ( mem_link_v_lo   [i] )
+    ,.link_tkn_i ( mem_link_tkn_li [i] )
+    ,.link_data_o( mem_link_data_lo[i][mem_link_channel_width_gp-1:0] )
+
+    ,.links_i    ( mem_links_li[i] ) 
+    ,.links_o    ( mem_links_lo[i] )
+    );
+  end
+
+  //////////////////////////////////////////////////
+  //
+  // Loopback Test Node
+  //
+  logic node_en_lo;
+  
+  logic [3:0][io_ct_num_in_gp-1:0] io_error_r;
+  logic [3:0][io_ct_num_in_gp-1:0][31:0] io_sent_r, io_received_r;
+
+  for (genvar i = 0; i < 4; i++)
+  begin: io_node
+    for (genvar j = 0; j < io_ct_num_in_gp; j++)
+      begin: ch
+        bsg_fifo_1r1w_small_hardened_test_node
+       #(.num_channels_p(io_ct_width_gp/io_link_channel_width_gp)
+        ,.channel_width_p(io_link_channel_width_gp)
+        ,.is_client_node_p(0)
+        ) node
+        (.node_clk_i  (hb_clk)
+        ,.node_reset_i(hb_tag_data_lo.reset)
+        ,.node_en_i   (node_en_lo)
+        
+        ,.error_o   (io_error_r[i][j])
+        ,.sent_o    (io_sent_r[i][j])
+        ,.received_o(io_received_r[i][j])
+         
+        ,.clk_i   (hb_clk)
+        ,.reset_i (hb_tag_data_lo.reset)
+        
+        ,.link_i(io_links_lo[i][j])
+        ,.link_o(io_links_li[i][j])
+        );
+      end
+  end
+  
+  logic [15:0] mem_error_r;
+  logic [15:0][31:0] mem_sent_r, mem_received_r;
+
+  for (genvar i = 0; i < 16; i++)
+  begin: mem_node
+    bsg_fifo_1r1w_small_hardened_test_node
+   #(.num_channels_p(mem_link_width_gp/mem_link_channel_width_gp)
+    ,.channel_width_p(mem_link_channel_width_gp)
+    ,.is_client_node_p(0)
+    ) node
+    (.node_clk_i  (hb_clk)
+    ,.node_reset_i(hb_tag_data_lo.reset)
+    ,.node_en_i   (node_en_lo)
+    
+    ,.error_o   (mem_error_r[i])
+    ,.sent_o    (mem_sent_r[i])
+    ,.received_o(mem_received_r[i])
+     
+    ,.clk_i   (hb_clk)
+    ,.reset_i (hb_tag_data_lo.reset)
+    
+    ,.link_i(mem_links_lo[i])
+    ,.link_o(mem_links_li[i])
+    );
+  end
+
+  initial
+  begin
+    // Init
+    node_en_lo = 0;
+    #100000
+    
+    // Wait for bsg_tag initialization
+    @(posedge tag_trace_done_lo); #1;
+
+    // node enable
+    @(posedge hb_clk); #1;
+    node_en_lo = 1;
+    $display("node enable HIGH");
+    
+    $display("running tests...");
+    #50000000
+    $display("finished running tests");
+    
+    // node disable
+    @(posedge hb_clk); #1;
+    node_en_lo = 0;
+    $display("node enable LOW");
+    
+    #5000000
+
+    // verification
+    for (integer i = 0; i < 4; i++)
+      begin
+        for (integer j = 0; j < io_ct_num_in_gp; j++)
+          begin
+            assert(io_error_r[i][j] == 0)
+            else 
+              begin
+                $error("\nFAIL... Error in loopback IO node[%0d][%0d]", i, j);
+                $finish;
+              end
+            assert(io_sent_r[i][j] == io_received_r[i][j])
+            else 
+              begin
+                $error("\nFAIL... Loopback IO node[%0d][%0d] sent %0d packets but received only %0d", i, j, io_sent_r[i][j], io_received_r[i][j]);
+                $finish;
+              end
+            $display("Loopback IO node[%0d][%0d] sent and received %0d packets", i, j, io_sent_r[i][j]);
+          end
+      end
+      
+    for (integer i = 0; i < 16; i++)
+      begin
+        assert(mem_error_r[i] == 0)
+        else 
+          begin
+            $error("\nFAIL... Error in loopback MEM node[%0d]", i);
+            $finish;
+          end
+        assert(mem_sent_r[i] == mem_received_r[i])
+        else 
+          begin
+            $error("\nFAIL... Loopback MEM node[%0d] sent %0d packets but received only %0d", i, mem_sent_r[i], mem_received_r[i]);
+            $finish;
+          end
+        $display("Loopback MEM node[%0d] sent and received %0d packets", i, mem_sent_r[i]);
+      end
+
+    $display("\nPASS!\n");
+    $finish;
+  end
+
+endmodule
