@@ -27,8 +27,8 @@ export TESTING_BASEJUMP_STL_DIR       ?= $(BSG_OUT_DIR)/root/basejump_stl
 export TESTING_BSG_PACKAGING_DIR      ?= $(BSG_OUT_DIR)/root/bsg_packaging
 export TESTING_BOARD_DIR              ?= $(BSG_OUT_DIR)/root/board
 
-export BSG_PACKAGE           ?=uw_bga
-export BSG_PINOUT            ?=bsg_asic_cloud
+export BSG_PACKAGE           ?=hb_bga
+export BSG_PINOUT            ?=bsg_bigblade
 export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
 
