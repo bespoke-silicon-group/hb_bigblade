@@ -1,8 +1,8 @@
 `timescale 1ps/1ps
 
 `define HB_CLK_PERIOD 10000
-`define IO_LINK_MASTER_CLK_PERIOD 10000
-`define MEM_LINK_MASTER_CLK_PERIOD 10000
+`define BP_CLK_PERIOD 10000
+`define ROUTER_CLK_PERIOD 10000
 `define TAG_CLK_PERIOD 20000
 
 module bsg_gateway_chip
@@ -23,18 +23,18 @@ import bsg_manycore_pkg::*;
   logic hb_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`HB_CLK_PERIOD)) hb_clk_gen (.o(hb_clk));
   
-  logic io_link_master_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_LINK_MASTER_CLK_PERIOD)) io_link_master_clk_gen (.o(io_link_master_clk));
+  logic bp_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`BP_CLK_PERIOD)) bp_clk_gen (.o(bp_clk));
 
-  logic mem_link_master_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MEM_LINK_MASTER_CLK_PERIOD)) mem_link_master_clk_gen (.o(mem_link_master_clk));
+  logic router_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`ROUTER_CLK_PERIOD)) router_clk_gen (.o(router_clk));
 
   logic tag_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
 
   assign p_clk_A_o = hb_clk;
-  assign p_clk_B_o = io_link_master_clk;
-  assign p_clk_C_o = mem_link_master_clk;
+  assign p_clk_B_o = bp_clk;
+  assign p_clk_C_o = router_clk;
   assign p_bsg_tag_clk_o = ~tag_clk;
   
   assign p_sel_0_o = 1'b0;
@@ -58,13 +58,13 @@ import bsg_manycore_pkg::*;
   //
 
   localparam tag_trace_rom_addr_width_lp = 32;
-  localparam tag_trace_rom_data_width_lp = 28;
+  localparam tag_trace_rom_data_width_lp = 29;
 
   logic [tag_trace_rom_addr_width_lp-1:0] rom_addr_li;
   logic [tag_trace_rom_data_width_lp-1:0] rom_data_lo;
 
   logic       tag_trace_valid_lo;
-  logic [2:0] tag_trace_en_r_lo;
+  logic [1:0] tag_trace_en_r_lo;
   logic       tag_trace_done_lo;
 
   // TAG TRACE ROM
@@ -77,10 +77,10 @@ import bsg_manycore_pkg::*;
       );
 
   // TAG TRACE REPLAY
-  bsg_tag_trace_replay #(.rom_addr_width_p( tag_trace_rom_addr_width_lp )
-                        ,.rom_data_width_p( tag_trace_rom_data_width_lp )
-                        ,.num_masters_p( 3 )
-                        ,.num_clients_p( tag_num_clients_gp )
+  bsg_tag_trace_replay #(.rom_addr_width_p   ( tag_trace_rom_addr_width_lp )
+                        ,.rom_data_width_p   ( tag_trace_rom_data_width_lp )
+                        ,.num_masters_p      ( 2 )
+                        ,.num_clients_p      ( tag_num_clients_gp )
                         ,.max_payload_width_p( tag_max_payload_width_gp )
                         )
     tag_trace_replay
@@ -125,26 +125,31 @@ import bsg_manycore_pkg::*;
   bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
 
   // Tag lines for clock generators
-  bsg_tag_s       async_reset_tag_lines_lo;
-  bsg_tag_s [2:0] osc_tag_lines_lo;
-  bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
-  bsg_tag_s [2:0] ds_tag_lines_lo;
-  bsg_tag_s [2:0] sel_tag_lines_lo;
+  wire bsg_tag_s        async_reset_tag_lines_lo           = tag_lines_lo[0];
+  wire bsg_tag_s [2:0]  osc_tag_lines_lo                   = tag_lines_lo[3:1];
+  wire bsg_tag_s [2:0]  osc_trigger_tag_lines_lo           = tag_lines_lo[6:4];
+  wire bsg_tag_s [2:0]  ds_tag_lines_lo                    = tag_lines_lo[9:7];
+  wire bsg_tag_s [2:0]  sel_tag_lines_lo                   = tag_lines_lo[12:10];
 
-  assign async_reset_tag_lines_lo = tag_lines_lo[0];
-  assign osc_tag_lines_lo         = tag_lines_lo[3:1];
-  assign osc_trigger_tag_lines_lo = tag_lines_lo[6:4];
-  assign ds_tag_lines_lo          = tag_lines_lo[9:7];
-  assign sel_tag_lines_lo         = tag_lines_lo[12:10];
+  // Tag lines for io link
+  wire bsg_tag_s [3:0]  io_link_osc_tag_lines_lo           = tag_lines_lo[16:13];
+  wire bsg_tag_s [3:0]  io_link_osc_trigger_tag_lines_lo   = tag_lines_lo[20:17];
+  wire bsg_tag_s [3:0]  io_link_ds_tag_lines_lo            = tag_lines_lo[24:21];
+  wire bsg_tag_s [3:0]  io_link_sel_tag_lines_lo           = tag_lines_lo[28:25];
+  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo            = tag_lines_lo[32:29];
+  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo          = tag_lines_lo[36:33];
 
-  // Tag lines for io
-  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo    = tag_lines_lo[16:13];
-  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo  = tag_lines_lo[20:17];
-  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo   = tag_lines_lo[36:21];
-  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo = tag_lines_lo[52:37];
+  // Tag lines for mem link
+  wire bsg_tag_s [15:0] mem_link_osc_tag_lines_lo          = tag_lines_lo[52:37];
+  wire bsg_tag_s [15:0] mem_link_osc_trigger_tag_lines_lo  = tag_lines_lo[68:53];
+  wire bsg_tag_s [15:0] mem_link_ds_tag_lines_lo           = tag_lines_lo[84:69];
+  wire bsg_tag_s [15:0] mem_link_sel_tag_lines_lo          = tag_lines_lo[100:85];
+  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo           = tag_lines_lo[116:101];
+  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo         = tag_lines_lo[132:117];
 
   // Tag lines for HB
-  wire bsg_tag_s hb_tag_lines_lo                  = tag_lines_lo[53];
+  wire bsg_tag_s        hb_tag_lines_lo                    = tag_lines_lo[133];
+  wire bsg_tag_s [1:0]  hb_dest_cord_tag_lines_lo          = tag_lines_lo[135:134];
 
   // BSG tag master instance
   bsg_tag_master #(.els_p( tag_num_clients_gp )
@@ -164,11 +169,10 @@ import bsg_manycore_pkg::*;
 
   // Tag payload for hb control signals
   typedef struct packed { 
+      logic padding;
       logic reset;
-      logic [io_wh_cord_width_gp-1:0] cord;
   } hb_tag_payload_s;
 
-  // Tag payload for manycore control signals
   hb_tag_payload_s hb_tag_data_lo;
   logic            hb_tag_new_data_lo;
 
@@ -291,7 +295,7 @@ import bsg_manycore_pkg::*;
     ,.num_hops_p                          ( 2 )
     ) link
     (.core_clk_i ( hb_clk )
-    ,.io_clk_i   ( io_link_master_clk )
+    ,.io_clk_i   ( router_clk )
    
     ,.link_io_tag_lines_i   ( io_link_io_tag_lines_lo[i] )
     ,.link_core_tag_lines_i ( io_link_core_tag_lines_lo[i] )
@@ -324,7 +328,7 @@ import bsg_manycore_pkg::*;
     ,.num_hops_p                          ( 1 )
     ) link
     (.core_clk_i ( hb_clk )
-    ,.io_clk_i   ( mem_link_master_clk )
+    ,.io_clk_i   ( router_clk )
    
     ,.link_io_tag_lines_i   ( mem_link_io_tag_lines_lo[i] )
     ,.link_core_tag_lines_i ( mem_link_core_tag_lines_lo[i] )
