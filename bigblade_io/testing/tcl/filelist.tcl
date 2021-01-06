@@ -136,5 +136,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/prbs_any.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
+  $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
+  $bsg_designs_target_dir/v/bsg_manycore_link_async_to_bsg_link.v
 "]
 
