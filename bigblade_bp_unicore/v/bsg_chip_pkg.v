@@ -23,6 +23,8 @@ package bsg_chip_pkg;
   localparam mc_y_subcord_width_gp = `BSG_SAFE_CLOG2(mc_num_tiles_y_gp);
   localparam pod_x_cord_width_gp = 3;
   localparam pod_y_cord_width_gp = 4;
+  localparam bp_x_cord_width_gp = 0;
+  localparam bp_y_cord_width_gp = 1;
   
   localparam mc_addr_width_gp = 28;
   localparam mc_data_width_gp = 32;

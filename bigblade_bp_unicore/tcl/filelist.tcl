@@ -22,6 +22,7 @@ set bp_me_dir     ${blackparrot_dir}/bp_me
 
 set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bp_common_dir/src/include/bp_common_pkg.sv
@@ -80,6 +81,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_adder_ripple_carry.v
   $basejump_stl_dir/bsg_misc/bsg_adder_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_fixed.v
+  $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
   $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
@@ -127,6 +129,9 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_tielo.v
   $basejump_stl_dir/bsg_misc/bsg_transpose.v
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
   $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
@@ -253,10 +258,11 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_unicore_lite.sv
 
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
-  $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
+  $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
+  $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
@@ -296,13 +302,20 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
   $bsg_manycore_dir/v/bsg_1hold.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_encode.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
+  $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
+  $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/vanilla_bean/hash_function.v
 
   $bsg_designs_target_dir/v/bp_cce_to_mc_fifo.sv
   $bsg_designs_target_dir/v/bp_cce_to_mc_mmio.sv
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
- 
+
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bsg_chip.v
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_node.sv
 "]
 
+  #$bsg_designs_target_dir/v/bsg_chip.v

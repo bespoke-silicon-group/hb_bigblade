@@ -144,8 +144,9 @@ module bp_cce_to_mc_fifo
 
     ,.out_credits_o(out_credits_lo)
 
-    ,.my_x_i(my_x_i)
-    ,.my_y_i(my_y_i)
+    // Unused
+    ,.global_x_i('0)
+    ,.global_y_i('0)
     );
 
   //
@@ -157,12 +158,11 @@ module bp_cce_to_mc_fifo
   // TODO: This should be set in bsg_replicant
   typedef struct packed
   {
-    logic [7:0]  reserved;
+    logic [15:0] reserved;
     logic [31:0] addr;
-    logic [7:0]  op;
-    logic [7:0]  op_ex;
+    logic [7:0]  op_v2;
     logic [7:0]  reg_id;
-    logic [31:0] data;
+    logic [31:0] payload;
     logic [7:0]  y_src;
     logic [7:0]  x_src;
     logic [7:0]  y_dst;
@@ -172,32 +172,12 @@ module bp_cce_to_mc_fifo
   typedef struct packed
   {
     logic [63:0] reserved;
-    logic [7:0]  op;
-    logic [31:0] data;
-    logic [7:0]  load_id;
+    logic [7:0]  op_v2;
+    logic [31:0] payload;
+    logic [7:0]  reg_id;
     logic [7:0]  y_dst;
     logic [7:0]  x_dst;
   }  host_response_packet_s;
-
-  typedef struct packed
-  {
-    logic dram_not_tile;
-    logic tile_not_dram;
-    union packed
-    {
-      struct packed
-      {
-        logic [29:0] dram_addr;
-      } dram_eva;
-      struct packed
-      {
-        logic [max_y_cord_width_gp-1:0]    y_cord;
-        logic [max_x_cord_width_gp-1:0]    x_cord;
-        logic [epa_word_addr_width_gp-1:0] epa;
-        logic [1:0]                        low_bits;
-      } tile_eva;
-    } a;
-  } bp_eva_s;
 
   logic [word_width_p-1:0] bp_to_mc_data_li;
   logic bp_to_mc_v_li, bp_to_mc_ready_lo;
@@ -220,12 +200,11 @@ module bp_cce_to_mc_fifo
      );
   assign bp_to_mc_load_info = '{part_sel : io_cmd_li.header.addr[0+:2], default: '0};
   assign out_packet_li = '{addr       : bp_to_mc_lo.addr[2+:mc_addr_width_p]
-                           ,op        : bsg_manycore_packet_op_e'(bp_to_mc_lo.op)
-                           ,op_ex     : bp_to_mc_lo.op_ex
-                           // TODO: Overloaded, does host software depend on this?
-                           ,reg_id    : 5'd31
-                           ,payload   : (bp_to_mc_lo.op == e_remote_store)
-                                        ? bp_to_mc_lo.data
+                           ,op_v2     : bsg_manycore_packet_op_e'(bp_to_mc_lo.op_v2)
+                           ,reg_id    : bp_to_mc_lo.reg_id
+                           // TODO: decode reg_id
+                           ,payload   : (bp_to_mc_lo.op_v2 == e_remote_store)
+                                        ? bp_to_mc_lo.payload
                                         : bp_to_mc_load_info
                            ,src_y_cord: bp_to_mc_lo.y_src
                            ,src_x_cord: bp_to_mc_lo.x_src
@@ -256,10 +235,11 @@ module bp_cce_to_mc_fifo
   // We ignore the x dst and y dst of return packets
   assign mc_to_bp_response_li = '{x_dst   : my_x_i
                                   ,y_dst  : my_y_i
-                                  ,load_id: returned_reg_id_r_lo
-                                  ,data   : returned_data_r_lo
+                                  // Need to encode?
+                                  ,reg_id : returned_reg_id_r_lo
+                                  ,payload: returned_data_r_lo
                                   // Possibly unused by host?
-                                  ,op     : returned_pkt_type_r_lo
+                                  ,op_v2  : returned_pkt_type_r_lo
                                   ,default: '0
                                   };
   assign mc_to_bp_response_v_li = mc_to_bp_response_ready_lo & returned_v_r_lo;
@@ -287,11 +267,10 @@ module bp_cce_to_mc_fifo
                                  ,y_dst   : my_y_i
                                  ,x_src   : in_src_x_cord_lo
                                  ,y_src   : in_src_y_cord_lo
-                                 ,data    : in_data_lo
-                                 // We only support remote stores from MC
-                                 ,reg_id  : '0
-                                 ,op_ex   : in_mask_lo
-                                 ,op      : e_remote_store
+                                 // TODO: encode reg_id
+                                 ,payload : in_data_lo
+                                 ,reg_id  : in_mask_lo
+                                 ,op_v2   : e_remote_store
                                  // Else these fields would be dynamic
                                  ,addr    : in_addr_lo
                                  ,default : '0

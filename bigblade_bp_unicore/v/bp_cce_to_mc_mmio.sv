@@ -197,33 +197,11 @@ module bp_cce_to_mc_mmio
 
     ,.out_credits_o(out_credits_lo)
 
-    ,.my_x_i(my_x_i)
-    ,.my_y_i(my_y_i)
+    ,.global_x_i('0)
+    ,.global_y_i('0)
     );
 
-  typedef struct packed
-  {
-    // 1x indicates DRAM address
-    // 01x indicates global manycore address
-    // 00x indicates BlackParrot address
-    logic [1:0] _type;
-    union packed
-    {
-      struct packed
-      {
-        logic [29:0] dram_addr;
-      } dram_eva;
-      struct packed
-      {
-        logic [max_y_cord_width_gp-1:0]    y_cord;
-        logic [max_x_cord_width_gp-1:0]    x_cord;
-        logic [epa_word_addr_width_gp-1:0] epa;
-        logic [1:0]                        low_bits;
-      } tile_eva;
-    } a;
-  } bp_eva_s;
-
-  bp_eva_s io_cmd_eva_li;
+  bsg_manycore_global_addr_s io_cmd_eva_li;
   assign io_cmd_eva_li = io_cmd_cast_i.header.addr;
 
   // DRAM hash function
@@ -248,6 +226,29 @@ module bp_cce_to_mc_mmio
 
   assign hash_bank_input = io_cmd_eva_li[2+vcache_word_offset_width_lp+:hash_bank_input_width_lp];
 
+  logic [(mc_data_width_p>>3)-1:0] store_mask;
+  always_comb
+    case (io_cmd_cast_i.header.size)
+       e_bedrock_msg_size_1: store_mask = 4'h1 << io_cmd_eva_li.low_bits;
+       e_bedrock_msg_size_2: store_mask = 4'h3 << io_cmd_eva_li.low_bits;
+       default:              store_mask = 4'hf << io_cmd_eva_li.low_bits;
+    endcase
+
+  logic [mc_data_width_p-1:0] store_payload;
+  logic [bsg_manycore_reg_id_width_gp-1:0] store_reg_id;
+  bsg_manycore_packet_op_e store_op;
+  bsg_manycore_reg_id_encode
+   #(.data_width_p(mc_data_width_p))
+   reg_id_encode
+    (.data_i(io_cmd_cast_i.data[0+:mc_data_width_p])
+     ,.mask_i(store_mask)
+     ,.reg_id_i(trans_id_lo)
+
+     ,.data_o(store_payload)
+     ,.reg_id_o(store_reg_id)
+     ,.op_o(store_op)
+     );
+
   // Command packet formation
   always_comb
     begin
@@ -260,11 +261,11 @@ module bp_cce_to_mc_mmio
       // Overload reg_id with the trans id of the request
       out_packet_li.reg_id                           = bsg_manycore_reg_id_width_gp'(trans_id_lo);
 
-      if (io_cmd_eva_li._type == '0)
+      if (io_cmd_eva_li.remote == '0)
         begin
-          out_packet_li.addr                             = io_cmd_eva_li.a.tile_eva.epa;
-          out_packet_li.y_cord                           = io_cmd_eva_li.a.tile_eva.y_cord;
-          out_packet_li.x_cord                           = io_cmd_eva_li.a.tile_eva.x_cord;
+          out_packet_li.addr                             = io_cmd_eva_li.addr;
+          out_packet_li.y_cord                           = io_cmd_eva_li.y_cord;
+          out_packet_li.x_cord                           = io_cmd_eva_li.x_cord;
         end
       else
         begin
@@ -283,32 +284,16 @@ module bp_cce_to_mc_mmio
       case (io_cmd_cast_i.header.msg_type)
         e_bedrock_mem_uc_rd, e_bedrock_mem_rd:
           begin
-            out_packet_li.op                                       = e_remote_load;
+            out_packet_li.op_v2                                    = e_remote_load;
             out_packet_li.payload.load_info_s.load_info.is_byte_op = (io_cmd_cast_i.header.size == e_bedrock_msg_size_1);
             out_packet_li.payload.load_info_s.load_info.is_hex_op  = (io_cmd_cast_i.header.size == e_bedrock_msg_size_2);
-            out_packet_li.payload.load_info_s.load_info.part_sel   = io_cmd_eva_li.a.tile_eva.low_bits;
+            out_packet_li.payload.load_info_s.load_info.part_sel   = io_cmd_eva_li.low_bits;
           end
         default: // e_bedrock_mem_uc_wr, e_bedrock_mem_wr:
           begin
-            out_packet_li.op                               = e_remote_store;
-            // Set store data and mask (assume aligned)
-            case (io_cmd_cast_i.header.size)
-              e_bedrock_msg_size_1:
-                begin
-                  out_packet_li.payload.data               = {4{io_cmd_cast_i.data[0+:8]}};
-                  out_packet_li.op_ex.store_mask           = 4'h1 << io_cmd_eva_li.a.tile_eva.low_bits;
-                end
-              e_bedrock_msg_size_2:
-                begin
-                  out_packet_li.payload.data               = {2{io_cmd_cast_i.data[0+:16]}};
-                  out_packet_li.op_ex.store_mask           = 4'h3 << io_cmd_eva_li.a.tile_eva.low_bits;
-                end
-              default: //e_bedrock_msg_size_4:
-                begin
-                  out_packet_li.payload.data               = {1{io_cmd_cast_i.data[0+:32]}};
-                  out_packet_li.op_ex.store_mask           = 4'hf << io_cmd_eva_li.a.tile_eva.low_bits;
-                end
-            endcase
+            out_packet_li.op_v2                                    = store_op;
+            out_packet_li.payload.data                             = store_payload;
+            out_packet_li.reg_id                                   = store_reg_id;
           end
       endcase
     end

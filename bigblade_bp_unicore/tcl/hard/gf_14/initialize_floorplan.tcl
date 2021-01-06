@@ -8,8 +8,8 @@ set dcache_data_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*d
 set data_mem_width         [lindex [get_attribute [get_cell -hier $dcache_data_mems] width ] 0]
 set data_mem_height        [lindex [get_attribute [get_cell -hier $dcache_data_mems] height] 0]
 
-set tile_height [round_up_to_nearest [expr 6*($data_mem_height + $keepout_margin_y)] [unit_height]]
-set tile_width [expr 325]
+set tile_height [round_up_to_nearest [expr 8*($data_mem_height + $keepout_margin_y)+$keepout_margin_y] [unit_height]]
+set tile_width [expr 300]
 
 initialize_floorplan        \
   -control_type die         \
