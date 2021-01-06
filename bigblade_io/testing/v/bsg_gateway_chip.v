@@ -10,6 +10,7 @@ module bsg_gateway_chip
 import bsg_tag_pkg::*;
 import bsg_chip_pkg::*;
 import bsg_noc_pkg::*;
+import bsg_manycore_pkg::*;
 
 `include "bsg_pinout_inverted.v"
 

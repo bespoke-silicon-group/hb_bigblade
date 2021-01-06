@@ -1,5 +1,6 @@
 
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
+set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 
 set bsg_packaging_dir $::env(BSG_PACKAGING_DIR)

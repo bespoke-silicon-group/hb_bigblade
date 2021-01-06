@@ -4,6 +4,7 @@
 #------------------------------------------------------------
 
 set basejump_stl_dir       $::env(TESTING_BASEJUMP_STL_DIR)
+set bsg_manycore_dir       $::env(TESTING_BSG_MANYCORE_DIR)
 set bsg_designs_dir        $::env(TESTING_BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(TESTING_BSG_DESIGNS_TARGET_DIR)
 set board_dir              $::env(TESTING_BOARD_DIR)
@@ -19,6 +20,8 @@ set TESTING_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
 "]
 

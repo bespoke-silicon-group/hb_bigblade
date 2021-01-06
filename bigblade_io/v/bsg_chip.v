@@ -15,6 +15,7 @@ module bsg_chip
  import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
  import bsg_chip_pkg::*;
+ import bsg_manycore_pkg::*;
 
 `include "bsg_pinout.v"
 `include "bsg_iopads.v"
