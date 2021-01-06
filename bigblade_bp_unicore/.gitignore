@@ -7,3 +7,4 @@ black-parrot/
 out/
 vc_hdrs.h
 simv*
+bsg_manycore/
