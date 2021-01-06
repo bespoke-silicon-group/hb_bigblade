@@ -316,6 +316,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_node.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_pod.sv
 "]
 
   #$bsg_designs_target_dir/v/bsg_chip.v
