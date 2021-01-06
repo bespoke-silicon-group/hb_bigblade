@@ -4,8 +4,6 @@
 package bsg_chip_pkg;
 
   `include "bsg_defines.v"
-  //`include "bsg_manycore_packet.vh"
-  //`include "bsg_cache_dma_pkt.vh"
 
   //////////////////////////////////////////////////
   //
