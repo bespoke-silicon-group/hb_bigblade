@@ -79,6 +79,9 @@ module bsg_chip
       ,.sel_i ( clk_out_sel )
       ,.data_o( clk_out )
       );
+  
+  // FIXME: Change to appropriate external clock
+  wire bsg_link_clk_gen_ext_clk_lo = clk_C_i_int;
 
 
   //////////////////////////////////////////////////
@@ -184,7 +187,7 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.io_link_sel        [i] )
-    ,.ext_clk_i               ( clk_C_i_int )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
     ,.clk_o                   ( io_link_io_clk_lo               [i] )
     );
 
@@ -236,7 +239,7 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.mem_link_sel        [i] )
-    ,.ext_clk_i               ( clk_C_i_int )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
     ,.clk_o                   ( mem_link_io_clk_lo               [i] )
     );
 

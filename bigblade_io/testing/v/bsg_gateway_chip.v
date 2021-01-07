@@ -36,6 +36,9 @@ module bsg_gateway_chip
   
   assign p_sel_0_o = 1'b0;
   assign p_sel_1_o = 1'b0;
+  
+  // FIXME: Change to proper clock
+  wire bsg_link_io_clk_lo = router_clk;
 
   //////////////////////////////////////////////////
   //
@@ -240,7 +243,7 @@ module bsg_gateway_chip
     ,.num_hops_p                          ( 2 )
     ) link
     (.core_clk_i ( hb_clk )
-    ,.io_clk_i   ( router_clk )
+    ,.io_clk_i   ( bsg_link_io_clk_lo )
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.io_link_core[i] )
@@ -273,7 +276,7 @@ module bsg_gateway_chip
     ,.num_hops_p                          ( 1 )
     ) link
     (.core_clk_i ( hb_clk )
-    ,.io_clk_i   ( router_clk )
+    ,.io_clk_i   ( bsg_link_io_clk_lo )
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
