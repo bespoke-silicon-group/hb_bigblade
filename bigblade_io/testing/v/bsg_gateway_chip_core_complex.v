@@ -1,10 +1,10 @@
 
-module bsg_gateway_chip_hb_complex
+module bsg_gateway_chip_core_complex
 
  import bsg_chip_pkg::*;
  import bsg_manycore_pkg::*;
 
-  (input                      clk_i
+  (input                      hb_clk_i
   ,input bsg_chip_tag_lines_s tag_lines_i
   ,input                      tag_trace_done_i
 
@@ -32,7 +32,7 @@ module bsg_gateway_chip_hb_complex
   bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
     btc_hb
       (.bsg_tag_i     ( tag_lines_i.hb_reset )
-      ,.recv_clk_i    ( clk_i )
+      ,.recv_clk_i    ( hb_clk_i )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  ( hb_tag_new_data_lo )
       ,.recv_data_r_o ( hb_tag_data_lo )
@@ -57,7 +57,7 @@ module bsg_gateway_chip_hb_complex
         ,.channel_width_p(io_link_channel_width_gp)
         ,.is_client_node_p(0)
         ) node
-        (.node_clk_i  (clk_i)
+        (.node_clk_i  (hb_clk_i)
         ,.node_reset_i(hb_tag_data_lo.reset)
         ,.node_en_i   (node_en_lo)
         
@@ -65,7 +65,7 @@ module bsg_gateway_chip_hb_complex
         ,.sent_o    (io_sent_r[i][j])
         ,.received_o(io_received_r[i][j])
          
-        ,.clk_i   (clk_i)
+        ,.clk_i   (hb_clk_i)
         ,.reset_i (hb_tag_data_lo.reset)
         
         ,.link_i(io_links_i[i][j])
@@ -84,7 +84,7 @@ module bsg_gateway_chip_hb_complex
     ,.channel_width_p(mem_link_channel_width_gp)
     ,.is_client_node_p(0)
     ) node
-    (.node_clk_i  (clk_i)
+    (.node_clk_i  (hb_clk_i)
     ,.node_reset_i(hb_tag_data_lo.reset)
     ,.node_en_i   (node_en_lo)
     
@@ -92,7 +92,7 @@ module bsg_gateway_chip_hb_complex
     ,.sent_o    (mem_sent_r[i])
     ,.received_o(mem_received_r[i])
      
-    ,.clk_i   (clk_i)
+    ,.clk_i   (hb_clk_i)
     ,.reset_i (hb_tag_data_lo.reset)
     
     ,.link_i(mem_links_i[i])
@@ -110,7 +110,7 @@ module bsg_gateway_chip_hb_complex
     @(posedge tag_trace_done_i); #1;
 
     // node enable
-    @(posedge clk_i); #1;
+    @(posedge hb_clk_i); #1;
     node_en_lo = 1;
     $display("node enable HIGH");
     
@@ -119,7 +119,7 @@ module bsg_gateway_chip_hb_complex
     $display("finished running tests");
     
     // node disable
-    @(posedge clk_i); #1;
+    @(posedge hb_clk_i); #1;
     node_en_lo = 0;
     $display("node enable LOW");
     
@@ -185,12 +185,12 @@ module bsg_gateway_chip_hb_complex
   //  ,.y_cord_width_p  (hb_y_cord_width_gp)
   //  ,.bsg_link_width_p(io_ct_width_gp    )
   //  ) mc_adapter
-  //  (.mc_clk_i        (clk_i)
+  //  (.mc_clk_i        (hb_clk_i)
   //  ,.mc_reset_i      (tag_lines_i.hb_reset)
   //  ,.mc_links_sif_i  (manycore_links_lo[i])
   //  ,.mc_links_sif_o  (manycore_links_li[i])
   //
-  //  ,.bsg_link_clk_i  (clk_i)
+  //  ,.bsg_link_clk_i  (hb_clk_i)
   //  ,.bsg_link_reset_i(tag_lines_i.hb_reset)
   //  ,.bsg_link_i      (io_links_i[i])
   //  ,.bsg_link_o      (io_links_o[i])

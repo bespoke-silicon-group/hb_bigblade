@@ -302,14 +302,14 @@ module bsg_gateway_chip
   // HB Complex
   //
 
-  bsg_gateway_chip_hb_complex hb_complex
-  (.clk_i           ( hb_clk       )
-  ,.tag_lines_i     ( tag_lines_lo )
-  ,.tag_trace_done_i(tag_trace_done_lo)
-  ,.io_links_i      ( io_links_lo  )
-  ,.io_links_o      ( io_links_li  )
-  ,.mem_links_i     ( mem_links_lo )
-  ,.mem_links_o     ( mem_links_li )
+  bsg_gateway_chip_core_complex core_complex
+  (.hb_clk_i        ( hb_clk            )
+  ,.tag_lines_i     ( tag_lines_lo      )
+  ,.tag_trace_done_i( tag_trace_done_lo )
+  ,.io_links_i      ( io_links_lo       )
+  ,.io_links_o      ( io_links_li       )
+  ,.mem_links_i     ( mem_links_lo      )
+  ,.mem_links_o     ( mem_links_li      )
   );
 
 endmodule

@@ -279,8 +279,8 @@ module bsg_chip
   // HB Complex
   //
 
-  bsg_chip_hb_complex hb_complex
-  (.clk_i      ( hb_clk_lo    )
+  bsg_chip_core_complex core_complex
+  (.hb_clk_i   ( hb_clk_lo    )
   ,.tag_lines_i( tag_lines_lo )
   ,.io_links_i ( io_links_lo  )
   ,.io_links_o ( io_links_li  )
