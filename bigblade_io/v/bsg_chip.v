@@ -12,10 +12,7 @@
 
 module bsg_chip
 
- import bsg_noc_pkg::*;
- import bsg_tag_pkg::*;
  import bsg_chip_pkg::*;
- import bsg_manycore_pkg::*;
 
 `include "bsg_pinout.v"
 `include "bsg_iopads.v"
@@ -82,50 +79,6 @@ module bsg_chip
       ,.sel_i ( clk_out_sel )
       ,.data_o( clk_out )
       );
-
-  //////////////////////////////////////////////////
-  //
-  // BSG Tag Client Instance
-  //
-
-  // Tag payload for hb control signals
-  typedef struct packed { 
-      logic padding;
-      logic reset;
-  } hb_tag_payload_s;
-
-  hb_tag_payload_s hb_tag_data_lo;
-  logic            hb_tag_new_data_lo;
-
-  bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
-    btc_hb
-      (.bsg_tag_i     ( tag_lines_lo.hb_reset )
-      ,.recv_clk_i    ( hb_clk_lo )
-      ,.recv_reset_i  ( 1'b0 )
-      ,.recv_new_r_o  ( hb_tag_new_data_lo )
-      ,.recv_data_r_o ( hb_tag_data_lo )
-      );
-
-
-  // Tag payload for hb dest cords
-  typedef struct packed { 
-      logic [wh_cord_width_gp-1:0] cord;
-  } hb_dest_cord_tag_payload_s;
-
-  hb_dest_cord_tag_payload_s [1:0] hb_dest_cord_tag_data_lo;
-  logic                      [1:0] hb_dest_cord_tag_new_data_lo;
-
-  for (genvar i = 0; i < 2; i++)
-  begin
-    bsg_tag_client #(.width_p( $bits(hb_dest_cord_tag_data_lo[i]) ), .default_p( 0 ))
-      btc_hb_dest_cord
-        (.bsg_tag_i     ( tag_lines_lo.hb_dest_cord[i] )
-        ,.recv_clk_i    ( hb_clk_lo )
-        ,.recv_reset_i  ( 1'b0 )
-        ,.recv_new_r_o  ( hb_dest_cord_tag_new_data_lo[i] )
-        ,.recv_data_r_o ( hb_dest_cord_tag_data_lo[i] )
-        );
-  end
 
 
   //////////////////////////////////////////////////
@@ -214,11 +167,8 @@ module bsg_chip
   // BSG Chip IO
   //
 
-  `declare_bsg_ready_and_link_sif_s(io_ct_width_gp, io_link_sif_s);
-  `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, mem_link_sif_s);
-
-  io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
-  mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
+  bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
+  bsg_chip_mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
   logic [3:0] io_link_io_clk_lo;
   logic [15:0] mem_link_io_clk_lo;
 
@@ -323,10 +273,16 @@ module bsg_chip
 
   //////////////////////////////////////////////////
   //
-  // Loopback
+  // HB Complex
   //
-  
-  assign io_links_li = io_links_lo;
-  assign mem_links_li = mem_links_lo;
+
+  bsg_chip_hb_complex hb_complex
+  (.clk_i      ( hb_clk_lo    )
+  ,.tag_lines_i( tag_lines_lo )
+  ,.io_links_i ( io_links_lo  )
+  ,.io_links_o ( io_links_li  )
+  ,.mem_links_i( mem_links_lo )
+  ,.mem_links_o( mem_links_li )
+  );
 
 endmodule

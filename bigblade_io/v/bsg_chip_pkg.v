@@ -4,6 +4,7 @@
 package bsg_chip_pkg;
 
   `include "bsg_defines.v"
+  import bsg_noc_pkg::*;
   import bsg_tag_pkg::*;
 
   //////////////////////////////////////////////////
@@ -42,6 +43,9 @@ package bsg_chip_pkg;
   localparam io_ct_credit_decimation_gp     = io_ct_remote_credits_gp/4;
   localparam io_ct_lg_credit_decimation_gp  = `BSG_SAFE_CLOG2(io_ct_credit_decimation_gp/2+1);
   localparam io_ct_use_pseudo_large_fifo_gp = 1;
+  
+  `declare_bsg_ready_and_link_sif_s(io_ct_width_gp, bsg_chip_io_link_sif_s);
+  `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, bsg_chip_mem_link_sif_s);
 
   // FIXME: ADD REAL MAPPING
   localparam int io_link_mapping_gp [4]  = {11,10,1,0};
