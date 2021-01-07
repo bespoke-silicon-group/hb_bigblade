@@ -4,6 +4,7 @@
 package bsg_chip_pkg;
 
   `include "bsg_defines.v"
+  import bsg_tag_pkg::*;
 
   //////////////////////////////////////////////////
   //
@@ -65,9 +66,34 @@ package bsg_chip_pkg;
   // BSG CHIP TAG PARAMETERS AND STRUCTS
   //
 
-  // Total number of clients the master will be driving.
-  // Set mininum client_id_width to 8-bits (fixed to 8 most of the time)
-  localparam tag_num_clients_gp = `BSG_MAX((1<<7)+2, 136);
+  typedef struct packed {
+    bsg_tag_s [1:0] hb_dest_cord;
+    bsg_tag_s hb_reset;
+
+    bsg_tag_s [15:0] mem_link_core;
+    bsg_tag_s [15:0] mem_link_io;
+    bsg_tag_s [15:0] mem_link_sel;
+    bsg_tag_s [15:0] mem_link_ds;
+    bsg_tag_s [15:0] mem_link_osc_trigger;
+    bsg_tag_s [15:0] mem_link_osc;
+
+    bsg_tag_s [3:0] io_link_core;
+    bsg_tag_s [3:0] io_link_io;
+    bsg_tag_s [3:0] io_link_sel;
+    bsg_tag_s [3:0] io_link_ds;
+    bsg_tag_s [3:0] io_link_osc_trigger;
+    bsg_tag_s [3:0] io_link_osc;
+
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_sel;
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_ds;
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc_trigger;
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc;
+    bsg_tag_s async_reset;
+  } bsg_chip_tag_lines_s;
+
+  // Total number of clients the master will be driving
+  localparam tag_num_masters_gp = 2;
+  localparam tag_num_clients_gp = $bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
 
   localparam tag_max_payload_width_in_hb_gp = wh_cord_width_gp;
   localparam tag_max_payload_width_in_clk_gen_pd_gp = `BSG_MAX(clk_gen_ds_width_gp+1, clk_gen_num_adgs_gp+4);

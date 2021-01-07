@@ -26,34 +26,7 @@ module bsg_chip
   //
 
   // All tag lines from the btm
-  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
-
-  // Tag lines for clock generators
-  wire bsg_tag_s        async_reset_tag_lines_lo           = tag_lines_lo[0];
-  wire bsg_tag_s [2:0]  osc_tag_lines_lo                   = tag_lines_lo[3:1];
-  wire bsg_tag_s [2:0]  osc_trigger_tag_lines_lo           = tag_lines_lo[6:4];
-  wire bsg_tag_s [2:0]  ds_tag_lines_lo                    = tag_lines_lo[9:7];
-  wire bsg_tag_s [2:0]  sel_tag_lines_lo                   = tag_lines_lo[12:10];
-
-  // Tag lines for io link
-  wire bsg_tag_s [3:0]  io_link_osc_tag_lines_lo           = tag_lines_lo[16:13];
-  wire bsg_tag_s [3:0]  io_link_osc_trigger_tag_lines_lo   = tag_lines_lo[20:17];
-  wire bsg_tag_s [3:0]  io_link_ds_tag_lines_lo            = tag_lines_lo[24:21];
-  wire bsg_tag_s [3:0]  io_link_sel_tag_lines_lo           = tag_lines_lo[28:25];
-  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo            = tag_lines_lo[32:29];
-  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo          = tag_lines_lo[36:33];
-
-  // Tag lines for mem link
-  wire bsg_tag_s [15:0] mem_link_osc_tag_lines_lo          = tag_lines_lo[52:37];
-  wire bsg_tag_s [15:0] mem_link_osc_trigger_tag_lines_lo  = tag_lines_lo[68:53];
-  wire bsg_tag_s [15:0] mem_link_ds_tag_lines_lo           = tag_lines_lo[84:69];
-  wire bsg_tag_s [15:0] mem_link_sel_tag_lines_lo          = tag_lines_lo[100:85];
-  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo           = tag_lines_lo[116:101];
-  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo         = tag_lines_lo[132:117];
-
-  // Tag lines for HB
-  wire bsg_tag_s        hb_tag_lines_lo                    = tag_lines_lo[133];
-  wire bsg_tag_s [1:0]  hb_dest_cord_tag_lines_lo          = tag_lines_lo[135:134];
+  bsg_chip_tag_lines_s tag_lines_lo;
 
   // BSG tag master instance
   bsg_tag_master #(.els_p( tag_num_clients_gp )
@@ -80,11 +53,11 @@ module bsg_chip
                             ,.num_adgs_p( clk_gen_num_adgs_gp )
                             )
     clk_gen_pd
-      (.async_reset_tag_lines_i ( async_reset_tag_lines_lo )
-      ,.osc_tag_lines_i         ( osc_tag_lines_lo )
-      ,.osc_trigger_tag_lines_i ( osc_trigger_tag_lines_lo )
-      ,.ds_tag_lines_i          ( ds_tag_lines_lo )
-      ,.sel_tag_lines_i         ( sel_tag_lines_lo )
+      (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+      ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc )
+      ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger )
+      ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds )
+      ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel )
 
       ,.ext_clk_i({ clk_C_i_int, clk_B_i_int, clk_A_i_int })
 
@@ -126,7 +99,7 @@ module bsg_chip
 
   bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
     btc_hb
-      (.bsg_tag_i     ( hb_tag_lines_lo )
+      (.bsg_tag_i     ( tag_lines_lo.hb_reset )
       ,.recv_clk_i    ( hb_clk_lo )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  ( hb_tag_new_data_lo )
@@ -146,7 +119,7 @@ module bsg_chip
   begin
     bsg_tag_client #(.width_p( $bits(hb_dest_cord_tag_data_lo[i]) ), .default_p( 0 ))
       btc_hb_dest_cord
-        (.bsg_tag_i     ( hb_dest_cord_tag_lines_lo[i] )
+        (.bsg_tag_i     ( tag_lines_lo.hb_dest_cord[i] )
         ,.recv_clk_i    ( hb_clk_lo )
         ,.recv_reset_i  ( 1'b0 )
         ,.recv_new_r_o  ( hb_dest_cord_tag_new_data_lo[i] )
@@ -256,11 +229,11 @@ module bsg_chip
     ,.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
-    (.async_reset_tag_lines_i ( async_reset_tag_lines_lo )
-    ,.osc_tag_lines_i         ( io_link_osc_tag_lines_lo        [i] )
-    ,.osc_trigger_tag_lines_i ( io_link_osc_trigger_tag_lines_lo[i] )
-    ,.ds_tag_lines_i          ( io_link_ds_tag_lines_lo         [i] )
-    ,.sel_tag_lines_i         ( io_link_sel_tag_lines_lo        [i] )
+    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    ,.osc_tag_lines_i         ( tag_lines_lo.io_link_osc        [i] )
+    ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
+    ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
+    ,.sel_tag_lines_i         ( tag_lines_lo.io_link_sel        [i] )
     ,.ext_clk_i               ( clk_C_i_int )
     ,.clk_o                   ( io_link_io_clk_lo               [i] )
     );
@@ -283,8 +256,8 @@ module bsg_chip
     (.core_clk_i ( hb_clk_lo )
     ,.io_clk_i   ( io_link_io_clk_lo[i] )
    
-    ,.link_io_tag_lines_i   ( io_link_io_tag_lines_lo[i] )
-    ,.link_core_tag_lines_i ( io_link_core_tag_lines_lo[i] )
+    ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
+    ,.link_core_tag_lines_i ( tag_lines_lo.io_link_core[i] )
    
     ,.link_clk_i ( io_link_clk_li [i] )
     ,.link_v_i   ( io_link_v_li   [i] )
@@ -308,11 +281,11 @@ module bsg_chip
     ,.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
-    (.async_reset_tag_lines_i ( async_reset_tag_lines_lo )
-    ,.osc_tag_lines_i         ( mem_link_osc_tag_lines_lo        [i] )
-    ,.osc_trigger_tag_lines_i ( mem_link_osc_trigger_tag_lines_lo[i] )
-    ,.ds_tag_lines_i          ( mem_link_ds_tag_lines_lo         [i] )
-    ,.sel_tag_lines_i         ( mem_link_sel_tag_lines_lo        [i] )
+    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    ,.osc_tag_lines_i         ( tag_lines_lo.mem_link_osc        [i] )
+    ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
+    ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )
+    ,.sel_tag_lines_i         ( tag_lines_lo.mem_link_sel        [i] )
     ,.ext_clk_i               ( clk_C_i_int )
     ,.clk_o                   ( mem_link_io_clk_lo               [i] )
     );
@@ -330,8 +303,8 @@ module bsg_chip
     (.core_clk_i ( hb_clk_lo )
     ,.io_clk_i   ( mem_link_io_clk_lo[i] )
    
-    ,.link_io_tag_lines_i   ( mem_link_io_tag_lines_lo[i] )
-    ,.link_core_tag_lines_i ( mem_link_core_tag_lines_lo[i] )
+    ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
+    ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
    
     ,.link_clk_i ( mem_link_clk_li [i] )
     ,.link_v_i   ( mem_link_v_li   [i] )
