@@ -11,9 +11,6 @@ module bsg_manycore_link_async_to_wormhole
   
   // bsg link parameters
   ,parameter bsg_link_width_p = "inv"
-
-  // The number of registers between reset_i and reset sinks.
-  ,parameter mc_reset_depth_p = 3
   
   ,localparam num_nets_lp = 2
   ,localparam bsg_manycore_link_sif_width_lp = `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -57,27 +54,13 @@ module bsg_manycore_link_async_to_wormhole
   assign mc_links_sif_i_cast = mc_links_sif_i;
   assign mc_links_sif_o      = mc_links_sif_o_cast;
 
-  // Pipeline the reset
-  logic [mc_reset_depth_p:0] mc_reset_i_r;
-
-  assign mc_reset_i_r[0] = mc_reset_i;
-
-  genvar k;
-  for (k = 1; k <= mc_reset_depth_p; k++)
-    begin
-      always_ff @(posedge mc_clk_i)
-        begin
-          mc_reset_i_r[k] <= mc_reset_i_r[k-1];
-        end
-    end
-
   // Fwd link
   bsg_ready_and_link_async_to_bsg_link
  #(.ral_link_width_p  (manycore_fwd_packet_width_lp)
   ,.bsg_link_width_p  (bsg_link_width_p      )
   ) fwd
   (.ral_clk_i      (mc_clk_i      )
-  ,.ral_reset_i    (mc_reset_i_r[mc_reset_depth_p]    )
+  ,.ral_reset_i    (mc_reset_i    )
   ,.ral_link_i     (mc_links_sif_i_cast.fwd)
   ,.ral_link_o     (mc_links_sif_o_cast.fwd)
 
@@ -93,7 +76,7 @@ module bsg_manycore_link_async_to_wormhole
   ,.bsg_link_width_p  (bsg_link_width_p      )
   ) rev
   (.ral_clk_i      (mc_clk_i      )
-  ,.ral_reset_i    (mc_reset_i_r[mc_reset_depth_p]    )
+  ,.ral_reset_i    (mc_reset_i    )
   ,.ral_link_i     (mc_links_sif_i_cast.rev)
   ,.ral_link_o     (mc_links_sif_o_cast.rev)
 
