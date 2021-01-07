@@ -172,7 +172,30 @@ module bsg_gateway_chip_hb_complex
   //
   // Manycore Adapter
   //
-
+  //`declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
+  //bsg_manycore_link_sif_s [3:0] manycore_links_li;
+  //bsg_manycore_link_sif_s [3:0] manycore_links_lo;
+  //
+  //for (genvar i = 0; i < 4; i++)
+  //begin: mc_io
+  //  bsg_manycore_link_async_to_wormhole
+  // #(.addr_width_p    (hb_addr_width_gp  )
+  //  ,.data_width_p    (hb_data_width_gp  )
+  //  ,.x_cord_width_p  (hb_x_cord_width_gp)
+  //  ,.y_cord_width_p  (hb_y_cord_width_gp)
+  //  ,.bsg_link_width_p(io_ct_width_gp    )
+  //  ) mc_adapter
+  //  (.mc_clk_i        (clk_i)
+  //  ,.mc_reset_i      (tag_lines_i.hb_reset)
+  //  ,.mc_links_sif_i  (manycore_links_lo[i])
+  //  ,.mc_links_sif_o  (manycore_links_li[i])
+  //
+  //  ,.bsg_link_clk_i  (clk_i)
+  //  ,.bsg_link_reset_i(tag_lines_i.hb_reset)
+  //  ,.bsg_link_i      (io_links_i[i])
+  //  ,.bsg_link_o      (io_links_o[i])
+  //  );
+  //end
 
 
   //////////////////////////////////////////////////
