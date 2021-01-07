@@ -14,23 +14,23 @@ module bsg_blackparrot_unicore_pod
    , localparam mc_link_sif_width_lp = `bsg_manycore_link_sif_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
    , localparam mc_ruche_x_link_sif_width_lp = `bsg_manycore_ruche_x_link_sif_width(mc_addr_width_gp,mc_data_width_gp,mc_x_cord_width_gp,mc_y_cord_width_gp)
    )
-  (input                                                                         bp_clk_i
-   , input                                                                       bp_reset_i
+  (input                                                       bp_clk_i
+   , input                                                     bp_reset_i
 
-   , input                                                                       mc_clk_i
-   , input                                                                       mc_reset_i
+   , input                                                     mc_clk_i
+   , input                                                     mc_reset_i
 
-   , input [pod_y_cord_width_gp-1:0]                                             my_y_pod_i
+   , input [pod_y_cord_width_gp-1:0]                           my_y_pod_i
 
    // We use 8 manycore links per BlackParrot pod
-   , input [1:0][ruche_factor_X_gp-1:0][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
-   , output logic [1:0][ruche_factor_X_gp-1:0][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
+   , input [1:0][E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
+   , output logic [1:0][E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
 
-   , input [1:0][E:E][mc_link_sif_width_lp-1:0]                                  mc_hor_links_i
-   , output logic [1:0][E:E][mc_link_sif_width_lp-1:0]                           mc_hor_links_o
+   , input [1:0][E:E][mc_link_sif_width_lp-1:0]                mc_hor_links_i
+   , output logic [1:0][E:E][mc_link_sif_width_lp-1:0]         mc_hor_links_o
 
-   , input [S:N][mc_link_sif_width_lp-1:0]                                       mc_ver_links_i
-   , output logic [S:N][mc_link_sif_width_lp-1:0]                                mc_ver_links_o
+   , input [S:N][mc_link_sif_width_lp-1:0]                     mc_ver_links_i
+   , output logic [S:N][mc_link_sif_width_lp-1:0]              mc_ver_links_o
    );
 
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);

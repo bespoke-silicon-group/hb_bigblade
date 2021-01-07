@@ -109,4 +109,6 @@ uniquify -force
 ungroup -flatten [get_cells -hier]
 update_timing
 
+current_design bsg_blackparrot_unicore_tile_node
+
 puts "BSG-info: Completed script [info script]\n"

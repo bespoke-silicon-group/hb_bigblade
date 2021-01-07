@@ -16,6 +16,10 @@ set keepout_margin_x 2
 set keepout_margin_y 2
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
+
+# Switch to tile node
+current_design bsg_blackparrot_unicore_tile_node
+
 #####################################
 ### I CACHE DATA
 ###
@@ -204,6 +208,4 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
-
-
-current_design bsg_blackparrot_unicore_tile_node
+current_design bsg_blackparrot_unicore_pod

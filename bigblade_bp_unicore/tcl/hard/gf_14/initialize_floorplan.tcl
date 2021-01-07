@@ -1,8 +1,7 @@
 
-# HACK
-source $::env(BLACKPARROT_DIR)/../bigblade_pod/tcl/hard/gf_14/hb_common_variables.tcl
-
-set bp_pod_width [expr 300]
+# TODO: Move to common
+set bp_pod_width [expr 400]
+set bp_pod_height [expr 1500]
 
 # constraints
 if { ${DESIGN_NAME} == "bsg_blackparrot_unicore_tile_node" } {
@@ -26,12 +25,13 @@ if { ${DESIGN_NAME} == "bsg_blackparrot_unicore_tile_node" } {
     -side_length [list $bp_pod_width $tile_height]
 
 } elseif { ${DESIGN_NAME} == "bsg_blackparrot_unicore_pod" } {
+
   initialize_floorplan        \
     -control_type die         \
     -coincident_boundary true \
     -shape R                  \
     -core_offset 0.0          \
     -core_utilization 0.80    \
-    -side_length [list $bp_pod_width $core_height]]
+    -side_length [list $bp_pod_width $bp_pod_height]
 }
 
