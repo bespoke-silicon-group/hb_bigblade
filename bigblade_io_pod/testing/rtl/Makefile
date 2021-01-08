@@ -1,4 +1,4 @@
-.DEFAULT_GOAL=run
+.DEFAULT_GOAL=build
 
 # Note: most variables that are file/dir paths are ?= because they can be
 # overriden by the chip repo if this makefile is called from the chip
@@ -114,24 +114,10 @@ VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 ## Run Targets
 ########################################
 
-run: clean $(BSG_OUT_SIM)
-	$(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/run.log
-
-run-no-tee: clean $(BSG_OUT_SIM)
-	$(BSG_OUT_SIM)
-
-rerun: $(BSG_OUT_SIM)
-	$(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/run.log
-
-rerun-no-tee: $(BSG_OUT_SIM)
-	$(BSG_OUT_SIM)
-
-view:
-	$(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
-
 build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS)
 	$(VCS) $(VCS_OPTIONS) -o $(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/build.log
+	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@

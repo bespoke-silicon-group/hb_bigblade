@@ -89,8 +89,8 @@ if __name__ == "__main__":
   # init hb reset
   tg.send(masters=0b11, client_id=133, data_not_reset=1, length=2, data=0b01)
   # init hb cords
-  tg.send(masters=0b11, client_id=134, data_not_reset=1, length=7, data=0b0000000)
-  tg.send(masters=0b11, client_id=135, data_not_reset=1, length=7, data=0b1000000)
+  tg.send(masters=0b11, client_id=134, data_not_reset=1, length=7, data=0b0001111)
+  tg.send(masters=0b11, client_id=135, data_not_reset=1, length=7, data=0b1010000)
 
 
 

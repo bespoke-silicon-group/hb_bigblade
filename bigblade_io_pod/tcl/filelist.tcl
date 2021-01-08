@@ -127,18 +127,91 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
+
+  $basejump_stl_dir/bsg_cache/bsg_cache_decode.v
+  $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_small_unhardened.v
+  $basejump_stl_dir/bsg_misc/bsg_inv.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_chain.v
+  $basejump_stl_dir/bsg_misc/bsg_lru_pseudo_tree_encode.v
+  $basejump_stl_dir/bsg_misc/bsg_lru_pseudo_tree_decode.v
+  $basejump_stl_dir/bsg_misc/bsg_expand_bitmask.v
+  $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
+
+  $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
-  $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
-  $basejump_stl_dir/bsg_noc/bsg_noc_links.vh
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
-  $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_in.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_out.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
+  $bsg_manycore_dir/v/bsg_1hold.v
+  $bsg_manycore_dir/v/bsg_manycore_pod_ruche_array.v
+  $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
+  $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
+  $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache_array.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
+  $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_array_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
+  $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
+
+  $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
+  $bsg_manycore_dir/v/bsg_ruche_buffer.v
+  $bsg_manycore_dir/v/bsg_ruche_anti_buffer.v
+  $bsg_manycore_dir/v/bsg_manycore_eva_to_npa.v
+
+
+  $bsg_manycore_dir/imports/HardFloat/source/compareRecFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/divSqrtRecFN_small.v
+  $bsg_manycore_dir/imports/HardFloat/source/fNToRecFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/HardFloat_primitives.v
+  $bsg_manycore_dir/imports/HardFloat/source/HardFloat_rawFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/iNToRecFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/isSigNaNRecFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/mulAddRecFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/recFNToFN.v
+  $bsg_manycore_dir/imports/HardFloat/source/recFNToIN.v
+  $bsg_manycore_dir/imports/HardFloat/source/RISCV/HardFloat_specialize.v
+
+
+  $bsg_manycore_dir/v/vanilla_bean/bsg_manycore_proc_vanilla.v
+  $bsg_manycore_dir/v/vanilla_bean/network_rx.v
+  $bsg_manycore_dir/v/vanilla_bean/network_tx.v
+  $bsg_manycore_dir/v/vanilla_bean/vanilla_core.v
+  $bsg_manycore_dir/v/vanilla_bean/load_packer.v
+  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
+  $bsg_manycore_dir/v/vanilla_bean/icache.v
+  $bsg_manycore_dir/v/vanilla_bean/cl_decode.v
+  $bsg_manycore_dir/v/vanilla_bean/regfile.v
+  $bsg_manycore_dir/v/vanilla_bean/regfile_synth.v
+  $bsg_manycore_dir/v/vanilla_bean/scoreboard.v
+  $bsg_manycore_dir/v/vanilla_bean/alu.v
+  $bsg_manycore_dir/v/vanilla_bean/idiv.v
+  $bsg_manycore_dir/v/vanilla_bean/lsu.v
+  $bsg_manycore_dir/v/vanilla_bean/fcsr.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_int.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_float.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_float_aux.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_int_fclass.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_fmin_fmax.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_fdiv_fsqrt.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma.v
+  $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma_round.v
+
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
   $bsg_designs_target_dir/v/bsg_chip_core_complex.v

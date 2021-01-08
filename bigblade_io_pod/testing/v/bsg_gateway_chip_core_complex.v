@@ -2,6 +2,7 @@
 module bsg_gateway_chip_core_complex
 
  import bsg_chip_pkg::*;
+ import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
 
   (input                      hb_clk_i
@@ -41,166 +42,85 @@ module bsg_gateway_chip_core_complex
 
   //////////////////////////////////////////////////
   //
-  // Loopback Test Node
-  //
-  logic node_en_lo;
-  
-  logic [3:0][io_ct_num_in_gp-1:0] io_error_r;
-  logic [3:0][io_ct_num_in_gp-1:0][31:0] io_sent_r, io_received_r;
-
-  for (genvar i = 0; i < 4; i++)
-  begin: io_node
-    for (genvar j = 0; j < io_ct_num_in_gp; j++)
-      begin: ch
-        bsg_fifo_1r1w_small_hardened_test_node
-       #(.num_channels_p(io_ct_width_gp/io_link_channel_width_gp)
-        ,.channel_width_p(io_link_channel_width_gp)
-        ,.is_client_node_p(0)
-        ) node
-        (.node_clk_i  (hb_clk_i)
-        ,.node_reset_i(hb_tag_data_lo.reset)
-        ,.node_en_i   (node_en_lo)
-        
-        ,.error_o   (io_error_r[i][j])
-        ,.sent_o    (io_sent_r[i][j])
-        ,.received_o(io_received_r[i][j])
-         
-        ,.clk_i   (hb_clk_i)
-        ,.reset_i (hb_tag_data_lo.reset)
-        
-        ,.link_i(io_links_i[i][j])
-        ,.link_o(io_links_o[i][j])
-        );
-      end
-  end
-  
-  logic [15:0] mem_error_r;
-  logic [15:0][31:0] mem_sent_r, mem_received_r;
-
-  for (genvar i = 0; i < 16; i++)
-  begin: mem_node
-    bsg_fifo_1r1w_small_hardened_test_node
-   #(.num_channels_p(mem_link_width_gp/mem_link_channel_width_gp)
-    ,.channel_width_p(mem_link_channel_width_gp)
-    ,.is_client_node_p(0)
-    ) node
-    (.node_clk_i  (hb_clk_i)
-    ,.node_reset_i(hb_tag_data_lo.reset)
-    ,.node_en_i   (node_en_lo)
-    
-    ,.error_o   (mem_error_r[i])
-    ,.sent_o    (mem_sent_r[i])
-    ,.received_o(mem_received_r[i])
-     
-    ,.clk_i   (hb_clk_i)
-    ,.reset_i (hb_tag_data_lo.reset)
-    
-    ,.link_i(mem_links_i[i])
-    ,.link_o(mem_links_o[i])
-    );
-  end
-
-  initial
-  begin
-    // Init
-    node_en_lo = 0;
-    #100000
-    
-    // Wait for bsg_tag initialization
-    @(posedge tag_trace_done_i); #1;
-
-    // node enable
-    @(posedge hb_clk_i); #1;
-    node_en_lo = 1;
-    $display("node enable HIGH");
-    
-    $display("running tests...");
-    #50000000
-    $display("finished running tests");
-    
-    // node disable
-    @(posedge hb_clk_i); #1;
-    node_en_lo = 0;
-    $display("node enable LOW");
-    
-    #5000000
-
-    // verification
-    for (integer i = 0; i < 4; i++)
-      begin
-        for (integer j = 0; j < io_ct_num_in_gp; j++)
-          begin
-            assert(io_error_r[i][j] == 0)
-            else 
-              begin
-                $error("\nFAIL... Error in loopback IO node[%0d][%0d]", i, j);
-                $finish;
-              end
-            assert(io_sent_r[i][j] == io_received_r[i][j])
-            else 
-              begin
-                $error("\nFAIL... Loopback IO node[%0d][%0d] sent %0d packets but received only %0d", i, j, io_sent_r[i][j], io_received_r[i][j]);
-                $finish;
-              end
-            $display("Loopback IO node[%0d][%0d] sent and received %0d packets", i, j, io_sent_r[i][j]);
-          end
-      end
-      
-    for (integer i = 0; i < 16; i++)
-      begin
-        assert(mem_error_r[i] == 0)
-        else 
-          begin
-            $error("\nFAIL... Error in loopback MEM node[%0d]", i);
-            $finish;
-          end
-        assert(mem_sent_r[i] == mem_received_r[i])
-        else 
-          begin
-            $error("\nFAIL... Loopback MEM node[%0d] sent %0d packets but received only %0d", i, mem_sent_r[i], mem_received_r[i]);
-            $finish;
-          end
-        $display("Loopback MEM node[%0d] sent and received %0d packets", i, mem_sent_r[i]);
-      end
-
-    $display("\nPASS!\n");
-    $finish;
-  end
-
-
-  //////////////////////////////////////////////////
-  //
   // Manycore Adapter
   //
-  //`declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
-  //bsg_manycore_link_sif_s [3:0] manycore_links_li;
-  //bsg_manycore_link_sif_s [3:0] manycore_links_lo;
-  //
-  //for (genvar i = 0; i < 4; i++)
-  //begin: mc_io
-  //  bsg_manycore_link_async_to_wormhole
-  // #(.addr_width_p    (hb_addr_width_gp  )
-  //  ,.data_width_p    (hb_data_width_gp  )
-  //  ,.x_cord_width_p  (hb_x_cord_width_gp)
-  //  ,.y_cord_width_p  (hb_y_cord_width_gp)
-  //  ,.bsg_link_width_p(io_ct_width_gp    )
-  //  ) mc_adapter
-  //  (.mc_clk_i        (hb_clk_i)
-  //  ,.mc_reset_i      (tag_lines_i.hb_reset)
-  //  ,.mc_links_sif_i  (manycore_links_lo[i])
-  //  ,.mc_links_sif_o  (manycore_links_li[i])
-  //
-  //  ,.bsg_link_clk_i  (hb_clk_i)
-  //  ,.bsg_link_reset_i(tag_lines_i.hb_reset)
-  //  ,.bsg_link_i      (io_links_i[i])
-  //  ,.bsg_link_o      (io_links_o[i])
-  //  );
-  //end
+  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
+  bsg_manycore_link_sif_s [3:0] manycore_links_li;
+  bsg_manycore_link_sif_s [3:0] manycore_links_lo;
+  
+  for (genvar i = 0; i < 4; i++)
+  begin: mc_io
+    bsg_manycore_link_async_to_wormhole
+   #(.addr_width_p    (hb_addr_width_gp  )
+    ,.data_width_p    (hb_data_width_gp  )
+    ,.x_cord_width_p  (hb_x_cord_width_gp)
+    ,.y_cord_width_p  (hb_y_cord_width_gp)
+    ,.bsg_link_width_p(io_ct_width_gp    )
+    ) mc_adapter
+    (.mc_clk_i        (hb_clk_i)
+    ,.mc_reset_i      (hb_tag_data_lo.reset)
+    ,.mc_links_sif_i  (manycore_links_lo[i])
+    ,.mc_links_sif_o  (manycore_links_li[i])
+  
+    ,.bsg_link_clk_i  (hb_clk_i)
+    ,.bsg_link_reset_i(hb_tag_data_lo.reset)
+    ,.bsg_link_i      (io_links_i[i])
+    ,.bsg_link_o      (io_links_o[i])
+    );
+  end
 
 
   //////////////////////////////////////////////////
   //
   // Manycore Testbench
   //
+
+  // HOST CONNECTION
+  bsg_nonsynth_manycore_io_complex #(
+    .addr_width_p(hb_addr_width_gp)
+    ,.data_width_p(hb_data_width_gp)
+    ,.x_cord_width_p(hb_x_cord_width_gp)
+    ,.y_cord_width_p(hb_y_cord_width_gp)
+    ,.io_x_cord_p(7'b0010000)
+    ,.io_y_cord_p(7'b0000000)
+  ) host (
+    .clk_i(hb_clk_i)
+    ,.reset_i(hb_tag_data_lo.reset)
+    ,.io_link_sif_i(manycore_links_li[0])
+    ,.io_link_sif_o(manycore_links_lo[0])
+    ,.loader_done_o()
+    ,.print_stat_v_o()
+    ,.print_stat_tag_o()
+  );
+
+  // wormhole test mem
+  localparam int unsigned mem_size_lp = (2**31); // 2GB each
+
+  for (genvar i = 0; i < 16; i++) begin
+    bsg_nonsynth_wormhole_test_mem #(
+      .vcache_data_width_p(vcache_data_width_gp)
+      ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
+      ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
+      ,.num_vcaches_p(hb_num_tiles_x_gp*2)
+      ,.wh_cid_width_p(wh_cid_width_gp)
+      ,.wh_flit_width_p(wh_flit_width_gp)
+      ,.wh_cord_width_p(wh_cord_width_gp)
+      ,.wh_len_width_p(wh_len_width_gp)
+
+      ,.mem_size_p(mem_size_lp)
+
+    ) test_mem (
+      .clk_i(hb_clk_i)
+      ,.reset_i(hb_tag_data_lo.reset)
+
+      ,.wh_link_sif_i(mem_links_i[i])
+      ,.wh_link_sif_o(mem_links_o[i])
+    );
+  end
+
+  // manycore links tieoff
+  assign manycore_links_lo[1] = '0;
+  assign manycore_links_lo[2] = '0;
+  assign manycore_links_lo[3] = '0;
 
 endmodule

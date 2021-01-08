@@ -43,6 +43,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_large.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_pseudo_large.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_small.v
+  $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_small_unhardened.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1rw_large.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_tracker.v
   $basejump_stl_dir/bsg_dataflow/bsg_one_fifo.v
@@ -129,6 +130,34 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
   $basejump_stl_dir/testing/bsg_dataflow/bsg_fifo_1r1w_small_hardened/bsg_fifo_1r1w_small_hardened_test_node.v
+
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
+
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
+  $bsg_manycore_dir/v/bsg_1hold.v
+  $bsg_manycore_dir/v/bsg_manycore_pod_ruche_array.v
+  $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
+  $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
+  $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache_array.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
+  $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_array_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
+  $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
+
+  $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
+  $bsg_manycore_dir/v/bsg_ruche_buffer.v
+  $bsg_manycore_dir/v/bsg_ruche_anti_buffer.v
+  $bsg_manycore_dir/v/bsg_manycore_eva_to_npa.v
+
   $board_dir/pcb/bigblade/v/bsg_asic_socket.v
   $board_dir/pcb/bigblade/v/bsg_gateway_socket.v
   $board_dir/pcb/bigblade/v/bsg_hb_pcb.v
