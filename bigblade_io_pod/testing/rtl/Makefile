@@ -4,13 +4,23 @@
 # overriden by the chip repo if this makefile is called from the chip
 # infrastructure.
 
+#######################################
+# Simulation run-time flags
+########################################
+WAVE       ?= 0
+
+
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
 BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
-BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
+ifeq ($(WAVE),1)
+  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv-debug
+else
+  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
+endif
 
 include $(ROOT_DIR)/bsg_cadenv/cadenv.mk
 
@@ -41,7 +51,9 @@ export BSG_PADMAPPING        ?=default
 # Common VCS Options (will be used most of the time by all corners)
 VCS_OPTIONS := -full64
 VCS_OPTIONS += -notice
-VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+ifeq ($(WAVE),1)
+  VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+endif
 VCS_OPTIONS += -V
 VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
