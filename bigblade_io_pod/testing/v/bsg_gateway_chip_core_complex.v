@@ -85,7 +85,7 @@ module bsg_gateway_chip_core_complex
     ,.io_y_cord_p(7'b0000000)
   ) host (
     .clk_i(hb_clk_i)
-    ,.reset_i(hb_tag_data_lo.reset)
+    ,.reset_i(hb_tag_data_lo.reset | ~tag_trace_done_i)
     ,.io_link_sif_i(manycore_links_li[0])
     ,.io_link_sif_o(manycore_links_lo[0])
     ,.loader_done_o()
@@ -111,7 +111,7 @@ module bsg_gateway_chip_core_complex
 
     ) test_mem (
       .clk_i(hb_clk_i)
-      ,.reset_i(hb_tag_data_lo.reset)
+      ,.reset_i(hb_tag_data_lo.reset | ~tag_trace_done_i)
 
       ,.wh_link_sif_i(mem_links_i[i])
       ,.wh_link_sif_o(mem_links_o[i])
