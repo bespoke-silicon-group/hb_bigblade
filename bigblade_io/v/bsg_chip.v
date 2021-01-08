@@ -12,8 +12,6 @@
 
 module bsg_chip
 
- import bsg_noc_pkg::*;
- import bsg_tag_pkg::*;
  import bsg_chip_pkg::*;
 
 `include "bsg_pinout.v"
@@ -25,29 +23,7 @@ module bsg_chip
   //
 
   // All tag lines from the btm
-  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_lo;
-
-  // Tag lines for clock generators
-  bsg_tag_s       async_reset_tag_lines_lo;
-  bsg_tag_s [2:0] osc_tag_lines_lo;
-  bsg_tag_s [2:0] osc_trigger_tag_lines_lo;
-  bsg_tag_s [2:0] ds_tag_lines_lo;
-  bsg_tag_s [2:0] sel_tag_lines_lo;
-
-  assign async_reset_tag_lines_lo                 = tag_lines_lo[0];
-  assign osc_tag_lines_lo        [2:0]            = tag_lines_lo[3:1];
-  assign osc_trigger_tag_lines_lo[2:0]            = tag_lines_lo[6:4];
-  assign ds_tag_lines_lo         [2:0]            = tag_lines_lo[9:7];
-  assign sel_tag_lines_lo        [2:0]            = tag_lines_lo[12:10];
-
-  // Tag lines for io
-  wire bsg_tag_s [3:0]  io_link_io_tag_lines_lo    = tag_lines_lo[16:13];
-  wire bsg_tag_s [3:0]  io_link_core_tag_lines_lo  = tag_lines_lo[20:17];
-  wire bsg_tag_s [15:0] mem_link_io_tag_lines_lo   = tag_lines_lo[36:21];
-  wire bsg_tag_s [15:0] mem_link_core_tag_lines_lo = tag_lines_lo[52:37];
-
-  // Tag lines for HB
-  wire bsg_tag_s hb_tag_lines_lo                  = tag_lines_lo[53];
+  bsg_chip_tag_lines_s tag_lines_lo;
 
   // BSG tag master instance
   bsg_tag_master #(.els_p( tag_num_clients_gp )
@@ -66,23 +42,23 @@ module bsg_chip
   //
 
   logic hb_clk_lo;
-  logic io_link_master_clk_lo;
-  logic mem_link_master_clk_lo;
+  logic bp_clk_lo; // not used
+  logic router_clk_lo; // not used
 
   bsg_clk_gen_power_domain #(.num_clk_endpoint_p( clk_gen_num_endpoints_gp )
                             ,.ds_width_p( clk_gen_ds_width_gp )
                             ,.num_adgs_p( clk_gen_num_adgs_gp )
                             )
     clk_gen_pd
-      (.async_reset_tag_lines_i ( async_reset_tag_lines_lo )
-      ,.osc_tag_lines_i         ( osc_tag_lines_lo )
-      ,.osc_trigger_tag_lines_i ( osc_trigger_tag_lines_lo )
-      ,.ds_tag_lines_i          ( ds_tag_lines_lo )
-      ,.sel_tag_lines_i         ( sel_tag_lines_lo )
+      (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+      ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc )
+      ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger )
+      ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds )
+      ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel )
 
       ,.ext_clk_i({ clk_C_i_int, clk_B_i_int, clk_A_i_int })
 
-      ,.clk_o({ mem_link_master_clk_lo, io_link_master_clk_lo, hb_clk_lo })
+      ,.clk_o({ router_clk_lo, bp_clk_lo, hb_clk_lo })
       );
       
   // Route the clock signals off chip
@@ -99,35 +75,14 @@ module bsg_chip
            ,.harden_p  ( 1 )
            ) 
     clk_out_mux
-      (.data_i( {1'b0, hb_clk_lo, io_link_master_clk_lo, mem_link_master_clk_lo} )
+      (.data_i( {1'b0, hb_clk_lo, bp_clk_lo, router_clk_lo} )
       ,.sel_i ( clk_out_sel )
       ,.data_o( clk_out )
       );
+  
+  // FIXME: Change to appropriate external clock
+  wire bsg_link_clk_gen_ext_clk_lo = clk_C_i_int;
 
-  //////////////////////////////////////////////////
-  //
-  // BSG Tag Client Instance
-  //
-
-  // Tag payload for hb control signals
-  typedef struct packed { 
-      logic reset;
-      logic [io_wh_cord_width_gp-1:0] cord;
-  } hb_tag_payload_s;
-
-  // Tag payload for manycore control signals
-  hb_tag_payload_s hb_tag_data_lo;
-  logic            hb_tag_new_data_lo;
-
-  bsg_tag_client #(.width_p( $bits(hb_tag_data_lo) ), .default_p( 0 ))
-    btc_hb
-      (.bsg_tag_i     ( hb_tag_lines_lo )
-      ,.recv_clk_i    ( hb_clk_lo )
-      ,.recv_reset_i  ( 1'b0 )
-      ,.recv_new_r_o  ( hb_tag_new_data_lo )
-      ,.recv_data_r_o ( hb_tag_data_lo )
-      );
-      
 
   //////////////////////////////////////////////////
   //
@@ -215,14 +170,27 @@ module bsg_chip
   // BSG Chip IO
   //
 
-  `declare_bsg_ready_and_link_sif_s(io_ct_width_gp, io_link_sif_s);
-  `declare_bsg_ready_and_link_sif_s(mem_link_width_gp, mem_link_sif_s);
-
-  io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
-  mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
+  bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
+  bsg_chip_mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
+  logic [3:0] io_link_io_clk_lo;
+  logic [15:0] mem_link_io_clk_lo;
 
   for (genvar i = 0; i < 4; i++)
   begin: io_link
+    bsg_clk_gen_power_domain 
+   #(.num_clk_endpoint_p      ( 1 )
+    ,.ds_width_p              ( clk_gen_ds_width_gp )
+    ,.num_adgs_p              ( clk_gen_num_adgs_gp )
+    ) clk_gen
+    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    ,.osc_tag_lines_i         ( tag_lines_lo.io_link_osc        [i] )
+    ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
+    ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
+    ,.sel_tag_lines_i         ( tag_lines_lo.io_link_sel        [i] )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
+    ,.clk_o                   ( io_link_io_clk_lo               [i] )
+    );
+
     bsg_chip_io_links_ct_fifo 
    #(.link_width_p                        ( io_link_width_gp         )
     ,.link_channel_width_p                ( io_link_channel_width_gp )
@@ -239,10 +207,10 @@ module bsg_chip
     ,.num_hops_p                          ( 2 )
     ) link
     (.core_clk_i ( hb_clk_lo )
-    ,.io_clk_i   ( io_link_master_clk_lo )
+    ,.io_clk_i   ( io_link_io_clk_lo[i] )
    
-    ,.link_io_tag_lines_i   ( io_link_io_tag_lines_lo[i] )
-    ,.link_core_tag_lines_i ( io_link_core_tag_lines_lo[i] )
+    ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
+    ,.link_core_tag_lines_i ( tag_lines_lo.io_link_core[i] )
    
     ,.link_clk_i ( io_link_clk_li [i] )
     ,.link_v_i   ( io_link_v_li   [i] )
@@ -261,6 +229,20 @@ module bsg_chip
 
   for (genvar i = 0; i < 16; i++)
   begin: mem_link
+    bsg_clk_gen_power_domain 
+   #(.num_clk_endpoint_p      ( 1 )
+    ,.ds_width_p              ( clk_gen_ds_width_gp )
+    ,.num_adgs_p              ( clk_gen_num_adgs_gp )
+    ) clk_gen
+    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    ,.osc_tag_lines_i         ( tag_lines_lo.mem_link_osc        [i] )
+    ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
+    ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )
+    ,.sel_tag_lines_i         ( tag_lines_lo.mem_link_sel        [i] )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
+    ,.clk_o                   ( mem_link_io_clk_lo               [i] )
+    );
+
     bsg_chip_io_links_ct_fifo 
    #(.link_width_p                        ( mem_link_width_gp         )
     ,.link_channel_width_p                ( mem_link_channel_width_gp )
@@ -272,10 +254,10 @@ module bsg_chip
     ,.num_hops_p                          ( 1 )
     ) link
     (.core_clk_i ( hb_clk_lo )
-    ,.io_clk_i   ( mem_link_master_clk_lo )
+    ,.io_clk_i   ( mem_link_io_clk_lo[i] )
    
-    ,.link_io_tag_lines_i   ( mem_link_io_tag_lines_lo[i] )
-    ,.link_core_tag_lines_i ( mem_link_core_tag_lines_lo[i] )
+    ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
+    ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
    
     ,.link_clk_i ( mem_link_clk_li [i] )
     ,.link_v_i   ( mem_link_v_li   [i] )
@@ -294,10 +276,16 @@ module bsg_chip
 
   //////////////////////////////////////////////////
   //
-  // Loopback
+  // HB Complex
   //
-  
-  assign io_links_li = io_links_lo;
-  assign mem_links_li = mem_links_lo;
+
+  bsg_chip_core_complex core_complex
+  (.hb_clk_i   ( hb_clk_lo    )
+  ,.tag_lines_i( tag_lines_lo )
+  ,.io_links_i ( io_links_lo  )
+  ,.io_links_o ( io_links_li  )
+  ,.mem_links_i( mem_links_lo )
+  ,.mem_links_o( mem_links_li )
+  );
 
 endmodule

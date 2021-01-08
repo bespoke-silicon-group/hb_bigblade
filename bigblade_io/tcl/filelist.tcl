@@ -4,6 +4,7 @@
 #------------------------------------------------------------
 
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
+set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set bsg_designs_dir        $::env(BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 set bsg_packaging_dir      $::env(BSG_PACKAGING_DIR)
@@ -19,6 +20,10 @@ set SVERILOG_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
+  $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
+  $bsg_manycore_dir/imports/HardFloat/source/bsg_hardfloat_pkg.v
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
 "]
 
@@ -136,6 +141,9 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
+  $bsg_designs_target_dir/v/bsg_chip_core_complex.v
   $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
+  $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
+  $bsg_designs_target_dir/v/bsg_manycore_link_async_to_bsg_link.v
 "]
 
