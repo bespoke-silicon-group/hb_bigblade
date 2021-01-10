@@ -16,7 +16,6 @@ set keepout_margin_x 2
 set keepout_margin_y 2
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
-
 # Switch to tile node
 current_design bsg_blackparrot_unicore_tile_node
 

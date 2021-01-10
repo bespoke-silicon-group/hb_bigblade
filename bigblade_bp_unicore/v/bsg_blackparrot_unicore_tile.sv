@@ -135,13 +135,13 @@ module bsg_blackparrot_unicore_tile
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
-     ,.io_cmd_i(io_cmd_lo)
-     ,.io_cmd_v_i(io_cmd_v_lo)
-     ,.io_cmd_ready_o(io_cmd_ready_li)
+     ,.io_cmd_i(mc_cmd_lo)
+     ,.io_cmd_v_i(mc_cmd_v_lo)
+     ,.io_cmd_ready_o(mc_cmd_ready_li)
 
-     ,.io_resp_o(io_resp_li)
-     ,.io_resp_v_o(io_resp_v_li)
-     ,.io_resp_yumi_i(io_resp_yumi_lo)
+     ,.io_resp_o(mc_resp_li)
+     ,.io_resp_v_o(mc_resp_v_li)
+     ,.io_resp_yumi_i(mc_resp_yumi_lo)
 
      ,.link_sif_i(links_i[0])
      ,.link_sif_o(links_o[0])

@@ -37,6 +37,10 @@ blackparrot_dir     :=$(THIS_DIR)/black-parrot
 blackparrot_url     :=$(GITHUB)black-parrot/black-parrot
 blackparrot_commit  :=tapeout_bigblade
 
+bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
+bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
+bsg_manycore_commit  :=ci_bigblade
+
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
 all: $(all_repos)

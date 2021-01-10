@@ -22,16 +22,18 @@ set_clock_uncertainty ${mc_clk_uncertainty_ps} [get_clocks ${mc_clk_name}]
 # In2Reg
 set bp_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~bp*"]
 set mc_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~mc*"]
+set false_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~my*"]
 set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
 set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${bp_input_pins}
 set_input_delay ${mc_input_delay_ps} -clock ${mc_clk_name} ${mc_input_pins}
+set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${false_input_pins}
 
 # Reg2Out
-#set bp_output_pins [filter_collection [all_outputs] "name=~bp*"]
+set bp_output_pins [filter_collection [all_outputs] "name=~bp*"]
 set mc_output_pins [filter_collection [all_outputs] "name=~mc*"]
-#set_load [load_of [get_lib_pin */${load_lib_pin}]] ${bp_output_pins}
+set_load [load_of [get_lib_pin */${load_lib_pin}]] ${bp_output_pins}
 set_load [load_of [get_lib_pin */${load_lib_pin}]] ${mc_output_pins}
-#set_output_delay ${bp_output_delay_ps} -clock ${bp_clk_name} ${bp_output_pins}
+set_output_delay ${bp_output_delay_ps} -clock ${bp_clk_name} ${bp_output_pins}
 set_output_delay ${mc_output_delay_ps} -clock ${mc_clk_name} ${mc_output_pins}
 
 set_false_path -from [get_ports my_*]

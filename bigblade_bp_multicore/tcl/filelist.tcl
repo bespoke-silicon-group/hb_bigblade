@@ -6,6 +6,7 @@
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 set blackparrot_dir        $::env(BLACKPARROT_DIR)
+set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set hardfloat_dir          $::env(BLACKPARROT_DIR)/external/HardFloat
 
 set bsg_packaging_dir $::env(BSG_PACKAGING_DIR)
@@ -22,18 +23,13 @@ set bp_me_dir     ${blackparrot_dir}/bp_me
 set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bp_common_dir/src/include/bp_common_pkg.sv
   $bp_common_dir/src/include/bp_common_aviary_pkg.sv
-  $bp_fe_dir/src/include/bp_fe_icache_pkg.sv
   $bp_fe_dir/src/include/bp_fe_pkg.sv
-  $bp_common_dir/src/include/bp_common_rv64_pkg.sv
   $bp_be_dir/src/include/bp_be_pkg.sv
-  $bp_be_dir/src/include/bp_be_dcache_pkg.sv
-  $bp_be_dir/src/include/bp_be_hardfloat_pkg.sv
-  $bp_me_dir/src/include/v/bp_me_pkg.sv
-  $bp_me_dir/src/include/v/bp_cce_pkg.sv
-  $bp_common_dir/src/include/bp_common_cfg_link_pkg.sv
+  $bp_me_dir/src/include/bp_me_pkg.sv
   $basejump_stl_dir/bsg_cache/bsg_cache.v
   $basejump_stl_dir/bsg_cache/bsg_cache_dma.v
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
@@ -53,6 +49,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_pseudo_large.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_small.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_1r1w_small_unhardened.v
+  $basejump_stl_dir/bsg_dataflow/bsg_fifo_reorder.v
   $basejump_stl_dir/bsg_dataflow/bsg_fifo_tracker.v
   $basejump_stl_dir/bsg_dataflow/bsg_flow_counter.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_dynamic.v
@@ -84,6 +81,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_adder_ripple_carry.v
   $basejump_stl_dir/bsg_misc/bsg_adder_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_fixed.v
+  $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
   $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
@@ -131,6 +129,9 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_tielo.v
   $basejump_stl_dir/bsg_misc/bsg_transpose.v
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
   $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
@@ -142,7 +143,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_adapter_out.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v  
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v 
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v
   $hardfloat_dir/source/addRecFN.v
   $hardfloat_dir/source/compareRecFN.v
   $hardfloat_dir/source/divSqrtRecFN_small.v
@@ -157,6 +158,7 @@ set SVERILOG_SOURCE_FILES [join "
   $hardfloat_dir/source/recFNToIN.v
   $hardfloat_dir/source/recFNToRecFN.v
   $hardfloat_dir/source/RISCV/HardFloat_specialize.v
+  $bp_common_dir/src/v/bp_mmu.sv
   $bp_common_dir/src/v/bp_pma.sv
   $bp_common_dir/src/v/bp_tlb.sv
   $bp_common_dir/src/v/bsg_fifo_1r1w_rolly.sv
@@ -252,13 +254,14 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_sacc_complex.sv
   $bp_top_dir/src/v/bp_tile.sv
   $bp_top_dir/src/v/bp_tile_node.sv
-  $bp_top_dir/src/v/bp_unicore.sv
+  $bp_top_dir/src/v/bp_tile_lite.sv
 
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
+  $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
@@ -292,8 +295,26 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_dmc/bsg_dmc_phy.v
   $basejump_stl_dir/bsg_dataflow/bsg_make_2D_array.v
   $basejump_stl_dir/bsg_dataflow/bsg_flatten_2D_array.v
-  
+ 
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
+  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
+  $bsg_manycore_dir/v/bsg_1hold.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_encode.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
+  $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
+  $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
+  $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
+  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
+
+ 
+  $bsg_designs_target_dir/v/bp_cce_to_mc_fifo.sv
+  $bsg_designs_target_dir/v/bp_cce_to_mc_mmio.sv
+
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bsg_chip.v
+  $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile_node.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_multicore_pod.sv
 "]
 

@@ -1,5 +1,5 @@
 
-module bsg_blackparrot_unicore_tile_node
+module bsg_blackparrot_multicore_tile_node
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
@@ -8,6 +8,9 @@ module bsg_blackparrot_unicore_tile_node
  import bp_common_aviary_pkg::*;
  import bp_me_pkg::*;
  #(localparam bp_params_e bp_params_p = bp_cfg_gp
+   `declare_bp_proc_params(bp_params_p)
+   
+   , localparam coh_noc_ral_link_width_lp = `bsg_ready_and_link_sif_width(coh_noc_flit_width_p)
    , localparam mc_link_sif_width_lp = `bsg_manycore_link_sif_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
    , localparam mc_ruche_x_link_sif_width_lp = `bsg_manycore_ruche_x_link_sif_width(mc_addr_width_gp,mc_data_width_gp,mc_x_cord_width_gp,mc_y_cord_width_gp)
    )
@@ -23,15 +26,25 @@ module bsg_blackparrot_unicore_tile_node
    , input [E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
    , output logic [E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
 
-   , input [3:0][E:E][mc_link_sif_width_lp-1:0]           mc_hor_links_i
-   , output logic [3:0][E:E][mc_link_sif_width_lp-1:0]    mc_hor_links_o
+   , input [E:E][mc_link_sif_width_lp-1:0]                mc_hor_links_i
+   , output logic [E:E][mc_link_sif_width_lp-1:0]         mc_hor_links_o
 
    , input [S:N][mc_link_sif_width_lp-1:0]                mc_ver_links_i
    , output logic [S:N][mc_link_sif_width_lp-1:0]         mc_ver_links_o
+
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]           bp_lce_req_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]    bp_lce_req_links_o
+
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]           bp_lce_cmd_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]    bp_lce_cmd_links_o
+
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]           bp_lce_resp_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]    bp_lce_resp_links_o
    );
 
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
   `declare_bsg_manycore_ruche_x_link_sif_s(mc_addr_width_gp,mc_data_width_gp,mc_x_cord_width_gp,mc_y_cord_width_gp);
+  `declare_bsg_ready_and_link_sif_s(coh_noc_flit_width_p, bp_coh_ready_and_link_s);
 
   wire [mc_x_cord_width_gp-1:0] mc_global_x_li = '0;
   logic [3:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
@@ -40,17 +53,31 @@ module bsg_blackparrot_unicore_tile_node
       wire [mc_y_subcord_width_gp-1:0] y_subcord_li = (my_y_bp_cord_i << 2'b10) + i;
       assign mc_global_y_li[i] = {my_y_pod_i, y_subcord_li};
     end
+  // Transpose coherence x/y coordinates
+  wire [coh_noc_x_cord_width_p-1:0] my_bp_x_cord_li = {my_y_pod_i, my_y_bp_cord_i};
+  wire [coh_noc_y_cord_width_p-1:0] my_bp_y_cord_li = 1'b1;
+  wire [coh_noc_cord_width_p-1:0] my_bp_cord_li = {my_bp_y_cord_li, my_bp_x_cord_li};
 
   bsg_manycore_link_sif_s [3:0] bp_proc_links_li, bp_proc_links_lo;
-  bsg_blackparrot_unicore_tile
+  bsg_blackparrot_multicore_tile
    tile
     (.clk_i(bp_clk_i)
      ,.reset_i(bp_reset_i)
 
      ,.my_mc_y_cords_i(mc_global_y_li)
+     ,.my_bp_cord_i(my_bp_cord_li)
 
-     ,.links_i(bp_proc_links_li)
-     ,.links_o(bp_proc_links_lo)
+     ,.mc_links_i(bp_proc_links_li)
+     ,.mc_links_o(bp_proc_links_lo)
+
+     ,.lce_req_links_i(bp_lce_req_links_i)
+     ,.lce_req_links_o(bp_lce_req_links_o)
+
+     ,.lce_cmd_links_i(bp_lce_cmd_links_i)
+     ,.lce_cmd_links_o(bp_lce_cmd_links_o)
+
+     ,.lce_resp_links_i(bp_lce_resp_links_i)
+     ,.lce_resp_links_o(bp_lce_resp_links_o)
      );
 
   bsg_manycore_link_sif_s [3:0][E:W] mc_hor_links_li, mc_hor_links_lo;
@@ -109,7 +136,7 @@ module bsg_blackparrot_unicore_tile_node
      ,.proc_link_sif_o(mc_proc_links_li)
 
      ,.ruche_link_i(mc_ruche_links_li)
-     ,.ruche_link_o(mc_ruche_links_li)
+     ,.ruche_link_o(mc_ruche_links_lo)
     
      ,.global_x_i(mc_global_x_li)
      ,.global_y_i(mc_global_y_li)

@@ -25,15 +25,15 @@ set mc_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk
 set false_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~my*"]
 set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
 set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${bp_input_pins}
-set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${false_input_pins}
 set_input_delay ${mc_input_delay_ps} -clock ${mc_clk_name} ${mc_input_pins}
+set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${false_input_pins}
 
 # Reg2Out
-#set bp_output_pins [filter_collection [all_outputs] "name=~bp*"]
+set bp_output_pins [filter_collection [all_outputs] "name=~bp*"]
 set mc_output_pins [filter_collection [all_outputs] "name=~mc*"]
-#set_load [load_of [get_lib_pin */${load_lib_pin}]] ${bp_output_pins}
+set_load [load_of [get_lib_pin */${load_lib_pin}]] ${bp_output_pins}
 set_load [load_of [get_lib_pin */${load_lib_pin}]] ${mc_output_pins}
-#set_output_delay ${bp_output_delay_ps} -clock ${bp_clk_name} ${bp_output_pins}
+set_output_delay ${bp_output_delay_ps} -clock ${bp_clk_name} ${bp_output_pins}
 set_output_delay ${mc_output_delay_ps} -clock ${mc_clk_name} ${mc_output_pins}
 
 # This timing assertion for the RF is only valid in designs that do not do simultaneous read and write to the same address,
@@ -111,6 +111,6 @@ uniquify -force
 ungroup -flatten [get_cells -hier]
 update_timing
 
-current_design bsg_blackparrot_unicore_tile_node
+current_design bsg_blackparrot_multicore_tile_node
 
 puts "BSG-info: Completed script [info script]\n"

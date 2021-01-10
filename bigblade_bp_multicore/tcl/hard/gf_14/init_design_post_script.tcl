@@ -1,4 +1,4 @@
-if { $DESIGN_NAME == "bsg_chip" } {
+if { $DESIGN_NAME == "bsg_blackparrot_multicore_pod" } {
 proc bsg_dont_touch_regexp {arg1} {
     set pattern "full_name=~$arg1";
     set mycells [get_cells -hier -filter $pattern]
@@ -18,7 +18,7 @@ bsg_dont_touch_regexp */cdt/*
 bsg_dont_touch_regexp */fdt/*
 bsg_dont_touch_regexp *BSG_BAL41MUX*
 bsg_dont_touch_regexp_type *SYNC*SDFF*
-} elseif { $DESIGN_NAME == "bp_tile_node" } {
+} elseif { $DESIGN_NAME == "bsg_blackparrot_multicore_tile_node" } {
   # TODO: These constraints are only needed because they get dropped by the hierarchical SDC reading the top-level only
   # This timing assertion for the RF is only valid in designs that do not do simultaneous read and write to the same address,
   # or do not use the read value when it writes

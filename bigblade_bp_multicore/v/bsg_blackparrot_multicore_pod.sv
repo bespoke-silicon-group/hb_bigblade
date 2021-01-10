@@ -1,5 +1,5 @@
 
-module bsg_blackparrot_unicore_pod
+module bsg_blackparrot_multicore_pod
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
@@ -10,6 +10,7 @@ module bsg_blackparrot_unicore_pod
  #(localparam bp_params_e bp_params_p = bp_cfg_gp
    `declare_bp_proc_params(bp_params_p)
 
+   , localparam coh_noc_ral_link_width_lp = `bsg_ready_and_link_sif_width(coh_noc_flit_width_p)
    , localparam mc_link_sif_width_lp = `bsg_manycore_link_sif_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
    , localparam mc_ruche_x_link_sif_width_lp = `bsg_manycore_ruche_x_link_sif_width(mc_addr_width_gp,mc_data_width_gp,mc_x_cord_width_gp,mc_y_cord_width_gp)
    )
@@ -25,20 +26,33 @@ module bsg_blackparrot_unicore_pod
    , input [1:0][E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
    , output logic [1:0][E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
 
-   , input [1:0][3:0][E:E][mc_link_sif_width_lp-1:0]           mc_hor_links_i
-   , output logic [1:0][3:0][E:E][mc_link_sif_width_lp-1:0]    mc_hor_links_o
+   , input [1:0][E:E][mc_link_sif_width_lp-1:0]                mc_hor_links_i
+   , output logic [1:0][E:E][mc_link_sif_width_lp-1:0]         mc_hor_links_o
 
    , input [S:N][mc_link_sif_width_lp-1:0]                     mc_ver_links_i
    , output logic [S:N][mc_link_sif_width_lp-1:0]              mc_ver_links_o
+
+   // BlackParrot coherence networks
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]                bp_lce_req_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]         bp_lce_req_links_o
+
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]                bp_lce_cmd_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]         bp_lce_cmd_links_o
+
+   , input [S:N][coh_noc_ral_link_width_lp-1:0]                bp_lce_resp_links_i
+   , output logic [S:N][coh_noc_ral_link_width_lp-1:0]         bp_lce_resp_links_o
    );
 
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
+  `declare_bsg_ready_and_link_sif_s(coh_noc_flit_width_p, bp_coh_ready_and_link_s);
 
   bsg_manycore_link_sif_s [1:0][S:N] mc_ver_links_li, mc_ver_links_lo;
-  bsg_manycore_link_sif_s [1:0][E:E] mc_hor_links_li, mc_hor_links_lo;
+  bp_coh_ready_and_link_s [1:0][S:N] bp_lce_req_links_li, bp_lce_req_links_lo;
+  bp_coh_ready_and_link_s [1:0][S:N] bp_lce_cmd_links_li, bp_lce_cmd_links_lo;
+  bp_coh_ready_and_link_s [1:0][S:N] bp_lce_resp_links_li, bp_lce_resp_links_lo;
   for (genvar i = 0; i < 2; i++)
     begin : n
-      bsg_blackparrot_unicore_tile_node
+      bsg_blackparrot_multicore_tile_node
        tile_node
         (.bp_clk_i(bp_clk_i)
          ,.bp_reset_i(bp_reset_i)
@@ -56,6 +70,15 @@ module bsg_blackparrot_unicore_pod
 
          ,.mc_ver_links_i(mc_ver_links_li[i])
          ,.mc_ver_links_o(mc_ver_links_lo[i])
+
+         ,.bp_lce_req_links_i(bp_lce_req_links_li[i])
+         ,.bp_lce_req_links_o(bp_lce_req_links_lo[i])
+
+         ,.bp_lce_cmd_links_i(bp_lce_cmd_links_li[i])
+         ,.bp_lce_cmd_links_o(bp_lce_cmd_links_lo[i])
+
+         ,.bp_lce_resp_links_i(bp_lce_resp_links_li[i])
+         ,.bp_lce_resp_links_o(bp_lce_resp_links_lo[i])
          );
     end
   assign mc_ver_links_li[0][N] = mc_ver_links_i[N];
@@ -65,6 +88,18 @@ module bsg_blackparrot_unicore_pod
   assign mc_ver_links_li[1][S] = mc_ver_links_i[S];
   assign mc_ver_links_li[0][S] = mc_ver_links_lo[1][N];
   assign mc_ver_links_o[N] = mc_ver_links_lo[0][N];
+
+  assign bp_lce_req_links_li[0][N] = bp_lce_req_links_i[N];
+  assign bp_lce_req_links_li[1][N] = bp_lce_req_links_lo[0][S];
+  assign bp_lce_req_links_o[S] = bp_lce_req_links_lo[1][S];
+
+  assign bp_lce_cmd_links_li[0][N] = bp_lce_cmd_links_i[N];
+  assign bp_lce_cmd_links_li[1][N] = bp_lce_cmd_links_lo[0][S];
+  assign bp_lce_cmd_links_o[S] = bp_lce_cmd_links_lo[1][S];
+
+  assign bp_lce_resp_links_li[0][N] = bp_lce_resp_links_i[N];
+  assign bp_lce_resp_links_li[1][N] = bp_lce_resp_links_lo[0][S];
+  assign bp_lce_resp_links_o[S] = bp_lce_resp_links_lo[1][S];
 
 endmodule
 
