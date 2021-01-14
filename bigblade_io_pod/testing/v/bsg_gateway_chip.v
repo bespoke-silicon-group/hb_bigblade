@@ -306,6 +306,11 @@ module bsg_gateway_chip
   (.hb_clk_i        ( hb_clk            )
   ,.tag_lines_i     ( tag_lines_lo      )
   ,.tag_trace_done_i( tag_trace_done_lo )
+
+  ,.tag_clk_i       ( tag_clk           )
+  ,.tag_data_i      ( p_bsg_tag_data_o  )
+  ,.tag_en_i        ( tag_trace_en_r_lo[0] & tag_trace_valid_lo )
+
   ,.io_links_i      ( io_links_lo       )
   ,.io_links_o      ( io_links_li       )
   ,.mem_links_i     ( mem_links_lo      )
