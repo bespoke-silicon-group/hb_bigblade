@@ -22,27 +22,27 @@ else
   BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 endif
 
-include $(ROOT_DIR)/bsg_cadenv/cadenv.mk
-
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(ROOT_DIR)/hb_bigblade
 export BSG_DESIGNS_TARGET_DIR ?= $(BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
-export BASEJUMP_STL_DIR       ?= $(ROOT_DIR)/basejump_stl
-export BSG_MANYCORE_DIR       ?= $(ROOT_DIR)/bsg_manycore
-export BSG_PACKAGING_DIR      ?= $(ROOT_DIR)/bsg_packaging
-export BOARD_DIR              ?= $(ROOT_DIR)/board
+export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
+export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
+export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
 export TESTING_BSG_DESIGNS_DIR        ?= $(BSG_OUT_DIR)/root/hb_bigblade
 export TESTING_BSG_DESIGNS_TARGET_DIR ?= $(TESTING_BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
-export TESTING_BASEJUMP_STL_DIR       ?= $(BSG_OUT_DIR)/root/basejump_stl
-export TESTING_BSG_MANYCORE_DIR       ?= $(BSG_OUT_DIR)/root/bsg_manycore
-export TESTING_BSG_PACKAGING_DIR      ?= $(BSG_OUT_DIR)/root/bsg_packaging
-export TESTING_BOARD_DIR              ?= $(BSG_OUT_DIR)/root/board
+export TESTING_BASEJUMP_STL_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/basejump_stl
+export TESTING_BSG_MANYCORE_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export TESTING_BSG_PACKAGING_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_packaging
+export TESTING_BOARD_DIR              ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/board
 
 export BSG_PACKAGE           ?=hb_bga
 export BSG_PINOUT            ?=bsg_bigblade
 export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
+
+include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 
 ########################################
 ## VCS OPTIONS
