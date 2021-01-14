@@ -11,7 +11,7 @@ set grid_width  [expr 28*[unit_height]]
 set grid_height [expr 12*[unit_height]]
 
 # distance from core origin to pod origin
-set pod_x_offset      [expr $grid_width*1]
+set pod_x_offset      [expr $grid_width*0]
 set pod_y_offset      [expr $grid_height*1]
 
 

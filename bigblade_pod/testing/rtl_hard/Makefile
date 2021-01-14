@@ -10,10 +10,11 @@ export BSG_DESIGNS_DIR = $(abspath ../../../../)
 export BSG_DESIGNS_TARGET_DIR = $(abspath ../../)
 export BSG_DESIGNS_TARGET_TCL_HARD_DIR = $(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14
 export BASEJUMP_STL_DIR  = $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
-export BSG_PACKAGING_DIR = $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BSG_CHIP_DIR      = $(BSG_DESIGNS_TARGET_DIR)/bsg_14
-export BSG_MANYCORE_DIR  = $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BOARD_DIR         = $(BSG_DESIGNS_TARGET_DIR)/board
+export BSG_MANYCORE_DIR  = $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BSG_PACKAGING_DIR = $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
+
 export PREP_MEMGEN_RUN_DIR    = $(BSG_CHIP_DIR)/.pdk_prep/memgen
 
 export TESTING_BSG_DESIGNS_DIR        = $(BSG_OUT_DIR)/bsg_design_hb_one
@@ -23,15 +24,16 @@ export TESTING_BASEJUMP_STL_DIR 			= $(BSG_OUT_DIR)/basejump_stl
 export TESTING_BSG_MANYCORE_DIR				= $(BSG_OUT_DIR)/bsg_manycore
 export TESTING_BOARD_DIR              = $(BSG_OUT_DIR)/board
 
-TAG_TRACE_DIR=$(BSG_DESIGNS_TARGET_DIR)/testing/py/
 
 # packaging options
-export BSG_PACKAGE           		?=uw_bga
-export BSG_PINOUT            		?=bsg_asic_cloud
-export BSG_PACKAGING_FOUNDRY 		?=gf_14_invecas_1p8v
-export BSG_PADMAPPING        		?=default
+export BSG_PACKAGE                     ?=uw_bga
+export BSG_PINOUT                      ?=bsg_asic_cloud
+export BSG_PACKAGING_FOUNDRY           ?=gf_14_invecas_1p8v
+export BSG_PADMAPPING                  ?=default
 export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
 export BSG_TARGET_PROCESS       ?=gf_14
+
+
 
 
 # VCS options
@@ -78,24 +80,25 @@ VCS_OPTIONS += +define+BSG_DESIGNS_TESTING_LIBRARY_NAME=$(BSG_DESIGNS_TESTING_LI
 VCS_OPTIONS += -f $(BSG_DESIGNS_TESTING_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 
-# clock period
-#VCS_OPTIONS += +define+CORE_CLK_PERIOD=1000
-#VCS_OPTIONS += +define+IO_MASTER_CLK_PERIOD=1000
-#VCS_OPTIONS += +define+ROUTER_CLK_PERIOD=1000
-
-# mobile ddr
-VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
 # BUILD DEFS
 build: $(SIMV) $(SIMV_DEBUG)
 #build: $(SIMV_DEBUG)
 
-$(SIMV): filelist copy_machine
+$(SIMV): filelist copy_machine trace_rom
 	$(VCS) $(VCS_OPTIONS) -o $@ -l out/vcs.log -Mdir=out/csrc
 
-$(SIMV_DEBUG): filelist copy_machine
+$(SIMV_DEBUG): filelist copy_machine trace_rom
 	$(VCS) $(VCS_OPTIONS) -debug_pp +vcs+vcdpluson -o $@ -l out/vcs-debug.log -Mdir=out/csrc-debug
 	
+
+# POD TAG TRACE GEN
+POD_TRACE_GEN_PY = $(BSG_MANYCORE_DIR)/testbenches/py/pod_trace_gen.py
+ASCII_TO_ROM_PY = $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py
+trace_rom:
+	python $(POD_TRACE_GEN_PY) 1 1 7 > ../pod_trace.tr
+	python $(ASCII_TO_ROM_PY) ../pod_trace.tr bsg_tag_boot_rom > ../bsg_tag_boot_rom.v
+
 copy_machine:
 	mkdir -p out/
 	cp ../Makefile.machine.include out/
@@ -109,10 +112,8 @@ test_repo:
 	mkdir -p out/
 	ln -nsf $(BASEJUMP_STL_DIR) $(TESTING_BASEJUMP_STL_DIR)
 	ln -nsf $(BSG_MANYCORE_DIR) $(TESTING_BSG_MANYCORE_DIR)
-	ln -nsf $(BSG_PACKAGING_DIR) $(TESTING_BSG_PACKAGING_DIR)
 	ln -nsf $(BSG_DESIGNS_TARGET_DIR) $(TESTING_BSG_DESIGNS_TARGET_DIR)
 	ln -nsf $(BSG_DESIGNS_DIR) $(TESTING_BSG_DESIGNS_DIR)
-	ln -nsf $(BOARD_DIR) $(TESTING_BOARD_DIR)
 
 dve:
 	$(DVE) -full64 -vpd out/vcdplus.vpd

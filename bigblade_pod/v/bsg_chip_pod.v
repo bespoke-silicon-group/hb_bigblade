@@ -4,6 +4,7 @@ module bsg_chip_pod
   import bsg_chip_pkg::*;
   import bsg_noc_pkg::*;
   import bsg_manycore_pkg::*;
+  import bsg_tag_pkg::*;
   #(parameter manycore_link_sif_width_lp =
       `bsg_manycore_link_sif_width(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp)
     , parameter manycore_ruche_link_sif_width_lp =
@@ -13,7 +14,6 @@ module bsg_chip_pod
   )
   (
     input clk_i
-    , input reset_i
 
     // manycore
     , input  [E:W][hb_num_tiles_y_gp-1:0][manycore_link_sif_width_lp-1:0] hor_link_sif_i
@@ -28,16 +28,16 @@ module bsg_chip_pod
     // north vcache
     , input  [E:W][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] north_wh_link_sif_i
     , output [E:W][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] north_wh_link_sif_o
-    , input [wh_cord_width_gp-1:0] north_dest_wh_cord_i
     , input [hb_pod_x_cord_width_gp-1:0] north_vcache_pod_x_i
     , input [hb_pod_y_cord_width_gp-1:0] north_vcache_pod_y_i
+    , input bsg_tag_s north_bsg_tag_i
 
     // south vcache
     , input  [E:W][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] south_wh_link_sif_i
     , output [E:W][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] south_wh_link_sif_o
-    , input [wh_cord_width_gp-1:0] south_dest_wh_cord_i
     , input [hb_pod_x_cord_width_gp-1:0] south_vcache_pod_x_i
     , input [hb_pod_y_cord_width_gp-1:0] south_vcache_pod_y_i
+    , input bsg_tag_s south_bsg_tag_i
 
     // pod cord
     , input [hb_pod_x_cord_width_gp-1:0] pod_x_i
@@ -76,7 +76,6 @@ module bsg_chip_pod
 
   ) pod (
     .clk_i(clk_i)
-    ,.reset_i(reset_i)
 
     ,.hor_link_sif_i(hor_link_sif_i)
     ,.hor_link_sif_o(hor_link_sif_o)
@@ -89,15 +88,15 @@ module bsg_chip_pod
 
     ,.north_wh_link_sif_i(north_wh_link_sif_i)
     ,.north_wh_link_sif_o(north_wh_link_sif_o)
-    ,.north_dest_wh_cord_i(north_dest_wh_cord_i)
     ,.north_vcache_pod_x_i(north_vcache_pod_x_i)
     ,.north_vcache_pod_y_i(north_vcache_pod_y_i)
+    ,.north_bsg_tag_i(north_bsg_tag_i)
 
     ,.south_wh_link_sif_i(south_wh_link_sif_i)
     ,.south_wh_link_sif_o(south_wh_link_sif_o)
-    ,.south_dest_wh_cord_i(south_dest_wh_cord_i)
     ,.south_vcache_pod_x_i(south_vcache_pod_x_i)
     ,.south_vcache_pod_y_i(south_vcache_pod_y_i)
+    ,.south_bsg_tag_i(south_bsg_tag_i)
 
     ,.pod_x_i(pod_x_i)
     ,.pod_y_i(pod_y_i)

@@ -3,38 +3,53 @@
 
 module testbench();
   import bsg_noc_pkg::*;
+  import bsg_tag_pkg::*;
   import bsg_chip_pkg::*;
   import bsg_manycore_pkg::*;
 
-
+  // clock + reset
   bit clk;
-  bit reset;
-
+  bit global_reset;
   bsg_nonsynth_clock_gen #(
     .cycle_time_p(1000)
   ) cg0 (
     .o(clk)
   );
-
   bsg_nonsynth_reset_gen #(
     .reset_cycles_lo_p(0)
     ,.reset_cycles_hi_p(16)
   ) rg0 (
     .clk_i(clk)
-    ,.async_reset_o(reset)
+    ,.async_reset_o(global_reset)
+  );
+
+
+  // TAG MASTER
+  logic tag_done_lo;
+  bsg_tag_s [S:N] pod_tags_lo;
+  bsg_nonsynth_manycore_tag_master #(
+    .num_pods_x_p(1)
+    ,.num_pods_y_p(1)
+    ,.wh_cord_width_p(wh_cord_width_gp)
+  ) mtm (
+    .clk_i(clk)
+    ,.reset_i(global_reset)
+    ,.tag_done_o(tag_done_lo)
+    ,.pod_tags_o(pod_tags_lo)
   );
 
   logic reset_r;
   bsg_dff_chain #(
     .width_p(1)
     ,.num_stages_p(3)
-  ) reset_dff (
+  ) rdff (
     .clk_i(clk)
-    ,.data_i(reset)
+    ,.data_i(~tag_done_lo)
     ,.data_o(reset_r)
   );
 
 
+  // BSG CHIP POD
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_manycore_ruche_x_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
@@ -55,7 +70,6 @@ module testbench();
 
   bsg_chip_pod DUT (
     .clk_i(clk)
-    ,.reset_i(reset)
 
     ,.ver_link_sif_i(ver_link_sif_li)
     ,.ver_link_sif_o(ver_link_sif_lo)
@@ -68,19 +82,20 @@ module testbench();
 
     ,.north_wh_link_sif_i(north_wh_link_sif_li)
     ,.north_wh_link_sif_o(north_wh_link_sif_lo)
-    ,.north_dest_wh_cord_i(wh_cord_width_gp'('b001_1111))
-    ,.north_vcache_pod_x_i(hb_pod_x_cord_width_gp'('b010))
+    ,.north_vcache_pod_x_i(hb_pod_x_cord_width_gp'('b001))
     ,.north_vcache_pod_y_i(hb_pod_y_cord_width_gp'('b0000))
+    ,.north_bsg_tag_i(pod_tags_lo[N])
 
     ,.south_wh_link_sif_i(south_wh_link_sif_li)
     ,.south_wh_link_sif_o(south_wh_link_sif_lo)
-    ,.south_dest_wh_cord_i(wh_cord_width_gp'('b001_1111))
-    ,.south_vcache_pod_x_i(hb_pod_x_cord_width_gp'('b010))
+    ,.south_vcache_pod_x_i(hb_pod_x_cord_width_gp'('b001))
     ,.south_vcache_pod_y_i(hb_pod_y_cord_width_gp'('b0010))
+    ,.south_bsg_tag_i(pod_tags_lo[S])
 
-    ,.pod_x_i(hb_pod_x_cord_width_gp'('b010))
+    ,.pod_x_i(hb_pod_x_cord_width_gp'('b001))
     ,.pod_y_i(hb_pod_y_cord_width_gp'('b0001))
   );
+
 
   // IO ROUTERS on west side
   bsg_manycore_link_sif_s [hb_num_tiles_y_gp-1:0] proc_link_sif_li;
@@ -99,10 +114,6 @@ module testbench();
     assign io_global_y[i] = {4'b0001, hb_y_subcord_width_gp'(i)};
   end
   
-
-  
-
-
   bsg_manycore_hor_io_router_column #(
     .addr_width_p(hb_addr_width_gp)
     ,.data_width_p(hb_data_width_gp)
@@ -127,7 +138,7 @@ module testbench();
     ,.ruche_link_i(io_ruche_link_li)
     ,.ruche_link_o(io_ruche_link_lo)
 
-    ,.global_x_i(hb_x_cord_width_gp'('b0011111))
+    ,.global_x_i(hb_x_cord_width_gp'('b0001111))
     ,.global_y_i(io_global_y)
   );
 
@@ -165,7 +176,7 @@ module testbench();
     ,.data_width_p(hb_data_width_gp)
     ,.x_cord_width_p(hb_x_cord_width_gp)
     ,.y_cord_width_p(hb_y_cord_width_gp)
-    ,.io_x_cord_p(7'b0011111)
+    ,.io_x_cord_p(7'b0001111)
     ,.io_y_cord_p(7'b0001000)
   ) host (
     .clk_i(clk)
