@@ -4,7 +4,7 @@ source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
 
 # realign tile ruche buffers next to the coressponding pins
 for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
-  for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+  for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
 
     set tile_cell [get_cell "pod_mc_y_${y}__x_${x}__tile"]
     set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
@@ -39,7 +39,7 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
 
 
 # realign north vcache ruche buffers next to the coressponding pins
-for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
 
   set tile_cell [get_cell "pod_north_vc_row_vc_x_${x}__vc"]
   set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
@@ -73,7 +73,7 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
 
 
 # realign south vcache ruche buffers next to the coressponding pins
-for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
 
   set tile_cell [get_cell "pod_south_vc_row_vc_x_${x}__vc"]
   set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
