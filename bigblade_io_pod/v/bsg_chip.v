@@ -7,7 +7,7 @@
 // BSG CHIP
 //
 // This is the toplevel for the ASIC. This chip uses the HB BGA package found
-// inside bsg_packaging/hb_bga.
+// inside bsg_packaging/basejump_fcbga_785.
 //
 
 module bsg_chip
@@ -16,6 +16,27 @@ module bsg_chip
 
 `include "bsg_pinout.v"
 `include "bsg_iopads.v"
+
+
+  //////////////////////////////////////////////////
+  //
+  // Control Wires Hub
+  //
+
+  wire bsg_tag_clk_i_int  = pad_ML0_0_i_int;
+  wire bsg_tag_en_i_int   = pad_ML0_1_i_int;
+  wire bsg_tag_data_i_int = pad_ML0_2_i_int;
+  
+  wire clk_A_i_int        = pad_ML0_3_i_int;
+  wire clk_B_i_int        = pad_ML0_4_i_int;
+  wire clk_C_i_int        = pad_ML0_5_i_int;
+
+  wire sel_0_i_int        = pad_MR1_0_i_int;
+  wire sel_1_i_int        = pad_MR1_1_i_int;
+
+  wire clk_o_int;
+  assign pad_CT0_0_o_int  = clk_o_int;
+
 
   //////////////////////////////////////////////////
   //
@@ -88,94 +109,77 @@ module bsg_chip
   //
   // BSG Link Hub
   //
-
-  logic [19:0] bsg_link_clk_li, bsg_link_v_li, bsg_link_tkn_lo;
-  logic [19:0][8:0] bsg_link_data_li;
-
-  logic [19:0] bsg_link_clk_lo, bsg_link_v_lo, bsg_link_tkn_li;
-  logic [19:0][8:0] bsg_link_data_lo;
-
-`define BSG_CHIP_LINK_HUB_DATA(i, j)                               \
-    assign bsg_link_data_li[i][j] = bsg_link_in``i``_d``j``_i_int; \
-    assign bsg_link_out``i``_d``j``_o_int = bsg_link_data_lo[i][j];
-
-`define BSG_CHIP_LINK_HUB(i)                                          \
-    assign bsg_link_clk_li         [i] = bsg_link_in``i``_clk_i_int;  \
-    assign bsg_link_v_li           [i] = bsg_link_in``i``_v_i_int;    \
-    assign bsg_link_in``i``_tkn_o_int  = bsg_link_tkn_lo[i];          \
-    assign bsg_link_out``i``_clk_o_int = bsg_link_clk_lo[i];          \
-    assign bsg_link_out``i``_v_o_int   = bsg_link_v_lo  [i];          \
-    assign bsg_link_tkn_li         [i] = bsg_link_out``i``_tkn_i_int; \
-    `BSG_CHIP_LINK_HUB_DATA(i, 0)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 1)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 2)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 3)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 4)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 5)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 6)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 7)                                     \
-    `BSG_CHIP_LINK_HUB_DATA(i, 8)
-
-  `BSG_CHIP_LINK_HUB( 0)
-  `BSG_CHIP_LINK_HUB( 1)
-  `BSG_CHIP_LINK_HUB( 2)
-  `BSG_CHIP_LINK_HUB( 3)
-  `BSG_CHIP_LINK_HUB( 4)
-  `BSG_CHIP_LINK_HUB( 5)
-  `BSG_CHIP_LINK_HUB( 6)
-  `BSG_CHIP_LINK_HUB( 7)
-  `BSG_CHIP_LINK_HUB( 8)
-  `BSG_CHIP_LINK_HUB( 9)
-  `BSG_CHIP_LINK_HUB(10)
-  `BSG_CHIP_LINK_HUB(11)
-  `BSG_CHIP_LINK_HUB(12)
-  `BSG_CHIP_LINK_HUB(13)
-  `BSG_CHIP_LINK_HUB(14)
-  `BSG_CHIP_LINK_HUB(15)
-  `BSG_CHIP_LINK_HUB(16)
-  `BSG_CHIP_LINK_HUB(17)
-  `BSG_CHIP_LINK_HUB(18)
-  `BSG_CHIP_LINK_HUB(19)
-
+  
   // Mapping physical links to logical links
-  logic [3:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
-  logic [3:0][8:0] io_link_data_li;
-  logic [3:0] io_link_clk_lo, io_link_v_lo, io_link_tkn_li;
-  logic [3:0][8:0] io_link_data_lo;
+  logic [io_link_num_gp-1:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
+  logic [io_link_num_gp-1:0][io_link_channel_width_gp-1:0] io_link_data_li;
+  logic [io_link_num_gp-1:0] io_link_clk_lo, io_link_v_lo, io_link_tkn_li;
+  logic [io_link_num_gp-1:0][io_link_channel_width_gp-1:0] io_link_data_lo;
 
-  logic [15:0] mem_link_clk_li, mem_link_v_li, mem_link_tkn_lo;
-  logic [15:0][8:0] mem_link_data_li;
-  logic [15:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
-  logic [15:0][8:0] mem_link_data_lo;
+  logic [mem_link_num_gp-1:0] mem_link_clk_li, mem_link_v_li, mem_link_tkn_lo;
+  logic [mem_link_num_gp-1:0][mem_link_channel_width_gp-1:0] mem_link_data_li;
+  logic [mem_link_num_gp-1:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
+  logic [mem_link_num_gp-1:0][mem_link_channel_width_gp-1:0] mem_link_data_lo;
 
-`define BSG_CHIP_LINK_TYPE_HUB(typ, num)                                           \
-  for (genvar i = 0; i < ``num``; i++)                                             \
-  begin                                                                            \
-    assign ``typ``_link_clk_li [i] = bsg_link_clk_li [``typ``_link_mapping_gp[i]]; \
-    assign ``typ``_link_v_li   [i] = bsg_link_v_li   [``typ``_link_mapping_gp[i]]; \
-    assign ``typ``_link_data_li[i] = bsg_link_data_li[``typ``_link_mapping_gp[i]]; \
-    assign bsg_link_tkn_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_tkn_lo[i];   \
-                                                                                   \
-    assign bsg_link_clk_lo [``typ``_link_mapping_gp[i]] = ``typ``_link_clk_lo [i]; \
-    assign bsg_link_v_lo   [``typ``_link_mapping_gp[i]] = ``typ``_link_v_lo   [i]; \
-    assign bsg_link_data_lo[``typ``_link_mapping_gp[i]] = ``typ``_link_data_lo[i]; \
-    assign ``typ``_link_tkn_li[i] = bsg_link_tkn_li[``typ``_link_mapping_gp[i]];   \
-  end
+`define BSG_CHIP_LINK_HUB_DATA(pad, typ, i, j)                   \
+    assign ``typ``_link_data_li[i][j] = pad_``pad``_``j``_i_int; \
+    assign pad_``pad``_``j``_o_int = ``typ``_link_data_lo[i][j];
 
-  `BSG_CHIP_LINK_TYPE_HUB(io, 4)
-  `BSG_CHIP_LINK_TYPE_HUB(mem, 16)
+`define BSG_CHIP_LINK_HUB(pad, typ, i)                           \
+    assign ``typ``_link_clk_li[i] = pad_``pad``_clk_i_int;       \
+    assign ``typ``_link_v_li  [i] = pad_``pad``_v_i_int;         \
+    assign pad_``pad``_tkn_o_int  = ``typ``_link_tkn_lo[i];      \
+    assign pad_``pad``_clk_o_int  = ``typ``_link_clk_lo[i];      \
+    assign pad_``pad``_v_o_int    = ``typ``_link_v_lo  [i];      \
+    assign ``typ``_link_tkn_li[i] = pad_``pad``_tkn_i_int;       \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  0)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  1)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  2)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  3)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  4)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  5)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  6)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  7)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  8)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i,  9)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 10)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 11)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 12)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 13)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 14)                     \
+    `BSG_CHIP_LINK_HUB_DATA(pad, typ, i, 15)
+
+  `BSG_CHIP_LINK_HUB(IT0, io,   0)
+  `BSG_CHIP_LINK_HUB(IT1, io,   1)
+  `BSG_CHIP_LINK_HUB(DL0, mem,  0)
+  `BSG_CHIP_LINK_HUB(DL1, mem,  1)
+  `BSG_CHIP_LINK_HUB(DL2, mem,  2)
+  `BSG_CHIP_LINK_HUB(DL3, mem,  3)
+  `BSG_CHIP_LINK_HUB(DL4, mem,  4)
+  `BSG_CHIP_LINK_HUB(DL5, mem,  5)
+  `BSG_CHIP_LINK_HUB(DL6, mem,  6)
+  `BSG_CHIP_LINK_HUB(DL7, mem,  7)
+  `BSG_CHIP_LINK_HUB(DR0, mem,  8)
+  `BSG_CHIP_LINK_HUB(DR1, mem,  9)
+  `BSG_CHIP_LINK_HUB(DR2, mem, 10)
+  `BSG_CHIP_LINK_HUB(DR3, mem, 11)
+  `BSG_CHIP_LINK_HUB(DR4, mem, 12)
+  `BSG_CHIP_LINK_HUB(DR5, mem, 13)
+  `BSG_CHIP_LINK_HUB(DR6, mem, 14)
+  `BSG_CHIP_LINK_HUB(DR7, mem, 15)
+
 
   //////////////////////////////////////////////////
   //
   // BSG Chip IO
   //
 
-  bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
-  bsg_chip_mem_link_sif_s [15:0] mem_links_li, mem_links_lo;
-  logic [3:0] io_link_io_clk_lo;
-  logic [15:0] mem_link_io_clk_lo;
+  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
+  bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
+  logic [io_link_num_gp-1:0] io_link_io_clk_lo;
+  logic [mem_link_num_gp-1:0] mem_link_io_clk_lo;
 
-  for (genvar i = 0; i < 4; i++)
+  for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_link
     bsg_clk_gen_power_domain 
    #(.num_clk_endpoint_p      ( 1 )
@@ -215,19 +219,19 @@ module bsg_chip
     ,.link_clk_i ( io_link_clk_li [i] )
     ,.link_v_i   ( io_link_v_li   [i] )
     ,.link_tkn_o ( io_link_tkn_lo [i] )
-    ,.link_data_i( io_link_data_li[i][io_link_channel_width_gp-1:0] )
+    ,.link_data_i( io_link_data_li[i] )
    
     ,.link_clk_o ( io_link_clk_lo [i] )
     ,.link_v_o   ( io_link_v_lo   [i] )
     ,.link_tkn_i ( io_link_tkn_li [i] )
-    ,.link_data_o( io_link_data_lo[i][io_link_channel_width_gp-1:0] )
+    ,.link_data_o( io_link_data_lo[i] )
    
     ,.links_i    ( io_links_li[i] ) 
     ,.links_o    ( io_links_lo[i] )
     );
   end
 
-  for (genvar i = 0; i < 16; i++)
+  for (genvar i = 0; i < mem_link_num_gp; i++)
   begin: mem_link
     bsg_clk_gen_power_domain 
    #(.num_clk_endpoint_p      ( 1 )
@@ -262,12 +266,12 @@ module bsg_chip
     ,.link_clk_i ( mem_link_clk_li [i] )
     ,.link_v_i   ( mem_link_v_li   [i] )
     ,.link_tkn_o ( mem_link_tkn_lo [i] )
-    ,.link_data_i( mem_link_data_li[i][mem_link_channel_width_gp-1:0] )
+    ,.link_data_i( mem_link_data_li[i] )
 
     ,.link_clk_o ( mem_link_clk_lo [i] )
     ,.link_v_o   ( mem_link_v_lo   [i] )
     ,.link_tkn_i ( mem_link_tkn_li [i] )
-    ,.link_data_o( mem_link_data_lo[i][mem_link_channel_width_gp-1:0] )
+    ,.link_data_o( mem_link_data_lo[i] )
 
     ,.links_i    ( mem_links_li[i] ) 
     ,.links_o    ( mem_links_lo[i] )

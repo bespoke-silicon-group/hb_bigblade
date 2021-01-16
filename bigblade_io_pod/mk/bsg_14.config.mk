@@ -2,8 +2,8 @@ export BSG_TOPLEVEL_DESIGN_TYPE :=block
 export BSG_FLOW_STYLE           :=hier
 export BSG_FLOW_USE_DP          :=true
 export BSG_TARGET_PROCESS       :=gf_14
-export BSG_PACKAGE              :=hb_bga
-export BSG_PINOUT               :=bsg_bigblade
+export BSG_PACKAGE              :=basejump_fcbga_785
+export BSG_PINOUT               :=bsg_bigblade_v0
 export BSG_PACKAGING_FOUNDRY    :=gf_14_invecas_1p8v
 export BSG_PADMAPPING           :=default
 

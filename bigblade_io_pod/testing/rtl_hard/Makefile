@@ -37,8 +37,8 @@ export TESTING_BSG_MANYCORE_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_m
 export TESTING_BSG_PACKAGING_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export TESTING_BOARD_DIR              ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/board
 
-export BSG_PACKAGE           ?=hb_bga
-export BSG_PINOUT            ?=bsg_bigblade
+export BSG_PACKAGE           ?=basejump_fcbga_785
+export BSG_PINOUT            ?=bsg_bigblade_v0
 export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
 
@@ -80,8 +80,8 @@ VCS_OPTIONS += +nospecify
 ## Chip and Testing Filelists and Liblists
 ########################################
 
-BSG_TOP_SIM_MODULE = bsg_hb_pcb
-BSG_CHIP_INSTANCE_PATH = bsg_hb_pcb.IC.ASIC
+BSG_TOP_SIM_MODULE = bsg_bigblade_pcb
+BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)

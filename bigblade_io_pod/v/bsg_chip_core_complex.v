@@ -12,11 +12,11 @@ module bsg_chip_core_complex
   ,input  tag_data_i
   ,input  tag_en_i
 
-  ,input  bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_i
-  ,output bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_o
+  ,input  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_i
+  ,output bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_o
 
-  ,input  bsg_chip_mem_link_sif_s [15:0] mem_links_i
-  ,output bsg_chip_mem_link_sif_s [15:0] mem_links_o
+  ,input  bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_i
+  ,output bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_o
   );
 
   //////////////////////////////////////////////////
@@ -69,10 +69,10 @@ module bsg_chip_core_complex
   // Manycore Adapter
   //
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
-  bsg_manycore_link_sif_s [3:0] manycore_links_li;
-  bsg_manycore_link_sif_s [3:0] manycore_links_lo;
+  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_li;
+  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_lo;
   
-  for (genvar i = 0; i < 4; i++)
+  for (genvar i = 0; i < io_link_num_gp; i++)
   begin: mc_io
     bsg_manycore_link_async_to_wormhole
    #(.addr_width_p    (hb_addr_width_gp  )
@@ -119,11 +119,13 @@ module bsg_chip_core_complex
   
   // Attach manycore io to manycore links
   assign io_link_sif_li[N][0] = manycore_links_li[0];
-  assign manycore_links_lo[0] = io_link_sif_lo[N][0];
+  assign manycore_links_lo = {'0, io_link_sif_lo[N][0]};
 
   // Attach wormhole links to mem links
-  assign wh_link_sif_li = mem_links_i[2*2*hb_num_pods_y_gp-1:0];
-  assign mem_links_o = {'0, wh_link_sif_lo};
+  assign wh_link_sif_li[W] = mem_links_i[0+:2*hb_num_pods_y_gp];
+  assign wh_link_sif_li[E] = mem_links_i[mem_link_num_gp/2+:2*hb_num_pods_y_gp];
+  assign mem_links_o[0+:mem_link_num_gp/2]                 = {'0, wh_link_sif_lo[W]};
+  assign mem_links_o[mem_link_num_gp/2+:mem_link_num_gp/2] = {'0, wh_link_sif_lo[E]};
 
   bsg_manycore_pod_ruche_array #(
     .num_tiles_x_p(hb_num_tiles_x_gp)
@@ -249,10 +251,5 @@ module bsg_chip_core_complex
       ,.link_sif_o(io_link_sif_li[S][i])
     );
   end
-
-  // manycore links tieoff
-  assign manycore_links_lo[1] = '0;
-  assign manycore_links_lo[2] = '0;
-  assign manycore_links_lo[3] = '0;
 
 endmodule
