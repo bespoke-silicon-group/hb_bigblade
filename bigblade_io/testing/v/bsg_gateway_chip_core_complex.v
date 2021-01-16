@@ -2,17 +2,22 @@
 module bsg_gateway_chip_core_complex
 
  import bsg_chip_pkg::*;
+ import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
 
   (input                      hb_clk_i
   ,input bsg_chip_tag_lines_s tag_lines_i
   ,input                      tag_trace_done_i
 
-  ,input  bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_i
-  ,output bsg_chip_io_link_sif_s [3:0][io_ct_num_in_gp-1:0] io_links_o
+  ,input  tag_clk_i
+  ,input  tag_data_i
+  ,input  tag_en_i
 
-  ,input  bsg_chip_mem_link_sif_s [15:0] mem_links_i
-  ,output bsg_chip_mem_link_sif_s [15:0] mem_links_o
+  ,input  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_i
+  ,output bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_o
+
+  ,input  bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_i
+  ,output bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_o
   );
 
   //////////////////////////////////////////////////
@@ -45,15 +50,20 @@ module bsg_gateway_chip_core_complex
   //
   logic node_en_lo;
   
-  logic [3:0][io_ct_num_in_gp-1:0] io_error_r;
-  logic [3:0][io_ct_num_in_gp-1:0][31:0] io_sent_r, io_received_r;
+  logic [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_error_r;
+  logic [io_link_num_gp-1:0][io_ct_num_in_gp-1:0][31:0] io_sent_r, io_received_r;
 
-  for (genvar i = 0; i < 4; i++)
+  for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_node
     for (genvar j = 0; j < io_ct_num_in_gp; j++)
       begin: ch
+        localparam node_channels_lp = io_ct_width_gp/io_link_channel_width_gp;
+        localparam node_width_lp = node_channels_lp*io_link_channel_width_gp;
+        wire [node_width_lp+2-1:0] link_li, link_lo;
+        assign link_li = (io_links_i[i][j]) >> (io_ct_width_gp-node_width_lp);
+        assign io_links_o[i][j] = link_lo << (io_ct_width_gp-node_width_lp);
         bsg_fifo_1r1w_small_hardened_test_node
-       #(.num_channels_p(io_ct_width_gp/io_link_channel_width_gp)
+       #(.num_channels_p(node_channels_lp)
         ,.channel_width_p(io_link_channel_width_gp)
         ,.is_client_node_p(0)
         ) node
@@ -68,16 +78,16 @@ module bsg_gateway_chip_core_complex
         ,.clk_i   (hb_clk_i)
         ,.reset_i (hb_tag_data_lo.reset)
         
-        ,.link_i(io_links_i[i][j])
-        ,.link_o(io_links_o[i][j])
+        ,.link_i(link_li)
+        ,.link_o(link_lo)
         );
       end
   end
   
-  logic [15:0] mem_error_r;
-  logic [15:0][31:0] mem_sent_r, mem_received_r;
+  logic [mem_link_num_gp-1:0] mem_error_r;
+  logic [mem_link_num_gp-1:0][31:0] mem_sent_r, mem_received_r;
 
-  for (genvar i = 0; i < 16; i++)
+  for (genvar i = 0; i < mem_link_num_gp; i++)
   begin: mem_node
     bsg_fifo_1r1w_small_hardened_test_node
    #(.num_channels_p(mem_link_width_gp/mem_link_channel_width_gp)
@@ -126,7 +136,7 @@ module bsg_gateway_chip_core_complex
     #5000000
 
     // verification
-    for (integer i = 0; i < 4; i++)
+    for (integer i = 0; i < io_link_num_gp; i++)
       begin
         for (integer j = 0; j < io_ct_num_in_gp; j++)
           begin
@@ -146,7 +156,7 @@ module bsg_gateway_chip_core_complex
           end
       end
       
-    for (integer i = 0; i < 16; i++)
+    for (integer i = 0; i < mem_link_num_gp; i++)
       begin
         assert(mem_error_r[i] == 0)
         else 
@@ -166,41 +176,5 @@ module bsg_gateway_chip_core_complex
     $display("\nPASS!\n");
     $finish;
   end
-
-
-  //////////////////////////////////////////////////
-  //
-  // Manycore Adapter
-  //
-  //`declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
-  //bsg_manycore_link_sif_s [3:0] manycore_links_li;
-  //bsg_manycore_link_sif_s [3:0] manycore_links_lo;
-  //
-  //for (genvar i = 0; i < 4; i++)
-  //begin: mc_io
-  //  bsg_manycore_link_async_to_wormhole
-  // #(.addr_width_p    (hb_addr_width_gp  )
-  //  ,.data_width_p    (hb_data_width_gp  )
-  //  ,.x_cord_width_p  (hb_x_cord_width_gp)
-  //  ,.y_cord_width_p  (hb_y_cord_width_gp)
-  //  ,.bsg_link_width_p(io_ct_width_gp    )
-  //  ) mc_adapter
-  //  (.mc_clk_i        (hb_clk_i)
-  //  ,.mc_reset_i      (tag_lines_i.hb_reset)
-  //  ,.mc_links_sif_i  (manycore_links_lo[i])
-  //  ,.mc_links_sif_o  (manycore_links_li[i])
-  //
-  //  ,.bsg_link_clk_i  (hb_clk_i)
-  //  ,.bsg_link_reset_i(tag_lines_i.hb_reset)
-  //  ,.bsg_link_i      (io_links_i[i])
-  //  ,.bsg_link_o      (io_links_o[i])
-  //  );
-  //end
-
-
-  //////////////////////////////////////////////////
-  //
-  // Manycore Testbench
-  //
 
 endmodule

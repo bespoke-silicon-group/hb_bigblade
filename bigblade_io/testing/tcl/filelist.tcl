@@ -131,7 +131,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/testing/bsg_dataflow/bsg_fifo_1r1w_small_hardened/bsg_fifo_1r1w_small_hardened_test_node.v
   $board_dir/pcb/bigblade/v/bsg_asic_socket.v
   $board_dir/pcb/bigblade/v/bsg_gateway_socket.v
-  $board_dir/pcb/bigblade/v/bsg_hb_pcb.v
+  $board_dir/pcb/bigblade/v/bsg_bigblade_pcb.v
   $bsg_designs_target_dir/testing/v/test_bsg_data_gen.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_core_complex.v
