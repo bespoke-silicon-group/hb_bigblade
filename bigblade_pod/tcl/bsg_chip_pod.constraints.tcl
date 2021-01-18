@@ -21,7 +21,7 @@ append_to_collection tag_input_pins [get_ports "north_bsg_tag_i\[en\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[op\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[param\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[en\]"]
-set input_delay_ps [expr ${tag_clk_period_ps}*0.50]
+set input_delay_ps [expr ${manycore_clk_period_ps}*0.20]
 set_driving_cell -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" ${tag_input_pins}
 set_input_delay ${input_delay_ps} -clock ${tag_clk_name} ${tag_input_pins}
 
