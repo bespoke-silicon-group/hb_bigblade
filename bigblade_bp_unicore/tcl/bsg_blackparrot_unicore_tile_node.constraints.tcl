@@ -20,12 +20,10 @@ create_clock -period ${mc_clk_period_ps} -name ${mc_clk_name} [get_ports "mc_clk
 set_clock_uncertainty ${mc_clk_uncertainty_ps} [get_clocks ${mc_clk_name}]
 
 # In2Reg
-set bp_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~bp*"]
 set mc_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~mc*"]
-set false_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~my*"]
+set bp_input_pins [remove_from_collection [filter_collection [all_inputs] "name!~*clk*"] $mc_input_pins]
 set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
 set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${bp_input_pins}
-set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${false_input_pins}
 set_input_delay ${mc_input_delay_ps} -clock ${mc_clk_name} ${mc_input_pins}
 
 # Reg2Out
@@ -51,20 +49,6 @@ foreach_in_collection cell [filter_collection [all_macro_cells] "full_name=~*btb
 
 set_false_path -from [get_ports my_*]
 
-# Derate
-set cells_to_derate [list]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~IN12LP_*"]
-if { [sizeof $cells_to_derate] > 0 } {
-  foreach_in_collection cell $cells_to_derate {
-    set_timing_derate -cell_delay -early 0.97 $cell
-    set_timing_derate -cell_delay -late  1.03 $cell
-    set_timing_derate -cell_check -early 0.97 $cell
-    set_timing_derate -cell_check -late  1.03 $cell
-  }
-}
-#report_timing_derate
-
 # CDC Paths
 #=================
 update_timing
@@ -86,9 +70,22 @@ foreach_in_collection launch_clk $clocks {
   }
 }
 
+
+# Derate
+set cells_to_derate [list]
+append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
+append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~IN12LP_*"]
+if { [sizeof $cells_to_derate] > 0 } {
+  foreach_in_collection cell $cells_to_derate {
+    set_timing_derate -cell_delay -early 0.97 $cell
+    set_timing_derate -cell_delay -late  1.03 $cell
+    set_timing_derate -cell_check -early 0.97 $cell
+    set_timing_derate -cell_check -late  1.03 $cell
+  }
+}
+#report_timing_derate
+
 # Retiming
-set_app_var compile_keep_original_for_external_references true
-set_app_var case_analysis_propagate_through_icg true
 
 current_design *pipe_fma*
 create_clock -period ${bp_clk_period_ps} [get_ports "clk_i"]

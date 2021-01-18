@@ -66,8 +66,8 @@ module bsg_blackparrot_unicore_tile_node
          ,.bclk_i(mc_clk_i)
          ,.breset_i(mc_reset_i)
      
-         ,.alink_i(bp_proc_links_li[i])
-         ,.alink_o(bp_proc_links_lo[i])
+         ,.alink_i(bp_proc_links_lo[i])
+         ,.alink_o(bp_proc_links_li[i])
      
          ,.blink_i(mc_proc_links_li[i])
          ,.blink_o(mc_proc_links_lo[i])
@@ -78,7 +78,7 @@ module bsg_blackparrot_unicore_tile_node
       assign mc_hor_links_o[i][E] = mc_hor_links_lo[i][E];
     end
 
-  logic [3:0][E:W][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_li, mc_ruche_links_lo;
+  bsg_manycore_ruche_x_link_sif_s [3:0][E:W] mc_ruche_links_li, mc_ruche_links_lo;
   assign mc_ruche_links_li[0]    = '0;
   assign mc_ruche_links_li[1][W] = '0;
   assign mc_ruche_links_li[2]    = '0;
@@ -109,7 +109,7 @@ module bsg_blackparrot_unicore_tile_node
      ,.proc_link_sif_o(mc_proc_links_li)
 
      ,.ruche_link_i(mc_ruche_links_li)
-     ,.ruche_link_o(mc_ruche_links_li)
+     ,.ruche_link_o(mc_ruche_links_lo)
     
      ,.global_x_i(mc_global_x_li)
      ,.global_y_i(mc_global_y_li)

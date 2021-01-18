@@ -18,6 +18,7 @@ include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
+export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
 export BSG_PACKAGE           ?=uw_bga

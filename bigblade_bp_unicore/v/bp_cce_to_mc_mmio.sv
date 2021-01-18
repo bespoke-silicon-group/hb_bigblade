@@ -197,8 +197,8 @@ module bp_cce_to_mc_mmio
 
     ,.out_credits_o(out_credits_lo)
 
-    ,.global_x_i('0)
-    ,.global_y_i('0)
+    ,.global_x_i(my_x_i)
+    ,.global_y_i(my_y_i)
     );
 
   bsg_manycore_global_addr_s io_cmd_eva_li;
@@ -275,7 +275,7 @@ module bp_cce_to_mc_mmio
             hash_bank_index_lo,
             io_cmd_eva_li[2+:vcache_word_offset_width_lp]
           };
-          out_packet_li.y_cord = hash_bank_lo[mc_x_cord_width_p]
+          out_packet_li.y_cord = hash_bank_lo[mc_x_subcord_width_p]
             ? (mc_y_cord_width_p)'(mc_num_tiles_y_p+1) // DRAM ports are directly below the manycore tiles.
             : {mc_y_cord_width_p{1'b0}};
           out_packet_li.x_cord = hash_bank_lo[0+:mc_x_subcord_width_p];
@@ -327,10 +327,13 @@ module bp_cce_to_mc_mmio
   assign in_epa_li = in_addr_lo;
 
   bp_bedrock_cce_mem_payload_s io_payload_lo;
-  assign io_payload_lo = '{lce_id: 2'b10, default: '0};
   // Incoming packet
   always_comb
     begin
+      io_payload_lo = '0;
+      io_payload_lo.lce_id = 2'b10;
+
+      io_cmd_cast_o = '0;
       io_cmd_cast_o.header.msg_type = in_we_lo ? e_bedrock_mem_uc_wr : e_bedrock_mem_uc_rd;
 
       if (in_epa_li.dev == 2)

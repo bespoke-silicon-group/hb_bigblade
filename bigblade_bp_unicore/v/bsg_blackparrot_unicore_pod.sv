@@ -35,7 +35,7 @@ module bsg_blackparrot_unicore_pod
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
 
   bsg_manycore_link_sif_s [1:0][S:N] mc_ver_links_li, mc_ver_links_lo;
-  bsg_manycore_link_sif_s [1:0][E:E] mc_hor_links_li, mc_hor_links_lo;
+  bsg_manycore_link_sif_s [1:0][3:0][E:E] mc_hor_links_li, mc_hor_links_lo;
   for (genvar i = 0; i < 2; i++)
     begin : n
       bsg_blackparrot_unicore_tile_node
@@ -51,8 +51,8 @@ module bsg_blackparrot_unicore_pod
          ,.mc_ruche_links_i(mc_ruche_links_i[i])
          ,.mc_ruche_links_o(mc_ruche_links_o[i])
 
-         ,.mc_hor_links_i(mc_hor_links_i[i])
-         ,.mc_hor_links_o(mc_hor_links_o[i])
+         ,.mc_hor_links_i(mc_hor_links_li[i])
+         ,.mc_hor_links_o(mc_hor_links_lo[i])
 
          ,.mc_ver_links_i(mc_ver_links_li[i])
          ,.mc_ver_links_o(mc_ver_links_lo[i])
@@ -65,6 +65,9 @@ module bsg_blackparrot_unicore_pod
   assign mc_ver_links_li[1][S] = mc_ver_links_i[S];
   assign mc_ver_links_li[0][S] = mc_ver_links_lo[1][N];
   assign mc_ver_links_o[N] = mc_ver_links_lo[0][N];
+
+  assign mc_hor_links_li = mc_hor_links_i;
+  assign mc_hor_links_o = mc_hor_links_lo;
 
 endmodule
 

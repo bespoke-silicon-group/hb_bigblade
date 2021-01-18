@@ -135,7 +135,6 @@ module bp_cce_to_mc_fifo
     ,.returned_reg_id_r_o(returned_reg_id_r_lo)
     ,.returned_v_r_o(returned_v_r_lo)
     ,.returned_pkt_type_r_o(returned_pkt_type_r_lo)
-    // We allocate data in the return fifo, so we can immediately accept, always
     ,.returned_yumi_i(returned_yumi_li)
     ,.returned_fifo_full_o()
 
@@ -144,14 +143,12 @@ module bp_cce_to_mc_fifo
 
     ,.out_credits_o(out_credits_lo)
 
-    // Unused
-    ,.global_x_i('0)
-    ,.global_y_i('0)
+    ,.global_x_i(my_x_i)
+    ,.global_y_i(my_y_i)
     );
 
   //
   // MC loads from BP are disabled, so we stub this
-  //
   assign returning_data_li = '0;
   assign returning_v_li = '0;
 

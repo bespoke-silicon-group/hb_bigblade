@@ -52,8 +52,4 @@ if { [sizeof $cells_to_derate] > 0 } {
 }
 #report_timing_derate
 
-# Retiming
-set_app_var compile_keep_original_for_external_references true
-set_app_var case_analysis_propagate_through_icg true
-
 puts "BSG-info: Completed script [info script]\n"
