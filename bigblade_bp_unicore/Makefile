@@ -39,7 +39,7 @@ blackparrot_commit  :=tapeout_bigblade
 
 manycore_dir        :=$(THIS_DIR)/bsg_manycore
 manycore_url        :=$(GITHUB)bespoke-silicon-group/bsg_manycore
-manycore_commit     :=ci_bigblade
+manycore_commit     :=ci_fix_hor_io_tieoffs
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 

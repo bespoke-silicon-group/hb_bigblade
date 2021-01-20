@@ -18,8 +18,8 @@ export BSG_TOPLEVEL_DESIGN_TYPE :=block
 # block. If there is only a single block in your design's hier.mk, this
 # variable has no affect and is effectively  forced to flat.
 
-export BSG_FLOW_STYLE :=hier
-#export BSG_FLOW_STYLE :=flat
+#export BSG_FLOW_STYLE :=hier
+export BSG_FLOW_STYLE :=flat
 
 # Select if the backend flor is going to perform Design Planning (DP). Design
 # planning is about 10 additional steps that occurs before any placement and

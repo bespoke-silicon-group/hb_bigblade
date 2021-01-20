@@ -3,6 +3,7 @@ module bsg_blackparrot_unicore_tile_node
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
+ import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
  import bp_common_aviary_pkg::*;
@@ -17,8 +18,7 @@ module bsg_blackparrot_unicore_tile_node
    , input                                                mc_clk_i
    , input                                                mc_reset_i
 
-   , input [pod_y_cord_width_gp-1:0]                      my_y_pod_i
-   , input [bp_y_cord_width_gp-1:0]                       my_y_bp_cord_i
+   , input bsg_tag_s [3:0]                                bsg_tag_i
 
    , input [E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
    , output logic [E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
@@ -36,9 +36,17 @@ module bsg_blackparrot_unicore_tile_node
   wire [mc_x_cord_width_gp-1:0] mc_global_x_li = '0;
   logic [3:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
   for (genvar i = 0; i < 4; i++)
-    begin : rof1
-      wire [mc_y_subcord_width_gp-1:0] y_subcord_li = (my_y_bp_cord_i << 2'b10) + i;
-      assign mc_global_y_li[i] = {my_y_pod_i, y_subcord_li};
+    begin : btc
+      bsg_tag_client
+       #(.width_p(mc_y_cord_width_gp), .default_p(0))
+       btc
+        (.bsg_tag_i(bsg_tag_i[i])
+
+         ,.recv_clk_i(bp_clk_i)
+         ,.recv_reset_i(bp_reset_i)
+         ,.recv_new_r_o()
+         ,.recv_data_r_o(mc_global_y_li[i])
+         );
     end
 
   bsg_manycore_link_sif_s [3:0] bp_proc_links_li, bp_proc_links_lo;

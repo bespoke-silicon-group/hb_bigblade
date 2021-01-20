@@ -24,6 +24,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bp_common_dir/src/include/bp_common_pkg.sv
   $bp_common_dir/src/include/bp_common_aviary_pkg.sv
@@ -257,7 +258,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_unicore.sv
   $bp_top_dir/src/v/bp_unicore_lite.sv
 
-  $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
@@ -316,7 +316,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_node.sv
-  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_pod.sv
 "]
 
   #$bsg_designs_target_dir/v/bsg_chip.v

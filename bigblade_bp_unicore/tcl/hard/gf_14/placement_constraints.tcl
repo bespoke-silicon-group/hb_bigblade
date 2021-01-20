@@ -16,9 +16,6 @@ set keepout_margin_x 2
 set keepout_margin_y 2
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
-# Switch to tile node
-current_design bsg_blackparrot_unicore_tile_node
-
 #####################################
 ### I CACHE DATA
 ###
@@ -166,7 +163,7 @@ create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
 ### BTB Memory
 ###
 
-set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/btb/*"]
+set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*btb*tag_mem*"]
 set_macro_relative_location \
   -target_object $btb_mem \
   -target_corner tr \
@@ -207,4 +204,3 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
-current_design bsg_blackparrot_unicore_pod
