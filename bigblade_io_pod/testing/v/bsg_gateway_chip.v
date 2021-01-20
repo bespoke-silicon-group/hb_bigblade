@@ -8,6 +8,7 @@
 module bsg_gateway_chip
 
  import bsg_chip_pkg::*;
+ import bsg_tag_pkg::*;
 
 `include "bsg_pinout_inverted.v"
 
@@ -142,7 +143,8 @@ module bsg_gateway_chip
   //
 
   // All tag lines from the btm
-  bsg_chip_tag_lines_s tag_lines_lo;
+  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_raw_lo;
+  wire bsg_chip_tag_lines_s tag_lines_lo = tag_lines_raw_lo;
 
   // BSG tag master instance
   bsg_tag_master #(.els_p( tag_num_clients_gp )
@@ -152,7 +154,7 @@ module bsg_gateway_chip
       (.clk_i      ( tag_clk )
       ,.data_i     ( tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_bsg_tag_data_o : 1'b0 )
       ,.en_i       ( 1'b1 )
-      ,.clients_r_o( tag_lines_lo )
+      ,.clients_r_o( tag_lines_raw_lo )
       );
 
 

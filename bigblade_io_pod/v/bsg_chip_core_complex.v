@@ -43,27 +43,6 @@ module bsg_chip_core_complex
       );
 
 
-  // Tag payload for hb dest cords
-  typedef struct packed { 
-      logic [wh_cord_width_gp-1:0] cord;
-  } hb_dest_cord_tag_payload_s;
-
-  hb_dest_cord_tag_payload_s [1:0] hb_dest_cord_tag_data_lo;
-  logic                      [1:0] hb_dest_cord_tag_new_data_lo;
-
-  for (genvar i = 0; i < 2; i++)
-  begin: hb_cord_loop
-    bsg_tag_client #(.width_p( $bits(hb_dest_cord_tag_data_lo[i]) ), .default_p( 0 ))
-      btc_hb_dest_cord
-        (.bsg_tag_i     ( tag_lines_i.hb_dest_cord[i] )
-        ,.recv_clk_i    ( hb_clk_i )
-        ,.recv_reset_i  ( 1'b0 )
-        ,.recv_new_r_o  ( hb_dest_cord_tag_new_data_lo[i] )
-        ,.recv_data_r_o ( hb_dest_cord_tag_data_lo[i] )
-        );
-  end
-
-
   //////////////////////////////////////////////////
   //
   // Manycore Adapter
@@ -103,29 +82,27 @@ module bsg_chip_core_complex
   `declare_bsg_manycore_ruche_x_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
 
-  bsg_manycore_link_sif_s [S:N][(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_li;
-  bsg_manycore_link_sif_s [S:N][(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_lo;
+  bsg_manycore_link_sif_s [(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_li;
+  bsg_manycore_link_sif_s [(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_lo;
   wh_link_sif_s [E:W][2*hb_num_pods_y_gp-1:0] wh_link_sif_li;
   wh_link_sif_s [E:W][2*hb_num_pods_y_gp-1:0] wh_link_sif_lo;
   bsg_manycore_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0] hor_link_sif_li;
   bsg_manycore_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0] hor_link_sif_lo;
   bsg_manycore_ruche_x_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0][hb_ruche_factor_X_gp-1:0] ruche_link_li;
   bsg_manycore_ruche_x_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0][hb_ruche_factor_X_gp-1:0] ruche_link_lo;
-  logic [E:W][wh_cord_width_gp-1:0] dest_wh_cord_li;
-
-  // Attach dest cords to bsg_tag
-  assign dest_wh_cord_li[W] = hb_dest_cord_tag_data_lo[0].cord;
-  assign dest_wh_cord_li[E] = hb_dest_cord_tag_data_lo[1].cord;
   
   // Attach manycore io to manycore links
-  assign io_link_sif_li[N][0] = manycore_links_li[0];
-  assign manycore_links_lo = {'0, io_link_sif_lo[N][0]};
+  assign io_link_sif_li[0] = manycore_links_li[0];
+  assign manycore_links_lo = {'0, io_link_sif_lo[0]};
 
   // Attach wormhole links to mem links
   assign wh_link_sif_li[W] = mem_links_i[0+:2*hb_num_pods_y_gp];
   assign wh_link_sif_li[E] = mem_links_i[mem_link_num_gp/2+:2*hb_num_pods_y_gp];
   assign mem_links_o[0+:mem_link_num_gp/2]                 = {'0, wh_link_sif_lo[W]};
   assign mem_links_o[mem_link_num_gp/2+:mem_link_num_gp/2] = {'0, wh_link_sif_lo[E]};
+
+  // Attach pod tag lines
+  
 
   bsg_manycore_pod_ruche_array #(
     .num_tiles_x_p(hb_num_tiles_x_gp)
@@ -176,7 +153,7 @@ module bsg_chip_core_complex
     ,.ruche_link_i(ruche_link_li)
     ,.ruche_link_o(ruche_link_lo)
 
-    ,.dest_wh_cord_i(dest_wh_cord_li)
+    ,.bsg_tag_i(tag_lines_i.hb_pod)
   );
 
   // hor tieoff
@@ -233,22 +210,8 @@ module bsg_chip_core_complex
     ) io_n_tieoff (
       .clk_i(hb_clk_i)
       ,.reset_i(hb_tag_data_lo.reset)
-      ,.link_sif_i(io_link_sif_lo[N][i])
-      ,.link_sif_o(io_link_sif_li[N][i])
-    );
-  end
-
-  for (genvar i = 0; i < hb_num_pods_x_gp*hb_num_tiles_x_gp; i++) begin
-    bsg_manycore_link_sif_tieoff #(
-      .addr_width_p(hb_addr_width_gp)
-      ,.data_width_p(hb_data_width_gp)
-      ,.x_cord_width_p(hb_x_cord_width_gp)
-      ,.y_cord_width_p(hb_y_cord_width_gp)
-    ) io_s_tieoff (
-      .clk_i(hb_clk_i)
-      ,.reset_i(hb_tag_data_lo.reset)
-      ,.link_sif_i(io_link_sif_lo[S][i])
-      ,.link_sif_o(io_link_sif_li[S][i])
+      ,.link_sif_i(io_link_sif_lo[i])
+      ,.link_sif_o(io_link_sif_li[i])
     );
   end
 

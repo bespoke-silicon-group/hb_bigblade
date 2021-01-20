@@ -13,6 +13,7 @@
 module bsg_chip
 
  import bsg_chip_pkg::*;
+ import bsg_tag_pkg::*;
 
 `include "bsg_pinout.v"
 `include "bsg_iopads.v"
@@ -44,7 +45,8 @@ module bsg_chip
   //
 
   // All tag lines from the btm
-  bsg_chip_tag_lines_s tag_lines_lo;
+  bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_raw_lo;
+  wire bsg_chip_tag_lines_s tag_lines_lo = tag_lines_raw_lo;
 
   // BSG tag master instance
   bsg_tag_master #(.els_p( tag_num_clients_gp )
@@ -54,7 +56,7 @@ module bsg_chip
       (.clk_i      ( bsg_tag_clk_i_int )
       ,.data_i     ( bsg_tag_en_i_int ? bsg_tag_data_i_int : 1'b0 )
       ,.en_i       ( 1'b1 )
-      ,.clients_r_o( tag_lines_lo )
+      ,.clients_r_o( tag_lines_raw_lo )
       );
 
   //////////////////////////////////////////////////
