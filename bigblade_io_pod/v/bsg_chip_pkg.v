@@ -88,7 +88,7 @@ package bsg_chip_pkg;
 
   // wormhole parameters
   parameter wh_ruche_factor_gp    = 2;
-  parameter wh_cid_width_gp       = `BSG_SAFE_CLOG2(wh_ruche_factor_gp);
+  parameter wh_cid_width_gp       = `BSG_SAFE_CLOG2(2*wh_ruche_factor_gp);
   parameter wh_flit_width_gp      = vcache_dma_data_width_gp;
   parameter wh_cord_width_gp      = hb_x_cord_width_gp;
   parameter wh_len_width_gp       = `BSG_SAFE_CLOG2(1+(vcache_block_size_in_words_gp*vcache_data_width_gp/vcache_dma_data_width_gp)); // header + addr + data

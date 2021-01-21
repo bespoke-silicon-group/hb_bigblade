@@ -84,25 +84,12 @@ module bsg_chip_core_complex
 
   bsg_manycore_link_sif_s [(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_li;
   bsg_manycore_link_sif_s [(hb_num_pods_x_gp*hb_num_tiles_x_gp)-1:0] io_link_sif_lo;
-  wh_link_sif_s [E:W][2*hb_num_pods_y_gp-1:0] wh_link_sif_li;
-  wh_link_sif_s [E:W][2*hb_num_pods_y_gp-1:0] wh_link_sif_lo;
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0][S:N][wh_ruche_factor_gp-1:0] wh_unconc_link_sif_li;
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0][S:N][wh_ruche_factor_gp-1:0] wh_unconc_link_sif_lo;
   bsg_manycore_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0] hor_link_sif_li;
   bsg_manycore_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0] hor_link_sif_lo;
   bsg_manycore_ruche_x_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0][hb_ruche_factor_X_gp-1:0] ruche_link_li;
   bsg_manycore_ruche_x_link_sif_s [E:W][hb_num_pods_y_gp-1:0][hb_num_tiles_y_gp-1:0][hb_ruche_factor_X_gp-1:0] ruche_link_lo;
-  
-  // Attach manycore io to manycore links
-  assign io_link_sif_li[0] = manycore_links_li[0];
-  assign manycore_links_lo = {'0, io_link_sif_lo[0]};
-
-  // Attach wormhole links to mem links
-  assign wh_link_sif_li[W] = mem_links_i[0+:2*hb_num_pods_y_gp];
-  assign wh_link_sif_li[E] = mem_links_i[mem_link_num_gp/2+:2*hb_num_pods_y_gp];
-  assign mem_links_o[0+:mem_link_num_gp/2]                 = {'0, wh_link_sif_lo[W]};
-  assign mem_links_o[mem_link_num_gp/2+:mem_link_num_gp/2] = {'0, wh_link_sif_lo[E]};
-
-  // Attach pod tag lines
-  
 
   bsg_manycore_pod_ruche_array #(
     .num_tiles_x_p(hb_num_tiles_x_gp)
@@ -144,8 +131,8 @@ module bsg_chip_core_complex
     ,.io_link_sif_i(io_link_sif_li)
     ,.io_link_sif_o(io_link_sif_lo)
 
-    ,.wh_link_sif_i(wh_link_sif_li)
-    ,.wh_link_sif_o(wh_link_sif_lo)
+    ,.wh_link_sif_i(wh_unconc_link_sif_li)
+    ,.wh_link_sif_o(wh_unconc_link_sif_lo)
 
     ,.hor_link_sif_i(hor_link_sif_li)
     ,.hor_link_sif_o(hor_link_sif_lo)
@@ -155,6 +142,44 @@ module bsg_chip_core_complex
 
     ,.bsg_tag_i(tag_lines_i.hb_pod)
   );
+
+
+  // Attach manycore io to manycore links
+  assign io_link_sif_li[0] = manycore_links_li[0];
+  assign manycore_links_lo = {'0, io_link_sif_lo[0]};
+
+
+  // instantiate wormhole concentrators
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_li;
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_lo;
+
+  for (genvar i = W; i <= E; i++) begin: conc_s
+    for (genvar j = 0; j < hb_num_pods_y_gp; j++) begin: conc_y
+      bsg_wormhole_concentrator #(
+        .flit_width_p(wh_flit_width_gp)
+        ,.len_width_p(wh_len_width_gp)
+        ,.cid_width_p(wh_cid_width_gp)
+        ,.cord_width_p(wh_cord_width_gp)
+        ,.num_in_p(2*wh_ruche_factor_gp)
+      ) conc0 (
+        .clk_i(hb_clk_i)
+        ,.reset_i(hb_tag_data_lo.reset)
+      
+        ,.links_i(wh_unconc_link_sif_lo[i][j])
+        ,.links_o(wh_unconc_link_sif_li[i][j])
+
+        ,.concentrated_link_i(wh_link_sif_li[i][j])
+        ,.concentrated_link_o(wh_link_sif_lo[i][j])
+      );
+    end
+  end
+
+  // Attach wormhole links to mem links
+  assign wh_link_sif_li[W] = mem_links_i[0+:hb_num_pods_y_gp];
+  assign wh_link_sif_li[E] = mem_links_i[mem_link_num_gp/2+:hb_num_pods_y_gp];
+  assign mem_links_o[0+:mem_link_num_gp/2]                 = {'0, wh_link_sif_lo[W]};
+  assign mem_links_o[mem_link_num_gp/2+:mem_link_num_gp/2] = {'0, wh_link_sif_lo[E]};
+
 
   // hor tieoff
   for (genvar i = W; i <= E; i++) begin

@@ -102,19 +102,22 @@ module bsg_gateway_chip_core_complex
     assign manycore_links_lo[i] = '0;
 
   // wormhole test mem
-  localparam int unsigned mem_size_lp = (2**31); // 2GB each
+  // in bytes
+  // north + south row of vcache
+  localparam longint unsigned mem_size_lp = 2*(2**30)*`BSG_CDIV(hb_num_pods_x_gp, 2);
+  localparam num_vcaches_lp = 2*hb_num_tiles_x_gp*`BSG_CDIV(hb_num_pods_x_gp, 2);
 
   for (genvar i = 0; i < mem_link_num_gp; i++) begin
     bsg_nonsynth_wormhole_test_mem #(
       .vcache_data_width_p(vcache_data_width_gp)
       ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
       ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
-      ,.num_vcaches_p(hb_num_tiles_x_gp*2)
+      ,.num_vcaches_p(num_vcaches_lp)
       ,.wh_cid_width_p(wh_cid_width_gp)
       ,.wh_flit_width_p(wh_flit_width_gp)
       ,.wh_cord_width_p(wh_cord_width_gp)
       ,.wh_len_width_p(wh_len_width_gp)
-
+      ,.wh_ruche_factor_p(wh_ruche_factor_gp)
       ,.mem_size_p(mem_size_lp)
 
     ) test_mem (
