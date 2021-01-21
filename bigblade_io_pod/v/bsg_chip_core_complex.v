@@ -175,10 +175,28 @@ module bsg_chip_core_complex
   end
 
   // Attach wormhole links to mem links
-  assign wh_link_sif_li[W] = mem_links_i[0+:hb_num_pods_y_gp];
-  assign wh_link_sif_li[E] = mem_links_i[mem_link_num_gp/2+:hb_num_pods_y_gp];
-  assign mem_links_o[0+:mem_link_num_gp/2]                 = {'0, wh_link_sif_lo[W]};
-  assign mem_links_o[mem_link_num_gp/2+:mem_link_num_gp/2] = {'0, wh_link_sif_lo[E]};
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
+
+  assign wh_link_sif_li[W] = mem_links_conc_li[0+:hb_num_pods_y_gp];
+  assign wh_link_sif_li[E] = mem_links_conc_li[mem_link_conc_num_gp/2+:hb_num_pods_y_gp];
+  assign mem_links_conc_lo[0+:mem_link_conc_num_gp/2]                      = {'0, wh_link_sif_lo[W]};
+  assign mem_links_conc_lo[mem_link_conc_num_gp/2+:mem_link_conc_num_gp/2] = {'0, wh_link_sif_lo[E]};
+
+  // mem link round robin arbiters
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
+    bsg_ready_and_link_round_robin_static 
+   #(.width_p      (mem_link_width_gp   )
+    ,.num_in_p     (mem_link_rr_ratio_gp)
+    ) rr
+    (.clk_i        (hb_clk_i            )
+    ,.reset_i      (hb_tag_data_lo.reset)
+    ,.single_link_i(mem_links_conc_lo[i])
+    ,.single_link_o(mem_links_conc_li[i])
+    ,.links_i      (mem_links_i[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
+    ,.links_o      (mem_links_o[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
+    );
+  end
 
 
   // hor tieoff

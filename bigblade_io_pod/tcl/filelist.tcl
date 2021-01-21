@@ -218,5 +218,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
   $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
   $bsg_designs_target_dir/v/bsg_manycore_link_async_to_bsg_link.v
+  $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v
 "]
 

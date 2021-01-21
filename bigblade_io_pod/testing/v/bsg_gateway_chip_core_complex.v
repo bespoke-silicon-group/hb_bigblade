@@ -101,13 +101,34 @@ module bsg_gateway_chip_core_complex
   for (genvar i = 1; i < io_link_num_gp; i++)
     assign manycore_links_lo[i] = '0;
 
+
+  // Attach wormhole links to mem links
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
+
+  // mem link round robin arbiters
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
+    bsg_ready_and_link_round_robin_static 
+   #(.width_p      (mem_link_width_gp   )
+    ,.num_in_p     (mem_link_rr_ratio_gp)
+    ) rr
+    (.clk_i        (hb_clk_i            )
+    ,.reset_i      (hb_tag_data_lo.reset | ~tag_trace_done_i)
+    ,.single_link_i(mem_links_conc_lo[i])
+    ,.single_link_o(mem_links_conc_li[i])
+    ,.links_i      (mem_links_i[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
+    ,.links_o      (mem_links_o[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
+    );
+  end
+
+
   // wormhole test mem
   // in bytes
   // north + south row of vcache
   localparam longint unsigned mem_size_lp = 2*(2**30)*`BSG_CDIV(hb_num_pods_x_gp, 2);
   localparam num_vcaches_lp = 2*hb_num_tiles_x_gp*`BSG_CDIV(hb_num_pods_x_gp, 2);
 
-  for (genvar i = 0; i < mem_link_num_gp; i++) begin
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin
     bsg_nonsynth_wormhole_test_mem #(
       .vcache_data_width_p(vcache_data_width_gp)
       ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
@@ -124,8 +145,8 @@ module bsg_gateway_chip_core_complex
       .clk_i(hb_clk_i)
       ,.reset_i(hb_tag_data_lo.reset | ~tag_trace_done_i)
 
-      ,.wh_link_sif_i(mem_links_i[i])
-      ,.wh_link_sif_o(mem_links_o[i])
+      ,.wh_link_sif_i(mem_links_conc_li[i])
+      ,.wh_link_sif_o(mem_links_conc_lo[i])
     );
   end
 
