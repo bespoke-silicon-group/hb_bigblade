@@ -81,6 +81,17 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
 
+  $basejump_stl_dir/bsg_noc/bsg_router_crossbar_o_by_i.v
+  $basejump_stl_dir/bsg_misc/bsg_crossbar_control_basic_o_by_i.v
+  $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
+  $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
+  $bsg_manycore_dir/v/vanilla_bean/load_packer.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_crossbar.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_link_to_crossbar.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_mem_infinite.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
 
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v

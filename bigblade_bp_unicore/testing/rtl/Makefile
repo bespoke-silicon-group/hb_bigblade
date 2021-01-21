@@ -1,4 +1,4 @@
-.DEFAULT_GOAL=run_all
+.DEFAULT_GOAL=run
 .SECONDARY:
 
 # Note: most variables that are file/dir paths are ?= because they can be
@@ -90,38 +90,32 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ## BlackParrot test junk
 ########################################
 
-PROG_LIST :=hello_world cache_hammer aha-compress ns qsort towers
-
 %/prog.nbf:
 	mkdir -p $(@D)
-	python $(BLACKPARROT_DIR)/bp_common/software/py/nbf.py --ncpus 1 --config > $@
+	touch $@
+	echo "00_01_00000000_00000000" >> $@
+	echo "FF_FF_FFFFFFFF_FFFFFFFF" >> $@
 
-%/prog.mem:
-	mkdir -p $(@D)
-	@sed "s/@8/@0/g" $(BLACKPARROT_DIR)/bp_common/test/mem/$(lastword $(subst /, ,$(@D))).mem > $@
+PLUSARGS :=+nbf_file=prog.nbf
 
 ########################################
 ## Run Targets
 ########################################
 
-BSG_RUN_DIRS := $(addsuffix /run, $(addprefix $(BSG_OUT_DIR)/, $(PROG_LIST)))
-run_all: $(BSG_OUT_SIM)
-	$(MAKE) $(BSG_RUN_DIRS)
+run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/run: $(BSG_OUT_SIM) %/prog.mem %/prog.nbf
-	cd $(@D); ../simv | tee -i $(@D)/run.log
+run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/run-no-tee: $(BSG_OUT_SIM) %/prog.mem %/prog.nbf
-	cd $(@D); ../simv
+rerun: $(BSG_OUT_SIM)
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/rerun: $(BSG_OUT_SIM)
-	cd $(@D); ../simv | tee -i $(@D)/run.log
+rerun-no-tee: $(BSG_OUT_SIM)
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/rerun-no-tee: $(BSG_OUT_SIM)
-	cd $(@D); ../simv
-
-%/view:
-	cd $(@D); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
+view:
+	$(VCS_BIN)/dve -full64 -vpd $(BSG_OUT_DIR)/vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)

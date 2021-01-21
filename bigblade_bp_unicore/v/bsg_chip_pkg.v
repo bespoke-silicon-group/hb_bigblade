@@ -38,6 +38,7 @@ package bsg_chip_pkg;
   localparam mc_vcache_sets_gp = 64;
   localparam mc_vcache_block_size_in_words_gp = 8;
   localparam mc_vcache_size_gp = mc_vcache_ways_gp*mc_vcache_sets_gp*mc_vcache_block_size_in_words_gp;
+  localparam mc_vcache_dma_data_width_gp = mc_data_width_gp;
 
 endpackage // bsg_chip_pkg
 
