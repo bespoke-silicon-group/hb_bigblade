@@ -90,28 +90,38 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ## BlackParrot test junk
 ########################################
 
+PYTHON ?= python
+PYTHONPATH +=:../../bsg_manycore/testbenches/py
+TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
+
+%/trace.tr:
+	mkdir -p $(@D)
+	$(PYTHON) $(TRACE_GEN) > $@
+
 %/prog.nbf:
 	mkdir -p $(@D)
 	touch $@
-	echo "00_01_00000000_00000000" >> $@
+	#echo "00_01_00000000_00000000" >> $@
 	echo "FF_FF_FFFFFFFF_FFFFFFFF" >> $@
 
-PLUSARGS :=+nbf_file=prog.nbf
+PLUSARGS ?= +nbf_file=prog.nbf
+PLUSARGS += +max_cycle=1000000
+PLUSARGS += +num_pods=1
 
 ########################################
 ## Run Targets
 ########################################
 
-run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf
+run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf
+run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-rerun: $(BSG_OUT_SIM)
+rerun: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-rerun-no-tee: $(BSG_OUT_SIM)
+rerun-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
 view:

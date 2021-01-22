@@ -43,7 +43,7 @@ module bsg_blackparrot_unicore_tile_node
         (.bsg_tag_i(bsg_tag_i[i])
 
          ,.recv_clk_i(bp_clk_i)
-         ,.recv_reset_i(bp_reset_i)
+         ,.recv_reset_i(1'b0)
          ,.recv_new_r_o()
          ,.recv_data_r_o(mc_global_y_li[i])
          );
@@ -66,19 +66,35 @@ module bsg_blackparrot_unicore_tile_node
   for (genvar i = 0; i < 4; i++)
     begin : rof2
       bsg_async_noc_link
-       #(.width_p($bits(bsg_manycore_link_sif_s)-2), .lg_size_p(3))
-       cdc
+       #(.width_p($bits(bsg_manycore_fwd_link_sif_s)-2), .lg_size_p(3))
+       fwd_cdc
         (.aclk_i(bp_clk_i)
          ,.areset_i(bp_reset_i)
      
          ,.bclk_i(mc_clk_i)
          ,.breset_i(mc_reset_i)
      
-         ,.alink_i(bp_proc_links_lo[i])
-         ,.alink_o(bp_proc_links_li[i])
+         ,.alink_i(bp_proc_links_lo[i].fwd)
+         ,.alink_o(bp_proc_links_li[i].fwd)
      
-         ,.blink_i(mc_proc_links_li[i])
-         ,.blink_o(mc_proc_links_lo[i])
+         ,.blink_i(mc_proc_links_li[i].fwd)
+         ,.blink_o(mc_proc_links_lo[i].fwd)
+         );
+
+      bsg_async_noc_link
+       #(.width_p($bits(bsg_manycore_rev_link_sif_s)-2), .lg_size_p(3))
+       rev_cdc
+        (.aclk_i(bp_clk_i)
+         ,.areset_i(bp_reset_i)
+     
+         ,.bclk_i(mc_clk_i)
+         ,.breset_i(mc_reset_i)
+     
+         ,.alink_i(bp_proc_links_lo[i].rev)
+         ,.alink_o(bp_proc_links_li[i].rev)
+     
+         ,.blink_i(mc_proc_links_li[i].rev)
+         ,.blink_o(mc_proc_links_lo[i].rev)
          );
 
       assign mc_hor_links_li[i][E] = mc_hor_links_i[i][E];

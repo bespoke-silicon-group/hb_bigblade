@@ -81,6 +81,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
 
+  $basejump_stl_dir/bsg_fsb/bsg_fsb_node_trace_replay.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master.v
   $basejump_stl_dir/bsg_noc/bsg_router_crossbar_o_by_i.v
   $basejump_stl_dir/bsg_misc/bsg_crossbar_control_basic_o_by_i.v
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
