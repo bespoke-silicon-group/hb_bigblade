@@ -4,7 +4,7 @@ if __name__ == "__main__":
 
   # instantiate tg
   num_masters_p = 2
-  num_clients_p = 138
+  num_clients_p = 139
   max_payload_width_p = 10
   tg = TagTraceGen(num_masters_p, num_clients_p, max_payload_width_p)
 
@@ -70,12 +70,15 @@ if __name__ == "__main__":
     tg.send(masters=0b11, client_id=89+i, data_not_reset=0, length=3, data=0b111)
     tg.send(masters=0b11, client_id=105+i, data_not_reset=0, length=4, data=0b1111)
 
-  # reset hb clients
+  # reset router clients
   tg.send(masters=0b11, client_id=121, data_not_reset=0, length=2, data=0b11)
+
+  # reset hb clients
+  tg.send(masters=0b11, client_id=122, data_not_reset=0, length=2, data=0b11)
   for i in range(4):
     for j in range(4):
       for k in range(2):
-        tg.send(masters=0b11, client_id=122+(i*4+j)*2+k, data_not_reset=0, length=8, data=0b11111111)
+        tg.send(masters=0b11, client_id=123+(i*4+j)*2+k, data_not_reset=0, length=8, data=0b11111111)
 
 
 
@@ -88,16 +91,18 @@ if __name__ == "__main__":
   for i in range(16):
     tg.send(masters=0b11, client_id=89+i, data_not_reset=1, length=3, data=0b110)
     tg.send(masters=0b11, client_id=105+i, data_not_reset=1, length=4, data=0b1111)
-  # init hb reset
+  # init router reset
   tg.send(masters=0b11, client_id=121, data_not_reset=1, length=2, data=0b01)
+  # init hb reset
+  tg.send(masters=0b11, client_id=122, data_not_reset=1, length=2, data=0b01)
   # init hb pod
   for i in range(4):
     for j in range(4):
       for k in range(2):
         if j < 2:
-          tg.send(masters=0b11, client_id=122+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b10001111)
+          tg.send(masters=0b11, client_id=123+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b10001111)
         else:
-          tg.send(masters=0b11, client_id=122+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b11010000)
+          tg.send(masters=0b11, client_id=123+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b11010000)
 
 
   # STEP 2: perform async token reset
@@ -152,20 +157,26 @@ if __name__ == "__main__":
 
 
 
-  # STEP 8: de-assert hb reset
+  # STEP 8: de-assert router reset
+  # de-assert reset for router
+  tg.send(masters=0b11, client_id=121, data_not_reset=1, length=2, data=0b00)
+
+
+
+  # STEP 9: de-assert hb reset
   # de-assert reset for ASIC hb
-  tg.send(masters=0b10, client_id=121, data_not_reset=1, length=2, data=0b00)
+  tg.send(masters=0b10, client_id=122, data_not_reset=1, length=2, data=0b00)
   # de-assert reset for GW hb
-  tg.send(masters=0b01, client_id=121, data_not_reset=1, length=2, data=0b00)
+  tg.send(masters=0b01, client_id=122, data_not_reset=1, length=2, data=0b00)
 
   # de-assert reset for ASIC pod
   for i in range(4):
     for j in range(4):
       for k in range(2):
         if j < 2:
-          tg.send(masters=0b10, client_id=122+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b00001111)
+          tg.send(masters=0b10, client_id=123+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b00001111)
         else:
-          tg.send(masters=0b10, client_id=122+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b01010000)
+          tg.send(masters=0b10, client_id=123+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b01010000)
 
   tg.wait(64)
   tg.done()

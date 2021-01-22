@@ -66,7 +66,7 @@ module bsg_chip
 
   logic hb_clk_lo;
   logic bp_clk_lo; // not used
-  logic router_clk_lo; // not used
+  logic router_clk_lo;
 
   bsg_clk_gen_power_domain #(.num_clk_endpoint_p( clk_gen_num_endpoints_gp )
                             ,.ds_width_p( clk_gen_ds_width_gp )
@@ -212,7 +212,7 @@ module bsg_chip
     ,.ct_lg_credit_decimation_p           ( io_ct_lg_credit_decimation_gp )
     ,.num_hops_p                          ( 2 )
     ) link
-    (.core_clk_i ( hb_clk_lo )
+    (.core_clk_i ( router_clk_lo )
     ,.io_clk_i   ( io_link_io_clk_lo[i] )
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
@@ -259,7 +259,7 @@ module bsg_chip
     ,.ct_bypass_p                         ( 1 )
     ,.num_hops_p                          ( 1 )
     ) link
-    (.core_clk_i ( hb_clk_lo )
+    (.core_clk_i ( router_clk_lo )
     ,.io_clk_i   ( mem_link_io_clk_lo[i] )
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
@@ -286,17 +286,18 @@ module bsg_chip
   //
 
   bsg_chip_core_complex core_complex
-  (.hb_clk_i   ( hb_clk_lo          )
-  ,.tag_lines_i( tag_lines_lo       )
+  (.hb_clk_i    ( hb_clk_lo          )
+  ,.router_clk_i( router_clk_lo      )
+  ,.tag_lines_i ( tag_lines_lo       )
 
-  ,.tag_clk_i  ( bsg_tag_clk_i_int  )
-  ,.tag_data_i ( bsg_tag_data_i_int )
-  ,.tag_en_i   ( bsg_tag_en_i_int   )
+  ,.tag_clk_i   ( bsg_tag_clk_i_int  )
+  ,.tag_data_i  ( bsg_tag_data_i_int )
+  ,.tag_en_i    ( bsg_tag_en_i_int   )
 
-  ,.io_links_i ( io_links_lo        )
-  ,.io_links_o ( io_links_li        )
-  ,.mem_links_i( mem_links_lo       )
-  ,.mem_links_o( mem_links_li       )
+  ,.io_links_i  ( io_links_lo        )
+  ,.io_links_o  ( io_links_li        )
+  ,.mem_links_i ( mem_links_lo       )
+  ,.mem_links_o ( mem_links_li       )
   );
 
 endmodule

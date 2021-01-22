@@ -6,6 +6,7 @@ module bsg_chip_core_complex
  import bsg_manycore_pkg::*;
 
   (input                      hb_clk_i
+  ,input                      router_clk_i
   ,input bsg_chip_tag_lines_s tag_lines_i
 
   ,input  tag_clk_i
@@ -42,35 +43,23 @@ module bsg_chip_core_complex
       ,.recv_data_r_o ( hb_tag_data_lo )
       );
 
+  // Tag payload for router control signals
+  typedef struct packed { 
+      logic padding;
+      logic reset;
+  } router_tag_payload_s;
 
-  //////////////////////////////////////////////////
-  //
-  // Manycore Adapter
-  //
-  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
-  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_li;
-  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_lo;
-  
-  for (genvar i = 0; i < io_link_num_gp; i++)
-  begin: mc_io
-    bsg_manycore_link_async_to_wormhole
-   #(.addr_width_p    (hb_addr_width_gp  )
-    ,.data_width_p    (hb_data_width_gp  )
-    ,.x_cord_width_p  (hb_x_cord_width_gp)
-    ,.y_cord_width_p  (hb_y_cord_width_gp)
-    ,.bsg_link_width_p(io_ct_width_gp    )
-    ) mc_adapter
-    (.mc_clk_i        (hb_clk_i)
-    ,.mc_reset_i      (hb_tag_data_lo.reset)
-    ,.mc_links_sif_i  (manycore_links_lo[i])
-    ,.mc_links_sif_o  (manycore_links_li[i])
-  
-    ,.bsg_link_clk_i  (hb_clk_i)
-    ,.bsg_link_reset_i(hb_tag_data_lo.reset)
-    ,.bsg_link_i      (io_links_i[i])
-    ,.bsg_link_o      (io_links_o[i])
-    );
-  end
+  router_tag_payload_s router_tag_data_lo;
+  logic                router_tag_new_data_lo;
+
+  bsg_tag_client #(.width_p( $bits(router_tag_data_lo) ), .default_p( 0 ))
+    btc_router
+      (.bsg_tag_i     ( tag_lines_i.router_reset )
+      ,.recv_clk_i    ( router_clk_i )
+      ,.recv_reset_i  ( 1'b0 )
+      ,.recv_new_r_o  ( router_tag_new_data_lo )
+      ,.recv_data_r_o ( router_tag_data_lo )
+      );
 
 
   //////////////////////////////////////////////////
@@ -79,6 +68,7 @@ module bsg_chip_core_complex
   //
   localparam reset_depth_gp=3;
 
+  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_manycore_ruche_x_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
 
@@ -143,62 +133,6 @@ module bsg_chip_core_complex
     ,.bsg_tag_i(tag_lines_i.hb_pod)
   );
 
-
-  // Attach manycore io to manycore links
-  assign io_link_sif_li[0] = manycore_links_li[0];
-  assign manycore_links_lo = {'0, io_link_sif_lo[0]};
-
-
-  // instantiate wormhole concentrators
-  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_li;
-  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_lo;
-
-  for (genvar i = W; i <= E; i++) begin: conc_s
-    for (genvar j = 0; j < hb_num_pods_y_gp; j++) begin: conc_y
-      bsg_wormhole_concentrator #(
-        .flit_width_p(wh_flit_width_gp)
-        ,.len_width_p(wh_len_width_gp)
-        ,.cid_width_p(wh_cid_width_gp)
-        ,.cord_width_p(wh_cord_width_gp)
-        ,.num_in_p(2*wh_ruche_factor_gp)
-      ) conc0 (
-        .clk_i(hb_clk_i)
-        ,.reset_i(hb_tag_data_lo.reset)
-      
-        ,.links_i(wh_unconc_link_sif_lo[i][j])
-        ,.links_o(wh_unconc_link_sif_li[i][j])
-
-        ,.concentrated_link_i(wh_link_sif_li[i][j])
-        ,.concentrated_link_o(wh_link_sif_lo[i][j])
-      );
-    end
-  end
-
-  // Attach wormhole links to mem links
-  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
-  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
-
-  assign wh_link_sif_li[W] = mem_links_conc_li[0+:hb_num_pods_y_gp];
-  assign wh_link_sif_li[E] = mem_links_conc_li[mem_link_conc_num_gp/2+:hb_num_pods_y_gp];
-  assign mem_links_conc_lo[0+:mem_link_conc_num_gp/2]                      = {'0, wh_link_sif_lo[W]};
-  assign mem_links_conc_lo[mem_link_conc_num_gp/2+:mem_link_conc_num_gp/2] = {'0, wh_link_sif_lo[E]};
-
-  // mem link round robin arbiters
-  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
-    bsg_ready_and_link_round_robin_static 
-   #(.width_p      (mem_link_width_gp   )
-    ,.num_in_p     (mem_link_rr_ratio_gp)
-    ) rr
-    (.clk_i        (hb_clk_i            )
-    ,.reset_i      (hb_tag_data_lo.reset)
-    ,.single_link_i(mem_links_conc_lo[i])
-    ,.single_link_o(mem_links_conc_li[i])
-    ,.links_i      (mem_links_i[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
-    ,.links_o      (mem_links_o[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
-    );
-  end
-
-
   // hor tieoff
   for (genvar i = W; i <= E; i++) begin
     for (genvar j = 0; j < hb_num_pods_y_gp; j++) begin
@@ -255,6 +189,113 @@ module bsg_chip_core_complex
       ,.reset_i(hb_tag_data_lo.reset)
       ,.link_sif_i(io_link_sif_lo[i])
       ,.link_sif_o(io_link_sif_li[i])
+    );
+  end
+
+
+  //////////////////////////////////////////////////
+  //
+  // Manycore Adapter
+  //
+  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_li;
+  bsg_manycore_link_sif_s [io_link_num_gp-1:0] manycore_links_lo;
+  
+  assign io_link_sif_li[0] = manycore_links_li[0];
+  assign manycore_links_lo = {'0, io_link_sif_lo[0]};
+  
+  for (genvar i = 0; i < io_link_num_gp; i++)
+  begin: mc_io
+    bsg_manycore_link_async_to_wormhole
+   #(.addr_width_p    (hb_addr_width_gp  )
+    ,.data_width_p    (hb_data_width_gp  )
+    ,.x_cord_width_p  (hb_x_cord_width_gp)
+    ,.y_cord_width_p  (hb_y_cord_width_gp)
+    ,.bsg_link_width_p(io_ct_width_gp    )
+    ) mc_adapter
+    (.mc_clk_i        (hb_clk_i)
+    ,.mc_reset_i      (hb_tag_data_lo.reset)
+    ,.mc_links_sif_i  (manycore_links_lo[i])
+    ,.mc_links_sif_o  (manycore_links_li[i])
+  
+    ,.bsg_link_clk_i  (router_clk_i)
+    ,.bsg_link_reset_i(router_tag_data_lo.reset)
+    ,.bsg_link_i      (io_links_i[i])
+    ,.bsg_link_o      (io_links_o[i])
+    );
+  end
+
+
+  // clock domain crossing
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0][S:N][wh_ruche_factor_gp-1:0] router_unconc_link_sif_li;
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0][S:N][wh_ruche_factor_gp-1:0] router_unconc_link_sif_lo;
+  for (genvar i = W; i <= E; i++) begin: cdc_s
+    for (genvar j = 0; j < hb_num_pods_y_gp; j++) begin: cdc_y
+      for (genvar m = N; m <= S; m++) begin: cdc_tb
+        for (genvar l = 0; l < wh_ruche_factor_gp; l++) begin: cdc_f
+          bsg_ready_and_link_async_to_bsg_link
+         #(.ral_link_width_p(wh_flit_width_gp)
+          ,.bsg_link_width_p(wh_flit_width_gp)
+          ) async
+          (.ral_clk_i       (hb_clk_i)
+          ,.ral_reset_i     (hb_tag_data_lo.reset)
+          ,.ral_link_i      (wh_unconc_link_sif_lo[i][j][m][l])
+          ,.ral_link_o      (wh_unconc_link_sif_li[i][j][m][l])
+          ,.bsg_link_clk_i  (router_clk_i)
+          ,.bsg_link_reset_i(router_tag_data_lo.reset)
+          ,.bsg_link_i      (router_unconc_link_sif_li[i][j][m][l])
+          ,.bsg_link_o      (router_unconc_link_sif_lo[i][j][m][l])
+          );
+        end
+      end
+    end
+  end
+
+  // instantiate wormhole concentrators
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_li;
+  wh_link_sif_s [E:W][hb_num_pods_y_gp-1:0] wh_link_sif_lo;
+
+  for (genvar i = W; i <= E; i++) begin: conc_s
+    for (genvar j = 0; j < hb_num_pods_y_gp; j++) begin: conc_y
+      bsg_wormhole_concentrator #(
+        .flit_width_p(wh_flit_width_gp)
+        ,.len_width_p(wh_len_width_gp)
+        ,.cid_width_p(wh_cid_width_gp)
+        ,.cord_width_p(wh_cord_width_gp)
+        ,.num_in_p(2*wh_ruche_factor_gp)
+      ) conc0 (
+        .clk_i(router_clk_i)
+        ,.reset_i(router_tag_data_lo.reset)
+      
+        ,.links_i(router_unconc_link_sif_lo[i][j])
+        ,.links_o(router_unconc_link_sif_li[i][j])
+
+        ,.concentrated_link_i(wh_link_sif_li[i][j])
+        ,.concentrated_link_o(wh_link_sif_lo[i][j])
+      );
+    end
+  end
+
+  // Attach wormhole links to mem links
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
+  bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
+
+  assign wh_link_sif_li[W] = mem_links_conc_li[0+:hb_num_pods_y_gp];
+  assign wh_link_sif_li[E] = mem_links_conc_li[mem_link_conc_num_gp/2+:hb_num_pods_y_gp];
+  assign mem_links_conc_lo[0+:mem_link_conc_num_gp/2]                      = {'0, wh_link_sif_lo[W]};
+  assign mem_links_conc_lo[mem_link_conc_num_gp/2+:mem_link_conc_num_gp/2] = {'0, wh_link_sif_lo[E]};
+
+  // mem link round robin arbiters
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
+    bsg_ready_and_link_round_robin_static 
+   #(.width_p      (mem_link_width_gp   )
+    ,.num_in_p     (mem_link_rr_ratio_gp)
+    ) rr
+    (.clk_i        (router_clk_i        )
+    ,.reset_i      (router_tag_data_lo.reset)
+    ,.single_link_i(mem_links_conc_lo[i])
+    ,.single_link_o(mem_links_conc_li[i])
+    ,.links_i      (mem_links_i[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
+    ,.links_o      (mem_links_o[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
     );
   end
 

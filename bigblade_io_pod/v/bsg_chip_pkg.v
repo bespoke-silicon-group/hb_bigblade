@@ -105,6 +105,7 @@ package bsg_chip_pkg;
   typedef struct packed {
     bsg_tag_s [hb_num_pods_y_gp-1:0][hb_num_pods_x_gp-1:0][S:N] hb_pod;
     bsg_tag_s hb_reset;
+    bsg_tag_s router_reset;
 
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_core;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_io;
