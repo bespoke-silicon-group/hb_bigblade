@@ -191,13 +191,13 @@ module testbench();
 
 
   // OFF CHIP MEMORY MODEL 
-  localparam mem_size_lp = (2**30); // 1GB each
+  localparam longint unsigned mem_size_lp = (2**31); // 2GB each
 
   // north memory
-  wh_link_sif_s [wh_ruche_factor_gp-1:0] north_test_mem_wh_link_li;
-  wh_link_sif_s [wh_ruche_factor_gp-1:0] north_test_mem_wh_link_lo;
+  wh_link_sif_s [S:N][wh_ruche_factor_gp-1:0] test_mem_wh_link_li;
+  wh_link_sif_s [S:N][wh_ruche_factor_gp-1:0] test_mem_wh_link_lo;
 
-  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin: n_wh
+  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin: wh
     bsg_ruche_anti_buffer #(
       .width_p($bits(wh_link_sif_s))
       ,.ruche_factor_p(wh_ruche_factor_gp)
@@ -207,7 +207,7 @@ module testbench();
       ,.harden_p(0)
     ) n_abuf_w (
       .i(north_wh_link_sif_lo[W][i])
-      ,.o(north_test_mem_wh_link_li[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+      ,.o(test_mem_wh_link_li[N][(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
     );
 
     bsg_ruche_anti_buffer #(
@@ -218,29 +218,53 @@ module testbench();
       ,.input_not_output_p(1)
       ,.harden_p(0)
     ) n_abuf_e (
-      .i(north_test_mem_wh_link_lo[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+      .i(test_mem_wh_link_lo[N][(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
       ,.o(north_wh_link_sif_li[W][i])
+    );
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(0)
+      ,.harden_p(0)
+    ) s_abuf_w (
+      .i(south_wh_link_sif_lo[W][i])
+      ,.o(test_mem_wh_link_li[S][(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+    );
+
+    bsg_ruche_anti_buffer #(
+      .width_p($bits(wh_link_sif_s))
+      ,.ruche_factor_p(wh_ruche_factor_gp)
+      ,.ruche_stage_p(i)
+      ,.west_not_east_p(1)
+      ,.input_not_output_p(1)
+      ,.harden_p(0)
+    ) s_abuf_e (
+      .i(test_mem_wh_link_lo[S][(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
+      ,.o(south_wh_link_sif_li[W][i])
     );
   end
 
-  // north wormhole concentrator
-  wh_link_sif_s north_wh_conc_link_sif_li;
-  wh_link_sif_s north_wh_conc_link_sif_lo;
+  // wormhole concentrator
+  wh_link_sif_s wh_conc_link_sif_li;
+  wh_link_sif_s wh_conc_link_sif_lo;
   bsg_wormhole_concentrator #(
     .flit_width_p(wh_flit_width_gp)
     ,.len_width_p(wh_len_width_gp)
     ,.cid_width_p(wh_cid_width_gp)
     ,.cord_width_p(wh_cord_width_gp)
-    ,.num_in_p(wh_ruche_factor_gp)
-  ) conc_north (
+    ,.num_in_p(wh_ruche_factor_gp*2) // both north and south
+  ) conc (
     .clk_i(clk)
     ,.reset_i(reset_r)
 
-    ,.links_i(north_test_mem_wh_link_li)
-    ,.links_o(north_test_mem_wh_link_lo)
+    ,.links_i(test_mem_wh_link_li)
+    ,.links_o(test_mem_wh_link_lo)
 
-    ,.concentrated_link_i(north_wh_conc_link_sif_li)
-    ,.concentrated_link_o(north_wh_conc_link_sif_lo)
+    ,.concentrated_link_i(wh_conc_link_sif_li)
+    ,.concentrated_link_o(wh_conc_link_sif_lo)
   );
 
   bsg_nonsynth_wormhole_test_mem #(
@@ -254,85 +278,14 @@ module testbench();
     ,.wh_len_width_p(wh_len_width_gp)
     
     ,.mem_size_p(mem_size_lp)
-  ) north_test_mem (
+  ) test_mem (
     .clk_i(clk)
     ,.reset_i(reset_r)
   
-    ,.wh_link_sif_i(north_wh_conc_link_sif_lo)
-    ,.wh_link_sif_o(north_wh_conc_link_sif_li)
+    ,.wh_link_sif_i(wh_conc_link_sif_lo)
+    ,.wh_link_sif_o(wh_conc_link_sif_li)
   );
 
-
-
-
-  // south memory
-  wh_link_sif_s [wh_ruche_factor_gp-1:0] south_test_mem_wh_link_li;
-  wh_link_sif_s [wh_ruche_factor_gp-1:0] south_test_mem_wh_link_lo;
-
-  for (genvar i = 0; i < wh_ruche_factor_gp; i++) begin: s_wh
-    bsg_ruche_anti_buffer #(
-      .width_p($bits(wh_link_sif_s))
-      ,.ruche_factor_p(wh_ruche_factor_gp)
-      ,.ruche_stage_p(i)
-      ,.west_not_east_p(1)
-      ,.input_not_output_p(0)
-      ,.harden_p(0)
-    ) s_abuf_w (
-      .i(south_wh_link_sif_lo[W][i])
-      ,.o(south_test_mem_wh_link_li[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
-    );
-
-    bsg_ruche_anti_buffer #(
-      .width_p($bits(wh_link_sif_s))
-      ,.ruche_factor_p(wh_ruche_factor_gp)
-      ,.ruche_stage_p(i)
-      ,.west_not_east_p(1)
-      ,.input_not_output_p(1)
-      ,.harden_p(0)
-    ) s_abuf_e (
-      .i(south_test_mem_wh_link_lo[(wh_ruche_factor_gp-i)%wh_ruche_factor_gp])
-      ,.o(south_wh_link_sif_li[W][i])
-    );
-  end
-
-  // south wormhole concentrator
-  wh_link_sif_s south_wh_conc_link_sif_li;
-  wh_link_sif_s south_wh_conc_link_sif_lo;
-  bsg_wormhole_concentrator #(
-    .flit_width_p(wh_flit_width_gp)
-    ,.len_width_p(wh_len_width_gp)
-    ,.cid_width_p(wh_cid_width_gp)
-    ,.cord_width_p(wh_cord_width_gp)
-    ,.num_in_p(wh_ruche_factor_gp)
-  ) conc_south (
-    .clk_i(clk)
-    ,.reset_i(reset_r)
-
-    ,.links_i(south_test_mem_wh_link_li)
-    ,.links_o(south_test_mem_wh_link_lo)
-
-    ,.concentrated_link_i(south_wh_conc_link_sif_li)
-    ,.concentrated_link_o(south_wh_conc_link_sif_lo)
-  );
-
-  bsg_nonsynth_wormhole_test_mem #(
-    .vcache_data_width_p(vcache_data_width_gp)
-    ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
-    ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
-    ,.num_vcaches_p(hb_num_tiles_x_gp)
-    ,.wh_cid_width_p(wh_cid_width_gp)
-    ,.wh_flit_width_p(wh_flit_width_gp)
-    ,.wh_cord_width_p(wh_cord_width_gp) 
-    ,.wh_len_width_p(wh_len_width_gp)
-
-    ,.mem_size_p(mem_size_lp)
-  ) south_test_mem (
-    .clk_i(clk)
-    ,.reset_i(reset_r)
-  
-    ,.wh_link_sif_i(south_wh_conc_link_sif_lo)
-    ,.wh_link_sif_o(south_wh_conc_link_sif_li)
-  );
 
 
 
