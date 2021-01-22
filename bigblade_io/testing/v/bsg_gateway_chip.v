@@ -237,6 +237,8 @@ module bsg_gateway_chip
     ,.link_lg_fifo_depth_p                ( io_link_lg_fifo_depth_gp )
     ,.link_lg_credit_to_token_decimation_p( io_link_lg_credit_to_token_decimation_gp )
     ,.link_use_extra_data_bit_p           ( io_link_use_extra_data_bit_gp )
+    ,.link_use_encode_upstream_p          ( io_link_use_encode_gw_to_chip_gp )
+    ,.link_use_encode_downstream_p        ( io_link_use_encode_chip_to_gw_gp )
     ,.ct_bypass_p                         ( 0 )
     ,.ct_width_p                          ( io_ct_width_gp )
     ,.ct_num_in_p                         ( io_ct_num_in_gp )
@@ -275,6 +277,8 @@ module bsg_gateway_chip
     ,.link_lg_fifo_depth_p                ( mem_link_lg_fifo_depth_gp )
     ,.link_lg_credit_to_token_decimation_p( mem_link_lg_credit_to_token_decimation_gp )
     ,.link_use_extra_data_bit_p           ( mem_link_use_extra_data_bit_gp )
+    ,.link_use_encode_upstream_p          ( mem_link_use_encode_gw_to_chip_gp )
+    ,.link_use_encode_downstream_p        ( mem_link_use_encode_chip_to_gw_gp )
     ,.ct_bypass_p                         ( 1 )
     ,.num_hops_p                          ( 1 )
     ) link
