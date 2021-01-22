@@ -99,6 +99,7 @@ LINK ?= ../progs/riscv.ld
 PYTHON ?= python
 PYTHONPATH +=:../../bsg_manycore/testbenches/py
 TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
+NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
 %/trace.tr:
 	mkdir -p $(@D)
@@ -118,9 +119,7 @@ TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
 
 %/prog.nbf: %/prog.mem %/prog.dump
 	mkdir -p $(@D)
-	touch $@
-	#echo "00_01_00000000_00000000" >> $@
-	echo "FF_FF_FFFFFFFF_FFFFFFFF" >> $@
+	$(PYTHON) $(NBF_GEN) $< > $@
 
 PLUSARGS ?= +nbf_file=prog.nbf
 PLUSARGS += +max_cycle=1000000
