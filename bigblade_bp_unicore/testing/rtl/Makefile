@@ -90,6 +90,12 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ## BlackParrot test junk
 ########################################
 
+RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc
+RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
+RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog
+PROG ?= ../progs/manycore_poke_fifo.c
+CRT ?= ../progs/start.S
+LINK ?= ../progs/riscv.ld
 PYTHON ?= python
 PYTHONPATH +=:../../bsg_manycore/testbenches/py
 TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
@@ -98,7 +104,19 @@ TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
 	mkdir -p $(@D)
 	$(PYTHON) $(TRACE_GEN) > $@
 
-%/prog.nbf:
+%/prog.riscv:
+	mkdir -p $(@D)
+	$(RISCV_GCC) $(RISCV_LINK) -T$(LINK) -nostartfiles -nostdlib $(CRT) $(PROG) -o $@
+
+%/prog.dump: %/prog.riscv
+	mkdir -p $(@D)
+	$(RISCV_OBJDUMP) $< > $@
+
+%/prog.mem: %/prog.riscv
+	mkdir -p $(@D)
+	$(RISCV_OBJCOPY) $< $@
+
+%/prog.nbf: %/prog.mem %/prog.dump
 	mkdir -p $(@D)
 	touch $@
 	#echo "00_01_00000000_00000000" >> $@
