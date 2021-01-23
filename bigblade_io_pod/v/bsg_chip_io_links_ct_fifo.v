@@ -9,8 +9,6 @@ import bsg_tag_pkg::*;
 , parameter link_lg_fifo_depth_p = -1
 , parameter link_lg_credit_to_token_decimation_p = -1
 , parameter link_use_extra_data_bit_p = 0
-, parameter link_use_encode_upstream_p = 0
-, parameter link_use_encode_downstream_p = 0
 
 , parameter ct_bypass_p                = -1
 , parameter ct_width_p                 = (ct_bypass_p == 1)? link_width_p : -1
@@ -114,7 +112,7 @@ import bsg_tag_pkg::*;
                          ,.lg_fifo_depth_p( link_lg_fifo_depth_p )
                          ,.lg_credit_to_token_decimation_p( link_lg_credit_to_token_decimation_p )
                          ,.use_extra_data_bit_p( link_use_extra_data_bit_p )
-                         ,.use_encode_p(link_use_encode_upstream_p)
+                         ,.use_encode_p(1)
                          )
     uplink
       (.core_clk_i        ( core_clk_i )
@@ -152,7 +150,7 @@ import bsg_tag_pkg::*;
                            ,.lg_fifo_depth_p( link_lg_fifo_depth_p )
                            ,.lg_credit_to_token_decimation_p( link_lg_credit_to_token_decimation_p )
                            ,.use_extra_data_bit_p( link_use_extra_data_bit_p )
-                           ,.use_encode_p(link_use_encode_downstream_p)
+                           ,.use_encode_p(0)
                            )
     downlink
       (.core_clk_i        ( core_clk_i )

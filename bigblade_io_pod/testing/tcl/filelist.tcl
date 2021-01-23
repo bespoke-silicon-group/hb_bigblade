@@ -129,7 +129,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
   $basejump_stl_dir/testing/bsg_dataflow/bsg_fifo_1r1w_small_hardened/bsg_fifo_1r1w_small_hardened_test_node.v
+  $basejump_stl_dir/testing/bsg_link/bsg_link_ddr_downstream_encode.v
 
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
@@ -164,6 +166,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/test_bsg_data_gen.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_core_complex.v
+  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_links_ct_fifo.v
   $bsg_designs_target_dir/testing/v/prbs_any.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
   $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
