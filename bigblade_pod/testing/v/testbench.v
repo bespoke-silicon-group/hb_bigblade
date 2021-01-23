@@ -271,11 +271,12 @@ module testbench();
     .vcache_data_width_p(vcache_data_width_gp)
     ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
     ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
-    ,.num_vcaches_p(hb_num_tiles_x_gp)
+    ,.num_vcaches_p(hb_num_tiles_x_gp*2)
     ,.wh_cid_width_p(wh_cid_width_gp)
     ,.wh_flit_width_p(wh_flit_width_gp)
     ,.wh_cord_width_p(wh_cord_width_gp) 
     ,.wh_len_width_p(wh_len_width_gp)
+    ,.wh_ruche_factor_p(wh_ruche_factor_gp)
     
     ,.mem_size_p(mem_size_lp)
   ) test_mem (
