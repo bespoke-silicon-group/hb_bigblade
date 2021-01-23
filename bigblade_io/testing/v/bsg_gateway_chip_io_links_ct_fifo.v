@@ -1,5 +1,5 @@
 
-module bsg_chip_io_links_ct_fifo
+module bsg_gateway_chip_io_links_ct_fifo
 
 import bsg_tag_pkg::*;
 
@@ -30,7 +30,7 @@ import bsg_tag_pkg::*;
 , input bsg_tag_s  link_io_tag_lines_i
 , input bsg_tag_s  link_core_tag_lines_i
 
-, input  [link_num_channels_p-1:0]                           link_clk_i
+, input  [link_num_channels_p-1:0][1:0]                      link_clk_i
 , input  [link_num_channels_p-1:0]                           link_v_i
 , input  [link_num_channels_p-1:0][link_channel_width_p-1:0] link_data_i
 , output [link_num_channels_p-1:0]                           link_tkn_o
@@ -112,7 +112,7 @@ import bsg_tag_pkg::*;
                          ,.lg_fifo_depth_p( link_lg_fifo_depth_p )
                          ,.lg_credit_to_token_decimation_p( link_lg_credit_to_token_decimation_p )
                          ,.use_extra_data_bit_p( link_use_extra_data_bit_p )
-                         ,.use_encode_p(1)
+                         ,.use_encode_p(0)
                          )
     uplink
       (.core_clk_i        ( core_clk_i )
@@ -133,18 +133,21 @@ import bsg_tag_pkg::*;
       );
 
   // DOWNSTREAM
-  logic [link_num_channels_p-1:0] downlink_reset_lo;
+  logic [link_num_channels_p-1:0][1:0] downlink_reset_lo;
   for (i = 0; i < link_num_channels_p; i++)
   begin: down_bss
-    bsg_sync_sync #(.width_p( 1 ))
-      downlink_io_reset_sync_sync
-        (.oclk_i      ( link_clk_i[i] )
-        ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
-        ,.oclk_data_o ( downlink_reset_lo[i] )
-        );
+    for (h = 0; h < 2; h++)
+      begin: dual
+        bsg_sync_sync #(.width_p( 1 ))
+          downlink_io_reset_sync_sync
+            (.oclk_i      ( link_clk_i[i][h] )
+            ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
+            ,.oclk_data_o ( downlink_reset_lo[i][h] )
+            );
+      end
   end
 
-  bsg_link_ddr_downstream #(.width_p( link_width_p )
+  bsg_link_ddr_downstream_encode #(.width_p( link_width_p )
                            ,.channel_width_p( link_channel_width_p )
                            ,.num_channels_p( link_num_channels_p )
                            ,.lg_fifo_depth_p( link_lg_fifo_depth_p )

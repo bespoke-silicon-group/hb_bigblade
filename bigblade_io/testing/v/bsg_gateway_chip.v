@@ -31,7 +31,6 @@ module bsg_gateway_chip
   assign p_pad_MR1_0_o = p_sel_0_o;
   assign p_pad_MR1_1_o = p_sel_1_o;
 
-
   //////////////////////////////////////////////////
   //
   // Nonsynth Clock Generator(s)
@@ -162,14 +161,14 @@ module bsg_gateway_chip
   //
 
   // Mapping physical links to logical links
-  logic [io_link_num_gp-1:0] io_link_clk_li, io_link_v_li, io_link_tkn_lo;
+  logic [io_link_num_gp-1:0] io_link_clk_li, io_link_v_li, io_link_extra_li, io_link_tkn_lo;
   logic [io_link_num_gp-1:0][io_link_channel_width_gp-1:0] io_link_data_li;
-  logic [io_link_num_gp-1:0] io_link_clk_lo, io_link_v_lo, io_link_tkn_li;
+  logic [io_link_num_gp-1:0] io_link_clk_lo, io_link_v_lo, io_link_extra_lo, io_link_tkn_li;
   logic [io_link_num_gp-1:0][io_link_channel_width_gp-1:0] io_link_data_lo;
 
-  logic [mem_link_num_gp-1:0] mem_link_clk_li, mem_link_v_li, mem_link_tkn_lo;
+  logic [mem_link_num_gp-1:0] mem_link_clk_li, mem_link_v_li, mem_link_extra_li, mem_link_tkn_lo;
   logic [mem_link_num_gp-1:0][mem_link_channel_width_gp-1:0] mem_link_data_li;
-  logic [mem_link_num_gp-1:0] mem_link_clk_lo, mem_link_v_lo, mem_link_tkn_li;
+  logic [mem_link_num_gp-1:0] mem_link_clk_lo, mem_link_v_lo, mem_link_extra_lo, mem_link_tkn_li;
   logic [mem_link_num_gp-1:0][mem_link_channel_width_gp-1:0] mem_link_data_lo;
 
 `define BSG_GATEWAY_CHIP_LINK_HUB_DATA(pad, typ, i, j)         \
@@ -177,12 +176,14 @@ module bsg_gateway_chip
     assign p_pad_``pad``_``j``_o = ``typ``_link_data_lo[i][j];
 
 `define BSG_GATEWAY_CHIP_LINK_HUB(pad, typ, i)                 \
-    assign ``typ``_link_clk_li[i] = p_pad_``pad``_clk_i;       \
-    assign ``typ``_link_v_li  [i] = p_pad_``pad``_v_i;         \
-    assign p_pad_``pad``_tkn_o  = ``typ``_link_tkn_lo[i];      \
-    assign p_pad_``pad``_clk_o  = ``typ``_link_clk_lo[i];      \
-    assign p_pad_``pad``_v_o    = ``typ``_link_v_lo  [i];      \
-    assign ``typ``_link_tkn_li[i] = p_pad_``pad``_tkn_i;       \
+    assign ``typ``_link_clk_li  [i] = p_pad_``pad``_clk_i;     \
+    assign ``typ``_link_v_li    [i] = p_pad_``pad``_v_i;       \
+    assign ``typ``_link_extra_li[i] = p_pad_``pad``_extra_i;   \
+    assign p_pad_``pad``_tkn_o   = ``typ``_link_tkn_lo  [i];   \
+    assign p_pad_``pad``_clk_o   = ``typ``_link_clk_lo  [i];   \
+    assign p_pad_``pad``_v_o     = ``typ``_link_v_lo    [i];   \
+    assign p_pad_``pad``_extra_o = ``typ``_link_extra_lo[i];   \
+    assign ``typ``_link_tkn_li  [i] = p_pad_``pad``_tkn_i;     \
     `BSG_GATEWAY_CHIP_LINK_HUB_DATA(pad, typ, i,  0)           \
     `BSG_GATEWAY_CHIP_LINK_HUB_DATA(pad, typ, i,  1)           \
     `BSG_GATEWAY_CHIP_LINK_HUB_DATA(pad, typ, i,  2)           \
@@ -230,15 +231,13 @@ module bsg_gateway_chip
 
   for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_link
-    bsg_chip_io_links_ct_fifo 
+    bsg_gateway_chip_io_links_ct_fifo 
    #(.link_width_p                        ( io_link_width_gp         )
     ,.link_channel_width_p                ( io_link_channel_width_gp )
     ,.link_num_channels_p                 ( io_link_num_channels_gp  )
     ,.link_lg_fifo_depth_p                ( io_link_lg_fifo_depth_gp )
     ,.link_lg_credit_to_token_decimation_p( io_link_lg_credit_to_token_decimation_gp )
     ,.link_use_extra_data_bit_p           ( io_link_use_extra_data_bit_gp )
-    ,.link_use_encode_upstream_p          ( io_link_use_encode_gw_to_chip_gp )
-    ,.link_use_encode_downstream_p        ( io_link_use_encode_chip_to_gw_gp )
     ,.ct_bypass_p                         ( 0 )
     ,.ct_width_p                          ( io_ct_width_gp )
     ,.ct_num_in_p                         ( io_ct_num_in_gp )
@@ -253,7 +252,7 @@ module bsg_gateway_chip
     ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.io_link_core[i] )
    
-    ,.link_clk_i ( io_link_clk_li [i] )
+    ,.link_clk_i ( {io_link_clk_li[i], io_link_extra_li[i]} )
     ,.link_v_i   ( io_link_v_li   [i] )
     ,.link_tkn_o ( io_link_tkn_lo [i] )
     ,.link_data_i( io_link_data_li[i] )
@@ -270,15 +269,13 @@ module bsg_gateway_chip
 
   for (genvar i = 0; i < mem_link_num_gp; i++)
   begin: mem_link
-    bsg_chip_io_links_ct_fifo 
+    bsg_gateway_chip_io_links_ct_fifo 
    #(.link_width_p                        ( mem_link_width_gp         )
     ,.link_channel_width_p                ( mem_link_channel_width_gp )
     ,.link_num_channels_p                 ( mem_link_num_channels_gp  )
     ,.link_lg_fifo_depth_p                ( mem_link_lg_fifo_depth_gp )
     ,.link_lg_credit_to_token_decimation_p( mem_link_lg_credit_to_token_decimation_gp )
     ,.link_use_extra_data_bit_p           ( mem_link_use_extra_data_bit_gp )
-    ,.link_use_encode_upstream_p          ( mem_link_use_encode_gw_to_chip_gp )
-    ,.link_use_encode_downstream_p        ( mem_link_use_encode_chip_to_gw_gp )
     ,.ct_bypass_p                         ( 1 )
     ,.num_hops_p                          ( 1 )
     ) link
@@ -288,7 +285,7 @@ module bsg_gateway_chip
     ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
    
-    ,.link_clk_i ( mem_link_clk_li [i] )
+    ,.link_clk_i ( {mem_link_clk_li[i], mem_link_extra_li[i]} )
     ,.link_v_i   ( mem_link_v_li   [i] )
     ,.link_tkn_o ( mem_link_tkn_lo [i] )
     ,.link_data_i( mem_link_data_li[i] )

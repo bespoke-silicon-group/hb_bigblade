@@ -31,8 +31,6 @@ package bsg_chip_pkg;
   localparam mem_link_lg_fifo_depth_gp                 = 6;
   localparam mem_link_lg_credit_to_token_decimation_gp = 3;
   localparam mem_link_use_extra_data_bit_gp            = 0;
-  localparam mem_link_use_encode_gw_to_chip_gp         = 0;
-  localparam mem_link_use_encode_chip_to_gw_gp         = 1;
 
   localparam io_link_channel_width_gp                 = 16;
   localparam io_link_num_channels_gp                  = 1;
@@ -40,8 +38,6 @@ package bsg_chip_pkg;
   localparam io_link_lg_fifo_depth_gp                 = 6;
   localparam io_link_lg_credit_to_token_decimation_gp = 3;
   localparam io_link_use_extra_data_bit_gp            = 1;
-  localparam io_link_use_encode_gw_to_chip_gp         = 0;
-  localparam io_link_use_encode_chip_to_gw_gp         = 1;
 
   localparam io_ct_num_in_gp                = 2;
   localparam io_ct_tag_width_gp             = `BSG_SAFE_CLOG2(io_ct_num_in_gp + 1);
