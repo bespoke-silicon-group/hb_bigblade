@@ -19,19 +19,19 @@ module bsg_gateway_chip
   //
 
   wire p_bsg_tag_clk_o, p_bsg_tag_en_o, p_bsg_tag_data_o;
-  assign p_pad_ML0_0_o = p_bsg_tag_clk_o;
-  assign p_pad_ML0_1_o = p_bsg_tag_en_o;
-  assign p_pad_ML0_2_o = p_bsg_tag_data_o;
+  assign p_pad_CT0_0_o = p_bsg_tag_clk_o;
+  assign p_pad_CT0_1_o = p_bsg_tag_en_o;
+  assign p_pad_CT0_2_o = p_bsg_tag_data_o;
 
   wire p_clk_A_o, p_clk_B_o, p_clk_C_o;
-  assign p_pad_ML0_3_o = p_clk_A_o;
-  assign p_pad_ML0_4_o = p_clk_B_o;
-  assign p_pad_ML0_5_o = p_clk_C_o;
+  assign p_pad_CT0_3_o = p_clk_A_o;
+  assign p_pad_CT0_4_o = p_clk_B_o;
+  assign p_pad_CT0_5_o = p_clk_C_o;
 
   wire p_sel_0_o, p_sel_1_o, p_clk_output_disable_o;
-  assign p_pad_MR1_0_o = p_sel_0_o;
-  assign p_pad_MR1_1_o = p_sel_1_o;
-  assign p_pad_MR1_2_o = p_clk_output_disable_o;
+  assign p_pad_CT0_6_o = p_sel_0_o;
+  assign p_pad_CT0_7_o = p_sel_1_o;
+  assign p_pad_CT0_v_o = p_clk_output_disable_o;
 
 
   //////////////////////////////////////////////////

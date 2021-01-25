@@ -24,17 +24,17 @@ module bsg_chip
   // Control Wires Hub
   //
 
-  wire bsg_tag_clk_i_int  = pad_ML0_0_i_int;
-  wire bsg_tag_en_i_int   = pad_ML0_1_i_int;
-  wire bsg_tag_data_i_int = pad_ML0_2_i_int;
+  wire bsg_tag_clk_i_int      = pad_CT0_0_i_int;
+  wire bsg_tag_en_i_int       = pad_CT0_1_i_int;
+  wire bsg_tag_data_i_int     = pad_CT0_2_i_int;
   
-  wire clk_A_i_int        = pad_ML0_3_i_int;
-  wire clk_B_i_int        = pad_ML0_4_i_int;
-  wire clk_C_i_int        = pad_ML0_5_i_int;
+  wire clk_A_i_int            = pad_CT0_3_i_int;
+  wire clk_B_i_int            = pad_CT0_4_i_int;
+  wire clk_C_i_int            = pad_CT0_5_i_int;
 
-  wire sel_0_i_int        = pad_MR1_0_i_int;
-  wire sel_1_i_int        = pad_MR1_1_i_int;
-  wire clk_output_disable_int = pad_MR1_2_i_int;
+  wire sel_0_i_int            = pad_CT0_6_i_int;
+  wire sel_1_i_int            = pad_CT0_7_i_int;
+  wire clk_output_disable_int = pad_CT0_v_i_int;
 
   wire clk_o_int;
   assign pad_CT0_0_o_int  = clk_o_int;
