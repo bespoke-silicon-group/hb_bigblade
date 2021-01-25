@@ -33,6 +33,7 @@ module bsg_chip
 
   wire sel_0_i_int        = pad_MR1_0_i_int;
   wire sel_1_i_int        = pad_MR1_1_i_int;
+  wire clk_output_disable_int = pad_MR1_2_i_int;
 
   wire clk_o_int;
   assign pad_CT0_0_o_int  = clk_o_int;
@@ -76,7 +77,7 @@ module bsg_chip
       ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger )
       ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds )
       ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel )
-
+      ,.async_output_disable_i  ( clk_output_disable_int )
       ,.ext_clk_i({ clk_C_i_int, clk_B_i_int, clk_A_i_int })
 
       ,.clk_o({ router_clk_lo, bp_clk_lo, hb_clk_lo })
@@ -191,6 +192,7 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.io_link_sel        [i] )
+    ,.async_output_disable_i  ( clk_output_disable_int )
     ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
     ,.clk_o                   ( io_link_io_clk_lo               [i] )
     );
@@ -243,6 +245,7 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.mem_link_sel        [i] )
+    ,.async_output_disable_i  ( clk_output_disable_int )
     ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
     ,.clk_o                   ( mem_link_io_clk_lo               [i] )
     );

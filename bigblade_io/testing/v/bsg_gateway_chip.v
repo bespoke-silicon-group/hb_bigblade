@@ -27,9 +27,11 @@ module bsg_gateway_chip
   assign p_pad_ML0_4_o = p_clk_B_o;
   assign p_pad_ML0_5_o = p_clk_C_o;
 
-  wire p_sel_0_o, p_sel_1_o;
+  wire p_sel_0_o, p_sel_1_o, p_clk_output_disable_o;
   assign p_pad_MR1_0_o = p_sel_0_o;
   assign p_pad_MR1_1_o = p_sel_1_o;
+  assign p_pad_MR1_2_o = p_clk_output_disable_o;
+
 
   //////////////////////////////////////////////////
   //
@@ -70,6 +72,8 @@ module bsg_gateway_chip
       (.clk_i(tag_clk)
       ,.async_reset_o(tag_reset)
       );
+
+  assign p_clk_output_disable_o = 1'b0;
 
   //////////////////////////////////////////////////
   //

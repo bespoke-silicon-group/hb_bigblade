@@ -16,6 +16,9 @@ import bsg_tag_pkg::bsg_tag_s;
 , input bsg_tag_s [num_clk_endpoint_p-1:0] ds_tag_lines_i
 , input bsg_tag_s [num_clk_endpoint_p-1:0] sel_tag_lines_i
 
+// output constant zero for all clocks
+, input async_output_disable_i
+
 // external clock input
 , input [num_clk_endpoint_p-1:0] ext_clk_i
 
@@ -52,7 +55,7 @@ import bsg_tag_pkg::bsg_tag_s;
           ,.bsg_osc_trigger_tag_i (osc_trigger_tag_lines_i[i])
           ,.bsg_ds_tag_i          (ds_tag_lines_i[i])
           ,.ext_clk_i             (ext_clk_i[i])
-          ,.select_i              (clk_select[i])
+          ,.select_i              (async_output_disable_i? 2'b11 : clk_select[i])
           ,.clk_o                 (clk_o[i])
           );
 
