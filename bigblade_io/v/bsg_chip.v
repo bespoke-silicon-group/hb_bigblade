@@ -35,8 +35,10 @@ module bsg_chip
   wire sel_1_i_int            = pad_CT0_7_i_int;
   wire clk_output_disable_int = pad_CT0_v_i_int;
 
-  wire clk_o_int;
+  wire clk_o_int, clk_div_pos_o_int, clk_div_neg_o_int;
   assign pad_CT0_0_o_int  = clk_o_int;
+  assign pad_CT0_1_o_int  = clk_div_pos_o_int;
+  assign pad_CT0_2_o_int  = clk_div_neg_o_int;
 
 
   //////////////////////////////////////////////////
@@ -86,10 +88,13 @@ module bsg_chip
   // Route the clock signals off chip
   logic [1:0]  clk_out_sel;
   logic        clk_out;
+  logic [1:0]  clk_out_div_pos, clk_out_div_neg;
 
   assign clk_out_sel[0] = sel_0_i_int;
   assign clk_out_sel[1] = sel_1_i_int;
   assign clk_o_int      = clk_out;
+  assign clk_div_pos_o_int = clk_out_div_pos[1];
+  assign clk_div_neg_o_int = clk_out_div_neg[1];
 
   bsg_mux #(.width_p   ( 1 )
            ,.els_p     ( 4 )
@@ -101,7 +106,19 @@ module bsg_chip
       ,.sel_i ( clk_out_sel )
       ,.data_o( clk_out )
       );
-  
+
+  bsg_dff #(.width_p(2)) dff_clk_o_pos
+  (.clk_i  ( clk_out )
+  ,.data_i ( clk_out_div_pos + 2'b01 )
+  ,.data_o ( clk_out_div_pos )
+  );
+
+  bsg_dff #(.width_p(2)) dff_clk_o_neg
+  (.clk_i  ( ~clk_out )
+  ,.data_i ( clk_out_div_neg + 2'b01 )
+  ,.data_o ( clk_out_div_neg )
+  );
+
   // FIXME: Change to appropriate external clock
   wire bsg_link_clk_gen_ext_clk_lo = clk_C_i_int;
 
