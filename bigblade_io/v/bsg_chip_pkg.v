@@ -69,6 +69,7 @@ package bsg_chip_pkg;
     bsg_tag_s [1:0] hb_dest_cord;
     bsg_tag_s hb_reset;
 
+    bsg_tag_s [mem_link_num_gp-1:0] mem_link_ct;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_core;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_io;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_sel;
@@ -76,6 +77,7 @@ package bsg_chip_pkg;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_osc_trigger;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_osc;
 
+    bsg_tag_s [io_link_num_gp-1:0] io_link_ct;
     bsg_tag_s [io_link_num_gp-1:0] io_link_core;
     bsg_tag_s [io_link_num_gp-1:0] io_link_io;
     bsg_tag_s [io_link_num_gp-1:0] io_link_sel;

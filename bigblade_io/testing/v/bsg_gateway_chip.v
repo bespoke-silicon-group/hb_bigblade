@@ -255,6 +255,7 @@ module bsg_gateway_chip
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.io_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.io_link_core[i] )
+    ,.ct_core_tag_lines_i   ( tag_lines_lo.io_link_ct[i] )
    
     ,.link_clk_i ( {io_link_clk_li[i], io_link_extra_li[i]} )
     ,.link_v_i   ( io_link_v_li   [i] )
@@ -288,6 +289,7 @@ module bsg_gateway_chip
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
+    ,.ct_core_tag_lines_i   ( tag_lines_lo.mem_link_ct[i] )
    
     ,.link_clk_i ( {mem_link_clk_li[i], mem_link_extra_li[i]} )
     ,.link_v_i   ( mem_link_v_li   [i] )
