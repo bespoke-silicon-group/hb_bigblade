@@ -71,11 +71,11 @@ class NBF:
                 curr_addr = int(stripped.strip("@"), 16)
                 continue
 
-            for w in stripped.split():
+            for word in stripped.split(): 
                 # TODO: This hash function is broken
                 addr = curr_addr
-                data = int(w, 16)
-                x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1)
+                data = int(word, 16)
+                x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1) + 1
                 y = self.select_bits(addr, lg_block_size + lg_x, lg_block_size + lg_x)
                 index = self.select_bits(addr, lg_block_size+lg_x+1, lg_block_size+lg_x+1+index_width-1)
                 epa = self.select_bits(addr, 0, lg_block_size-1) | (index << lg_block_size)
@@ -86,6 +86,34 @@ class NBF:
                 else:
                     self.print_nbf(x, num_tiles_y, epa, data)
 
+    #  // BP EPA Map
+    #  // dev: 0 -- CFG
+    #  //      1 -- CCE ucode
+    #  //      2 -- CLINT
+    #  typedef struct packed
+    #  {
+    #    logic [3:0]  dev;
+    #    logic [11:0] addr;
+    #  } bp_epa_s;
+
+    # BP core configuration
+    def init_config(self):
+        cfg_base_addr          = 0x0000
+        cfg_reg_freeze         = 0x02
+        cfg_domain_mask        = 0x09
+        cfg_sac_mask           = 0x0a
+        cfg_reg_icache_mode    = 0x22
+        cfg_reg_dcache_mode    = 0x43
+
+        self.print_nbf(0, 1, cfg_base_addr + cfg_domain_mask, -1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_sac_mask, -1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_icache_mode, -1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_dcache_mode, -1)
+
+        self.fence()
+
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 0)
+
     # print finish
     def finish(self):
         self.print_nbf(0xff, 0xff, 0xffffffff, 0xffffffff)
@@ -94,10 +122,11 @@ class NBF:
     def fence(self):
         self.print_nbf(0xff, 0xff, 0x0, 0x0)
 
-
     # Dump the nbf
     def dump(self):
         self.init_dram()
+        self.fence()
+        self.init_config()
         self.fence()
         self.finish()
 

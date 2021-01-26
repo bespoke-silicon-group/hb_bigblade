@@ -92,7 +92,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 
 RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc
 RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
-RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog
+RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
 PROG ?= ../progs/manycore_poke_fifo.c
 CRT ?= ../progs/start.S
 LINK ?= ../progs/riscv.ld
