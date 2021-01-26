@@ -205,7 +205,7 @@ module bsg_chip_core_complex
   
   for (genvar i = 0; i < io_link_num_gp; i++)
   begin: mc_io
-    bsg_manycore_link_async_to_wormhole
+    bsg_manycore_link_async_to_bsg_link
    #(.addr_width_p    (hb_addr_width_gp  )
     ,.data_width_p    (hb_data_width_gp  )
     ,.x_cord_width_p  (hb_x_cord_width_gp)

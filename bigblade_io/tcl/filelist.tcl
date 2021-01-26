@@ -143,7 +143,5 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
   $bsg_designs_target_dir/v/bsg_chip_core_complex.v
   $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
-  $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
-  $bsg_designs_target_dir/v/bsg_manycore_link_async_to_bsg_link.v
 "]
 

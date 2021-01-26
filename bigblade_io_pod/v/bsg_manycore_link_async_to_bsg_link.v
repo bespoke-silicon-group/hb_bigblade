@@ -1,5 +1,5 @@
 
-module bsg_manycore_link_async_to_wormhole
+module bsg_manycore_link_async_to_bsg_link
 
   import bsg_manycore_pkg::*;
 
