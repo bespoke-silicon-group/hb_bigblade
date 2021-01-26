@@ -9,10 +9,6 @@ module bsg_chip_core_complex
   ,input                      router_clk_i
   ,input bsg_chip_tag_lines_s tag_lines_i
 
-  ,input  tag_clk_i
-  ,input  tag_data_i
-  ,input  tag_en_i
-
   ,input  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_i
   ,output bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_o
 

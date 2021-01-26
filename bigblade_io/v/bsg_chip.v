@@ -312,10 +312,6 @@ module bsg_chip
   ,.router_clk_i( router_clk_lo      )
   ,.tag_lines_i ( tag_lines_lo       )
 
-  ,.tag_clk_i   ( bsg_tag_clk_i_int  )
-  ,.tag_data_i  ( bsg_tag_data_i_int )
-  ,.tag_en_i    ( bsg_tag_en_i_int   )
-
   ,.io_links_i  ( io_links_lo        )
   ,.io_links_o  ( io_links_li        )
   ,.mem_links_i ( mem_links_lo       )
