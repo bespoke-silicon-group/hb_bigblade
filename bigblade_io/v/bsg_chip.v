@@ -197,7 +197,7 @@ module bsg_chip
   bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_li, io_links_lo;
   bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
   logic [io_link_num_gp-1:0] io_link_io_clk_lo;
-  logic [mem_link_num_gp-1:0] mem_link_io_clk_lo;
+  logic [mem_link_conc_num_gp-1:0] mem_link_io_clk_lo;
 
   for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_link
@@ -253,8 +253,8 @@ module bsg_chip
     );
   end
 
-  for (genvar i = 0; i < mem_link_num_gp; i++)
-  begin: mem_link
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++)
+  begin: mem_link_clk
     bsg_clk_gen_power_domain 
    #(.num_clk_endpoint_p      ( 1 )
     ,.ds_width_p              ( clk_gen_ds_width_gp )
@@ -269,7 +269,10 @@ module bsg_chip
     ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
     ,.clk_o                   ( mem_link_io_clk_lo               [i] )
     );
+  end
 
+  for (genvar i = 0; i < mem_link_num_gp; i++)
+  begin: mem_link
     bsg_chip_io_links_ct_fifo 
    #(.link_width_p                        ( mem_link_width_gp         )
     ,.link_channel_width_p                ( mem_link_channel_width_gp )
@@ -281,7 +284,7 @@ module bsg_chip
     ,.num_hops_p                          ( 1 )
     ) link
     (.core_clk_i ( router_clk_lo )
-    ,.io_clk_i   ( mem_link_io_clk_lo[i] )
+    ,.io_clk_i   ( mem_link_io_clk_lo[i/mem_link_rr_ratio_gp] )
    
     ,.link_io_tag_lines_i   ( tag_lines_lo.mem_link_io[i] )
     ,.link_core_tag_lines_i ( tag_lines_lo.mem_link_core[i] )
