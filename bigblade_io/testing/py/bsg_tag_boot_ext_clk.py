@@ -4,7 +4,7 @@ if __name__ == "__main__":
 
   # instantiate tg
   num_masters_p = 2
-  num_clients_p = 142
+  num_clients_p = 141
   max_payload_width_p = 10
   tg = TagTraceGen(num_masters_p, num_clients_p, max_payload_width_p)
 
@@ -72,10 +72,11 @@ if __name__ == "__main__":
     tg.send(masters=0b11, client_id=107+i, data_not_reset=0, length=2, data=0b11)
     tg.send(masters=0b11, client_id=123+i, data_not_reset=0, length=2, data=0b11)
 
-  # reset hb clients
+  # reset router clients
   tg.send(masters=0b11, client_id=139, data_not_reset=0, length=2, data=0b11)
-  tg.send(masters=0b11, client_id=140, data_not_reset=0, length=7, data=0b1111111)
-  tg.send(masters=0b11, client_id=141, data_not_reset=0, length=7, data=0b1111111)
+
+  # reset hb clients
+  tg.send(masters=0b11, client_id=140, data_not_reset=0, length=2, data=0b11)
 
 
 
@@ -90,11 +91,10 @@ if __name__ == "__main__":
     tg.send(masters=0b11, client_id=91+i, data_not_reset=1, length=3, data=0b110)
     tg.send(masters=0b11, client_id=107+i, data_not_reset=1, length=2, data=0b11)
     tg.send(masters=0b11, client_id=123+i, data_not_reset=1, length=2, data=0b11)
-  # init hb reset
+  # init router reset
   tg.send(masters=0b11, client_id=139, data_not_reset=1, length=2, data=0b01)
-  # init hb cords
-  tg.send(masters=0b11, client_id=140, data_not_reset=1, length=7, data=0b0001111)
-  tg.send(masters=0b11, client_id=141, data_not_reset=1, length=7, data=0b1010000)
+  # init hb reset
+  tg.send(masters=0b11, client_id=140, data_not_reset=1, length=2, data=0b01)
 
 
 
@@ -150,11 +150,17 @@ if __name__ == "__main__":
 
 
 
-  # STEP 8: de-assert hb reset
+  # STEP 8: de-assert router reset
+  # de-assert reset for router
+  tg.send(masters=0b11, client_id=139, data_not_reset=1, length=2, data=0b00)
+
+
+
+  # STEP 9: de-assert hb reset
   # de-assert reset for ASIC hb
-  tg.send(masters=0b10, client_id=139, data_not_reset=1, length=2, data=0b00)
+  tg.send(masters=0b10, client_id=140, data_not_reset=1, length=2, data=0b00)
   # de-assert reset for GW hb
-  tg.send(masters=0b01, client_id=139, data_not_reset=1, length=2, data=0b00)
+  tg.send(masters=0b01, client_id=140, data_not_reset=1, length=2, data=0b00)
 
 
 
