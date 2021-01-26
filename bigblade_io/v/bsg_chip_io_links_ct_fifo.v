@@ -48,23 +48,10 @@ import bsg_tag_pkg::*;
   genvar i, h;
 
   typedef struct packed { 
-      logic up_link_reset;
-      logic down_link_reset;
-      logic async_token_reset;
-  } link_io_tag_payload_s;
-
-  typedef struct packed { 
-      logic up_link_reset;
-      logic down_link_reset;
-  } link_core_tag_payload_s;
-
-  typedef struct packed { 
       logic ct_reset;
       logic fifo_reset;
   } ct_core_tag_payload_s;
 
-  link_io_tag_payload_s   link_io_tag_data_lo;
-  link_core_tag_payload_s link_core_tag_data_lo;
   ct_core_tag_payload_s   ct_core_tag_data_lo;
 
   logic                    link_v_lo;
@@ -92,24 +79,6 @@ import bsg_tag_pkg::*;
   bsg_ready_and_link_sif_s [num_hops_p:0][ct_num_in_p-1:0] links_cast_lo;
   assign links_o = links_cast_lo[num_hops_p];
 
-  bsg_tag_client #(.width_p( $bits(link_io_tag_data_lo) ), .default_p( 0 ))
-    btc_link_io
-      (.bsg_tag_i     ( link_io_tag_lines_i )
-      ,.recv_clk_i    ( io_clk_i )
-      ,.recv_reset_i  ( 1'b0 )
-      ,.recv_new_r_o  ()
-      ,.recv_data_r_o ( link_io_tag_data_lo )
-      );
-
-  bsg_tag_client #(.width_p( $bits(link_core_tag_data_lo) ), .default_p( 0 ))
-    btc_link_core
-      (.bsg_tag_i     ( link_core_tag_lines_i )
-      ,.recv_clk_i    ( core_clk_i )
-      ,.recv_reset_i  ( 1'b0 )
-      ,.recv_new_r_o  ()
-      ,.recv_data_r_o ( link_core_tag_data_lo )
-      );
-
   bsg_tag_client #(.width_p( $bits(ct_core_tag_data_lo) ), .default_p( 0 ))
     btc_ct_core
       (.bsg_tag_i     ( ct_core_tag_lines_i )
@@ -119,68 +88,38 @@ import bsg_tag_pkg::*;
       ,.recv_data_r_o ( ct_core_tag_data_lo )
       );
 
-  // UPSTREAM LINK
-  bsg_link_ddr_upstream #(.width_p( link_width_p )
-                         ,.channel_width_p( link_channel_width_p )
-                         ,.num_channels_p( link_num_channels_p )
-                         ,.lg_fifo_depth_p( link_lg_fifo_depth_p )
-                         ,.lg_credit_to_token_decimation_p( link_lg_credit_to_token_decimation_p )
-                         ,.use_extra_data_bit_p( link_use_extra_data_bit_p )
-                         ,.use_encode_p(1)
-                         )
-    uplink
-      (.core_clk_i        ( core_clk_i )
-      ,.core_link_reset_i ( link_core_tag_data_lo.up_link_reset )
+  bsg_chip_io_links
+ #(.link_width_p                         ( link_width_p )
+  ,.link_channel_width_p                 ( link_channel_width_p )
+  ,.link_num_channels_p                  ( link_num_channels_p )
+  ,.link_lg_fifo_depth_p                 ( link_lg_fifo_depth_p )
+  ,.link_lg_credit_to_token_decimation_p ( link_lg_credit_to_token_decimation_p )
+  ,.link_use_extra_data_bit_p            ( link_use_extra_data_bit_p )
+  ) io_links
+  (.core_clk_i ( core_clk_i )
+  ,.io_clk_i   ( io_clk_i )
 
-      ,.core_data_i  ( ct_multi_data_lo )
-      ,.core_valid_i ( ct_multi_v_lo )
-      ,.core_ready_o ( link_ready_lo )
+  ,.link_io_tag_lines_i   ( link_io_tag_lines_i )
+  ,.link_core_tag_lines_i ( link_core_tag_lines_i )
 
-      ,.io_clk_i            ( io_clk_i )
-      ,.io_link_reset_i     ( link_io_tag_data_lo.up_link_reset )
-      ,.async_token_reset_i ( link_io_tag_data_lo.async_token_reset )
+  ,.link_clk_i   ( link_clk_i  )
+  ,.link_v_i     ( link_v_i    )
+  ,.link_data_i  ( link_data_i )
+  ,.link_tkn_o   ( link_tkn_o  )
 
-      ,.io_clk_r_o   ( link_clk_o )
-      ,.io_data_r_o  ( link_data_o )
-      ,.io_valid_r_o ( link_v_o )
-      ,.token_clk_i  ( link_tkn_i )
-      );
+  ,.link_clk_o   ( link_clk_o  )
+  ,.link_v_o     ( link_v_o    )
+  ,.link_data_o  ( link_data_o )
+  ,.link_tkn_i   ( link_tkn_i  )
 
-  // DOWNSTREAM
-  logic [link_num_channels_p-1:0] downlink_reset_lo;
-  for (i = 0; i < link_num_channels_p; i++)
-  begin: down_bss
-    bsg_sync_sync #(.width_p( 1 ))
-      downlink_io_reset_sync_sync
-        (.oclk_i      ( link_clk_i[i] )
-        ,.iclk_data_i ( link_io_tag_data_lo.down_link_reset )
-        ,.oclk_data_o ( downlink_reset_lo[i] )
-        );
-  end
+  ,.core_data_i  ( ct_multi_data_lo )
+  ,.core_valid_i ( ct_multi_v_lo )
+  ,.core_ready_o ( link_ready_lo )
 
-  bsg_link_ddr_downstream #(.width_p( link_width_p )
-                           ,.channel_width_p( link_channel_width_p )
-                           ,.num_channels_p( link_num_channels_p )
-                           ,.lg_fifo_depth_p( link_lg_fifo_depth_p )
-                           ,.lg_credit_to_token_decimation_p( link_lg_credit_to_token_decimation_p )
-                           ,.use_extra_data_bit_p( link_use_extra_data_bit_p )
-                           ,.use_encode_p(0)
-                           )
-    downlink
-      (.core_clk_i        ( core_clk_i )
-      ,.core_link_reset_i ( link_core_tag_data_lo.down_link_reset )
-
-      ,.io_link_reset_i ( downlink_reset_lo )
-
-      ,.core_data_o  ( link_data_lo )
-      ,.core_valid_o ( link_v_lo )
-      ,.core_yumi_i  ( ct_multi_yumi_lo )
-
-      ,.io_clk_i       ( link_clk_i )
-      ,.io_data_i      ( link_data_i )
-      ,.io_valid_i     ( link_v_i )
-      ,.core_token_r_o ( link_tkn_o )
-      );
+  ,.core_data_o  ( link_data_lo )
+  ,.core_valid_o ( link_v_lo )
+  ,.core_yumi_i  ( ct_multi_yumi_lo )
+  );
 
   // CHANNEL TUNNEL
   if (ct_bypass_p == 1)

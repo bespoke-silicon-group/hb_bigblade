@@ -141,6 +141,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
+  $bsg_designs_target_dir/v/bsg_chip_io_links.v
   $bsg_designs_target_dir/v/bsg_chip_core_complex.v
   $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
 "]
