@@ -75,6 +75,8 @@ package bsg_chip_pkg;
   parameter hb_num_pods_x_gp   = 1;
   parameter hb_num_pods_y_gp   = 1;
 
+  parameter hb_reset_depth_gp  = 3;
+
   parameter hb_dmem_size_gp           = 1024;
   parameter hb_icache_entries_gp      = 1024;
   parameter hb_icache_tag_width_gp    = 12;

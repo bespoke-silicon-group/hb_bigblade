@@ -66,8 +66,6 @@ module bsg_chip_core_complex
   //
   // Manycore Array
   //
-  localparam reset_depth_gp=3;
-
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_manycore_ruche_x_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
@@ -113,7 +111,7 @@ module bsg_chip_core_complex
     ,.num_pods_y_p(hb_num_pods_y_gp)
     ,.num_pods_x_p(hb_num_pods_x_gp)
 
-    ,.reset_depth_p(reset_depth_gp)
+    ,.reset_depth_p(hb_reset_depth_gp)
   ) DUT (
     .clk_i(hb_clk_i)
     ,.reset_i(hb_tag_data_lo.reset)
