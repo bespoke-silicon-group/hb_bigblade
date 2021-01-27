@@ -136,6 +136,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
+  $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v

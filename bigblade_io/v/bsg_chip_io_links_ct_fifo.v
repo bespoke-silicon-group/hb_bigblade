@@ -189,35 +189,16 @@ import bsg_tag_pkg::*;
     begin: r
       for (h = 0; h < num_hops_p; h++)
         begin: hop
-
-          bsg_two_fifo #(.width_p( ct_width_p ))
-            fifo_to_ct
-              (.clk_i( core_clk_i )
-              ,.reset_i ( ct_core_tag_data_lo.fifo_reset )
-
-              ,.v_o     ( links_cast_li[h][i].v )
-              ,.data_o  ( links_cast_li[h][i].data )
-              ,.yumi_i  ( links_cast_lo[h][i].ready_and_rev & links_cast_li[h][i].v )
-
-              ,.v_i     ( links_cast_li[h+1][i].v )
-              ,.data_i  ( links_cast_li[h+1][i].data )
-              ,.ready_o ( links_cast_lo[h+1][i].ready_and_rev )
-              );
-
-          bsg_two_fifo #(.width_p( ct_width_p ))
-            fifo_to_rtr
-              (.clk_i( core_clk_i )
-              ,.reset_i ( ct_core_tag_data_lo.fifo_reset )
-
-              ,.ready_o (links_cast_li[h][i].ready_and_rev)
-              ,.data_i  (links_cast_lo[h][i].data)
-              ,.v_i     (links_cast_lo[h][i].v)
-
-              ,.v_o    (links_cast_lo[h+1][i].v)
-              ,.data_o (links_cast_lo[h+1][i].data)
-              ,.yumi_i (links_cast_li[h+1][i].ready_and_rev & links_cast_lo[h+1][i].v)
-              );
-          
+          bsg_noc_repeater_node
+         #(.width_p       (ct_width_p)
+          ) node
+          (.clk_i         (core_clk_i)
+          ,.reset_i       (ct_core_tag_data_lo.fifo_reset)
+          ,.side_A_links_i(links_cast_lo[h][i])
+          ,.side_A_links_o(links_cast_li[h][i])
+          ,.side_B_links_i(links_cast_li[h+1][i])
+          ,.side_B_links_o(links_cast_lo[h+1][i])
+          );
         end: hop
     end: r
 
