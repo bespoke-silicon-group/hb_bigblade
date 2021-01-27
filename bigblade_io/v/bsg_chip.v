@@ -76,7 +76,7 @@ module bsg_chip
                             ,.num_adgs_p( clk_gen_num_adgs_gp )
                             )
     clk_gen_pd
-      (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+      (.async_reset_tag_lines_i ( tag_lines_lo.clk_gen_async_reset )
       ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc )
       ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger )
       ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds )
@@ -206,7 +206,7 @@ module bsg_chip
     ,.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
-    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    (.async_reset_tag_lines_i ( tag_lines_lo.io_link_async_reset[i] )
     ,.osc_tag_lines_i         ( tag_lines_lo.io_link_osc        [i] )
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
@@ -260,7 +260,7 @@ module bsg_chip
     ,.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
-    (.async_reset_tag_lines_i ( tag_lines_lo.async_reset )
+    (.async_reset_tag_lines_i ( tag_lines_lo.mem_link_async_reset[i] )
     ,.osc_tag_lines_i         ( tag_lines_lo.mem_link_osc        [i] )
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )

@@ -79,6 +79,7 @@ package bsg_chip_pkg;
     bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_ds;
     bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_osc_trigger;
     bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_osc;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_async_reset;
 
     bsg_tag_s [io_link_num_gp-1:0] io_link_ct;
     bsg_tag_s [io_link_num_gp-1:0] io_link_core;
@@ -87,12 +88,13 @@ package bsg_chip_pkg;
     bsg_tag_s [io_link_num_gp-1:0] io_link_ds;
     bsg_tag_s [io_link_num_gp-1:0] io_link_osc_trigger;
     bsg_tag_s [io_link_num_gp-1:0] io_link_osc;
+    bsg_tag_s [io_link_num_gp-1:0] io_link_async_reset;
 
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_sel;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_ds;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc_trigger;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc;
-    bsg_tag_s async_reset;
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_async_reset;
   } bsg_chip_tag_lines_s;
 
   // Total number of clients the master will be driving

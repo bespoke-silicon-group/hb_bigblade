@@ -10,7 +10,7 @@ import bsg_tag_pkg::bsg_tag_s;
 )
 
 ( // bsg_tag signals
-  input bsg_tag_s                          async_reset_tag_lines_i
+  input bsg_tag_s [num_clk_endpoint_p-1:0] async_reset_tag_lines_i
 , input bsg_tag_s [num_clk_endpoint_p-1:0] osc_tag_lines_i
 , input bsg_tag_s [num_clk_endpoint_p-1:0] osc_trigger_tag_lines_i
 , input bsg_tag_s [num_clk_endpoint_p-1:0] ds_tag_lines_i
@@ -26,18 +26,17 @@ import bsg_tag_pkg::bsg_tag_s;
 , output logic [num_clk_endpoint_p-1:0] clk_o
 );
 
-  logic async_reset_lo;
-
-  bsg_tag_client_unsync #( .width_p(1) )
-    btc_async_reset
-      (.bsg_tag_i(async_reset_tag_lines_i)
-      ,.data_async_r_o(async_reset_lo)
-      );
-
+  logic [num_clk_endpoint_p-1:0] async_reset_lo;
   logic [num_clk_endpoint_p-1:0][1:0] clk_select;
 
   for (genvar i = 0; i < num_clk_endpoint_p; i++)
     begin: clk_gen
+
+      bsg_tag_client_unsync #( .width_p(1) )
+        btc_async_reset
+          (.bsg_tag_i(async_reset_tag_lines_i[i])
+          ,.data_async_r_o(async_reset_lo[i])
+          );
 
       bsg_tag_client_unsync #( .width_p(2) )
         btc_clk_select
@@ -50,7 +49,7 @@ import bsg_tag_pkg::bsg_tag_s;
                    ,.version_p(2)
                    )
         clk_gen_inst
-          (.async_osc_reset_i     (async_reset_lo)
+          (.async_osc_reset_i     (async_reset_lo[i])
           ,.bsg_osc_tag_i         (osc_tag_lines_i[i])
           ,.bsg_osc_trigger_tag_i (osc_trigger_tag_lines_i[i])
           ,.bsg_ds_tag_i          (ds_tag_lines_i[i])
