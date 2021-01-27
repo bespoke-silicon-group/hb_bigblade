@@ -71,22 +71,27 @@ module bsg_chip
   logic bp_clk_lo; // not used
   logic router_clk_lo;
 
-  bsg_clk_gen_power_domain #(.num_clk_endpoint_p( clk_gen_num_endpoints_gp )
-                            ,.ds_width_p( clk_gen_ds_width_gp )
-                            ,.num_adgs_p( clk_gen_num_adgs_gp )
-                            )
-    clk_gen_pd
-      (.async_reset_tag_lines_i ( tag_lines_lo.clk_gen_async_reset )
-      ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc )
-      ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger )
-      ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds )
-      ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel )
-      ,.async_output_disable_i  ( clk_output_disable_int )
-      ,.ext_clk_i({ clk_C_i_int, clk_B_i_int, clk_A_i_int })
+  logic [clk_gen_num_endpoints_gp-1:0] main_ext_clk_li, main_clk_lo;
+  assign main_ext_clk_li = { clk_C_i_int, clk_B_i_int, clk_A_i_int };
+  assign { router_clk_lo, bp_clk_lo, hb_clk_lo } = main_clk_lo;
 
-      ,.clk_o({ router_clk_lo, bp_clk_lo, hb_clk_lo })
-      );
-      
+  for (genvar i = 0; i < clk_gen_num_endpoints_gp; i++)
+  begin: top_clk_gen
+    bsg_chip_clk_gen 
+   #(.ds_width_p              ( clk_gen_ds_width_gp )
+    ,.num_adgs_p              ( clk_gen_num_adgs_gp )
+    ) clk_gen
+    (.async_reset_tag_lines_i ( tag_lines_lo.clk_gen_async_reset[i] )
+    ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc        [i] )
+    ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger[i] )
+    ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds         [i] )
+    ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel        [i] )
+    ,.async_output_disable_i  ( clk_output_disable_int              )
+    ,.ext_clk_i               ( main_ext_clk_li                 [i] )
+    ,.clk_o                   ( main_clk_lo                     [i] )
+    );
+  end
+
   // Route the clock signals off chip
   logic [1:0]  clk_out_sel;
   logic        clk_out;
@@ -201,9 +206,8 @@ module bsg_chip
 
   for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_link
-    bsg_clk_gen_power_domain 
-   #(.num_clk_endpoint_p      ( 1 )
-    ,.ds_width_p              ( clk_gen_ds_width_gp )
+    bsg_chip_clk_gen 
+   #(.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
     (.async_reset_tag_lines_i ( tag_lines_lo.io_link_async_reset[i] )
@@ -211,8 +215,8 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.io_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.io_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.io_link_sel        [i] )
-    ,.async_output_disable_i  ( clk_output_disable_int )
-    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
+    ,.async_output_disable_i  ( clk_output_disable_int              )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo         )
     ,.clk_o                   ( io_link_io_clk_lo               [i] )
     );
 
@@ -255,9 +259,8 @@ module bsg_chip
 
   for (genvar i = 0; i < mem_link_conc_num_gp; i++)
   begin: mem_link_clk
-    bsg_clk_gen_power_domain 
-   #(.num_clk_endpoint_p      ( 1 )
-    ,.ds_width_p              ( clk_gen_ds_width_gp )
+    bsg_chip_clk_gen 
+   #(.ds_width_p              ( clk_gen_ds_width_gp )
     ,.num_adgs_p              ( clk_gen_num_adgs_gp )
     ) clk_gen
     (.async_reset_tag_lines_i ( tag_lines_lo.mem_link_async_reset[i] )
@@ -265,8 +268,8 @@ module bsg_chip
     ,.osc_trigger_tag_lines_i ( tag_lines_lo.mem_link_osc_trigger[i] )
     ,.ds_tag_lines_i          ( tag_lines_lo.mem_link_ds         [i] )
     ,.sel_tag_lines_i         ( tag_lines_lo.mem_link_sel        [i] )
-    ,.async_output_disable_i  ( clk_output_disable_int )
-    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo )
+    ,.async_output_disable_i  ( clk_output_disable_int               )
+    ,.ext_clk_i               ( bsg_link_clk_gen_ext_clk_lo          )
     ,.clk_o                   ( mem_link_io_clk_lo               [i] )
     );
   end
