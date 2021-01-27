@@ -27,10 +27,10 @@ package bsg_chip_pkg;
 
   localparam mem_link_channel_width_gp                 = 16;
   localparam mem_link_num_channels_gp                  = 1;
-  localparam mem_link_width_gp                         = 32;
+  localparam mem_link_width_gp                         = 33;
   localparam mem_link_lg_fifo_depth_gp                 = 6;
   localparam mem_link_lg_credit_to_token_decimation_gp = 3;
-  localparam mem_link_use_extra_data_bit_gp            = 0;
+  localparam mem_link_use_extra_data_bit_gp            = 1;
 
   localparam mem_link_rr_ratio_gp = 2;
   localparam mem_link_conc_num_gp = mem_link_num_gp/mem_link_rr_ratio_gp;

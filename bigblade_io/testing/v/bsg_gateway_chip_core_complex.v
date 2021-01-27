@@ -85,8 +85,13 @@ module bsg_gateway_chip_core_complex
 
   for (genvar i = 0; i < mem_link_num_gp; i++)
   begin: mem_node
+    localparam node_channels_lp = mem_link_width_gp/mem_link_channel_width_gp;
+    localparam node_width_lp = node_channels_lp*mem_link_channel_width_gp;
+    wire [node_width_lp+2-1:0] link_li, link_lo;
+    assign link_li = (mem_links_i[i]) >> (mem_link_width_gp-node_width_lp);
+    assign mem_links_o[i] = link_lo << (mem_link_width_gp-node_width_lp);
     bsg_fifo_1r1w_small_hardened_test_node
-   #(.num_channels_p(mem_link_width_gp/mem_link_channel_width_gp)
+   #(.num_channels_p(node_channels_lp)
     ,.channel_width_p(mem_link_channel_width_gp)
     ,.is_client_node_p(0)
     ) node
@@ -101,8 +106,8 @@ module bsg_gateway_chip_core_complex
     ,.clk_i   (hb_clk_i)
     ,.reset_i (hb_tag_data_lo.reset)
     
-    ,.link_i(mem_links_i[i])
-    ,.link_o(mem_links_o[i])
+    ,.link_i(link_li)
+    ,.link_o(link_lo)
     );
   end
 
