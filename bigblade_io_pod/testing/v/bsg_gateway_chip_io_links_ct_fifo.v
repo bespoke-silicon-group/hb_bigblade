@@ -29,6 +29,7 @@ import bsg_tag_pkg::*;
 
 , input bsg_tag_s  link_io_tag_lines_i
 , input bsg_tag_s  link_core_tag_lines_i
+, input bsg_tag_s  ct_core_tag_lines_i
 
 , input  [link_num_channels_p-1:0][1:0]                      link_clk_i
 , input  [link_num_channels_p-1:0]                           link_v_i
@@ -55,12 +56,16 @@ import bsg_tag_pkg::*;
   typedef struct packed { 
       logic up_link_reset;
       logic down_link_reset;
+  } link_core_tag_payload_s;
+
+  typedef struct packed { 
       logic ct_reset;
       logic fifo_reset;
-  } link_core_tag_payload_s;
+  } ct_core_tag_payload_s;
 
   link_io_tag_payload_s   link_io_tag_data_lo;
   link_core_tag_payload_s link_core_tag_data_lo;
+  ct_core_tag_payload_s   ct_core_tag_data_lo;
 
   logic                    link_v_lo;
   logic [link_width_p-1:0] link_data_lo;
@@ -103,6 +108,15 @@ import bsg_tag_pkg::*;
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  ()
       ,.recv_data_r_o ( link_core_tag_data_lo )
+      );
+
+  bsg_tag_client #(.width_p( $bits(ct_core_tag_data_lo) ), .default_p( 0 ))
+    btc_ct_core
+      (.bsg_tag_i     ( ct_core_tag_lines_i )
+      ,.recv_clk_i    ( core_clk_i )
+      ,.recv_reset_i  ( 1'b0 )
+      ,.recv_new_r_o  ()
+      ,.recv_data_r_o ( ct_core_tag_data_lo )
       );
 
   // UPSTREAM LINK
@@ -191,7 +205,7 @@ import bsg_tag_pkg::*;
                         )
       tunnel
         (.clk_i   ( core_clk_i )
-        ,.reset_i ( link_core_tag_data_lo.ct_reset )
+        ,.reset_i ( ct_core_tag_data_lo.ct_reset )
     
         ,.multi_v_i     ( link_v_lo )
         ,.multi_data_i  ( link_data_lo )
@@ -216,7 +230,7 @@ import bsg_tag_pkg::*;
         bsg_two_fifo #(.width_p( ct_width_p ))
           tunnel_fifo
             (.clk_i( core_clk_i )
-            ,.reset_i ( link_core_tag_data_lo.ct_reset )
+            ,.reset_i ( ct_core_tag_data_lo.ct_reset )
     
             ,.v_o    ( ct_fifo_valid_lo[i] )
             ,.data_o ( ct_fifo_data_lo[i] )
@@ -242,7 +256,7 @@ import bsg_tag_pkg::*;
           bsg_two_fifo #(.width_p( ct_width_p ))
             fifo_to_ct
               (.clk_i( core_clk_i )
-              ,.reset_i ( link_core_tag_data_lo.fifo_reset )
+              ,.reset_i ( ct_core_tag_data_lo.fifo_reset )
 
               ,.v_o     ( links_cast_li[h][i].v )
               ,.data_o  ( links_cast_li[h][i].data )
@@ -256,7 +270,7 @@ import bsg_tag_pkg::*;
           bsg_two_fifo #(.width_p( ct_width_p ))
             fifo_to_rtr
               (.clk_i( core_clk_i )
-              ,.reset_i ( link_core_tag_data_lo.fifo_reset )
+              ,.reset_i ( ct_core_tag_data_lo.fifo_reset )
 
               ,.ready_o (links_cast_li[h][i].ready_and_rev)
               ,.data_i  (links_cast_lo[h][i].data)

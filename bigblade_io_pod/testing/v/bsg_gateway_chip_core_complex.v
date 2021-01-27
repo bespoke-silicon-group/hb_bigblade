@@ -9,10 +9,6 @@ module bsg_gateway_chip_core_complex
   ,input bsg_chip_tag_lines_s tag_lines_i
   ,input                      tag_trace_done_i
 
-  ,input  tag_clk_i
-  ,input  tag_data_i
-  ,input  tag_en_i
-
   ,input  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_i
   ,output bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_o
 
@@ -102,11 +98,10 @@ module bsg_gateway_chip_core_complex
     assign manycore_links_lo[i] = '0;
 
 
-  // Attach wormhole links to mem links
+  // mem link round robin arbiters
   bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
   bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
 
-  // mem link round robin arbiters
   for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
     bsg_ready_and_link_round_robin_static 
    #(.width_p      (mem_link_width_gp   )
@@ -119,6 +114,20 @@ module bsg_gateway_chip_core_complex
     ,.links_i      (mem_links_i[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
     ,.links_o      (mem_links_o[i*mem_link_rr_ratio_gp+:mem_link_rr_ratio_gp])
     );
+  end
+
+  // Attach wormhole links to mem links
+  `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
+  wh_link_sif_s [mem_link_conc_num_gp-1:0] wh_link_sif_li;
+  wh_link_sif_s [mem_link_conc_num_gp-1:0] wh_link_sif_lo;
+
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin
+    assign wh_link_sif_li[i].v                = mem_links_conc_li[i].v;
+    assign wh_link_sif_li[i].data             = mem_links_conc_li[i].data;
+    assign wh_link_sif_li[i].ready_and_rev    = mem_links_conc_li[i].ready_and_rev;
+    assign mem_links_conc_lo[i].v             = wh_link_sif_lo[i].v;
+    assign mem_links_conc_lo[i].data          = wh_link_sif_lo[i].data;
+    assign mem_links_conc_lo[i].ready_and_rev = wh_link_sif_lo[i].ready_and_rev;
   end
 
 
@@ -145,8 +154,8 @@ module bsg_gateway_chip_core_complex
       .clk_i(hb_clk_i)
       ,.reset_i(hb_tag_data_lo.reset | ~tag_trace_done_i)
 
-      ,.wh_link_sif_i(mem_links_conc_li[i])
-      ,.wh_link_sif_o(mem_links_conc_lo[i])
+      ,.wh_link_sif_i(wh_link_sif_li[i])
+      ,.wh_link_sif_o(wh_link_sif_lo[i])
     );
   end
 

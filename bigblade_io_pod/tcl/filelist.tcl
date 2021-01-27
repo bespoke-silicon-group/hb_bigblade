@@ -148,6 +148,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_in.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_out.v
+  $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
@@ -215,8 +216,9 @@ set SVERILOG_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/v/bsg_chip_io_links_ct_fifo.v
+  $bsg_designs_target_dir/v/bsg_chip_io_links.v
   $bsg_designs_target_dir/v/bsg_chip_core_complex.v
-  $bsg_designs_target_dir/v/bsg_clk_gen_power_domain.v
+  $bsg_designs_target_dir/v/bsg_chip_clk_gen.v
   $bsg_designs_target_dir/v/bsg_ready_and_link_async_to_bsg_link.v
   $bsg_designs_target_dir/v/bsg_manycore_link_async_to_bsg_link.v
   $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v

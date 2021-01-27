@@ -9,10 +9,6 @@ module bsg_chip_core_complex
   ,input                      router_clk_i
   ,input bsg_chip_tag_lines_s tag_lines_i
 
-  ,input  tag_clk_i
-  ,input  tag_data_i
-  ,input  tag_en_i
-
   ,input  bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_i
   ,output bsg_chip_io_link_sif_s [io_link_num_gp-1:0][io_ct_num_in_gp-1:0] io_links_o
 
@@ -277,10 +273,25 @@ module bsg_chip_core_complex
   bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
   bsg_chip_mem_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
 
-  assign wh_link_sif_li[W] = mem_links_conc_li[0+:hb_num_pods_y_gp];
-  assign wh_link_sif_li[E] = mem_links_conc_li[mem_link_conc_num_gp/2+:hb_num_pods_y_gp];
-  assign mem_links_conc_lo[0+:mem_link_conc_num_gp/2]                      = {'0, wh_link_sif_lo[W]};
-  assign mem_links_conc_lo[mem_link_conc_num_gp/2+:mem_link_conc_num_gp/2] = {'0, wh_link_sif_lo[E]};
+  for (genvar i = 0; i < mem_link_conc_num_gp/2; i++) begin
+    if (i < hb_num_pods_y_gp) begin
+      assign wh_link_sif_li[W][i].v             = mem_links_conc_li[i].v;
+      assign wh_link_sif_li[W][i].data          = mem_links_conc_li[i].data;
+      assign wh_link_sif_li[W][i].ready_and_rev = mem_links_conc_li[i].ready_and_rev;
+      assign mem_links_conc_lo[i].v             = wh_link_sif_lo[W][i].v;
+      assign mem_links_conc_lo[i].data          = wh_link_sif_lo[W][i].data;
+      assign mem_links_conc_lo[i].ready_and_rev = wh_link_sif_lo[W][i].ready_and_rev;
+      assign wh_link_sif_li[E][i].v             = mem_links_conc_li[i+mem_link_conc_num_gp/2].v;
+      assign wh_link_sif_li[E][i].data          = mem_links_conc_li[i+mem_link_conc_num_gp/2].data;
+      assign wh_link_sif_li[E][i].ready_and_rev = mem_links_conc_li[i+mem_link_conc_num_gp/2].ready_and_rev;
+      assign mem_links_conc_lo[i+mem_link_conc_num_gp/2].v             = wh_link_sif_lo[E][i].v;
+      assign mem_links_conc_lo[i+mem_link_conc_num_gp/2].data          = wh_link_sif_lo[E][i].data;
+      assign mem_links_conc_lo[i+mem_link_conc_num_gp/2].ready_and_rev = wh_link_sif_lo[E][i].ready_and_rev;
+    end else begin
+      assign mem_links_conc_lo[i] = '0;
+      assign mem_links_conc_lo[i+mem_link_conc_num_gp/2] = '0;
+    end
+  end
 
   // mem link round robin arbiters
   for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb

@@ -27,10 +27,10 @@ package bsg_chip_pkg;
 
   localparam mem_link_channel_width_gp                 = 16;
   localparam mem_link_num_channels_gp                  = 1;
-  localparam mem_link_width_gp                         = 32;
+  localparam mem_link_width_gp                         = 33;
   localparam mem_link_lg_fifo_depth_gp                 = 6;
   localparam mem_link_lg_credit_to_token_decimation_gp = 3;
-  localparam mem_link_use_extra_data_bit_gp            = 0;
+  localparam mem_link_use_extra_data_bit_gp            = 1;
 
   localparam mem_link_rr_ratio_gp = 2;
   localparam mem_link_conc_num_gp = mem_link_num_gp/mem_link_rr_ratio_gp;
@@ -109,25 +109,29 @@ package bsg_chip_pkg;
     bsg_tag_s hb_reset;
     bsg_tag_s router_reset;
 
+    bsg_tag_s [mem_link_num_gp-1:0] mem_link_ct;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_core;
     bsg_tag_s [mem_link_num_gp-1:0] mem_link_io;
-    bsg_tag_s [mem_link_num_gp-1:0] mem_link_sel;
-    bsg_tag_s [mem_link_num_gp-1:0] mem_link_ds;
-    bsg_tag_s [mem_link_num_gp-1:0] mem_link_osc_trigger;
-    bsg_tag_s [mem_link_num_gp-1:0] mem_link_osc;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_sel;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_ds;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_osc_trigger;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_osc;
+    bsg_tag_s [mem_link_conc_num_gp-1:0] mem_link_async_reset;
 
+    bsg_tag_s [io_link_num_gp-1:0] io_link_ct;
     bsg_tag_s [io_link_num_gp-1:0] io_link_core;
     bsg_tag_s [io_link_num_gp-1:0] io_link_io;
     bsg_tag_s [io_link_num_gp-1:0] io_link_sel;
     bsg_tag_s [io_link_num_gp-1:0] io_link_ds;
     bsg_tag_s [io_link_num_gp-1:0] io_link_osc_trigger;
     bsg_tag_s [io_link_num_gp-1:0] io_link_osc;
+    bsg_tag_s [io_link_num_gp-1:0] io_link_async_reset;
 
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_sel;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_ds;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc_trigger;
     bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_osc;
-    bsg_tag_s async_reset;
+    bsg_tag_s [clk_gen_num_endpoints_gp-1:0] clk_gen_async_reset;
   } bsg_chip_tag_lines_s;
 
   // Total number of clients the master will be driving
