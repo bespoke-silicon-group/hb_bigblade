@@ -156,15 +156,25 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 
   # top side
   set lly $vcache_ury
-  set ury $core_height
+  set ury [expr $lly + 0.48]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_top"
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_top_1"
+
+  set ury $core_height
+  set lly [expr $ury - 0.48]
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_top_2"
 
   # bottom side
   set lly [expr $vcache_lly - $vcache_top_y_space]
-  set ury $vcache_lly
+  set ury [expr $lly + 0.48]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_bottom"
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_bottom_1"
+
+  set ury $vcache_lly
+  set lly [expr $ury - 0.48]
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_bottom_2"
 }
 
 
@@ -180,15 +190,25 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 
   # top side
   set lly $vcache_ury
-  set ury [expr $vcache_ury + $vcache_bot_y_space]
+  set ury [expr $lly + 0.48]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_top"
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_top_1"
+
+  set ury [expr $vcache_ury + $vcache_bot_y_space]
+  set lly [expr $ury - 0.48]
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_top_2"
 
   # bottom side
   set lly 0
-  set ury $vcache_lly
+  set ury 0.48
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_bottom"
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_bottom_1"
+
+  set ury $vcache_lly
+  set lly [expr $ury - 0.48]
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_bottom_2"
 }
 
 
@@ -198,13 +218,21 @@ for {set y 0} {$y < [expr $HB_NUM_TILES_Y_P-1]} {incr y} {
     set tile_llx [get_attribute $tile_cell boundary_bounding_box.ll_x]
     set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
 
-    # bottom side
+
     set llx [expr $tile_llx + $NORTH_INPUT_OFFSET]
     set urx [expr $llx + $BLOCKAGE_WIDTH]
+
+    # bottom side
     set lly [expr $tile_lly - $tile_y_space]
-    set ury [expr $tile_lly]
+    set ury [expr $lly + 0.48]
     set boundary [list [list $llx $lly] [list $urx $ury]]
-    create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_bottom"
+    create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_bottom_1"
+
+    # bottom side
+    set ury [expr $tile_lly]
+    set lly [expr $ury - 0.48]
+    set boundary [list [list $llx $lly] [list $urx $ury]]
+    create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_bottom_2"
   }
 }
 
