@@ -110,14 +110,14 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
   set llx [get_attribute [get_cells "pod_north_vc_row_vc_x_${x}__vc"] boundary_bounding_box.ur_x]
   set urx [expr $llx + $RB_RP_X_OFFSET]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_${y}_left"
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_left"
   # right side
   #set xp1 [expr $x+1]
   #set urx [get_attribute [get_cells "pod_north_vc_row_vc_x_${xp1}__vc"] boundary_bounding_box.ll_x]
   set urx [expr $llx+$vcache_x_space]
   set llx [expr $urx - (0.084*46)]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_${y}_right"
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_right"
 }
 
 
@@ -131,14 +131,81 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
   set llx [get_attribute [get_cells "pod_south_vc_row_vc_x_${x}__vc"] boundary_bounding_box.ur_x]
   set urx [expr $llx + $RB_RP_X_OFFSET]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_${y}_left"
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_left"
   # right side
   #set xp1 [expr $x+1]
   #set urx [get_attribute [get_cells "pod_south_vc_row_vc_x_${xp1}__vc"] boundary_bounding_box.ll_x]
   set urx [expr $llx+$vcache_x_space]
   set llx [expr $urx - (0.084*46)]
   set boundary [list [list $llx $lly] [list $urx $ury]]
-  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_${y}_right"
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_right"
+}
+
+
+set BLOCKAGE_WIDTH 58.24
+
+# placement blockage vcaches (north) (top/bottom side)
+for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
+  set vcache_cell [get_cells "pod_north_vc_row_vc_x_${x}__vc"]
+  set vcache_llx [get_attribute $vcache_cell boundary_bounding_box.ll_x]
+  set vcache_lly [get_attribute $vcache_cell boundary_bounding_box.ll_y]
+  set vcache_ury [get_attribute $vcache_cell boundary_bounding_box.ur_y]
+
+  set llx [expr $vcache_llx + $NORTH_INPUT_OFFSET]
+  set urx [expr $llx + $BLOCKAGE_WIDTH]
+
+  # top side
+  set lly $vcache_ury
+  set ury $core_height
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_top"
+
+  # bottom side
+  set lly [expr $vcache_lly - $vcache_top_y_space]
+  set ury $vcache_lly
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "north_vc_rp_${x}_bottom"
+}
+
+
+# placement blockage vcaches (south) (top/bottom side)
+for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
+  set vcache_cell [get_cells "pod_south_vc_row_vc_x_${x}__vc"]
+  set vcache_llx [get_attribute $vcache_cell boundary_bounding_box.ll_x]
+  set vcache_lly [get_attribute $vcache_cell boundary_bounding_box.ll_y]
+  set vcache_ury [get_attribute $vcache_cell boundary_bounding_box.ur_y]
+
+  set llx [expr $vcache_llx + $NORTH_INPUT_OFFSET]
+  set urx [expr $llx + $BLOCKAGE_WIDTH]
+
+  # top side
+  set lly $vcache_ury
+  set ury [expr $vcache_ury + $vcache_bot_y_space]
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_top"
+
+  # bottom side
+  set lly 0
+  set ury $vcache_lly
+  set boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -boundary $boundary -type hard -name "south_vc_rp_${x}_bottom"
+}
+
+
+for {set y 0} {$y < [expr $HB_NUM_TILES_Y_P-1]} {incr y} {
+  for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
+    set tile_cell [get_cell "pod_mc_y_${y}__x_${x}__tile"]
+    set tile_llx [get_attribute $tile_cell boundary_bounding_box.ll_x]
+    set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
+
+    # bottom side
+    set llx [expr $tile_llx + $NORTH_INPUT_OFFSET]
+    set urx [expr $llx + $BLOCKAGE_WIDTH]
+    set lly [expr $tile_lly - $tile_y_space]
+    set ury [expr $tile_lly]
+    set boundary [list [list $llx $lly] [list $urx $ury]]
+    create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_bottom"
+  }
 }
 
 
