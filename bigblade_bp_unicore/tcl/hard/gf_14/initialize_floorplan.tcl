@@ -17,6 +17,5 @@ initialize_floorplan        \
   -coincident_boundary true \
   -shape R                  \
   -core_offset 0.0          \
-  -core_utilization 0.80    \
   -side_length [list $tile_width $tile_height]
 

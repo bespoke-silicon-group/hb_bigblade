@@ -7,8 +7,11 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_misc.tcl
 
 ########################################
 ## App Var Setup
+# Needed for CDC multiple clock path constraints
 set_app_var timing_enable_multiple_clocks_per_reg true
+# Needed for retiming in some cases
 set_app_var compile_keep_original_for_external_references true
+# Needed for automatic clock-gate insertions
 set_app_var case_analysis_propagate_through_icg true
 
 ########################################
@@ -140,3 +143,4 @@ set_optimize_registers true -designs [get_designs *pipe_mem*] -check_design -ver
 update_timing
 
 puts "BSG-info: Completed script [info script]\n"
+

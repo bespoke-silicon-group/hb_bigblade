@@ -20,7 +20,6 @@ if { ${DESIGN_NAME} == "bsg_blackparrot_multicore_tile_node" } {
     -coincident_boundary true \
     -shape R                  \
     -core_offset 0.0          \
-    -core_utilization 0.80    \
     -side_length [list $bp_pod_width $tile_height]
 
 } elseif { ${DESIGN_NAME} == "bsg_blackparrot_multicore_pod" } {
@@ -30,7 +29,6 @@ if { ${DESIGN_NAME} == "bsg_blackparrot_multicore_tile_node" } {
     -coincident_boundary true \
     -shape R                  \
     -core_offset 0.0          \
-    -core_utilization 0.80    \
     -side_length [list $bp_pod_width $bp_pod_height]
 }
 
