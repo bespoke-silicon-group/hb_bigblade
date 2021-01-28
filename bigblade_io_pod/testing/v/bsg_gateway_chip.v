@@ -28,10 +28,13 @@ module bsg_gateway_chip
   assign p_pad_CT0_4_o = p_clk_B_o;
   assign p_pad_CT0_5_o = p_clk_C_o;
 
-  wire p_sel_0_o, p_sel_1_o, p_clk_output_disable_o;
+  wire p_sel_0_o, p_sel_1_o, p_clk_output_disable_o, p_clk_o_reset_o;
   assign p_pad_CT0_6_o = p_sel_0_o;
   assign p_pad_CT0_7_o = p_sel_1_o;
   assign p_pad_CT0_v_o = p_clk_output_disable_o;
+  assign p_pad_CT0_clk_o = p_clk_o_reset_o;
+
+  wire p_clk_i = p_pad_CT0_0_i;
 
 
   //////////////////////////////////////////////////
@@ -72,6 +75,12 @@ module bsg_gateway_chip
     tag_reset_gen
       (.clk_i(tag_clk)
       ,.async_reset_o(tag_reset)
+      );
+
+  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
+    clk_o_reset_gen
+      (.clk_i(p_clk_i)
+      ,.async_reset_o(p_clk_o_reset_o)
       );
 
   assign p_clk_output_disable_o = 1'b0;

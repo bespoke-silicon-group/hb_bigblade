@@ -35,6 +35,7 @@ module bsg_chip
   wire sel_0_i_int            = pad_CT0_6_i_int;
   wire sel_1_i_int            = pad_CT0_7_i_int;
   wire clk_output_disable_int = pad_CT0_v_i_int;
+  wire clk_o_reset_int        = pad_CT0_clk_i_int;
 
   wire clk_o_int, clk_div_pos_o_int, clk_div_neg_o_int;
   assign pad_CT0_0_o_int  = clk_o_int;
@@ -114,14 +115,23 @@ module bsg_chip
       ,.data_o( clk_out )
       );
 
-  bsg_dff #(.width_p(2)) dff_clk_o_pos
+  // clk_o signal is connected directly to the outside world. This will prevent user 
+  // from visualizing the clock when clock frequency is high (the upper limit will be
+  // around 1GHz). Dividing the frequency by 4 can resolve this.
+  //
+  // In order to preserve information about duty cycle, both posedge and negedge 
+  // waveforms are transmitted off-chip. Refer to Github issue #6 for more info.
+  //
+  bsg_dff_reset #(.width_p(2)) dff_clk_o_pos
   (.clk_i  ( clk_out )
+  ,.reset_i( clk_o_reset_int )
   ,.data_i ( clk_out_div_pos + 2'b01 )
   ,.data_o ( clk_out_div_pos )
   );
 
-  bsg_dff #(.width_p(2)) dff_clk_o_neg
+  bsg_dff_reset #(.width_p(2)) dff_clk_o_neg
   (.clk_i  ( ~clk_out )
+  ,.reset_i( clk_o_reset_int )
   ,.data_i ( clk_out_div_neg + 2'b01 )
   ,.data_o ( clk_out_div_neg )
   );
