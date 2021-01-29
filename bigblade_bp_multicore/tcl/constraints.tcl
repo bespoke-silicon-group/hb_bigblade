@@ -101,6 +101,8 @@ bsg_chip_derate_mems
 ## Ungrouping
 set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"      ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_crossbar_o_by_i"         ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_dff_chain"               ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"                    ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_transpose"               ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"    ] true
