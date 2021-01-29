@@ -118,6 +118,7 @@ set_ungroup [get_designs -filter "hdl_template==bp_be_fp_to_rec"             ] t
 set_ungroup [get_designs -filter "hdl_template==bp_be_rec_to_fp"             ] true
 set_ungroup [get_designs -filter "hdl_template==bp_fe_icache"                ] true
 set_ungroup [get_designs -filter "hdl_template==bp_fe_pc_gen"                ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                ] true
 
 set_ungroup [get_designs -filter "hdl_template==compareRecFN"                ] true 
 set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"     ] true
