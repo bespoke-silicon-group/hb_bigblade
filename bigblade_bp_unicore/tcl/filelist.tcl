@@ -256,7 +256,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_tile.sv
   $bp_top_dir/src/v/bp_tile_node.sv
   $bp_top_dir/src/v/bp_unicore.sv
-  $bp_top_dir/src/v/bp_unicore_lite.sv
 
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
@@ -314,6 +313,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_node.sv
 "]

@@ -313,6 +313,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bp_cce_to_mc_mmio.sv
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/v/bp_tile_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile_node.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_multicore_pod.sv

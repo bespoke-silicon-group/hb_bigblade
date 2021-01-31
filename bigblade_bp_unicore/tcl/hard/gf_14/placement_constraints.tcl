@@ -12,8 +12,8 @@ remove_edit_groups -all
 set tile_height [core_height]
 set tile_width  [core_width]
 
-set keepout_margin_x 2
-set keepout_margin_y 2
+set keepout_margin_x [expr 6*[unit_width]]
+set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
 #####################################

@@ -1,7 +1,7 @@
 
 # constraints
-set keepout_margin_x 2
-set keepout_margin_y 2
+set keepout_margin_x [expr 6*[unit_width]]
+set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
 set dcache_data_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem_*"]
