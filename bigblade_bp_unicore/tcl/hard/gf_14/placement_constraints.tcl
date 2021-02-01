@@ -12,53 +12,32 @@ remove_edit_groups -all
 set tile_height [core_height]
 set tile_width  [core_width]
 
-set keepout_margin_x 2
-set keepout_margin_y 2
+set keepout_margin_x [expr 6*[unit_width]]
+set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
 #####################################
 ### I CACHE DATA
 ###
 
-set icache_data_mems_bot [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mems_*"] 0 5]
-set icache_data_ma_bot [create_macro_array \
-  -num_rows 6 \
+set icache_data_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mems_*"]
+set icache_data_ma [create_macro_array \
+  -num_rows 8 \
   -num_cols 1 \
   -align bottom \
   -horizontal_channel_height [expr $keepout_margin_y] \
   -vertical_channel_width [expr $keepout_margin_x] \
   -orientation FN \
-  $icache_data_mems_bot]
+  $icache_data_mems]
 
-create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_bot
+create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems
 
 set_macro_relative_location \
-  -target_object $icache_data_ma_bot \
+  -target_object $icache_data_ma \
   -target_corner bl \
   -target_orientation R0 \
   -anchor_corner bl \
   -offset [list 0 0]
-
-set icache_data_mems_top [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mems_*"] 6 7]
-set icache_data_ma_top [create_macro_array \
-  -num_rows 2 \
-  -num_cols 1 \
-  -align bottom \
-  -horizontal_channel_height [expr $keepout_margin_y] \
-  -vertical_channel_width [expr $keepout_margin_x] \
-  -orientation FN \
-  $icache_data_mems_top]
-
-create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_top
-
-set_macro_relative_location \
-  -target_object $icache_data_ma_top \
-  -target_corner tl \
-  -target_orientation R0 \
-  -anchor_object $icache_data_ma_bot \
-  -anchor_corner tr \
-  -offset [list 0 0]
-
 
 #####################################
 ### I CACHE TAG
@@ -78,55 +57,34 @@ create_keepout_margin -type hard -outer $keepout_margins $icache_tag_mems
 
 set_macro_relative_location \
   -target_object $icache_tag_ma \
-  -target_corner bl \
+  -target_corner tl \
   -target_orientation R0 \
-  -anchor_object $icache_data_ma_bot \
-  -anchor_corner br \
+  -anchor_object $icache_data_ma \
+  -anchor_corner tr \
   -offset [list 0 0]
 
 #####################################
 ### D CACHE DATA
 ###
 
-set dcache_data_mems_bot [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem_*"] 0 5]
-set dcache_data_ma_bot [create_macro_array \
-  -num_rows 6 \
+set dcache_data_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem_*"]
+set dcache_data_ma [create_macro_array \
+  -num_rows 8 \
   -num_cols 1 \
   -align bottom \
   -horizontal_channel_height [expr $keepout_margin_y] \
   -vertical_channel_width [expr $keepout_margin_x] \
   -orientation N \
-  $dcache_data_mems_bot]
+  $dcache_data_mems]
 
-create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_bot
+create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems
 
 set_macro_relative_location \
-  -target_object $dcache_data_ma_bot \
+  -target_object $dcache_data_ma \
   -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
   -offset [list 0 0]
-
-set dcache_data_mems_top [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem_*"] 6 7]
-set dcache_data_ma_top [create_macro_array \
-  -num_rows 2 \
-  -num_cols 1 \
-  -align bottom \
-  -horizontal_channel_height [expr $keepout_margin_y] \
-  -vertical_channel_width [expr $keepout_margin_x] \
-  -orientation N \
-  $dcache_data_mems_top]
-
-create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_top
-
-set_macro_relative_location \
-  -target_object $dcache_data_ma_top \
-  -target_corner tr \
-  -target_orientation R0 \
-  -anchor_object $dcache_data_ma_bot \
-  -anchor_corner tl \
-  -offset [list 0 0]
-
 
 #####################################
 ### D CACHE TAG
@@ -148,7 +106,7 @@ set_macro_relative_location \
   -target_object $dcache_tag_ma \
   -target_corner br \
   -target_orientation R0 \
-  -anchor_object $dcache_data_ma_bot \
+  -anchor_object $dcache_data_ma \
   -anchor_corner bl \
   -offset [list 0 0]
 
@@ -163,24 +121,6 @@ set ireg_mem_width    [lindex [get_attribute [get_cell -hier $int_regfile_mems] 
 set freg_mem_height   [lindex [get_attribute [get_cell -hier $fp_regfile_mems] height ] 0]
 set freg_mem_width    [lindex [get_attribute [get_cell -hier $fp_regfile_mems] width ] 0]
 
-set int_regfile_ma [create_macro_array \
-  -num_rows 2 \
-  -num_cols 1 \
-  -align left \
-  -horizontal_channel_height [expr $keepout_margin_y] \
-  -vertical_channel_width [expr $keepout_margin_x] \
-  -orientation FN \
-  $int_regfile_mems]
-
-set_macro_relative_location \
-  -target_object $int_regfile_ma \
-  -target_corner bl \
-  -target_orientation R0 \
-  -anchor_corner bl \
-  -offset [list [expr $tile_width/2-$freg_mem_width-$keepout_margin_x] 0]
-
-create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
-
 set fp_regfile_ma [create_macro_array \
   -num_rows 3 \
   -num_cols 1 \
@@ -194,24 +134,43 @@ set_macro_relative_location \
   -target_object $fp_regfile_ma \
   -target_corner bl \
   -target_orientation R0 \
-  -anchor_object $int_regfile_ma \
+  -anchor_object $icache_data_ma \
   -anchor_corner br \
   -offset [list 0 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $fp_regfile_mems
 
+set int_regfile_ma [create_macro_array \
+  -num_rows 2 \
+  -num_cols 1 \
+  -align left \
+  -horizontal_channel_height [expr $keepout_margin_y] \
+  -vertical_channel_width [expr $keepout_margin_x] \
+  -orientation FN \
+  $int_regfile_mems]
+
+set_macro_relative_location \
+  -target_object $int_regfile_ma \
+  -target_corner bl \
+  -target_orientation R0 \
+  -anchor_object $fp_regfile_ma \
+  -anchor_corner br \
+  -offset [list 0 0]
+
+create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
+
 #####################################
 ### BTB Memory
 ###
 
-set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/btb/*"]
+set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*btb*tag_mem*"]
 set_macro_relative_location \
   -target_object $btb_mem \
-  -target_corner br \
+  -target_corner tr \
   -target_orientation N \
-  -anchor_object $int_regfile_ma \
-  -anchor_corner tr \
-  -offset [list $keepout_margin_x $keepout_margin_y]
+  -anchor_object $dcache_data_ma \
+  -anchor_corner tl \
+  -offset [list -$keepout_margin_x -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $btb_mem
 
@@ -222,11 +181,11 @@ create_keepout_margin -type hard -outer $keepout_margins $btb_mem
 set icache_stat_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/icache*stat_mem/*"]
 set_macro_relative_location \
   -target_object $icache_stat_mem \
-  -target_corner bl \
+  -target_corner tl \
   -target_orientation MY \
   -anchor_object $icache_tag_ma \
-  -anchor_corner br \
-  -offset [list $keepout_margin_x $keepout_margin_y]
+  -anchor_corner tr \
+  -offset [list $keepout_margin_x -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $icache_stat_mem
 
@@ -245,6 +204,3 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
-
-
-current_design bsg_chip

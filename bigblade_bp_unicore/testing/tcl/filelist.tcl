@@ -25,15 +25,11 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
-  $bp_common_dir/src/include/bp_common_rv64_pkg.sv
-  $bp_common_dir/src/include/bp_common_cfg_link_pkg.sv
   $bp_common_dir/src/include/bp_common_pkg.sv
   $bp_common_dir/src/include/bp_common_aviary_pkg.sv
-  $bp_me_dir/src/include/v/bp_me_pkg.sv
-  $bp_me_dir/src/include/v/bp_cce_pkg.sv
+  $bp_me_dir/src/include/bp_me_pkg.sv
   $bp_me_dir/test/common/bp_dramsim3_pkg.sv
   $bp_be_dir/src/include/bp_be_pkg.sv
-  $bp_be_dir/src/include/bp_be_dcache_pkg.sv
 
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
@@ -85,17 +81,26 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
 
+  $basejump_stl_dir/bsg_fsb/bsg_fsb_node_trace_replay.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_noc/bsg_router_crossbar_o_by_i.v
+  $basejump_stl_dir/bsg_misc/bsg_crossbar_control_basic_o_by_i.v
+  $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
+  $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
+  $bsg_manycore_dir/v/vanilla_bean/load_packer.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_crossbar.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_link_to_crossbar.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_mem_infinite.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
 
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_test_rom.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
   $basejump_stl_dir/testing/bsg_dmc/lpddr_verilog_model/mobile_ddr.v
-  $bp_me_dir/test/common/bp_mem.sv
-  $bp_me_dir/test/common/bp_mem_to_dram.sv
-  $bp_top_dir/test/common/bp_nonsynth_host.sv
-  $bp_top_dir/test/common/bp_monitor.cpp
-  $bp_top_dir/test/common/bp_nonsynth_nbf_loader.sv
   $bp_common_dir/src/v/bsg_bus_pack.sv
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv

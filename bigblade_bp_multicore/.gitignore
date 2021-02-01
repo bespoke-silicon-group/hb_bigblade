@@ -6,3 +6,4 @@ bsg_packaging/
 black-parrot/
 out/
 vc_hdrs.h
+bsg_manycore/
