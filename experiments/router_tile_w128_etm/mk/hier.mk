@@ -1,0 +1,13 @@
+
+# Top hierarchical block design name. This variable is not a list and should be just a single design
+# name. Used in both flat and hierarchical design flows.
+export TOP_HIER_BLOCK := bsg_router_tile
+
+# Intermediate hierarchical blocks. This is a list of all non-toplevel blocks that have sub-block
+# dependancies. Only used in hierarchical design flows.
+export MID_HIER_BLOCKS :=
+
+# Bottom hierarchical blocks. This is a lost of all non-toplevel blocks that have no sub-block
+# dependancies (ie. leaf blocks). Only used in hierarchical design flows.
+export BOT_HIER_BLOCKS :=
+
