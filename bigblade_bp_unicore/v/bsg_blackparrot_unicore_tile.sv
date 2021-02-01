@@ -1,11 +1,13 @@
 
+`include "bp_common_defines.svh"
+`include "bp_me_defines.svh"
+
 module bsg_blackparrot_unicore_tile
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
  import bp_me_pkg::*;
  #(localparam bp_params_e bp_params_p = bp_cfg_gp
    `declare_bp_proc_params(bp_params_p)
@@ -25,10 +27,10 @@ module bsg_blackparrot_unicore_tile
    , output logic [3:0][mc_link_sif_width_lp-1:0] links_o
    );
 
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, io);
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, mc);
-  `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_p, lce_id_width_p, lce_assoc_p, uce);
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, dram);
+  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
+  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, mc);
+  `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, uce);
+  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, dram);
 
   // Latch reset to meet timing
   logic reset_r;

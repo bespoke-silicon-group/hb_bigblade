@@ -26,10 +26,10 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bp_common_dir/src/include/bp_common_pkg.sv
-  $bp_common_dir/src/include/bp_common_aviary_pkg.sv
   $bp_fe_dir/src/include/bp_fe_pkg.sv
   $bp_be_dir/src/include/bp_be_pkg.sv
   $bp_me_dir/src/include/bp_me_pkg.sv
+  $bp_top_dir/src/include/bp_top_pkg.sv
   $basejump_stl_dir/bsg_cache/bsg_cache.v
   $basejump_stl_dir/bsg_cache/bsg_cache_dma.v
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
@@ -186,7 +186,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache.sv
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_decoder.sv
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_wbuf.sv
-  $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_wbuf_queue.sv
   $bp_fe_dir/src/v/bp_fe_bht.sv
   $bp_fe_dir/src/v/bp_fe_btb.sv
   $bp_fe_dir/src/v/bp_fe_icache.sv
@@ -254,7 +253,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_sacc_complex.sv
   $bp_top_dir/src/v/bp_tile.sv
   $bp_top_dir/src/v/bp_tile_node.sv
-  $bp_top_dir/src/v/bp_tile_lite.sv
 
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v

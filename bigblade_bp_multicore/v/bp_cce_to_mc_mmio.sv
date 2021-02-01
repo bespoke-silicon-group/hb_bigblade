@@ -1,11 +1,12 @@
 
+`include "bp_common_defines.svh"
+
 module bp_cce_to_mc_mmio
- import bp_common_aviary_pkg::*;
  import bp_common_pkg::*;
  import bsg_manycore_pkg::*;
  #(parameter bp_params_e bp_params_p = e_bp_default_cfg
    `declare_bp_proc_params(bp_params_p)
-   `declare_bp_bedrock_mem_if_widths(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, cce)
+   `declare_bp_bedrock_mem_if_widths(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce)
 
    , parameter mc_max_outstanding_p            = "inv"
    , parameter mc_x_cord_width_p               = "inv"
@@ -49,7 +50,7 @@ module bp_cce_to_mc_mmio
    , input [mc_y_cord_width_p-1:0]            my_y_i
    );
 
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, cce);
+  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_packet_s(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p);
   `bp_cast_i(bp_bedrock_cce_mem_msg_s, io_cmd);
   `bp_cast_o(bp_bedrock_cce_mem_msg_s, io_resp);
@@ -139,8 +140,7 @@ module bp_cce_to_mc_mmio
   bsg_manycore_endpoint_standard
    #(.x_cord_width_p(mc_x_cord_width_p)
      ,.y_cord_width_p(mc_y_cord_width_p)
-    // TODO: Magic numbers
-    ,.fifo_els_p(16)
+    ,.fifo_els_p(2)
     ,.data_width_p(mc_data_width_p)
     ,.addr_width_p(mc_addr_width_p)
 
@@ -197,8 +197,8 @@ module bp_cce_to_mc_mmio
 
     ,.out_credits_o(out_credits_lo)
 
-    ,.global_x_i('0)
-    ,.global_y_i('0)
+    ,.global_x_i(my_x_i)
+    ,.global_y_i(my_y_i)
     );
 
   bsg_manycore_global_addr_s io_cmd_eva_li;
@@ -275,7 +275,7 @@ module bp_cce_to_mc_mmio
             hash_bank_index_lo,
             io_cmd_eva_li[2+:vcache_word_offset_width_lp]
           };
-          out_packet_li.y_cord = hash_bank_lo[mc_x_cord_width_p]
+          out_packet_li.y_cord = hash_bank_lo[mc_x_subcord_width_p]
             ? (mc_y_cord_width_p)'(mc_num_tiles_y_p+1) // DRAM ports are directly below the manycore tiles.
             : {mc_y_cord_width_p{1'b0}};
           out_packet_li.x_cord = hash_bank_lo[0+:mc_x_subcord_width_p];
@@ -327,16 +327,19 @@ module bp_cce_to_mc_mmio
   assign in_epa_li = in_addr_lo;
 
   bp_bedrock_cce_mem_payload_s io_payload_lo;
-  assign io_payload_lo = '{lce_id: 2'b10, default: '0};
   // Incoming packet
   always_comb
     begin
+      io_payload_lo = '0;
+      io_payload_lo.lce_id = 2'b10;
+
+      io_cmd_cast_o = '0;
       io_cmd_cast_o.header.msg_type = in_we_lo ? e_bedrock_mem_uc_wr : e_bedrock_mem_uc_rd;
 
       if (in_epa_li.dev == 2)
         io_cmd_cast_o.header.addr = clint_dev_base_addr_gp + in_epa_li.addr;
       else if (in_epa_li.dev == 1)
-        io_cmd_cast_o.header.addr = cfg_dev_base_addr_gp + bp_cfg_mem_base_cce_ucode_gp + in_epa_li.addr;
+        io_cmd_cast_o.header.addr = cfg_dev_base_addr_gp + cfg_mem_base_cce_ucode_gp + in_epa_li.addr;
       else // if (in_epa_li.dev == cfg_dev_gp)
         io_cmd_cast_o.header.addr = cfg_dev_base_addr_gp + in_epa_li.addr;
 

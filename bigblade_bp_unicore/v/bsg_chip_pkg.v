@@ -5,14 +5,14 @@ package bsg_chip_pkg;
 
   `include "bsg_defines.v"
 
-  import bp_common_aviary_pkg::*;
+  import bp_common_pkg::*;
 
   //////////////////////////////////////////////////
   //
   // BSG BLACKPARROT PARAMETERS
   //
   
-  localparam bp_params_e bp_cfg_gp = e_bp_unicore_no_l2_cfg;
+  localparam bp_params_e bp_cfg_gp = e_bp_bigblade_unicore_cfg;
 
   localparam mc_num_tiles_x_gp = 16;
   localparam mc_num_tiles_y_gp = 8;

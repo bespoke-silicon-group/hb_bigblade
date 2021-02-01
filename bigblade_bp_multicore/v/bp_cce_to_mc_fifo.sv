@@ -1,11 +1,12 @@
 
+`include "bp_common_defines.svh"
+
 module bp_cce_to_mc_fifo
- import bp_common_aviary_pkg::*;
  import bp_common_pkg::*;
  import bsg_manycore_pkg::*;
  #(parameter bp_params_e bp_params_p = e_bp_default_cfg
    `declare_bp_proc_params(bp_params_p)
-   `declare_bp_bedrock_mem_if_widths(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, cce)
+   `declare_bp_bedrock_mem_if_widths(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce)
 
    , parameter mc_max_outstanding_p     = 32
    , parameter mc_x_cord_width_p        = "inv"
@@ -33,7 +34,7 @@ module bp_cce_to_mc_fifo
    , input [mc_y_cord_width_p-1:0]            my_y_i
    );
 
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_p, lce_id_width_p, lce_assoc_p, cce);
+  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_packet_s(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p);
   `bp_cast_i(bp_bedrock_cce_mem_msg_s, io_cmd);
   `bp_cast_o(bp_bedrock_cce_mem_msg_s, io_resp);
@@ -87,14 +88,14 @@ module bp_cce_to_mc_fifo
   bsg_manycore_endpoint_standard
    #(.x_cord_width_p(mc_x_cord_width_p)
      ,.y_cord_width_p(mc_y_cord_width_p)
-    ,.fifo_els_p(16)
-    ,.data_width_p(mc_data_width_p)
-    ,.addr_width_p(mc_addr_width_p)
+     ,.fifo_els_p(2)
+     ,.data_width_p(mc_data_width_p)
+     ,.addr_width_p(mc_addr_width_p)
 
-    ,.max_out_credits_p(15)
-    ,.warn_out_of_credits_p(0)
-    ,.debug_p(1)
-    )
+     ,.max_out_credits_p(15)
+     ,.warn_out_of_credits_p(0)
+     ,.debug_p(1)
+     )
    blackparrot_endpoint
    (.clk_i(clk_i)
     ,.reset_i(reset_i)
@@ -135,7 +136,6 @@ module bp_cce_to_mc_fifo
     ,.returned_reg_id_r_o(returned_reg_id_r_lo)
     ,.returned_v_r_o(returned_v_r_lo)
     ,.returned_pkt_type_r_o(returned_pkt_type_r_lo)
-    // We allocate data in the return fifo, so we can immediately accept, always
     ,.returned_yumi_i(returned_yumi_li)
     ,.returned_fifo_full_o()
 
@@ -144,14 +144,12 @@ module bp_cce_to_mc_fifo
 
     ,.out_credits_o(out_credits_lo)
 
-    // Unused
-    ,.global_x_i('0)
-    ,.global_y_i('0)
+    ,.global_x_i(my_x_i)
+    ,.global_y_i(my_y_i)
     );
 
   //
   // MC loads from BP are disabled, so we stub this
-  //
   assign returning_data_li = '0;
   assign returning_v_li = '0;
 
@@ -179,13 +177,13 @@ module bp_cce_to_mc_fifo
     logic [7:0]  x_dst;
   }  host_response_packet_s;
 
-  logic [word_width_p-1:0] bp_to_mc_data_li;
+  logic [word_width_gp-1:0] bp_to_mc_data_li;
   logic bp_to_mc_v_li, bp_to_mc_ready_lo;
   host_request_packet_s bp_to_mc_lo;
   logic bp_to_mc_v_lo, bp_to_mc_yumi_li;
   bsg_manycore_load_info_s bp_to_mc_load_info;
   bsg_serial_in_parallel_out_full
-   #(.width_p(word_width_p), .els_p($bits(host_request_packet_s)/word_width_p))
+   #(.width_p(word_width_gp), .els_p($bits(host_request_packet_s)/word_width_gp))
    bp_to_mc_request_sipo
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
@@ -216,10 +214,10 @@ module bp_cce_to_mc_fifo
 
   host_response_packet_s mc_to_bp_response_li;
   logic mc_to_bp_response_v_li, mc_to_bp_response_ready_lo;
-  logic [word_width_p-1:0] mc_to_bp_response_data_lo;
+  logic [word_width_gp-1:0] mc_to_bp_response_data_lo;
   logic mc_to_bp_response_v_lo, mc_to_bp_response_yumi_li;
   bsg_parallel_in_serial_out
-   #(.width_p(word_width_p), .els_p($bits(host_response_packet_s)/word_width_p))
+   #(.width_p(word_width_gp), .els_p($bits(host_response_packet_s)/word_width_gp))
    mc_to_bp_response_piso
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
@@ -247,10 +245,10 @@ module bp_cce_to_mc_fifo
 
   host_request_packet_s mc_to_bp_request_li;
   logic mc_to_bp_request_v_li, mc_to_bp_request_ready_lo;
-  logic [word_width_p-1:0] mc_to_bp_request_data_lo;
+  logic [word_width_gp-1:0] mc_to_bp_request_data_lo;
   logic mc_to_bp_request_v_lo, mc_to_bp_request_yumi_li;
   bsg_parallel_in_serial_out
-   #(.width_p(word_width_p), .els_p($bits(host_request_packet_s)/word_width_p))
+   #(.width_p(word_width_gp), .els_p($bits(host_request_packet_s)/word_width_gp))
    mc_to_bp_request_piso
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
@@ -347,7 +345,7 @@ module bp_cce_to_mc_fifo
           io_resp_v_o      = bp_to_mc_ready_lo;
           io_cmd_yumi_lo   = io_resp_yumi_i;
 
-          bp_to_mc_data_li = io_cmd_li.data[0+:word_width_p];
+          bp_to_mc_data_li = io_cmd_li.data[0+:word_width_gp];
           bp_to_mc_v_li    = io_cmd_yumi_lo;
         end
       else if (bp_req_credits_cmd_v)
