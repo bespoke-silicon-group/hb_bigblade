@@ -17,7 +17,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set bp_clk_name "bp_clk" ;# main clock running black parrot
-set bp_clk_period_ps       2000
+set bp_clk_period_ps       1000
 set bp_clk_uncertainty_per 3.0
 set bp_clk_uncertainty_ps  [expr min([expr ${bp_clk_period_ps}*(${bp_clk_uncertainty_per}/100.0)], 20)]
 
@@ -114,17 +114,25 @@ set_ungroup [get_designs -filter "hdl_template==hash_function"               ] t
 
 set_ungroup [get_designs -filter "hdl_template==bp_be_bypass"                ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_decoder"        ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_wbuf"           ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_fp_to_rec"             ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_rec_to_fp"             ] true
 set_ungroup [get_designs -filter "hdl_template==bp_fe_icache"                ] true
 set_ungroup [get_designs -filter "hdl_template==bp_fe_pc_gen"                ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                ] true
+set_ungroup [get_designs -filter "hdl_template==bp_fe_instr_scan"            ] true
+set_ungroup [get_designs -filter "hdl_template==bp_mmu"                      ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                   ] true
+set_ungroup [get_designs -filter "hdl_template==bp_tlb"                      ] true
+#set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                ] true
 
 set_ungroup [get_designs -filter "hdl_template==compareRecFN"                ] true 
 set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"     ] true
 set_ungroup [get_designs -filter "hdl_template==fNToRecFN"                   ] true
 set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"                ] true
 set_ungroup [get_designs -filter "hdl_template==roundAnyRawFNToRecFN"        ] true
+set_ungroup [get_designs -filter "hdl_template==iNFromException"             ] true
+set_ungroup [get_designs -filter "hdl_template==iNToRawFN"                   ] true
 set_ungroup [get_designs -filter "hdl_template==iNToRecFN"                   ] true
 set_ungroup [get_designs -filter "hdl_template==isSigNaNRecFN"               ] true
 set_ungroup [get_designs -filter "hdl_template==mulAddRecFNToRaw"            ] true
@@ -139,10 +147,17 @@ set_ungroup [get_designs -filter "hdl_template==compressBy2"                 ] t
 set_ungroup [get_designs -filter "hdl_template==compressBy4"                 ] true
 
 ########################################
+## Flattening
+
+#ungroup -flatten [get_cells -hier -filter "full_name=~*bp_be_pipe_aux/*"]
+#ungroup -flatten [get_cells -hier -filter "full_name=~*bp_be_pipe_fma/*"]
+#ungroup -flatten [get_cells -hier -filter "full_name=~*bp_be_pipe_long/*"]
+
+########################################
 ## Retiming
-set_optimize_registers true -designs [get_designs *pipe_fma*] -check_design -verbose
-set_optimize_registers true -designs [get_designs *pipe_aux*] -check_design -verbose
-set_optimize_registers true -designs [get_designs *pipe_mem*] -check_design -verbose
+set_optimize_registers true -designs [get_designs bp_be_pipe_aux* ] -check_design -verbose
+set_optimize_registers true -designs [get_designs bp_be_pipe_fma* ] -check_design -verbose
+set_optimize_registers true -designs [get_designs bp_be_pipe_long*] -check_design -verbose
 update_timing
 
 puts "BSG-info: Completed script [info script]\n"

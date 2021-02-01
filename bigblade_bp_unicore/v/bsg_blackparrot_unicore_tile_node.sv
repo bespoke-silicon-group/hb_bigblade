@@ -1,4 +1,7 @@
 
+`include "bp_common_defines.svh"
+`include "bp_me_defines.svh"
+
 module bsg_blackparrot_unicore_tile_node
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
@@ -6,7 +9,6 @@ module bsg_blackparrot_unicore_tile_node
  import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
  import bp_me_pkg::*;
  #(localparam bp_params_e bp_params_p = bp_cfg_gp
    , localparam mc_link_sif_width_lp = `bsg_manycore_link_sif_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
