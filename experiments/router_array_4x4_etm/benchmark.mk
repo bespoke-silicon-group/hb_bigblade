@@ -35,3 +35,19 @@ DATE := $(shell date "+%Y_%m_%d_%H_%M_%S")
 	$(MAKE) -C bsg_14/ BUILD_DIR=$(CURDIR)/bsg_14/build.run2 prof.pnr.export.bsg_chip
 	$(MAKE) -C bsg_14/ $@.notify
 
+8-core-pinned:
+	$(eval export DC_NUM_CORES=8)
+	$(eval export ICC2_NUM_CORES=8)
+	$(MAKE) -C bsg_14/ new_build
+	$(MAKE) -C bsg_14/ rename_build.$@-$(DATE)
+	numactl --cpunodebind=3 --membind=3 $(MAKE) -C bsg_14/ prof.pnr.export.bsg_chip
+	$(MAKE) -C bsg_14/ $@.notify
+
+16-core-pinned:
+	$(eval export DC_NUM_CORES=8)
+	$(eval export ICC2_NUM_CORES=8)
+	$(MAKE) -C bsg_14/ new_build
+	$(MAKE) -C bsg_14/ rename_build.$@-$(DATE)
+	numactl --cpunodebind=3 --membind=3 $(MAKE) -C bsg_14/ prof.pnr.export.bsg_chip
+	$(MAKE) -C bsg_14/ $@.notify
+
