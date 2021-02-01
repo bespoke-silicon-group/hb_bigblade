@@ -21,10 +21,10 @@ module bsg_blackparrot_unicore_tile
   (input                                          clk_i
    , input                                        reset_i
 
-   , input [3:0][mc_y_cord_width_gp-1:0]          my_mc_y_cords_i
+   , input [2:0][mc_y_cord_width_gp-1:0]          my_mc_y_cords_i
 
-   , input [3:0][mc_link_sif_width_lp-1:0]        links_i
-   , output logic [3:0][mc_link_sif_width_lp-1:0] links_o
+   , input [2:0][mc_link_sif_width_lp-1:0]        links_i
+   , output logic [2:0][mc_link_sif_width_lp-1:0] links_o
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
@@ -46,10 +46,6 @@ module bsg_blackparrot_unicore_tile
   logic io_cmd_v_lo, io_cmd_ready_li;
   bp_bedrock_io_mem_msg_s io_resp_li;
   logic io_resp_v_li, io_resp_yumi_lo;
-  bp_bedrock_mc_mem_msg_s mc_cmd_lo;
-  logic mc_cmd_v_lo, mc_cmd_ready_li;
-  bp_bedrock_mc_mem_msg_s mc_resp_li;
-  logic mc_resp_v_li, mc_resp_yumi_lo;
   bp_bedrock_io_mem_msg_s io_cmd_li;
   logic io_cmd_v_li, io_cmd_yumi_lo;
   bp_bedrock_io_mem_msg_s io_resp_lo;
@@ -71,14 +67,6 @@ module bsg_blackparrot_unicore_tile
      ,.io_resp_i(io_resp_li)
      ,.io_resp_v_i(io_resp_v_li)
      ,.io_resp_yumi_o(io_resp_yumi_lo)
-
-     ,.mc_cmd_o(mc_cmd_lo)
-     ,.mc_cmd_v_o(mc_cmd_v_lo)
-     ,.mc_cmd_ready_i(mc_cmd_ready_li)
-
-     ,.mc_resp_i(mc_resp_li)
-     ,.mc_resp_v_i(mc_resp_v_li)
-     ,.mc_resp_yumi_o(mc_resp_yumi_lo)
 
      ,.io_cmd_i(io_cmd_li)
      ,.io_cmd_v_i(io_cmd_v_li)
@@ -124,39 +112,12 @@ module bsg_blackparrot_unicore_tile
      ,.io_resp_yumi_o(dram_resp_yumi_lo)
      );
 
-  wire [mc_x_cord_width_gp-1:0] host_fifo_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_fifo_y_cord_li = my_mc_y_cords_i[0];
-  bp_cce_to_mc_fifo
-   #(.bp_params_p(bp_params_p)
-     ,.mc_x_cord_width_p(mc_x_cord_width_gp)
-     ,.mc_y_cord_width_p(mc_y_cord_width_gp)
-     ,.mc_data_width_p(mc_data_width_gp)
-     ,.mc_addr_width_p(mc_addr_width_gp)
-     )
-   host_fifo_link
-    (.clk_i(clk_i)
-     ,.reset_i(reset_r)
-
-     ,.io_cmd_i(mc_cmd_lo)
-     ,.io_cmd_v_i(mc_cmd_v_lo)
-     ,.io_cmd_ready_o(mc_cmd_ready_li)
-
-     ,.io_resp_o(mc_resp_li)
-     ,.io_resp_v_o(mc_resp_v_li)
-     ,.io_resp_yumi_i(mc_resp_yumi_lo)
-
-     ,.link_sif_i(links_i[0])
-     ,.link_sif_o(links_o[0])
-
-     ,.my_x_i(host_fifo_x_cord_li)
-     ,.my_y_i(host_fifo_y_cord_li)
-     );
-
   wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = my_mc_y_cords_i[1];
-  bp_cce_to_mc_mmio
+  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = my_mc_y_cords_i[0];
+  bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
-     ,.mc_max_outstanding_p(32)
+     ,.host_enable_p(1)
+     ,.mc_max_outstanding_p(mc_max_outstanding_host_gp)
      ,.mc_x_cord_width_p(mc_x_cord_width_gp)
      ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
      ,.mc_y_cord_width_p(mc_y_cord_width_gp)
@@ -169,7 +130,7 @@ module bsg_blackparrot_unicore_tile
      ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
      ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
      )
-   host_mmio_link
+   host_link
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
@@ -189,8 +150,8 @@ module bsg_blackparrot_unicore_tile
      ,.io_resp_v_i(io_resp_v_lo)
      ,.io_resp_ready_o(io_resp_ready_li)
 
-     ,.link_sif_i(links_i[1])
-     ,.link_sif_o(links_o[1])
+     ,.link_sif_i(links_i[0])
+     ,.link_sif_o(links_o[0])
 
      ,.my_x_i(host_mmio_x_cord_li)
      ,.my_y_i(host_mmio_y_cord_li)
@@ -199,11 +160,11 @@ module bsg_blackparrot_unicore_tile
   for (genvar i = 0; i < 2; i++)
     begin : d
       wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
-      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = my_mc_y_cords_i[2+i];
-      bp_cce_to_mc_mmio
+      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = my_mc_y_cords_i[1+i];
+      bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
-         // TODO: Magic number
-         ,.mc_max_outstanding_p(32)
+         ,.host_enable_p(0)
+         ,.mc_max_outstanding_p(mc_max_outstanding_dram_gp)
          ,.mc_x_cord_width_p(mc_x_cord_width_gp)
          ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
          ,.mc_y_cord_width_p(mc_y_cord_width_gp)
@@ -236,8 +197,8 @@ module bsg_blackparrot_unicore_tile
          ,.io_resp_v_i('0)
          ,.io_resp_ready_o()
 
-         ,.link_sif_i(links_i[2+i])
-         ,.link_sif_o(links_o[2+i])
+         ,.link_sif_i(links_i[1+i])
+         ,.link_sif_o(links_o[1+i])
 
          ,.my_x_i(host_dram_x_cord_li)
          ,.my_y_i(host_dram_y_cord_li)

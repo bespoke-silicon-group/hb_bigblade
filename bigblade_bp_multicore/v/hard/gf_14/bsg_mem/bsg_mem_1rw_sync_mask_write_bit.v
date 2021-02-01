@@ -30,6 +30,7 @@ module bsg_mem_1rw_sync_mask_write_bit #( parameter width_p = -1
   `bsg_mem_1rw_sync_mask_write_bit_banked_macro(128,232,2,1) else
   `bsg_mem_1rw_sync_mask_write_bit_banked_macro(64,496,4,1) else
   `bsg_mem_1rw_sync_mask_write_bit_banked_macro(32,496,4,1) else
+  `bsg_mem_1rw_sync_mask_write_bit_banked_macro(33,496,4,1) else
     begin: notmacro
       bsg_mem_1rw_sync_mask_write_bit_synth #(.width_p(width_p), .els_p(els_p), .latch_last_read_p(latch_last_read_p))
         synth

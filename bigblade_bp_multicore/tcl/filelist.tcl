@@ -164,7 +164,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_common_dir/src/v/bsg_fifo_1r1w_rolly.sv
   $bp_common_dir/src/v/bsg_bus_pack.sv
   $bp_be_dir/src/v/bp_be_top.sv
-  $bp_be_dir/src/v/bp_be_calculator/bp_be_bypass.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_calculator_top.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_csr.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_fp_to_rec.sv
@@ -183,6 +182,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/v/bp_be_checker/bp_be_issue_queue.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_regfile.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_scheduler.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_scoreboard.sv
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache.sv
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_decoder.sv
   $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_wbuf.sv
@@ -276,6 +276,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_buf_ctrl.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_misc/bsg_reduce.v
+  $basejump_stl_dir/bsg_misc/bsg_reduce_segmented.v
   $basejump_stl_dir/bsg_misc/bsg_nor2.v
   $basejump_stl_dir/bsg_misc/bsg_nor3.v
   $basejump_stl_dir/bsg_misc/bsg_muxi2_gatestack.v
@@ -306,14 +307,11 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/vanilla_bean/hash_function.v
 
- 
-  $bsg_designs_target_dir/v/bp_cce_to_mc_fifo.sv
-  $bsg_designs_target_dir/v/bp_cce_to_mc_mmio.sv
+  $bsg_designs_target_dir/v/bp_cce_to_mc_bridge.sv
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_tile_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_multicore_tile_node.sv
-  $bsg_designs_target_dir/v/bsg_blackparrot_multicore_pod.sv
 "]
 
