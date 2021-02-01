@@ -1,0 +1,15 @@
+# cad flows
+bsg_14/
+bsg_40/
+bsg_130/
+bsg_180/
+bsg_45/
+
+# repository dependencies
+basejump_stl/
+bsg_packaging/
+black-parrot/
+bsg_manycore/
+board/
+bsg_cadenv/
+
