@@ -1,10 +1,16 @@
 from bsg_tag_trace_gen import *
+import math
 
 if __name__ == "__main__":
 
+  # chip config
+  num_pods_x_p = 4
+  num_pods_y_p = 4
+  num_pods_tag_p = (num_pods_y_p*num_pods_x_p*2)
+
   # instantiate tg
   num_masters_p = 2
-  num_clients_p = 137
+  num_clients_p = 121+num_pods_tag_p+num_pods_x_p
   max_payload_width_p = 10
   tg = TagTraceGen(num_masters_p, num_clients_p, max_payload_width_p)
 
@@ -67,11 +73,12 @@ if __name__ == "__main__":
 
   # reset hb clients
   tg.send(masters=0b11, client_id=120, data_not_reset=0, length=2, data=0b11)
-  for i in range(4):
-    for j in range(4):
+  for i in range(num_pods_y_p):
+    for j in range(num_pods_x_p):
       for k in range(2):
         tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=0, length=8, data=0b11111111)
-
+  for j in range(num_pods_x_p):
+    tg.send(masters=0b11, client_id=121+num_pods_tag_p+j, data_not_reset=0, length=1, data=0b1)
 
 
   # STEP 1: initialize everything
@@ -90,13 +97,15 @@ if __name__ == "__main__":
   # init hb reset
   tg.send(masters=0b11, client_id=120, data_not_reset=1, length=2, data=0b01)
   # init hb pod
-  for i in range(4):
-    for j in range(4):
+  for i in range(num_pods_y_p):
+    for j in range(num_pods_x_p):
       for k in range(2):
-        if j < 2:
+        if j < math.ceil(num_pods_x_p/2):
           tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b10001111)
         else:
           tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b11010000)
+  for j in range(num_pods_x_p):
+    tg.send(masters=0b11, client_id=121+num_pods_tag_p+j, data_not_reset=1, length=1, data=0b1)
 
 
   # STEP 2: perform async token reset
@@ -164,13 +173,17 @@ if __name__ == "__main__":
   tg.send(masters=0b01, client_id=120, data_not_reset=1, length=2, data=0b00)
 
   # de-assert reset for ASIC pod
-  for i in range(4):
-    for j in range(4):
+  for i in range(num_pods_y_p):
+    for j in range(num_pods_x_p):
       for k in range(2):
-        if j < 2:
+        if j < math.ceil(num_pods_x_p/2):
           tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b00001111)
         else:
           tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b01010000)
+
+  # de-assert reset for ASIC io router
+  for j in range(num_pods_x_p):
+    tg.send(masters=0b10, client_id=121+num_pods_tag_p+j, data_not_reset=1, length=1, data=0b0)
 
   tg.wait(64)
   tg.done()

@@ -110,7 +110,6 @@ module bsg_chip_core_complex
     ,.reset_depth_p(hb_reset_depth_gp)
   ) DUT (
     .clk_i(hb_clk_i)
-    ,.reset_i(hb_tag_data_lo.reset)
 
     ,.io_link_sif_i(io_link_sif_li)
     ,.io_link_sif_o(io_link_sif_lo)
@@ -124,7 +123,8 @@ module bsg_chip_core_complex
     ,.ruche_link_i(ruche_link_li)
     ,.ruche_link_o(ruche_link_lo)
 
-    ,.bsg_tag_i(tag_lines_i.hb_pod)
+    ,.pod_tags_i(tag_lines_i.hb_pod)
+    ,.io_tags_i(tag_lines_i.hb_io)
   );
 
   // hor tieoff
