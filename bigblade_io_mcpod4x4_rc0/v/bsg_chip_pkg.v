@@ -105,6 +105,7 @@ package bsg_chip_pkg;
   //
 
   typedef struct packed {
+    bsg_tag_s [hb_num_pods_x_gp-1:0] hb_io;
     bsg_tag_s [hb_num_pods_y_gp-1:0][hb_num_pods_x_gp-1:0][S:N] hb_pod;
     bsg_tag_s hb_reset;
     bsg_tag_s router_reset;
@@ -136,7 +137,7 @@ package bsg_chip_pkg;
 
   // Total number of clients the master will be driving
   localparam tag_num_masters_gp = 2;
-  localparam tag_num_clients_gp = `BSG_MAX((1<<7)+1, $bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s));
+  localparam tag_num_clients_gp = $bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
 
   localparam tag_max_payload_width_in_hb_gp = wh_cord_width_gp;
   localparam tag_max_payload_width_in_clk_gen_pd_gp = `BSG_MAX(clk_gen_ds_width_gp+1, clk_gen_num_adgs_gp+4);
