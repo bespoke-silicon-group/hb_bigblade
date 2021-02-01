@@ -1,19 +1,20 @@
 
+`include "bp_common_defines.svh"
+`include "bp_me_defines.svh"
+
 module bp_tile_lite
  import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
- import bp_be_pkg::*;
+ import bp_me_pkg::*;
  import bsg_cache_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_wormhole_router_pkg::*;
- import bp_me_pkg::*;
  #(parameter bp_params_e bp_params_p = e_bp_default_cfg
    `declare_bp_proc_params(bp_params_p)
    `declare_bp_bedrock_lce_if_widths(paddr_width_p, cce_block_width_p, lce_id_width_p, cce_id_width_p, lce_assoc_p, lce)
    `declare_bp_bedrock_mem_if_widths(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce)
-   `declare_bp_bedrock_mem_if_widths(paddr_width_p, dword_width_p, lce_id_width_p, lce_assoc_p, xce)
+   `declare_bp_bedrock_mem_if_widths(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, xce)
 
-    , localparam cfg_bus_width_lp        = `bp_cfg_bus_width(vaddr_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, cce_pc_width_p, cce_instr_width_p)
+    , localparam cfg_bus_width_lp        = `bp_cfg_bus_width(vaddr_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p)
    // Wormhole parameters
    , localparam coh_noc_ral_link_width_lp = `bsg_ready_and_link_sif_width(coh_noc_flit_width_p)
    , localparam mem_noc_ral_link_width_lp = `bsg_ready_and_link_sif_width(mem_noc_flit_width_p)
@@ -42,10 +43,10 @@ module bp_tile_lite
    , output                                                   mem_resp_yumi_o
    );
 
-  `declare_bp_cfg_bus_s(vaddr_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p, cce_pc_width_p, cce_instr_width_p);
+  `declare_bp_cfg_bus_s(vaddr_width_p, core_id_width_p, cce_id_width_p, lce_id_width_p);
   `declare_bp_bedrock_lce_if(paddr_width_p, cce_block_width_p, lce_id_width_p, cce_id_width_p, lce_assoc_p, lce);
   `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
-  `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_p, lce_id_width_p, lce_assoc_p, xce);
+  `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, xce);
 
   // Cast the routing links
   `declare_bsg_ready_and_link_sif_s(coh_noc_flit_width_p, bp_coh_ready_and_link_s);
@@ -96,10 +97,10 @@ module bp_tile_lite
   bp_bedrock_xce_mem_msg_s loopback_mem_resp;
   logic loopback_mem_resp_v_lo, loopback_mem_resp_yumi_li;
   assign loopback_mem_cmd = '{header: loopback_mem_cmd_li.header
-                             ,data: loopback_mem_cmd_li.data[0+:dword_width_p]
+                             ,data: loopback_mem_cmd_li.data[0+:dword_width_gp]
                              };
   assign loopback_mem_resp_lo = '{header: loopback_mem_resp.header
-                                 ,data: {cce_block_width_p/dword_width_p{loopback_mem_resp.data}}
+                                 ,data: {cce_block_width_p/dword_width_gp{loopback_mem_resp.data}}
                                  };
 
   bp_bedrock_cce_mem_msg_s cache_mem_cmd_li;
@@ -114,10 +115,10 @@ module bp_tile_lite
   bp_bedrock_xce_mem_msg_s cfg_mem_resp;
   logic cfg_mem_resp_v_lo, cfg_mem_resp_yumi_li;
   assign cfg_mem_cmd = '{header: cfg_mem_cmd_li.header
-                        ,data: cfg_mem_cmd_li.data[0+:dword_width_p]
+                        ,data: cfg_mem_cmd_li.data[0+:dword_width_gp]
                         };
   assign cfg_mem_resp_lo = '{header: cfg_mem_resp.header
-                            ,data: {cce_block_width_p/dword_width_p{cfg_mem_resp.data}}
+                            ,data: {cce_block_width_p/dword_width_gp{cfg_mem_resp.data}}
                             };
 
   bp_bedrock_cce_mem_msg_s clint_mem_cmd_li;
@@ -127,10 +128,10 @@ module bp_tile_lite
   bp_bedrock_xce_mem_msg_s clint_mem_resp;
   logic clint_mem_resp_v_lo, clint_mem_resp_yumi_li;
   assign clint_mem_cmd = '{header: clint_mem_cmd_li.header
-                          ,data: clint_mem_cmd_li.data[0+:dword_width_p]
+                          ,data: clint_mem_cmd_li.data[0+:dword_width_gp]
                           };
   assign clint_mem_resp_lo = '{header: clint_mem_resp.header
-                              ,data: {cce_block_width_p/dword_width_p{clint_mem_resp.data}}
+                              ,data: {cce_block_width_p/dword_width_gp{clint_mem_resp.data}}
                               };
 
   logic reset_r;
@@ -141,7 +142,7 @@ module bp_tile_lite
   logic cce_ucode_v_lo;
   logic cce_ucode_w_lo;
   logic [cce_pc_width_p-1:0] cce_ucode_addr_lo;
-  logic [cce_instr_width_p-1:0] cce_ucode_data_lo, cce_ucode_data_li;
+  logic [cce_instr_width_gp-1:0] cce_ucode_data_lo, cce_ucode_data_li;
   bp_cfg
    #(.bp_params_p(bp_params_p))
    cfg

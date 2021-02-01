@@ -1,11 +1,13 @@
 
+`include "bp_common_defines.svh"
+`include "bp_me_defines.svh"
+
 module bsg_blackparrot_multicore_tile_node
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
  import bp_me_pkg::*;
  #(localparam bp_params_e bp_params_p = bp_cfg_gp
    `declare_bp_proc_params(bp_params_p)
@@ -26,8 +28,8 @@ module bsg_blackparrot_multicore_tile_node
    , input [E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
    , output logic [E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
 
-   , input [E:E][mc_link_sif_width_lp-1:0]                mc_hor_links_i
-   , output logic [E:E][mc_link_sif_width_lp-1:0]         mc_hor_links_o
+   , input [3:0][E:E][mc_link_sif_width_lp-1:0]           mc_hor_links_i
+   , output logic [3:0][E:E][mc_link_sif_width_lp-1:0]    mc_hor_links_o
 
    , input [S:N][mc_link_sif_width_lp-1:0]                mc_ver_links_i
    , output logic [S:N][mc_link_sif_width_lp-1:0]         mc_ver_links_o
@@ -85,19 +87,35 @@ module bsg_blackparrot_multicore_tile_node
   for (genvar i = 0; i < 4; i++)
     begin : rof2
       bsg_async_noc_link
-       #(.width_p($bits(bsg_manycore_link_sif_s)-2), .lg_size_p(3))
-       cdc
+       #(.width_p($bits(bsg_manycore_fwd_link_sif_s)-2), .lg_size_p(3))
+       fwd_cdc
         (.aclk_i(bp_clk_i)
          ,.areset_i(bp_reset_i)
      
          ,.bclk_i(mc_clk_i)
          ,.breset_i(mc_reset_i)
      
-         ,.alink_i(bp_proc_links_li[i])
-         ,.alink_o(bp_proc_links_lo[i])
+         ,.alink_i(bp_proc_links_lo[i].fwd)
+         ,.alink_o(bp_proc_links_li[i].fwd)
      
-         ,.blink_i(mc_proc_links_li[i])
-         ,.blink_o(mc_proc_links_lo[i])
+         ,.blink_i(mc_proc_links_li[i].fwd)
+         ,.blink_o(mc_proc_links_lo[i].fwd)
+         );
+
+      bsg_async_noc_link
+       #(.width_p($bits(bsg_manycore_rev_link_sif_s)-2), .lg_size_p(3))
+       rev_cdc
+        (.aclk_i(bp_clk_i)
+         ,.areset_i(bp_reset_i)
+     
+         ,.bclk_i(mc_clk_i)
+         ,.breset_i(mc_reset_i)
+     
+         ,.alink_i(bp_proc_links_lo[i].rev)
+         ,.alink_o(bp_proc_links_li[i].rev)
+     
+         ,.blink_i(mc_proc_links_li[i].rev)
+         ,.blink_o(mc_proc_links_lo[i].rev)
          );
 
       assign mc_hor_links_li[i][E] = mc_hor_links_i[i][E];
@@ -105,7 +123,7 @@ module bsg_blackparrot_multicore_tile_node
       assign mc_hor_links_o[i][E] = mc_hor_links_lo[i][E];
     end
 
-  logic [3:0][E:W][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_li, mc_ruche_links_lo;
+  bsg_manycore_ruche_x_link_sif_s [3:0][E:W] mc_ruche_links_li, mc_ruche_links_lo;
   assign mc_ruche_links_li[0]    = '0;
   assign mc_ruche_links_li[1][W] = '0;
   assign mc_ruche_links_li[2]    = '0;
