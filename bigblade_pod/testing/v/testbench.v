@@ -36,6 +36,7 @@ module testbench();
     ,.reset_i(global_reset)
     ,.tag_done_o(tag_done_lo)
     ,.pod_tags_o(pod_tags_lo)
+    ,.io_tags_o()
   );
 
   logic reset_r;

@@ -1,6 +1,6 @@
 puts "BSG-info: Running script [info script]\n"
 
-proc bsg_async_icg {clocks} {
+proc bsg_async_icl {clocks} {
 
   foreach_in_collection  launch_clk $clocks {
     if { [get_attribute $launch_clk is_generated] } {

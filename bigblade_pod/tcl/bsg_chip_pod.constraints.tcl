@@ -13,7 +13,8 @@ append_to_collection tag_clock_pins [get_ports "north_bsg_tag_i\[clk\]"]
 append_to_collection tag_clock_pins [get_ports "south_bsg_tag_i\[clk\]"]
 create_clock -period ${tag_clk_period_ps} -name ${tag_clk_name} $tag_clock_pins
 set_clock_uncertainty ${tag_clk_uncertainty_ps} [get_clocks ${tag_clk_name}]
-set tag_ports [get_ports north_bsg_tag_i*]
+
+# tag input pins
 set tag_input_pins [list]
 append_to_collection tag_input_pins [get_ports "north_bsg_tag_i\[op\]"]
 append_to_collection tag_input_pins [get_ports "north_bsg_tag_i\[param\]"]
@@ -21,9 +22,10 @@ append_to_collection tag_input_pins [get_ports "north_bsg_tag_i\[en\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[op\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[param\]"]
 append_to_collection tag_input_pins [get_ports "south_bsg_tag_i\[en\]"]
-set input_delay_ps [expr ${manycore_clk_period_ps}*0.20]
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" ${tag_input_pins}
-set_input_delay ${input_delay_ps} -clock ${tag_clk_name} ${tag_input_pins}
+set input_min_delay_ps [expr ${tag_clk_period_ps}*0.02]
+set input_max_delay_ps [expr ${tag_clk_period_ps}*0.50]
+set_input_delay -min ${input_min_delay_ps} -clock ${tag_clk_name} ${tag_input_pins}
+set_input_delay -max ${input_max_delay_ps} -clock ${tag_clk_name} ${tag_input_pins}
 
 # input pins
 set all_input_pins [list]
@@ -32,9 +34,10 @@ append_to_collection all_input_pins [get_ports ver_link_sif_i*]
 append_to_collection all_input_pins [get_ports ruche_link_i*]
 append_to_collection all_input_pins [get_ports north_wh_link_sif_i*]
 append_to_collection all_input_pins [get_ports south_wh_link_sif_i*]
-set input_delay_ps [expr ${manycore_clk_period_ps}*0.50]
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" ${all_input_pins}
-set_input_delay ${input_delay_ps} -clock ${manycore_clk_name} ${all_input_pins}
+set input_min_delay_ps [expr ${manycore_clk_period_ps}*0.02]
+set input_max_delay_ps [expr ${manycore_clk_period_ps}*0.50]
+set_input_delay -min ${input_min_delay_ps} -clock ${manycore_clk_name} ${all_input_pins}
+set_input_delay -max ${input_max_delay_ps} -clock ${manycore_clk_name} ${all_input_pins}
 
 
 # output pins
@@ -44,16 +47,26 @@ append_to_collection all_output_pins [get_ports ver_link_sif_o*]
 append_to_collection all_output_pins [get_ports ruche_link_o*]
 append_to_collection all_output_pins [get_ports north_wh_link_sif_o*]
 append_to_collection all_output_pins [get_ports south_wh_link_sif_o*]
-set output_delay_ps [expr ${manycore_clk_period_ps}*0.50]
-set_load [load_of [get_lib_pin */SC7P5T_INVX8_SSC14R/A]] ${all_output_pins}
-set_output_delay ${output_delay_ps} -clock ${manycore_clk_name} ${all_output_pins}
+set output_max_delay_ps [expr ${manycore_clk_period_ps}*0.50]
+set output_min_delay_ps [expr ${manycore_clk_period_ps}*0.02]
+set_output_delay -min ${output_min_delay_ps} -clock ${manycore_clk_name} ${all_output_pins}
+set_output_delay -max ${output_max_delay_ps} -clock ${manycore_clk_name} ${all_output_pins}
+
+
+# driver
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" ${all_input_pins}
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" ${all_input_pins}
+
+# load
+set_load -min [load_of [get_lib_pin */SC7P5T_INVX1_SSC14R/A]] ${all_output_pins}
+set_load -max [load_of [get_lib_pin */SC7P5T_INVX8_SSC14R/A]] ${all_output_pins}
 
 
 # async paths
 set clocks [list]
 append_to_collection clocks [get_clock ${manycore_clk_name}]
 append_to_collection clocks [get_clock ${tag_clk_name}]
-bsg_async_icg $clocks
+bsg_async_icl $clocks
 
 
 # false path
