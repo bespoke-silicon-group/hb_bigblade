@@ -21,4 +21,15 @@ set ury $core_height
 set north_btc_bound [bsg_create_soft_bound "north_btc_bound"  $llx $lly $urx $ury]
 add_to_bound $north_btc_bound [get_cells -hier -filter "full_name=~pod_btc_n*"]
 
+
+# south btc placement bound
+
+set llx [expr 0.128*7980]
+set lly 0
+set urx [expr 0.128*8135]
+set ury $pod_y_offset
+set south_btc_bound [bsg_create_soft_bound "south_btc_bound" $llx $lly $urx $ury]
+add_to_bound $south_btc_bound [get_cells -hier -filter "full_name=~pod_btc_s*"]
+  
+
 puts "BSG-info: Completed script [info script]\n"

@@ -392,13 +392,13 @@ place_wh_ports_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSE
 set north_vc_cord_pins [list]
 append_to_collection north_vc_cord_pins [get_ports "north_bsg_tag_i*"]
 append_to_collection north_vc_cord_pins [get_ports "north_vcache_pod_*_i*"]
-place_ports_k2_k4 $north_vc_cord_pins [expr $core_llx + (8050*0.128)] $core_ury
+place_ports_k2_k4 $north_vc_cord_pins [expr $core_llx + (8049*0.128)] $core_ury
 
 # south vcache cord
 set south_vc_cord_pins [list]
 append_to_collection south_vc_cord_pins [get_ports "south_bsg_tag_i*"]
 append_to_collection south_vc_cord_pins [get_ports "south_vcache_pod_*_i*"]
-place_ports_k2_k4 $south_vc_cord_pins [expr $core_llx + (8050*0.128)] $core_lly
+place_ports_k2_k4 $south_vc_cord_pins [expr $core_llx + (8049*0.128)] $core_lly
 
 
 # pod cord
