@@ -34,6 +34,9 @@ append_to_collection all_input_pins [get_ports ver_link_sif_i*]
 append_to_collection all_input_pins [get_ports ruche_link_i*]
 append_to_collection all_input_pins [get_ports north_wh_link_sif_i*]
 append_to_collection all_input_pins [get_ports south_wh_link_sif_i*]
+append_to_collection all_input_pins [get_ports north_vcache_pod*]
+append_to_collection all_input_pins [get_ports south_vcache_pod*]
+append_to_collection all_input_pins [get_ports pod*]
 set input_min_delay_ps [expr ${manycore_clk_period_ps}*0.02]
 set input_max_delay_ps [expr ${manycore_clk_period_ps}*0.50]
 set_input_delay -min ${input_min_delay_ps} -clock ${manycore_clk_name} ${all_input_pins}
@@ -47,19 +50,19 @@ append_to_collection all_output_pins [get_ports ver_link_sif_o*]
 append_to_collection all_output_pins [get_ports ruche_link_o*]
 append_to_collection all_output_pins [get_ports north_wh_link_sif_o*]
 append_to_collection all_output_pins [get_ports south_wh_link_sif_o*]
-set output_max_delay_ps [expr ${manycore_clk_period_ps}*0.50]
 set output_min_delay_ps [expr ${manycore_clk_period_ps}*0.02]
+set output_max_delay_ps [expr ${manycore_clk_period_ps}*0.50]
 set_output_delay -min ${output_min_delay_ps} -clock ${manycore_clk_name} ${all_output_pins}
 set_output_delay -max ${output_max_delay_ps} -clock ${manycore_clk_name} ${all_output_pins}
 
 
 # driver
-set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" ${all_input_pins}
-set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" ${all_input_pins}
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" [all_inputs]
 
 # load
-set_load -min [load_of [get_lib_pin */SC7P5T_INVX1_SSC14R/A]] ${all_output_pins}
-set_load -max [load_of [get_lib_pin */SC7P5T_INVX8_SSC14R/A]] ${all_output_pins}
+set_load -min [load_of [get_lib_pin */SC7P5T_INVX1_SSC14R/A]] [all_outputs]
+set_load -max [load_of [get_lib_pin */SC7P5T_INVX8_SSC14R/A]] [all_outputs]
 
 
 # async paths
@@ -70,10 +73,9 @@ bsg_async_icl $clocks
 
 
 # false path
-set_false_path -from [get_ports north_vcache_pod*]
-set_false_path -from [get_ports south_vcache_pod*]
-set_false_path -from [get_ports pod_*]
-
+set_case_analysis 0 [get_ports north_vcache_pod*]
+set_case_analysis 0 [get_ports south_vcache_pod*]
+set_case_analysis 0 [get_ports pod_*]
 
 # ungrouping
 set_ungroup [get_cells "pod/mc/link"] true
@@ -116,7 +118,8 @@ if { [sizeof $cells_to_derate] > 0 } {
   }
 }
 
-
+#set_app_var case_analysis_propagate_through_icg true 
+#update_timing
 
 
 

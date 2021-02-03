@@ -14,19 +14,14 @@ set ruche_output_ports [sort_collection [get_ports ruche_link_o*] name]
 
 
 # input pins
-set all_input_pins [list]
-append_to_collection all_input_pins [get_ports reset_i]
-append_to_collection all_input_pins [get_ports link_i*]
-append_to_collection all_input_pins [index_collection $ruche_input_ports  0 [expr (2*$HB_RUCHE_LINK_WIDTH_P)-1]]
+set all_input_pins [remove_from_collection [all_inputs] [get_ports clk_i]]
 set input_max_delay_ps [expr ${clk_period_ps}*0.70]
 set input_min_delay_ps [expr ${clk_period_ps}*0.02]
 set_input_delay -max ${input_max_delay_ps} -clock ${clk_name} ${all_input_pins}
 set_input_delay -min ${input_min_delay_ps} -clock ${clk_name} ${all_input_pins}
 
 # output pins
-set all_output_pins [list]
-append_to_collection all_output_pins [get_ports link_o*]
-append_to_collection all_output_pins [index_collection $ruche_output_ports 0 [expr (2*$HB_RUCHE_LINK_WIDTH_P)-1]]
+set all_output_pins [all_outputs]
 set output_max_delay_ps [expr ${clk_period_ps}*0.70]
 set output_min_delay_ps [expr ${clk_period_ps}*0.02]
 set_output_delay -max ${output_max_delay_ps} -clock ${clk_name} ${all_output_pins}
@@ -35,14 +30,7 @@ set_output_delay -min ${output_min_delay_ps} -clock ${clk_name} ${all_output_pin
 
 # feedthrough input pins
 set feedthrough_input_pins [index_collection $ruche_input_ports [expr 2*$HB_RUCHE_LINK_WIDTH_P] [expr (6*$HB_RUCHE_LINK_WIDTH_P)-1]]
-set_input_delay -min 10.0 -clock ${clk_name} ${feedthrough_input_pins}
-set_input_delay -max 10.0 -clock ${clk_name} ${feedthrough_input_pins}
 set_dont_touch [get_nets -of_objects $feedthrough_input_pins] true
-
-# feedthrough output pins
-set feedthrough_output_pins [index_collection $ruche_output_ports [expr 2*$HB_RUCHE_LINK_WIDTH_P] [expr (6*$HB_RUCHE_LINK_WIDTH_P)-1]]
-set_output_delay -min 10.0 -clock ${clk_name} ${feedthrough_output_pins}
-set_output_delay -max 10.0 -clock ${clk_name} ${feedthrough_output_pins}
 
 
 # input driving cell
@@ -50,13 +38,13 @@ set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [all_input
 set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" [all_inputs]
 
 # output load
-set_load -max [load_of [get_lib_pin */SC7P5T_INVX8_SSC14R/A]] [all_outputs]
-set_load -min [load_of [get_lib_pin */SC7P5T_INVX1_SSC14R/A]] [all_outputs]
+set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] [all_outputs]
+set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX1_SSC14R/A"]] [all_outputs]
 
 
 # false path
-set_false_path -from [get_ports my_*]
-set_false_path -from [get_ports pod_*]
+set_case_analysis 0 [get_ports my_*]
+set_case_analysis 0 [get_ports pod_*]
 
 # derating
 set cells_to_derate [list]
@@ -99,7 +87,7 @@ ungroup [get_cells proc/h.z/vcore/idiv0/*] -flatten
 set_optimize_registers true -designs [get_designs fpu_float_fma] -check_design -verbose
 set_optimize_registers true -designs [get_designs fpu_float_fma_round] -check_design -verbose
 
-set_app_var case_analysis_propagate_through_icg true
-update_timing
+#set_app_var case_analysis_propagate_through_icg true
+#update_timing
 
 puts "BSG-info: Completed script [info script]\n"
