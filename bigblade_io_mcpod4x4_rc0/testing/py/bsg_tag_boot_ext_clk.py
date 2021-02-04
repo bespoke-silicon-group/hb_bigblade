@@ -76,7 +76,7 @@ if __name__ == "__main__":
   for i in range(num_pods_y_p):
     for j in range(num_pods_x_p):
       for k in range(2):
-        tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=0, length=8, data=0b11111111)
+        tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=0, length=2, data=0b11)
   for j in range(num_pods_x_p):
     tg.send(masters=0b11, client_id=121+num_pods_tag_p+j, data_not_reset=0, length=1, data=0b1)
 
@@ -100,10 +100,10 @@ if __name__ == "__main__":
   for i in range(num_pods_y_p):
     for j in range(num_pods_x_p):
       for k in range(2):
-        if j < math.ceil(num_pods_x_p/2):
-          tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b10001111)
+        if j < int(math.ceil(num_pods_x_p/2.0)):
+          tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=2, data=0b10)
         else:
-          tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b11010000)
+          tg.send(masters=0b11, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=2, data=0b11)
   for j in range(num_pods_x_p):
     tg.send(masters=0b11, client_id=121+num_pods_tag_p+j, data_not_reset=1, length=1, data=0b1)
 
@@ -176,10 +176,10 @@ if __name__ == "__main__":
   for i in range(num_pods_y_p):
     for j in range(num_pods_x_p):
       for k in range(2):
-        if j < math.ceil(num_pods_x_p/2):
-          tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b00001111)
+        if j < int(math.ceil(num_pods_x_p/2.0)):
+          tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=2, data=0b00)
         else:
-          tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=8, data=0b01010000)
+          tg.send(masters=0b10, client_id=121+(i*4+j)*2+k, data_not_reset=1, length=2, data=0b01)
 
   # de-assert reset for ASIC io router
   for j in range(num_pods_x_p):
