@@ -21,7 +21,7 @@ set TESTING_SOURCE_FILES [join "
   $TESTING_PACKAGE_FILES
 
   $bsg_designs_target_dir/testing/v/testbench.v
-  $bsg_designs_target_dir/testing/v/bsg_nonsynth_wormhole_test_mem.v
+  $bsg_designs_target_dir/testing/bsg_tag_boot_rom.v
 
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
@@ -55,6 +55,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_encode_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
+
+
+  $basejump_stl_dir/bsg_fsb/bsg_fsb_node_trace_replay.v
 
   $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync_synth.v
@@ -122,6 +125,8 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_io_complex.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_tag_master.v
 
 
 "]

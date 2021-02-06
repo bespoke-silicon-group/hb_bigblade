@@ -134,7 +134,7 @@ set_individual_pin_constraints -pins $reset_pin -allowed_layers "K4" -location "
 set cord_pins [list]
 append_to_collection cord_pins [get_pins -of $master_vcache -filter "name=~global_*_i*"]
 append_to_collection cord_pins [get_pins -of $master_vcache -filter "name=~my_wh_cord_i*"]
-append_to_collection cord_pins [get_pins -of $master_vcache -filter "name=~dest_wh_cord_i*"]
+append_to_collection cord_pins [get_pins -of $master_vcache -filter "name=~wh_dest_east_not_west_i"]
 append_to_collection cord_pins [get_pins -of $master_vcache -filter "name=~my_wh_cid_i*"]
 
 place_pins_k2_k4 $cord_pins [expr $vcache_llx+(0.128*935)] $vcache_lly

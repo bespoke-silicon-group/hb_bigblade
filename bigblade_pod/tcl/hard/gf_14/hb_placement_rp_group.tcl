@@ -26,7 +26,7 @@ proc make_rp_array {rp_name cells row col orientation} {
 
 # MANYCORE TILE RUCHE buffers
 for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
-  for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+  for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
     set tile_cell [get_cells "pod_mc_y_${y}__x_${x}__tile"] 
     set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
     set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
@@ -39,9 +39,9 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
     # to west
     for {set b 0} {$b < $HB_RUCHE_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_0__rb_w_bf_buf0/hard_hard_${b}__hard_buf"]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_1__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_2__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_0_*_rb_w_bf_buf0/hard_hard_${b}__hard_buf"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_1_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_2_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_rp_rb_w_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 3 "MY"]
@@ -57,9 +57,9 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
     # to east
     for {set b 0} {$b < $HB_RUCHE_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_0__rb_e_bf_buf0/hard_hard_${b}__hard_buf"]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_1__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_2__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_0_*_rb_e_bf_buf0/hard_hard_${b}__hard_buf"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_1_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_mc_rr_${y}__rc_${x}__rl_2_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_rp_rb_e_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 3 "R0"]
@@ -79,7 +79,7 @@ for {set y 0} {$y < $HB_NUM_TILES_Y_P} {incr y} {
 
 
 # NORTH VC ruche buffers
-for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
   set vc_cell [get_cells "pod_north_vc_row_vc_x_${x}__vc"]
   set vc_lly [get_attribute $vc_cell boundary_bounding_box.ll_y]
   set vc_urx [get_attribute $vc_cell boundary_bounding_box.ur_x]
@@ -91,8 +91,8 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # to west
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_0__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_1__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_0_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_1_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_north_vc_rp_rb_w_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "MY"]
@@ -108,8 +108,8 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # to east
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_0__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_1__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_0_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_north_vc_row_rc_${x}__rl_1_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_north_vc_rp_rb_e_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "R0"]
@@ -126,7 +126,7 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
 
 
 # SOUTH VC ruche buffers
-for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
+for {set x 0} {$x < [expr $HB_NUM_TILES_X_P]} {incr x} {
   set vc_cell [get_cells "pod_south_vc_row_vc_x_${x}__vc"]
   set vc_lly [get_attribute $vc_cell boundary_bounding_box.ll_y]
   set vc_urx [get_attribute $vc_cell boundary_bounding_box.ur_x]
@@ -138,8 +138,8 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # to west
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_0__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_1__rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_0_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_1_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_south_vc_rp_rb_w_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "MY"]
@@ -155,8 +155,8 @@ for {set x 0} {$x < [expr $HB_NUM_TILES_X_P-1]} {incr x} {
   # to east
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_0__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_1__rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_0_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "pod_south_vc_row_rc_${x}__rl_1_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
     
       set rp_name "bsg_south_vc_rp_rb_e_${y}_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "R0"]

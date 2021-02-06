@@ -173,9 +173,9 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 
 # clock reset
 set clk_pin   [get_ports -filter "name=~clk_i"]
-set reset_pin [get_ports -filter "name=~reset_i"]
+#set reset_pin [get_ports -filter "name=~reset_i"]
 set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9306)] $vcache_ury"
-set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9310)] $vcache_ury"
+#set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*9310)] $vcache_ury"
 
 
 
@@ -390,15 +390,15 @@ place_wh_ports_k1_k3 $east_out_pins [expr $vcache_lly + $VCACHE_WEST_INPUT_OFFSE
 
 # north vcache cord
 set north_vc_cord_pins [list]
-append_to_collection north_vc_cord_pins [get_ports "north_dest_wh_cord_i*"]
+append_to_collection north_vc_cord_pins [get_ports "north_bsg_tag_i*"]
 append_to_collection north_vc_cord_pins [get_ports "north_vcache_pod_*_i*"]
-place_ports_k2_k4 $north_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_ury
+place_ports_k2_k4 $north_vc_cord_pins [expr $core_llx + (8049*0.128)] $core_ury
 
 # south vcache cord
 set south_vc_cord_pins [list]
-append_to_collection south_vc_cord_pins [get_ports "south_dest_wh_cord_i*"]
+append_to_collection south_vc_cord_pins [get_ports "south_bsg_tag_i*"]
 append_to_collection south_vc_cord_pins [get_ports "south_vcache_pod_*_i*"]
-place_ports_k2_k4 $south_vc_cord_pins [expr $core_llx + (8137*0.128)] $core_lly
+place_ports_k2_k4 $south_vc_cord_pins [expr $core_llx + (8049*0.128)] $core_lly
 
 
 # pod cord

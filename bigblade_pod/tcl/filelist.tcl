@@ -186,6 +186,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/vanilla_bean/idiv.v
   $bsg_manycore_dir/v/vanilla_bean/lsu.v
   $bsg_manycore_dir/v/vanilla_bean/fcsr.v
+  $bsg_manycore_dir/v/vanilla_bean/mcsr.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_int.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_float.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_float_aux.v
