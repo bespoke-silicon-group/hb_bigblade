@@ -22,7 +22,7 @@ set_input_delay -min ${input_min_delay_ps} -clock ${clk_name} ${all_input_pins}
 
 # output pins
 set all_output_pins [all_outputs]
-set output_max_delay_ps [expr ${clk_period_ps}*0.70]
+set output_max_delay_ps [expr ${clk_period_ps}*0.20]
 set output_min_delay_ps [expr ${clk_period_ps}*0.02]
 set_output_delay -max ${output_max_delay_ps} -clock ${clk_name} ${all_output_pins}
 set_output_delay -min ${output_min_delay_ps} -clock ${clk_name} ${all_output_pins}
@@ -35,11 +35,11 @@ set_dont_touch [get_nets -of_objects $feedthrough_input_pins] true
 
 # input driving cell
 set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" [all_inputs]
 
 # output load
 set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] [all_outputs]
-set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX1_SSC14R/A"]] [all_outputs]
+set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] [all_outputs]
 
 
 # false path
