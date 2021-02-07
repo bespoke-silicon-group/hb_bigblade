@@ -51,8 +51,8 @@ module bsg_gateway_chip
   logic router_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`ROUTER_CLK_PERIOD)) router_clk_gen (.o(router_clk));
 
-  logic tag_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk));
+  logic tag_clk, tag_clk_raw;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
 
   assign p_clk_A_o = hb_clk;
   assign p_clk_B_o = bp_clk;
@@ -138,16 +138,8 @@ module bsg_gateway_chip
       ) ;
 
   assign p_bsg_tag_en_o = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
-  
-  logic init_done_lo;
-  bsg_launch_sync_sync #(.width_p(1)) done_blss
-   (.iclk_i       ( tag_clk )
-    ,.iclk_reset_i( 1'b0 )
-    ,.oclk_i      ( hb_clk )
-    ,.iclk_data_i ( tag_trace_done_lo )
-    ,.iclk_data_o (  )
-    ,.oclk_data_o ( init_done_lo )
-    );
+
+  assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
   //////////////////////////////////////////////////
   //
