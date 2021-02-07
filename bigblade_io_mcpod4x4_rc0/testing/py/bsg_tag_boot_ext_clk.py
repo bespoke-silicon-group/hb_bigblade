@@ -97,6 +97,7 @@ if __name__ == "__main__":
   # init hb reset
   tg.send(masters=0b11, client_id=120, data_not_reset=1, length=2, data=0b01)
   # init hb pod
+  # {reset, wh_dest_east_not_west[1:0]}
   for i in range(num_pods_y_p):
     for j in range(num_pods_x_p):
       for k in range(2):
@@ -175,6 +176,7 @@ if __name__ == "__main__":
   tg.send(masters=0b01, client_id=120, data_not_reset=1, length=2, data=0b00)
 
   # de-assert reset for ASIC pod
+  # {reset, wh_dest_east_not_west[1:0]}
   for i in range(num_pods_y_p):
     for j in range(num_pods_x_p):
       for k in range(2):
