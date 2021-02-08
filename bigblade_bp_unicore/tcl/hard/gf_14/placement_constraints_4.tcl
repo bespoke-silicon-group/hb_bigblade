@@ -6,6 +6,7 @@ current_design ${DESIGN_NAME}
 
 # Start script fresh
 set_locked_objects -unlock [get_cells -hier]
+remove_bounds -all
 remove_edit_groups -all
 
 set tile_height [core_height]
@@ -134,8 +135,8 @@ set dcache_data_ma_west [create_macro_array \
   -num_rows 2 \
   -num_cols 2 \
   -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_x] \
-  -vertical_channel_width [expr 4*$keepout_margin_y] \
+  -horizontal_channel_height [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 2*$keepout_margin_y] \
   -orientation FN \
   $dcache_data_mems_west]
 
@@ -153,8 +154,8 @@ set dcache_data_ma_east [create_macro_array \
   -num_rows 2 \
   -num_cols 2 \
   -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_x] \
-  -vertical_channel_width [expr 4*$keepout_margin_y] \
+  -horizontal_channel_height [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 2*$keepout_margin_y] \
   -orientation N \
   $dcache_data_mems_east]
 
@@ -166,7 +167,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner br \
   -anchor_object $dcache_data_ma_west \
-  -offset [list [expr 4*$keepout_margin_x] 0]
+  -offset [list [expr 2*$keepout_margin_x] 0]
 
 #####################################
 ### BTB Memory
@@ -175,10 +176,10 @@ set_macro_relative_location \
 set_macro_relative_location \
   -target_object $btb_mem \
   -target_corner tl \
-  -target_orientation FN \
-  -anchor_corner bl \
-  -anchor_object $icache_data_ma_west \
-  -offset [list 0 -$keepout_margin_y]
+  -target_orientation N \
+  -anchor_corner tr \
+  -anchor_object $icache_data_ma_east \
+  -offset [list $keepout_margin_x 0]
 #  -offset [list [expr $tile_width/2 - $btb_mem_width/2 - 2*$ireg_mem_width/2 - 3*$freg_mem_width/2] [expr -$tile_height/2 + $btb_mem_height/2]]
 
 create_keepout_margin -type hard -outer $keepout_margins $btb_mem
@@ -193,7 +194,7 @@ set fp_regfile_ma [create_macro_array \
   -align left \
   -horizontal_channel_height [expr 4*$keepout_margin_x] \
   -vertical_channel_width [expr 2*$keepout_margin_y] \
-  -orientation N \
+  -orientation FN \
   $fp_regfile_mems]
 
 set_macro_relative_location \
@@ -226,7 +227,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_object $fp_regfile_ma \
   -anchor_corner tr \
-  -offset [list 0 -$keepout_margin_y]
+  -offset [list $keepout_margin_x 0]
 #  -offset [list [expr 1.5*$freg_mem_width - $ireg_mem_width]  0]
 
 create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
@@ -237,11 +238,11 @@ create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
 
 set_macro_relative_location \
   -target_object $icache_stat_mem \
-  -target_corner tl \
+  -target_corner bl \
   -target_orientation FN \
-  -anchor_object $btb_mem \
-  -anchor_corner tr \
-  -offset [list [expr $keepout_margin_x] 0]
+  -anchor_object $icache_tag_ma \
+  -anchor_corner br \
+  -offset [list [expr 2*$keepout_margin_x] 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $icache_stat_mem
 
@@ -251,68 +252,16 @@ create_keepout_margin -type hard -outer $keepout_margins $icache_stat_mem
 
 set_macro_relative_location \
   -target_object $dcache_stat_mem \
-  -target_corner bl \
+  -target_corner tl \
   -target_orientation FN \
-  -anchor_object $dcache_data_ma_west \
-  -anchor_corner tl \
-  -offset [list [expr 2*$keepout_margin_x] [expr 2*$keepout_margin_y]]
+  -anchor_object $dcache_tag_ma \
+  -anchor_corner tr \
+  -offset [list $keepout_margin_x 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
 #####################################
 ### GUI setup
 ###
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *bp_be_*]
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *bp_fe_*]
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *io_router*]
-#
-#####################################
-### Placement bounds
-###
-remove_bounds -all
-
-#set core_bound [create_bound -name "core_bound" -exclusive -boundary \
-#    [list [list 0 0] [list $router_x $tile_height]]]
-set core_bound [create_bound -name "core_bound" -exclusive -boundary \
-    [list [list 22 166] [list 295 400]]]
-
-add_to_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*2__cmd_fifo*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*cfg*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*clint*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*loopback*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*__resp_fifo*"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*__resp_select*"]
-add_to_bound $core_bound [get_cells -hier -filter "full_name=~*tile*dram_splitter"]
-add_to_bound $core_bound [get_cells -hier -filter "full_name=~*tile*host_link"]
-add_to_bound $core_bound [get_cells -hier -filter "full_name=~*tile*dram_link"]
-remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot_endpoint*"]
-
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*core_minimal*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*icache_uce*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*dcache_uce*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*cmd_fifo*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*resp_fifo*"]
-
-#remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*__cmd_fifo*"]
-#remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*__resp_fifo*"]
-#remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*__resp_select*"]
-#remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*blackparrot*loopback*"]
-
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*tile*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*core_minimal*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*cache_uce*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*clint*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*cfg*"]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*loopback*"]
-
-#set core_bound [create_bound -name "core_bound" -type soft -boundary \
-#    [list [list 0 0] [list $router_x $tile_height]]]
-#add_to_bound $core_bound [get_cells -hier -filter "full_name=~*tile*"]
-#remove_from_bound $core_bound [get_cells -hier -filter "full_name=~*tile*link*"]
-#
-#set router_bound [create_bound -name "router_bound" -type soft -boundary \
-#    [list [list $router_x 0] [list $tile_width $tile_height]]]
-#add_to_bound $router_bound [get_cells -hier -filter "full_name!~*tile*"]
-#add_to_bound $router_bound [get_cells -hier -filter "full_name=~*link*"]
-
+#gui_explore_logic_hierarchy -create [get_cells -hier *bp_be_*]
+#change_selection [gui_explore_logic_hierarchy -expand]

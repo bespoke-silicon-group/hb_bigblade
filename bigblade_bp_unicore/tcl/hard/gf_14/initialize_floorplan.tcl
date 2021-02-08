@@ -17,6 +17,7 @@ set int_regfile_height        [lindex [get_attribute [get_cell -hier $int_regfil
 #set tile_width [round_up_to_nearest [expr 4*($data_mem_width + 2*$keepout_margin_x)+2*$keepout_margin_x] [unit_width]]
 #set tile_height [round_up_to_nearest [expr 8*($data_mem_height + 2*$keepout_margin_y)+2*$keepout_margin_y] [unit_height]]
 #set tile_width [round_up_to_nearest 325 [unit_width]]
+#set tile_width [round_up_to_nearest 300 [unit_width]]
 set tile_width [round_up_to_nearest 325 [unit_width]]
 #set tile_height [round_up_to_nearest 500 [unit_height]]
 #set tile_height [round_up_to_nearest [expr 4*($data_mem_height + 2*$keepout_margin_y)+2*$keepout_margin_y+2*($int_regfile_height + $keepout_margin_y)] [unit_height]]

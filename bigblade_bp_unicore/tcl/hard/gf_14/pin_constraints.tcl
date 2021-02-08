@@ -38,9 +38,7 @@ set data_mem_width    [lindex [get_attribute [get_cell -hier $dcache_data_mems_e
 set freg_mem_width    [lindex [get_attribute [get_cell -hier $fp_regfile_mems] width ] 0]
 
 set link_pin_N_len [sizeof_collection $link_pin_N]
-set start_x [expr $tile_width - ($k_pitch*$link_pin_N_len/2) - $data_mem_width - 2*$keepout_margin_x]
-#set start_x [expr ($tile_width/2) - ($k_pitch*$link_pin_N_len/2) + ($tag_mem_width/2+$keepout_margin_x) + $keepout_margin_x]
-#set start_x [expr $tile_width - $k_pitch*($link_pin_N_len+1) - 2*$freg_mem_width]
+set start_x [expr $tile_width - $k_pitch*($link_pin_N_len+10)]
 set last_loc [bsg_pins_line_constraint $link_pin_N "K2 K4" top $start_x "self" $link_pin_S 1 0]
 
 set                  misc_pins [get_ports -filter "name=~*clk*"]

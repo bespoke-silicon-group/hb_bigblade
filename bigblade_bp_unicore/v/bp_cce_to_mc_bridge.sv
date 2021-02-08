@@ -537,11 +537,6 @@ module bp_cce_to_mc_bridge
               mc_to_bp_response_v_li = mc_to_bp_response_ready_lo;
               returned_yumi_li = mc_to_bp_response_v_li;
             end
-          
-          // Send out mmio response opportunistically
-          io_resp_v_o = mmio_resp_v_lo;
-          io_resp_cast_o = mmio_resp_lo;
-          mmio_resp_yumi_li = io_resp_yumi_i;
         end
 
       // Send out host request opportunistically
@@ -550,6 +545,14 @@ module bp_cce_to_mc_bridge
           bp_to_mc_yumi_li = out_ready_lo & bp_to_mc_v_lo;
           out_v_li = bp_to_mc_yumi_li;
           out_packet_li = bp_to_mc_out_packet_li;
+        end
+
+      // Send out mmio response opportunistically
+      if (~io_resp_v_o)
+        begin
+          io_resp_v_o = mmio_resp_v_lo;
+          io_resp_cast_o = mmio_resp_lo;
+          mmio_resp_yumi_li = io_resp_yumi_i;
         end
     end
 
