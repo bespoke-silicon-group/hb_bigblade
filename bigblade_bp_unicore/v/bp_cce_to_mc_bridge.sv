@@ -531,16 +531,16 @@ module bp_cce_to_mc_bridge
               out_packet_li = mmio_out_packet_li;
             end
 
-          if (returned_v_r_lo & (returned_reg_id_r_lo <= mc_max_outstanding_p)
-              || (returned_credit_v_r_lo & (returned_credit_reg_id_r_lo <= mc_max_outstanding_p)))
-            begin
-              mmio_returned_v_li = 1'b1;
-              returned_yumi_li = mmio_returned_v_li;
-            end
-          else if (returned_v_r_lo & (returned_reg_id_r_lo > mc_max_outstanding_p))
+          if ((returned_v_r_lo & (returned_credit_reg_id_r_lo > mc_max_outstanding_p)))
             begin
               mc_to_bp_response_v_li = mc_to_bp_response_ready_lo;
               returned_yumi_li = mc_to_bp_response_v_li;
+            end
+          else
+            begin
+              // We can always ack mmio requests, because we've allocated space in the reorder fifo
+              mmio_returned_v_li = returned_credit_v_r_lo;
+              returned_yumi_li = returned_v_r_lo;
             end
         end
 

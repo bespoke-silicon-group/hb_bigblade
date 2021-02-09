@@ -6,7 +6,6 @@ module bsg_blackparrot_unicore_tile
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
- import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
  import bp_me_pkg::*;
@@ -22,7 +21,7 @@ module bsg_blackparrot_unicore_tile
   (input                                          clk_i
    , input                                        reset_i
 
-   , input bsg_tag_s [2:0]                        bsg_tag_i
+   , input [2:0][mc_y_cord_width_gp-1:0]          my_mc_y_cords_i
 
    , input [2:0][mc_link_sif_width_lp-1:0]        links_i
    , output logic [2:0][mc_link_sif_width_lp-1:0] links_o
@@ -42,22 +41,6 @@ module bsg_blackparrot_unicore_tile
      ,.data_i(reset_i)
      ,.data_o(reset_r)
      );
-
-  wire [mc_x_cord_width_gp-1:0] mc_global_x_li = '0;
-  logic [2:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
-  for (genvar i = 0; i < 3; i++)
-    begin : btc
-      bsg_tag_client
-       #(.width_p(mc_y_cord_width_gp), .default_p(0))
-       btc
-        (.bsg_tag_i(bsg_tag_i[i])
-
-         ,.recv_clk_i(clk_i)
-         ,.recv_reset_i(1'b0)
-         ,.recv_new_r_o()
-         ,.recv_data_r_o(mc_global_y_li[i])
-         );
-    end
 
   bp_bedrock_io_mem_msg_s io_cmd_lo;
   logic io_cmd_v_lo, io_cmd_ready_li;
@@ -130,7 +113,7 @@ module bsg_blackparrot_unicore_tile
      );
 
   wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = mc_global_y_li[0];
+  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = my_mc_y_cords_i[0];
   bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
      ,.host_enable_p(1)
@@ -177,7 +160,7 @@ module bsg_blackparrot_unicore_tile
   for (genvar i = 0; i < 2; i++)
     begin : d
       wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
-      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = mc_global_y_li[1+i];
+      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = my_mc_y_cords_i[1+i];
       bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
          ,.host_enable_p(0)
