@@ -11,3 +11,9 @@ export MID_HIER_BLOCKS :=
 # dependancies (ie. leaf blocks). Only used in hierarchical design flows.
 export BOT_HIER_BLOCKS :=
 
+# ETM (hard macro) hierarchical blocks. The blocks are a space separated list elements whose format
+# is <design_name>,<build_dir>. These blocks should be previously built in a separate bsg_design
+# directory. Note: this does not include hardened SRAMs and RFs. Can be used in both flat and
+# hierarchical design flows.
+export ETM_BLOCKS :=
+

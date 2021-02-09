@@ -9,7 +9,7 @@
 #
 #		1. block       - block level (no GPIOs)
 #		2. chip_3x3    - 3mm by 3mm die size
-#		3. chip_11x9   - 11.1mm by 9mm die size
+#		3. chip_11x9   - 11mm by 9mm die size
 
 export BSG_TOPLEVEL_DESIGN_TYPE := block
 
@@ -21,7 +21,7 @@ export BSG_TOPLEVEL_DESIGN_TYPE := block
 
 export BSG_FLOW_STYLE := flat
 
-# *NOTE -- this flag currently does nothing as the feature has been disabled.  It is planned to
+# *NOTE -- this flag currently does nothing as the feature has been disabled. It is planned to
 # return in the future* Select if the backend flow is going to perform Design Planning (DP). Design
 # planning is about 10 additional steps that occur before any placement and routing actually occurs.
 # These steps are used to partition the physical hierarchy and implement a full-chip floorplan early
@@ -29,6 +29,13 @@ export BSG_FLOW_STYLE := flat
 # however this may result in poor QoR, particularly for hierarchical flows.
 
 export BSG_FLOW_USE_DP := true
+
+# Determines if the flow should generate an ETM (ndm + db files) for the toplevel block. The primary
+# difference is that during PTSI, model extraction will be performed to generate .db files that can
+# be used in higher level of the hierarchy. Other aspects of the flow might also change to allow for
+# higher-level integration.
+
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
 
 # Select the target package. Inside of bsg_packaging there are multiple packages to choose from that
 # determine the intended package for the ASIC.
