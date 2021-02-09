@@ -4,7 +4,7 @@ source -echo -verbose $constraints_dir/hb_design_constants.tcl
 
 # core clk
 set clk_name           "manycore_clk"
-set clk_period_ps      1500
+set clk_period_ps      2000
 set clk_uncertainty_ps 20
 create_clock -period ${clk_period_ps} -name ${clk_name} [get_ports clk_i]
 set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
@@ -24,6 +24,7 @@ for {set i 1} {$i < 5} {incr i} {
     append_to_collection local_output_ports [get_ports "link_o[$i][$j]"]
   }
 }
+
 for {set i 0} {$i < 3} {incr i} {
   for {set j 1} {$j < 3} {incr j} {
     for {set k 0} {$k < $HB_RUCHE_LINK_WIDTH_P} {incr k} {
@@ -32,6 +33,8 @@ for {set i 0} {$i < 3} {incr i} {
     }
   }
 }
+
+
 
 # W = 0
 # E = 1
@@ -73,25 +76,12 @@ for {set i 0} {$i < 2} {incr i} {
 }
 
 
-# input pins constraints
 proc constraint_input_ports {clk_name ports max_delay min_delay} {
   set_input_delay -max $max_delay -clock $clk_name $ports
   set_input_delay -min $min_delay -clock $clk_name $ports
   set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $ports
   set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $ports
 }
-
-constraint_input_ports $clk_name $reset_port 500 0
-for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)   [expr $clk_period - 1400] 0
-  constraint_input_ports $clk_name $rev_ready_in_ports($i)  [expr $clk_period - 1200] 0
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)  [expr $clk_period - 1300] 0
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)   [expr $clk_period - 1400] 0
-  constraint_input_ports $clk_name $fwd_ready_in_ports($i)  [expr $clk_period - 1200] 0
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)  [expr $clk_period - 1300] 0
-}
-
-# output pins constraints
 proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_output_delay -max $max_delay -clock $clk_name $ports
   set_output_delay -min $min_delay -clock $clk_name $ports
@@ -99,33 +89,50 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
+constraint_input_ports $clk_name $reset_port 500 0
+
+# FIFO input constraints
+for {set i 0} {$i < 6} {incr i} {
+  constraint_input_ports $clk_name $rev_data_in_ports($i)     [expr $clk_period_ps - 100] 0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)    [expr $clk_period_ps - 200] 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)  [expr $clk_period_ps - 150] 0
+
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)     [expr $clk_period_ps - 100] 0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)    [expr $clk_period_ps - 200] 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)  [expr $clk_period_ps - 150] 0
+}
+
+
+# FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 450] 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 400] 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
 }
 
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 350] 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 400] 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
 }
 
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
-}
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 450] 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
 
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 500] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 350] 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+}
 
 
 # feedthrough input pins

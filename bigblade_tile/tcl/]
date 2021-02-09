@@ -13,25 +13,10 @@ set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
 # Grouping ports...
 set reset_port [get_ports reset_i]
 
-set ruche_input_ports         [list]
-set ruche_output_ports        [list]
-set local_input_ports         [list]
-set local_output_ports        [list]
-
-for {set i 1} {$i < 5} {incr i} {
-  for {set j 0} {$j < $HB_LINK_WIDTH_P} {incr j} {
-    append_to_collection local_input_ports [get_ports "link_i[$i][$j]"]
-    append_to_collection local_output_ports [get_ports "link_o[$i][$j]"]
-  }
-}
-for {set i 0} {$i < 3} {incr i} {
-  for {set j 1} {$j < 3} {incr j} {
-    for {set k 0} {$k < $HB_RUCHE_LINK_WIDTH_P} {incr k} {
-      append_to_collection ruche_input_ports [get_ports "ruche_link_i[$i][$j][$k]"]
-      append_to_collection ruche_output_ports [get_ports "ruche_link_o[$i][$j][$k]"]
-    }
-  }
-}
+set ruche_input_ports         [sort_collection [get_ports ruche_link_i*] name]
+set ruche_output_ports        [sort_collection [get_ports ruche_link_o*] name]
+set local_input_ports         [sort_collection [get_ports link_i*] name]
+set local_output_ports        [sort_collection [get_ports link_o*] name]
 
 # W = 0
 # E = 1
@@ -83,12 +68,12 @@ proc constraint_input_ports {clk_name ports max_delay min_delay} {
 
 constraint_input_ports $clk_name $reset_port 500 0
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)   [expr $clk_period - 1400] 0
-  constraint_input_ports $clk_name $rev_ready_in_ports($i)  [expr $clk_period - 1200] 0
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)  [expr $clk_period - 1300] 0
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)   [expr $clk_period - 1400] 0
-  constraint_input_ports $clk_name $fwd_ready_in_ports($i)  [expr $clk_period - 1200] 0
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)  [expr $clk_period - 1300] 0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)   500 0
+  constraint_input_ports $clk_name $rev_ready_in_ports($i)  550 0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)  500 0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)   500 0
+  constraint_input_ports $clk_name $fwd_ready_in_ports($i)  500 0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)  500 0
 }
 
 # output pins constraints
@@ -100,30 +85,30 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 }
 
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 500 0
 }
 
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 500 0
 }
 
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  700 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 700 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 700 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)  500 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 500 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 500 0
 }
 
 
