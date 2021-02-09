@@ -41,9 +41,9 @@ set mc_input_delay_ps  [expr ${mc_clk_period_ps}*(${mc_input_delay_per}/100.0)]
 set mc_output_delay_per 20.0
 set mc_output_delay_ps [expr ${mc_clk_period_ps}*(${mc_output_delay_per}/100.0)]
 
-set tag_input_delay_per  50.0
+set tag_input_delay_per  20.0
 set tag_input_delay_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_per}/100.0)]
-set tag_output_delay_per 50.0
+set tag_output_delay_per 20.0
 set tag_output_delay_ps [expr ${tag_clk_period_ps}*(${tag_output_delay_per}/100.0)]
 
 ########################################
@@ -87,9 +87,9 @@ bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
 ########################################
 ## CDC Paths
-update_timing
-bsg_chip_async_constraints
-bsg_chip_cdc_constraints [all_clocks]
+#update_timing
+#bsg_chip_async_constraints
+#bsg_chip_cdc_constraints [all_clocks]
 
 ########################################
 ## Derate
