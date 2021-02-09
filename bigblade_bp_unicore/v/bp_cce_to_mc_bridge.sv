@@ -474,6 +474,11 @@ module bp_cce_to_mc_bridge
       out_packet_li = '0;
       out_v_li = '0;
 
+      mmio_returned_v_li = '0;
+      mc_to_bp_response_v_li = '0;
+      returned_yumi_li = '0;
+      mmio_resp_yumi_li = '0;
+
       if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_req_fifo_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: '0};
