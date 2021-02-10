@@ -1,0 +1,6 @@
+{ "memories": [
+    {"name": "gf14_1rw_d512_w64_m2",       "width":  64, "depth":  512, "mux": 2, "mask": 0, "banks": 2, "type": "sram" }
+  ],
+  "dont_compile": [
+  ]
+}
