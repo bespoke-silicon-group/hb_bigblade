@@ -18,20 +18,14 @@ set ruche_output_ports        [list]
 set local_input_ports         [list]
 set local_output_ports        [list]
 
-for {set i 1} {$i < 5} {incr i} {
-  for {set j 0} {$j < $HB_LINK_WIDTH_P} {incr j} {
-    append_to_collection local_input_ports [get_ports "link_i[$i][$j]"]
-    append_to_collection local_output_ports [get_ports "link_o[$i][$j]"]
-  }
+for {set i 0} {$i < [expr 4*$HB_LINK_WIDTH_P]} {incr i} {
+  append_to_collection local_input_ports  [get_ports "link_i[$i]"]
+  append_to_collection local_output_ports [get_ports "link_o[$i]"]
 }
 
-for {set i 0} {$i < 3} {incr i} {
-  for {set j 1} {$j < 3} {incr j} {
-    for {set k 0} {$k < $HB_RUCHE_LINK_WIDTH_P} {incr k} {
-      append_to_collection ruche_input_ports [get_ports "ruche_link_i[$i][$j][$k]"]
-      append_to_collection ruche_output_ports [get_ports "ruche_link_o[$i][$j][$k]"]
-    }
-  }
+for {set i 0} {$i < [expr 6*$HB_RUCHE_LINK_WIDTH_P]} {incr i} {
+  append_to_collection ruche_input_ports [get_ports "ruche_link_i[$i]"]
+  append_to_collection ruche_output_ports [get_ports "ruche_link_o[$i]"]
 }
 
 
@@ -91,47 +85,58 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 
 constraint_input_ports $clk_name $reset_port 500 0
 
+# ruche link delay
+set ruche_max_delay 150
+set ruche_min_delay 40
+# synth relax + apr relax
+set in_relax      [expr 10 + 50]
+# synth relax + apr relax
+set out_relax     [expr 40 + 100]
+# estimated clock skew
+set ext_skew 50
+set int_skew 150
+
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)     [expr $clk_period_ps -  80] 0
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)    [expr $clk_period_ps - 150] 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i)  [expr $clk_period_ps -  90] 0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr $in_relax + 360]   0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr $in_relax + 380]   0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr $out_relax + 110]  [expr 45-$ext_skew-$int_skew]
 
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)     [expr $clk_period_ps - 80] 0
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)    [expr $clk_period_ps - 150] 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i)  [expr $clk_period_ps - 110] 0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr $in_relax + 340]   0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr $in_relax + 440]   0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr $out_relax + 150]  [expr 45-$ext_skew-$int_skew]
 }
 
 
 # FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 360] 0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 380] 0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 110] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$ext_skew-$int_skew]
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$ext_skew-$int_skew] 
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 340] 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 440] 0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
 }
 
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 280] 0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 350] 0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 110] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$ext_skew-$int_skew]
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$ext_skew-$int_skew] 
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 310] 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 440] 0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 140] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$ext_skew-$int_skew]
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$ext_skew-$int_skew]
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
 }
 
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $clk_period_ps - 340] 0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $clk_period_ps - 390] 0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + $ruche_max_delay + 150]  [expr 55+$ruche_min_delay-$ext_skew-$int_skew]
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + $ruche_max_delay + 80]   [expr 50+$ruche_min_delay-$ext_skew-$int_skew]
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + $ruche_max_delay + 90]    0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $clk_period_ps - 330] 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $clk_period_ps - 410] 0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $clk_period_ps - 150] 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + $ruche_max_delay + 150]  [expr 55+$ruche_min_delay-$ext_skew-$int_skew]
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + $ruche_max_delay + 80]   [expr 50+$ruche_min_delay-$ext_skew-$int_skew]
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + $ruche_max_delay + 110]   0
 }
 
 
@@ -157,33 +162,6 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 
-# false path
-set_false_path -from [get_ports my_*]
-set_false_path -from [get_ports pod_*]
-#set_multicycle_path 2 -from [get_ports my_*] -setup
-#set_multicycle_path 1 -from [get_ports my_*] -hold
-#set_multicycle_path 2 -from [get_ports pod_*] -setup
-#set_multicycle_path 1 -from [get_ports pod_*] -hold
-
-
-
-
-
-
-
-# derating
-set cells_to_derate [list]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~IN12LP_*"]
-
-if { [sizeof $cells_to_derate] > 0 } {
-  foreach_in_collection cell $cells_to_derate {
-    set_timing_derate -cell_delay -early 0.97 $cell
-    set_timing_derate -cell_delay -late  1.03 $cell
-    set_timing_derate -cell_check -early 0.97 $cell
-    set_timing_derate -cell_check -late  1.03 $cell
-  }
-}
 
 
 
@@ -193,35 +171,5 @@ if { [sizeof $cells_to_derate] > 0 } {
 
 
 
-# Ungroup
-set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
-set_ungroup [get_designs -filter "hdl_template==network_tx"] true
-set_ungroup [get_designs -filter "hdl_template==network_rx"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
-set_ungroup [get_designs -filter "hdl_template==reverse"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"] true
-set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"] true
-set_ungroup [get_designs -filter "hdl_template==hash_function"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
-set_ungroup [get_designs fpu_float_fma] false
-set_ungroup [get_designs fpu_float_fma_round] false
-ungroup [get_cells proc/h.z/vcore/fpu_int0/*] -flatten
-ungroup [get_cells proc/h.z/vcore/fpu_float0/fma1/*] -flatten
-ungroup [get_cells proc/h.z/vcore/fpu_float0/fma2/*] -flatten
-ungroup [get_cells proc/h.z/vcore/fpu_float0/aux0/*] -flatten
-ungroup [get_cells proc/h.z/vcore/fpu_fdiv_fsqrt0/*] -flatten
-ungroup [get_cells proc/h.z/vcore/idiv0/*] -flatten
-
-# Retiming
-set_optimize_registers true -designs [get_designs fpu_float_fma] -check_design -verbose
-set_optimize_registers true -designs [get_designs fpu_float_fma_round] -check_design -verbose
-
-#set_app_var case_analysis_propagate_through_icg true
-#update_timing
 
 puts "BSG-info: Completed script [info script]\n"
