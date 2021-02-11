@@ -6,11 +6,8 @@ set HARD_INCLUDE_PATHS [join "
 "]
 
 set HARD_SWAP_FILELIST [join "
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_mem_1rw_sync_mask_write_bit.v
   $bsg_designs_target_dir/v/hard/gf_14/bsg_mem_1rw_sync_mask_write_byte.v
   $bsg_designs_target_dir/v/hard/gf_14/bsg_mem_1rw_sync.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_inv.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_buf.v
 "]
 
 set NETLIST_SOURCE_FILES [join "

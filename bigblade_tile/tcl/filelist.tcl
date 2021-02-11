@@ -14,13 +14,10 @@ set SVERILOG_PACKAGE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $bsg_manycore_dir/imports/HardFloat/source/bsg_hardfloat_pkg.v
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
 "]
 
 set SVERILOG_SOURCE_FILES [join "
   $SVERILOG_PACKAGE_FILES
-
-  $bsg_designs_target_dir/v/bsg_chip_pod.v
 
   $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
   $basejump_stl_dir/bsg_misc/bsg_counter_up_down_variable.v

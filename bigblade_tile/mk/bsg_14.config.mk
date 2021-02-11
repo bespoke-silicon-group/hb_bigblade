@@ -9,6 +9,7 @@ export BSG_PADMAPPING           :=default
 
 export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json 
 
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
 
 export DC_FLOW_RMPLUS_FLOW :=
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE := false

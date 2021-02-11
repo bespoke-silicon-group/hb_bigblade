@@ -3,36 +3,240 @@ puts "BSG-info: Running script [info script]\n"
 # constraints dir
 set constraints_dir $::env(BSG_DESIGNS_TARGET_DIR)/tcl
 
-# clock setup config
-set router_clk_name               "router_clk"
-set router_clk_period_ps          1666.0
-set router_clk_uncertainty_ps     20
 
-set io_master_clk_name            "io_master_clk"
-set io_master_clk_period_ps       1666.0
-set io_master_clk_uncertainty_ps  20
+source -echo -verbose $constraints_dir/hb_design_constants.tcl
 
-set manycore_clk_name             "manycore_clk"
-set manycore_clk_period_ps        1000.0
-set manycore_clk_uncertainty_ps   20
-
-set tag_clk_name                  "tag_clk"
-set tag_clk_period_ps             6666.0
-set tag_clk_uncertainty_ps        20
-
-set oscillator_period_ps          250.0
-set oscillator_uncertainty_ps     20
-set ds_uncertainty_ps             20
+# core clk
+set clk_name           "manycore_clk"
+set clk_period_ps      1000
+set clk_uncertainty_ps 20
+create_clock -period ${clk_period_ps} -name ${clk_name} [get_ports clk_i]
+set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
 
 
-# constraints
-if { ${DESIGN_NAME} == "bsg_manycore_tile_compute_ruche" } {
-  source -echo -verbose $constraints_dir/bsg_manycore_tile_compute_ruche.synth.constraints.tcl
-} elseif { ${DESIGN_NAME} == "bsg_manycore_tile_vcache" } {
-  source -echo -verbose $constraints_dir/bsg_manycore_tile_vcache.constraints.tcl
-} elseif { ${DESIGN_NAME} == "bsg_chip_pod" } {
-  source -echo -verbose $constraints_dir/bsg_chip_pod.constraints.tcl
+# Grouping ports...
+set reset_port [get_ports reset_i]
+
+set ruche_input_ports         [list]
+set ruche_output_ports        [list]
+set local_input_ports         [list]
+set local_output_ports        [list]
+
+for {set i 1} {$i < 5} {incr i} {
+  for {set j 0} {$j < $HB_LINK_WIDTH_P} {incr j} {
+    append_to_collection local_input_ports [get_ports "link_i[$i][$j]"]
+    append_to_collection local_output_ports [get_ports "link_o[$i][$j]"]
+  }
 }
 
+for {set i 0} {$i < 3} {incr i} {
+  for {set j 1} {$j < 3} {incr j} {
+    for {set k 0} {$k < $HB_RUCHE_LINK_WIDTH_P} {incr k} {
+      append_to_collection ruche_input_ports [get_ports "ruche_link_i[$i][$j][$k]"]
+      append_to_collection ruche_output_ports [get_ports "ruche_link_o[$i][$j][$k]"]
+    }
+  }
+}
+
+
+
+# W = 0
+# E = 1
+# N = 2
+# S = 3
+# RW = 4
+# RE = 5
+# link format = {
+#   fwd.v
+#   fwd.ready_and_rev
+#   fwd.data
+#   rev.v
+#   rev.ready_and_rev
+#   rev.data
+# }
+for {set i 0} {$i < 4} {incr i} {
+  set rev_data_out_ports($i)       [index_collection $local_output_ports [expr 0+($HB_LINK_WIDTH_P*$i)] [expr 52+($HB_LINK_WIDTH_P*$i)]] 
+  set rev_ready_out_ports($i)      [index_collection $local_output_ports [expr 53+($HB_LINK_WIDTH_P*$i)]] 
+  set rev_valid_out_ports($i)      [index_collection $local_output_ports [expr 54+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_data_out_ports($i)       [index_collection $local_output_ports [expr 55+($HB_LINK_WIDTH_P*$i)] [expr 151+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_ready_out_ports($i)      [index_collection $local_output_ports [expr 152+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_valid_out_ports($i)      [index_collection $local_output_ports [expr 153+($HB_LINK_WIDTH_P*$i)]] 
+
+  set rev_data_in_ports($i)       [index_collection $local_input_ports [expr 0+($HB_LINK_WIDTH_P*$i)] [expr 52+($HB_LINK_WIDTH_P*$i)]] 
+  set rev_ready_in_ports($i)      [index_collection $local_input_ports [expr 53+($HB_LINK_WIDTH_P*$i)]] 
+  set rev_valid_in_ports($i)      [index_collection $local_input_ports [expr 54+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_data_in_ports($i)       [index_collection $local_input_ports [expr 55+($HB_LINK_WIDTH_P*$i)] [expr 151+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_ready_in_ports($i)      [index_collection $local_input_ports [expr 152+($HB_LINK_WIDTH_P*$i)]] 
+  set fwd_valid_in_ports($i)      [index_collection $local_input_ports [expr 153+($HB_LINK_WIDTH_P*$i)]] 
+}
+
+for {set i 0} {$i < 2} {incr i} {
+  set dir [expr $i+4]
+  set rev_data_out_ports($dir)        [index_collection $ruche_output_ports [expr 0+($HB_RUCHE_LINK_WIDTH_P*$i)] [expr 45+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set rev_ready_out_ports($dir)       [index_collection $ruche_output_ports [expr 46+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set rev_valid_out_ports($dir)       [index_collection $ruche_output_ports [expr 47+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_data_out_ports($dir)        [index_collection $ruche_output_ports [expr 48+($HB_RUCHE_LINK_WIDTH_P*$i)] [expr 137+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_ready_out_ports($dir)       [index_collection $ruche_output_ports [expr 138+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_valid_out_ports($dir)       [index_collection $ruche_output_ports [expr 139+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+
+  set rev_data_in_ports($dir)        [index_collection $ruche_input_ports [expr 0+($HB_RUCHE_LINK_WIDTH_P*$i)] [expr 45+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set rev_ready_in_ports($dir)       [index_collection $ruche_input_ports [expr 46+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set rev_valid_in_ports($dir)       [index_collection $ruche_input_ports [expr 47+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_data_in_ports($dir)        [index_collection $ruche_input_ports [expr 48+($HB_RUCHE_LINK_WIDTH_P*$i)] [expr 137+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_ready_in_ports($dir)       [index_collection $ruche_input_ports [expr 138+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+  set fwd_valid_in_ports($dir)       [index_collection $ruche_input_ports [expr 139+($HB_RUCHE_LINK_WIDTH_P*$i)]] 
+}
+
+
+proc constraint_input_ports {clk_name ports max_delay min_delay} {
+  set_input_delay -max $max_delay -clock $clk_name $ports
+  set_input_delay -min $min_delay -clock $clk_name $ports
+  set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $ports
+  set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $ports
+}
+proc constraint_output_ports {clk_name ports max_delay min_delay} {
+  set_output_delay -max $max_delay -clock $clk_name $ports
+  set_output_delay -min $min_delay -clock $clk_name $ports
+  set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $ports
+  set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
+}
+
+# reset port
+constraint_input_ports $clk_name $reset_port 500 0
+
+# ruche link delay
+set ruche_delay   150
+set in_relax      10
+set out_relax     40
+
+
+# FIFO input constraints
+for {set i 0} {$i < 6} {incr i} {
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr $in_relax + 360]   0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr $in_relax + 380]   0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr $out_relax + 110]  0
+
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr $in_relax + 340]   0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr $in_relax + 440]   0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr $out_relax + 150]  0
+}
+
+
+# FIFO output constraints
+for {set i 0} {$i < 2} {incr i} {
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+}
+
+for {set i 2} {$i < 4} {incr i} {
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+}
+
+for {set i 4} {$i < 6} {incr i} {
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + $ruche_delay + 150]  0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + $ruche_delay + 80]   0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + $ruche_delay + 90]    0
+
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + $ruche_delay + 150]  0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + $ruche_delay + 80]   0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + $ruche_delay + 110]   0
+}
+
+
+# feedthrough input pins
+set feedthrough_input_pins [index_collection $ruche_input_ports [expr 2*$HB_RUCHE_LINK_WIDTH_P] [expr (6*$HB_RUCHE_LINK_WIDTH_P)-1]]
+set_input_delay -min 20.0 ${feedthrough_input_pins} -clock ${clk_name}
+set_input_delay -max 20.0 ${feedthrough_input_pins} -clock ${clk_name}
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $feedthrough_input_pins
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $feedthrough_input_pins
+set_dont_touch [get_nets -of_objects $feedthrough_input_pins] true
+
+
+
+# feedthrough output pins
+set feedthrough_output_pins [index_collection $ruche_output_ports [expr 2*$HB_RUCHE_LINK_WIDTH_P] [expr (6*$HB_RUCHE_LINK_WIDTH_P)-1]]
+set_output_delay -min 20.0 ${feedthrough_output_pins} -clock ${clk_name}
+set_output_delay -max 20.0 ${feedthrough_output_pins} -clock ${clk_name}
+set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
+set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
+
+
+
+
+
+
+# false path
+set_false_path -from [get_ports my_*]
+set_false_path -from [get_ports pod_*]
+#set_multicycle_path 2 -from [get_ports my_*] -setup
+#set_multicycle_path 1 -from [get_ports my_*] -hold
+#set_multicycle_path 2 -from [get_ports pod_*] -setup
+#set_multicycle_path 1 -from [get_ports pod_*] -hold
+
+
+
+
+
+
+
+# derating
+set cells_to_derate [list]
+append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
+append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~IN12LP_*"]
+
+if { [sizeof $cells_to_derate] > 0 } {
+  foreach_in_collection cell $cells_to_derate {
+    set_timing_derate -cell_delay -early 0.97 $cell
+    set_timing_derate -cell_delay -late  1.03 $cell
+    set_timing_derate -cell_check -early 0.97 $cell
+    set_timing_derate -cell_check -late  1.03 $cell
+  }
+}
+
+
+
+
+
+# Ungroup
+set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
+set_ungroup [get_designs -filter "hdl_template==network_tx"] true
+set_ungroup [get_designs -filter "hdl_template==network_rx"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
+set_ungroup [get_designs -filter "hdl_template==reverse"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"] true
+set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"] true
+set_ungroup [get_designs -filter "hdl_template==hash_function"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
+set_ungroup [get_designs fpu_float_fma] false
+set_ungroup [get_designs fpu_float_fma_round] false
+ungroup [get_cells proc/h.z/vcore/fpu_int0/*] -flatten
+ungroup [get_cells proc/h.z/vcore/fpu_float0/fma1/*] -flatten
+ungroup [get_cells proc/h.z/vcore/fpu_float0/fma2/*] -flatten
+ungroup [get_cells proc/h.z/vcore/fpu_float0/aux0/*] -flatten
+ungroup [get_cells proc/h.z/vcore/fpu_fdiv_fsqrt0/*] -flatten
+ungroup [get_cells proc/h.z/vcore/idiv0/*] -flatten
+
+# Retiming
+set_optimize_registers true -designs [get_designs fpu_float_fma] -check_design -verbose
+set_optimize_registers true -designs [get_designs fpu_float_fma_round] -check_design -verbose
+
+#set_app_var case_analysis_propagate_through_icg true
+#update_timing
 
 puts "BSG-info: Completed script [info script]\n"

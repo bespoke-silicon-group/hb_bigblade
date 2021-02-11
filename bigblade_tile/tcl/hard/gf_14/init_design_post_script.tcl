@@ -35,48 +35,20 @@ if { $DESIGN_NAME == "bsg_chip_pod" } {
   }
 
 
-  # clock skew group
-  # grab valid/ready bits and put them in a skew group
-  set local_link_input_pins [sort_collection [get_ports "link_i*"] name]  
-  set local_link_output_pins [sort_collection [get_ports "link_o*"] name]  
-  set ruche_link_input_pins [sort_collection [get_ports "ruche_link_i*"] name]  
-  set ruche_link_output_pins [sort_collection [get_ports "ruche_link_o*"] name]  
+  # isolate output port
+  #for {set i 0} {$i < 4} {incr i} {
+  #  set idx [expr ($i*$HB_LINK_WIDTH_P)+54]
+  #  set_isolate_ports [get_ports "link_o[$idx]"]
+  #  set idx [expr ($i*$HB_LINK_WIDTH_P)+153]
+  #  set_isolate_ports [get_ports "link_o[$idx]"]
+  #}
 
-  set skew_group_ports [list]
-  for {set i 0} {$i < 4} {incr i} {
-    set rev_valid_idx [expr ($i*$HB_LINK_WIDTH_P)+54]
-    set rev_ready_idx [expr ($i*$HB_LINK_WIDTH_P)+53]
-    set fwd_valid_idx [expr ($i*$HB_LINK_WIDTH_P)+153]
-    set fwd_ready_idx [expr ($i*$HB_LINK_WIDTH_P)+152]
-    append_to_collection skew_group_ports [index_collection $local_link_input_pins $rev_valid_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_input_pins $rev_ready_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_input_pins $fwd_valid_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_input_pins $fwd_ready_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_output_pins $rev_valid_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_output_pins $rev_ready_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_output_pins $fwd_valid_idx]
-    append_to_collection skew_group_ports [index_collection $local_link_output_pins $fwd_ready_idx]
-  }
-
-  for {set i 0} {$i < 2} {incr i} {
-    set rev_valid_idx [expr ($i*$HB_LINK_WIDTH_P)+47]
-    set rev_ready_idx [expr ($i*$HB_LINK_WIDTH_P)+46]
-    set fwd_valid_idx [expr ($i*$HB_LINK_WIDTH_P)+139]
-    set fwd_ready_idx [expr ($i*$HB_LINK_WIDTH_P)+138]
-    append_to_collection skew_group_ports [index_collection $ruche_link_input_pins $rev_valid_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_input_pins $rev_ready_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_input_pins $fwd_valid_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_input_pins $fwd_ready_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_output_pins $rev_valid_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_output_pins $rev_ready_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_output_pins $fwd_valid_idx]
-    append_to_collection skew_group_ports [index_collection $ruche_link_output_pins $fwd_ready_idx]
-  }
-
-  
-  set skew_group_clk_pins [get_pins -of [all_transitive_fanout -from $skew_group_ports -only_cells -flat -endpoints_only] -filter "is_clock_pin"]
-  create_clock_skew_group -name "bsg_csg" -objects $skew_group_clk_pins
-
+  #for {set i 0} {$i < 2} {incr i} {
+  #  set idx [expr ($i*$HB_RUCHE_LINK_WIDTH_P)+47]
+  #  set_isolate_ports [get_ports "ruche_link_o[$idx]"]
+  #  set idx [expr ($i*$HB_RUCHE_LINK_WIDTH_P)+139]
+  #  set_isolate_ports [get_ports "ruche_link_o[$idx]"]
+  #}
 
 } elseif {$DESIGN_NAME == "bsg_manycore_tile_vcache"} {
 

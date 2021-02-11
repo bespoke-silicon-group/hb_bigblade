@@ -20,10 +20,10 @@ module bsg_mem_1rw_sync_mask_write_byte #( parameter els_p = -1
 
   wire unused = reset_i;
 
-  // TODO: Define more hardened macro configs here
+  // manycore DMEM
   `bsg_mem_1rw_sync_mask_write_byte_macro(1024,32,4) else
+  // vcache data mem
   `bsg_mem_1rw_sync_mask_write_byte_macro(512,128,2) else
-  //`bsg_mem_1rw_sync_mask_write_byte_banked_macro(1024,256,4,1) else
   // no hardened version found
     begin : notmacro
       bsg_mem_1rw_sync_mask_write_byte_synth #(.data_width_p(data_width_p), .els_p(els_p))

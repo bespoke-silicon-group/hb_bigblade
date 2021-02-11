@@ -2,9 +2,27 @@ puts "BSG-info: Running script [info script]\n"
 
 set_app_options -name plan.place.auto_generate_blockages -value false
 
-#source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_placement_blockage.tcl
-source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_placement_sram.tcl
-#source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_placement_rp_group.tcl
-#source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_placement_bound.tcl
+# SRAM margin
+set margin_x [expr 6*[unit_width]]
+set margin_y [expr 1*[unit_height]]
+
+## MANYCORE TILES
+set icache_path "proc/h_z/vcore/icache0/imem_0/macro_mem"
+set dmem_path   "proc/h_z/vcore/dmem/macro_mem"
+
+
+set icache_cell [get_cell -hier  -filter "full_name=~$icache_path"]
+create_keepout_margin -type hard -outer "$margin_x $margin_y $margin_x $margin_y" $icache_cell
+set_macro_relative_location -target_object $icache_cell -target_corner bl -target_orientation MY \
+                                                        -anchor_corner bl \
+                                                        -offset "$margin_x $margin_y"
+
+set dmem_cell [get_cell -hier -filter "full_name=~$dmem_path"]
+create_keepout_margin -type hard -outer "$margin_x $margin_y $margin_x $margin_y" $dmem_cell
+set_macro_relative_location -target_object $dmem_cell -target_corner tr -target_orientation R0 \
+                                                      -anchor_corner tr \
+                                                      -offset "-$margin_x -$margin_y"
+
+
 
 puts "BSG-info: Completed script [info script]\n"
