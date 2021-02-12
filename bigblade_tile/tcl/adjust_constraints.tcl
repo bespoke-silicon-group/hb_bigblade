@@ -1,8 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 
-set constraints_dir $::env(BSG_DESIGNS_TARGET_DIR)/tcl
-source -echo -verbose $constraints_dir/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
 
 # core clk
 set clk_name           "manycore_clk"
@@ -90,56 +89,52 @@ constraint_input_ports $clk_name $reset_port 500 0
 # ruche link delay
 set ruche_max_delay 150
 set ruche_min_delay 40
-# synth relax + apr relax
-set in_relax      [expr 10 + 50]
-# synth relax + apr relax
-set out_relax     [expr 40 + 100]
+# in fifo relax
+set in_relax      [expr 50]
 # estimated clock skew
-set ext_skew 50
-set int_skew 150
-set total_skew [expr $ext_skew + $int_skew]
+set ext_skew 75
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr $in_relax + 360]   0
-  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr $in_relax + 380]   0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr $out_relax + 110]  [expr 45-$total_skew]
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr 935 - $in_relax]   0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr 910 - $in_relax]   0
 
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr $in_relax + 340]   0
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr $in_relax + 440]   0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr $out_relax + 150]  [expr 45-$total_skew]
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr 935 - $in_relax]   0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr 890 - $in_relax]   0
 }
 
 
 # FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$total_skew]
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$total_skew] 
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    65    -60
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -75
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     90    -50
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    65    -60
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -75
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     110   -50
 }
 
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$total_skew]
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$total_skew] 
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    65    -60
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -75
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     90    -50
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   [expr 55-$total_skew]
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    [expr 50-$total_skew]
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    65    -60
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -75
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     110   -50
 }
 
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + $ruche_max_delay + 150]  [expr 55+$ruche_min_delay-$total_skew]
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + $ruche_max_delay + 80]   [expr 50+$ruche_min_delay-$total_skew]
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + $ruche_max_delay + 90]    0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    [expr 65 + $ruche_max_delay]    -20
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     [expr 150 + $ruche_max_delay]   -35
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     [expr 90 + $ruche_max_delay]    -10
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + $ruche_max_delay + 150]  [expr 55+$ruche_min_delay-$total_skew]
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + $ruche_max_delay + 80]   [expr 50+$ruche_min_delay-$total_skew]
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + $ruche_max_delay + 110]   0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    [expr 65 + $ruche_max_delay]    -20
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     [expr 155 + $ruche_max_delay]   -35
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     [expr 110 + $ruche_max_delay]   -10
 }
 
 

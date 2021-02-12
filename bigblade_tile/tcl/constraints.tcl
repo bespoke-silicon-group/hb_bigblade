@@ -1,10 +1,6 @@
 puts "BSG-info: Running script [info script]\n"
 
-# constraints dir
-set constraints_dir $::env(BSG_DESIGNS_TARGET_DIR)/tcl
-
-
-source -echo -verbose $constraints_dir/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
 
 # core clk
 set clk_name           "manycore_clk"
@@ -46,14 +42,6 @@ for {set i 0} {$i < 3} {incr i} {
 # S = 3
 # RW = 4
 # RE = 5
-# link format = {
-#   fwd.v
-#   fwd.ready_and_rev
-#   fwd.data
-#   rev.v
-#   rev.ready_and_rev
-#   rev.data
-# }
 for {set i 0} {$i < 4} {incr i} {
   set rev_data_out_ports($i)       [index_collection $local_output_ports [expr 0+($HB_LINK_WIDTH_P*$i)] [expr 52+($HB_LINK_WIDTH_P*$i)]] 
   set rev_ready_out_ports($i)      [index_collection $local_output_ports [expr 53+($HB_LINK_WIDTH_P*$i)]] 
@@ -101,56 +89,52 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
-# reset port
 constraint_input_ports $clk_name $reset_port 500 0
-
-# ruche link delay
-set ruche_delay   150
-set in_relax      10
-set out_relax     40
-
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr $in_relax + 360]   0
-  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr $in_relax + 380]   0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr $out_relax + 110]  0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)     935 0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)    850 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)  910 0
 
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr $in_relax + 340]   0
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr $in_relax + 440]   0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr $out_relax + 150]  0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)     935 0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)    845 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)  890 0
 }
 
 
 # FIFO output constraints
+# W/E
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   610 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  655 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   885 0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   570 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  685 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   850 0
 }
 
+# N/S
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + 150]   0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + 80]    0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + 90]     0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   665 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  740 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   890 0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + 150]   0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + 80]    0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + 110]    0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   570 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  710 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   860 0
 }
 
+# RW/RE
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)  [expr $out_relax + $ruche_delay + 150]  0
-  constraint_output_ports $clk_name $rev_data_out_ports($i)   [expr $out_relax + $ruche_delay + 80]   0
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   [expr $in_relax + $ruche_delay + 90]    0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)   605 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)  660 0
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)   855 0
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  [expr $out_relax + $ruche_delay + 150]  0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)   [expr $out_relax + $ruche_delay + 80]   0
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   [expr $in_relax + $ruche_delay + 110]   0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)   605 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)  700 0
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)   860 0
 }
 
 
@@ -187,9 +171,6 @@ set_false_path -from [get_ports pod_*]
 
 
 
-
-
-
 # derating
 set cells_to_derate [list]
 append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
@@ -203,7 +184,6 @@ if { [sizeof $cells_to_derate] > 0 } {
     set_timing_derate -cell_check -late  1.03 $cell
   }
 }
-
 
 
 
