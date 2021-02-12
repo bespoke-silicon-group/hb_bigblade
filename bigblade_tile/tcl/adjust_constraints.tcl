@@ -96,12 +96,12 @@ set ext_skew        75
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr 935 - $in_relax]   40
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   10
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      200   100
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   -20
   constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr 910 - $in_relax]   -55
 
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr 935 - $in_relax]   40
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   10
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      200   100
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   -20
   constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr 890 - $in_relax]   -55
 }
 
@@ -109,7 +109,7 @@ for {set i 0} {$i < 6} {incr i} {
 # FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    65    -60
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -75
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     145   -75
   constraint_input_ports  $clk_name $rev_ready_in_ports($i)     90    -50
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    65    -60
