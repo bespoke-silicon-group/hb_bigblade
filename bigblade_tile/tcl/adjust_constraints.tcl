@@ -90,19 +90,19 @@ constraint_input_ports $clk_name $reset_port 500 0
 set ruche_max_delay 150
 set ruche_min_delay 40
 # in fifo relax
-set in_relax      [expr 50]
+set in_relax        50
 # estimated clock skew
-set ext_skew 75
+set ext_skew        75
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr 935 - $in_relax]   0
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr 910 - $in_relax]   0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      [expr 935 - $in_relax]   40
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   10
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr 910 - $in_relax]   -55
 
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr 935 - $in_relax]   0
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr 890 - $in_relax]   0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      [expr 935 - $in_relax]   40
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   10
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr 890 - $in_relax]   -55
 }
 
 
