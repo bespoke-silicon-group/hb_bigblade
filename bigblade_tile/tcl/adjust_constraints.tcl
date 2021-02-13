@@ -88,53 +88,48 @@ constraint_input_ports $clk_name $reset_port 500 0
 
 # ruche link delay
 set ruche_max_delay 150
-set ruche_min_delay 40
-# in fifo relax
-set in_relax        50
-# estimated clock skew
-set ext_skew        75
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
-  constraint_input_ports $clk_name $rev_data_in_ports($i)      200   100
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     [expr 850 - $in_relax]   -20
-  constraint_output_ports $clk_name $rev_ready_out_ports($i)   [expr 910 - $in_relax]   -55
+  constraint_input_ports $clk_name $rev_data_in_ports($i)      885   200
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     780   200
+  constraint_output_ports $clk_name $rev_ready_out_ports($i)   860   200
 
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)      200   100
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     [expr 845 - $in_relax]   -20
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   [expr 890 - $in_relax]   -55
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)      885   200
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     775   200
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i)   840   200
 }
 
 
 # FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)    65    -60
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     145   -75
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     90    -50
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    265    -85
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -100
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     835   -100
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    65    -60
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -75
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     110   -50
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    265    -85
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -100
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     800   -100
 }
 
 for {set i 2} {$i < 4} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)    65    -60
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -75
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     90    -50
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    265    -85
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -100
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     840   -100
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    65    -60
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -75
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     110   -50
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    265    -85
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -100
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     810   -100
 }
 
 for {set i 4} {$i < 6} {incr i} {
-  constraint_output_ports $clk_name $rev_valid_out_ports($i)    [expr 65 + $ruche_max_delay]    -20
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     [expr 150 + $ruche_max_delay]   -35
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     [expr 90 + $ruche_max_delay]    -10
+  constraint_output_ports $clk_name $rev_valid_out_ports($i)    350   -45
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     300   -65
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     805   -50
 
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    [expr 65 + $ruche_max_delay]    -20
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)     [expr 155 + $ruche_max_delay]   -35
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     [expr 110 + $ruche_max_delay]   -10
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i)    350   -45
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     305   -65
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     810   -50
 }
 
 
