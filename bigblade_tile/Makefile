@@ -1,4 +1,4 @@
-all: | bsg_cadenv bsg_packaging basejump_stl bsg_14
+all: | bsg_cadenv bsg_manycore basejump_stl bsg_14
 
 bsg_cadenv:    commit=master
 basejump_stl:  commit=master
