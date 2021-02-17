@@ -188,7 +188,7 @@ place_pins_k2_k4 $south_output_pins [expr $tile_llx+$NORTH_INPUT_OFFSET] $tile_l
 
 # clock
 set clk_pin   [get_ports -filter "name=~clk_i"]
-set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "$tile_urx [expr 0.128*732]"
+set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K3" -location "$tile_urx [expr 0.128*740]"
 # reset
 set reset_in_pin [get_ports  -filter "name=~reset_i"]
 set_individual_pin_constraints -ports $reset_in_pin -allowed_layers "K4" -location "[expr $tile_llx+(0.128*234)] $tile_ury"
