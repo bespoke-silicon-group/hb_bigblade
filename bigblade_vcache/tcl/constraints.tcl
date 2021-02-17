@@ -28,7 +28,7 @@ for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
   }
 }
 
-for {set dir 1} {$dir <= 4} {incr dir} {
+for {set dir 3} {$dir <= 4} {incr dir} {
   for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
     append_to_collection ver_input_ports  [get_ports "ver_link_sif_i[$dir][$i]"]
     append_to_collection ver_output_ports [get_ports "ver_link_sif_o[$dir][$i]"]
