@@ -310,10 +310,12 @@ set SVERILOG_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/v/bp_cce_to_mc_bridge.sv
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
+  $bsg_designs_target_dir/v/bp_cce_serializer.sv
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_small.sv
 "]
 
   #$bsg_designs_target_dir/v/bsg_chip.v

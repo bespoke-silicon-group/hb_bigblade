@@ -17,7 +17,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set bp_clk_name "bp_clk" ;# main clock running black parrot
-set bp_clk_period_ps       2000
+set bp_clk_period_ps       1000
 set bp_clk_uncertainty_per 3.0
 set bp_clk_uncertainty_ps  [expr min([expr ${bp_clk_period_ps}*(${bp_clk_uncertainty_per}/100.0)], 20)]
 
@@ -26,15 +26,25 @@ set tag_clk_period_ps       6666.0 ;# 150 MHz
 set tag_clk_uncertainty_per 3.0
 set tag_clk_uncertainty_ps  [expr min([expr ${tag_clk_period_ps}*(${tag_clk_uncertainty_per}/100.0)], 20)]
 
-set bp_input_delay_per  20.0
-set bp_input_delay_ps  [expr ${bp_clk_period_ps}*(${bp_input_delay_per}/100.0)]
-set bp_output_delay_per 20.0
-set bp_output_delay_ps [expr ${bp_clk_period_ps}*(${bp_output_delay_per}/100.0)]
+set bp_input_delay_min_per 2.0
+set bp_input_delay_min_ps  [expr ${bp_clk_period_ps}*(${bp_input_delay_min_per}/100.0)]
+set bp_input_delay_max_per 70.0
+set bp_input_delay_max_ps  [expr ${bp_clk_period_ps}*(${bp_input_delay_max_per}/100.0)]
 
-set tag_input_delay_per  20.0
-set tag_input_delay_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_per}/100.0)]
-set tag_output_delay_per 20.0
-set tag_output_delay_ps [expr ${tag_clk_period_ps}*(${tag_output_delay_per}/100.0)]
+set bp_output_delay_min_per 2.0
+set bp_output_delay_min_ps  [expr ${bp_clk_period_ps}*(${bp_output_delay_min_per}/100.0)]
+set bp_output_delay_max_per 20.0
+set bp_output_delay_max_ps  [expr ${bp_clk_period_ps}*(${bp_output_delay_max_per}/100.0)]
+
+set tag_input_delay_min_per  2.0
+set tag_input_delay_min_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_min_per}/100.0)]
+set tag_input_delay_max_per  70.0
+set tag_input_delay_max_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_max_per}/100.0)]
+
+set tag_output_delay_min_per  2.0
+set tag_output_delay_min_ps  [expr ${tag_clk_period_ps}*(${tag_output_delay_min_per}/100.0)]
+set tag_output_delay_max_per  20.0
+set tag_output_delay_max_ps  [expr ${tag_clk_period_ps}*(${tag_output_delay_max_per}/100.0)]
 
 ########################################
 ## Reg2Reg
@@ -47,18 +57,20 @@ set_clock_uncertainty ${tag_clk_uncertainty_ps} [get_clocks ${tag_clk_name}]
 
 ########################################
 ## In2Reg
-set driving_lib_cell $LIB_CELLS(invx2)
 set bp_input_pins [filter_collection [filter_collection [all_inputs] "name=~*links*" ] "name!~*clk*"]
+add_to_collection $bp_input_pins [get_ports reset_i]
+set_input_delay -min ${bp_input_delay_min_ps} -clock ${bp_clk_name} ${bp_input_pins}
+set_input_delay -max ${bp_input_delay_max_ps} -clock ${bp_clk_name} ${bp_input_pins}
 set tag_input_pins [remove_from_collection [filter_collection [all_inputs] "name=~bsg_tag*"] ${tag_clk_pins}]
-set_input_delay ${bp_input_delay_ps} -clock ${bp_clk_name} ${bp_input_pins}
-set_input_delay ${tag_input_delay_ps} -clock ${tag_clk_name} ${tag_input_pins}
-set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
+set_input_delay -min ${tag_input_delay_min_ps} -clock ${tag_clk_name} ${tag_input_pins}
+set_input_delay -max ${tag_input_delay_max_ps} -clock ${tag_clk_name} ${tag_input_pins}
+set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 ########################################
 ## Reg2Out
-set load_lib_pin $LIB_CELLS(invx8,load_pin)
-set bp_output_pins [all_outputs]
-set_load [load_of [get_lib_pin */${load_lib_pin}]] ${bp_output_pins}
+set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
+set_load -max [load_of [get_lib_pin */$LIB_CELLS(invx8,load_pin)]] [all_outputs]
 
 ########################################
 ## Disabled or false paths
@@ -79,46 +91,49 @@ bsg_chip_derate_mems
 
 ########################################
 ## Ungrouping
-set_ungroup [get_designs -filter "hdl_template==bsg_dff_chain"               ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_scan"                    ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_dff_chain"                   ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_mux_one_hot"                 ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_scan"                        ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode_one_hot_out" ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"             ] true
 
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"  ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"       ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"      ] true
-set_ungroup [get_designs -filter "hdl_template==hash_function"               ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"          ] true
+set_ungroup [get_designs -filter "hdl_template==hash_function"                   ] true
 
-set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                ] true
-set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_decoder"        ] true
-set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_wbuf"           ] true
-set_ungroup [get_designs -filter "hdl_template==bp_be_fp_to_rec"             ] true
-set_ungroup [get_designs -filter "hdl_template==bp_be_rec_to_fp"             ] true
-set_ungroup [get_designs -filter "hdl_template==bp_fe_icache"                ] true
-set_ungroup [get_designs -filter "hdl_template==bp_fe_pc_gen"                ] true
-set_ungroup [get_designs -filter "hdl_template==bp_fe_instr_scan"            ] true
-set_ungroup [get_designs -filter "hdl_template==bp_mmu"                      ] true
-set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                   ] true
-set_ungroup [get_designs -filter "hdl_template==bp_tlb"                      ] true
-#set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                    ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_decoder"            ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_wbuf"               ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_fp_to_rec"                 ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_rec_to_fp"                 ] true
+set_ungroup [get_designs -filter "hdl_template==bp_fe_icache"                    ] true
+set_ungroup [get_designs -filter "hdl_template==bp_fe_pc_gen"                    ] true
+set_ungroup [get_designs -filter "hdl_template==bp_fe_instr_scan"                ] true
+set_ungroup [get_designs -filter "hdl_template==bp_mmu"                          ] true
+set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                       ] true
+set_ungroup [get_designs -filter "hdl_template==bp_tlb"                          ] true
+#set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                    ] true
 
-set_ungroup [get_designs -filter "hdl_template==compareRecFN"                ] true 
-set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"     ] true
-set_ungroup [get_designs -filter "hdl_template==fNToRecFN"                   ] true
-set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"                ] true
-set_ungroup [get_designs -filter "hdl_template==roundAnyRawFNToRecFN"        ] true
-set_ungroup [get_designs -filter "hdl_template==iNFromException"             ] true
-set_ungroup [get_designs -filter "hdl_template==iNToRawFN"                   ] true
-set_ungroup [get_designs -filter "hdl_template==iNToRecFN"                   ] true
-set_ungroup [get_designs -filter "hdl_template==isSigNaNRecFN"               ] true
-set_ungroup [get_designs -filter "hdl_template==mulAddRecFNToRaw"            ] true
-set_ungroup [get_designs -filter "hdl_template==recFNToFN"                   ] true
-set_ungroup [get_designs -filter "hdl_template==recFNToIN"                   ] true
-set_ungroup [get_designs -filter "hdl_template==recFNToRecFN"                ] true
-set_ungroup [get_designs -filter "hdl_template==reverse"                     ] true
-set_ungroup [get_designs -filter "hdl_template==lowMaskHiLo"                 ] true
-set_ungroup [get_designs -filter "hdl_template==lowMaskLoHi"                 ] true
-set_ungroup [get_designs -filter "hdl_template==countLeadingZeros"           ] true
-set_ungroup [get_designs -filter "hdl_template==compressBy2"                 ] true
-set_ungroup [get_designs -filter "hdl_template==compressBy4"                 ] true
+set_ungroup [get_designs -filter "hdl_template==compareRecFN"                    ] true 
+set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"         ] true
+set_ungroup [get_designs -filter "hdl_template==fNToRecFN"                       ] true
+set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"                    ] true
+set_ungroup [get_designs -filter "hdl_template==roundAnyRawFNToRecFN"            ] true
+set_ungroup [get_designs -filter "hdl_template==iNFromException"                 ] true
+set_ungroup [get_designs -filter "hdl_template==iNToRawFN"                       ] true
+set_ungroup [get_designs -filter "hdl_template==iNToRecFN"                       ] true
+set_ungroup [get_designs -filter "hdl_template==isSigNaNRecFN"                   ] true
+set_ungroup [get_designs -filter "hdl_template==mulAddRecFNToRaw"                ] true
+set_ungroup [get_designs -filter "hdl_template==recFNToFN"                       ] true
+set_ungroup [get_designs -filter "hdl_template==recFNToIN"                       ] true
+set_ungroup [get_designs -filter "hdl_template==recFNToRecFN"                    ] true
+set_ungroup [get_designs -filter "hdl_template==reverse"                         ] true
+set_ungroup [get_designs -filter "hdl_template==lowMaskHiLo"                     ] true
+set_ungroup [get_designs -filter "hdl_template==lowMaskLoHi"                     ] true
+set_ungroup [get_designs -filter "hdl_template==countLeadingZeros"               ] true
+set_ungroup [get_designs -filter "hdl_template==compressBy2"                     ] true
+set_ungroup [get_designs -filter "hdl_template==compressBy4"                     ] true
 
 ########################################
 ## Flattening
