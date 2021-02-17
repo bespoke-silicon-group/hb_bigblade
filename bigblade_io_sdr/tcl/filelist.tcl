@@ -89,5 +89,6 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
     $bsg_designs_target_dir/v/bsg_chip_pkg.v
+    $bsg_designs_target_dir/v/bsg_chip.v
     $bsg_designs_target_dir/v/bsg_sdr_one_side.v
 "]
