@@ -157,14 +157,14 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset ports
-constraint_input_ports $clk_name $reset_in_port  400 40
-constraint_output_ports $clk_name $reset_out_port 400 40
+constraint_input_ports $clk_name $reset_in_port  300 40
+constraint_output_ports $clk_name $reset_out_port 300 40
 
 
 set cord_in_ports [list]
 append_to_collection cord_in_ports [get_ports my_*_i*]
 append_to_collection cord_in_ports [get_ports pod_*_i*]
-constraint_input_ports $clk_name $cord_in_ports 400 40
+constraint_input_ports $clk_name $cord_in_ports 300 40
 #set_multicycle_path 2 -from $cord_in_ports -setup
 #set_multicycle_path 1 -from $cord_in_ports -hold
 #set_false_path -from $cord_in_ports
@@ -172,7 +172,7 @@ constraint_input_ports $clk_name $cord_in_ports 400 40
 set cord_out_ports [list]
 append_to_collection cord_out_ports [get_ports my_*_o*]
 append_to_collection cord_out_ports [get_ports pod_*_o*]
-constraint_output_ports $clk_name $cord_out_ports 400 40
+constraint_output_ports $clk_name $cord_out_ports 300 40
 #set_multicycle_path 2 -to $cord_out_ports -setup
 #set_multicycle_path 1 -to $cord_out_ports -hold
 #set_false_path -to $cord_out_ports
