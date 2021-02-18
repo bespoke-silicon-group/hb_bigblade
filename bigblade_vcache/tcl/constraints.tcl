@@ -13,7 +13,9 @@ set_clock_uncertainty $clk_uncertainty_ps [get_clocks $clk_name]
 
 
 # group the ports in orderly manner.
-set reset_port [get_ports reset_i]
+set reset_in_port  [get_ports reset_i]
+set reset_out_port [get_ports reset_o]
+
 set ver_input_ports  [list]
 set ver_output_ports [list]
 set wh_input_ports  [list]
@@ -85,34 +87,28 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 # constraint links
 for {set i 0} {$i < 2} {incr i} {
   # ver link
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  500 0
-  constraint_output_ports $clk_name $rev_ready_out_ports($i) 500 0
-  constraint_output_ports $clk_name $rev_valid_out_ports($i) 500 0
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  500 0
-  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 500 0
-  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 500 0
+  constraint_output_ports $clk_name $rev_data_out_ports($i)  560 0
+  constraint_output_ports $clk_name $rev_ready_out_ports($i) 885 0
+  constraint_output_ports $clk_name $rev_valid_out_ports($i) 670 0
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)  590 0
+  constraint_output_ports $clk_name $fwd_ready_out_ports($i) 880 0
+  constraint_output_ports $clk_name $fwd_valid_out_ports($i) 715 0
 
-  constraint_input_ports $clk_name $rev_data_in_ports($i)  500 0
-  constraint_input_ports $clk_name $rev_ready_in_ports($i) 500 0
-  constraint_input_ports $clk_name $rev_valid_in_ports($i) 500 0
-  constraint_input_ports $clk_name $fwd_data_in_ports($i)  500 0
-  constraint_input_ports $clk_name $fwd_ready_in_ports($i) 500 0
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i) 500 0
+  constraint_input_ports $clk_name $rev_data_in_ports($i)  925 0
+  constraint_input_ports $clk_name $rev_ready_in_ports($i) 835 0
+  constraint_input_ports $clk_name $rev_valid_in_ports($i) 835 0
+  constraint_input_ports $clk_name $fwd_data_in_ports($i)  925 0
+  constraint_input_ports $clk_name $fwd_ready_in_ports($i) 825 0
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i) 835 0
 
   # wh link
-  constraint_output_ports $clk_name $wh_data_out_ports($i)  500 0
-  constraint_output_ports $clk_name $wh_ready_out_ports($i) 500 0
-  constraint_output_ports $clk_name $wh_valid_out_ports($i) 500 0
-  constraint_output_ports $clk_name $wh_data_out_ports($i)  500 0
-  constraint_output_ports $clk_name $wh_ready_out_ports($i) 500 0
-  constraint_output_ports $clk_name $wh_valid_out_ports($i) 500 0
+  constraint_output_ports $clk_name $wh_data_out_ports($i)  565 0
+  constraint_output_ports $clk_name $wh_ready_out_ports($i) 870 0
+  constraint_output_ports $clk_name $wh_valid_out_ports($i) 625 0
 
-  constraint_input_ports $clk_name $wh_data_in_ports($i)  500 0
-  constraint_input_ports $clk_name $wh_ready_in_ports($i) 500 0
-  constraint_input_ports $clk_name $wh_valid_in_ports($i) 500 0
-  constraint_input_ports $clk_name $wh_data_in_ports($i)  500 0
-  constraint_input_ports $clk_name $wh_ready_in_ports($i) 500 0
-  constraint_input_ports $clk_name $wh_valid_in_ports($i) 500 0
+  constraint_input_ports $clk_name $wh_data_in_ports($i)  925 0
+  constraint_input_ports $clk_name $wh_ready_in_ports($i) 735 0
+  constraint_input_ports $clk_name $wh_valid_in_ports($i) 835 0
 }
 
 
@@ -133,11 +129,16 @@ set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
 
 
-# false path
-set_false_path -from [get_ports global_*]
-set_false_path -from [get_ports my_wh_cord_i*]
-set_false_path -from [get_ports my_wh_cid_i*]
-set_false_path -from [get_ports wh_dest_east_not_west_i]
+# reset port
+constraint_input_ports  $clk_name $reset_in_port  0 40
+constraint_output_ports $clk_name $reset_out_port 0 40
+
+
+constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
+constraint_input_ports $clk_name [get_ports my_wh_cid_i*]  0 40
+constraint_input_ports $clk_name [get_ports wh_dest_east_not_west_i*]  0 40
+constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
+
 
 
 # ungrouping
