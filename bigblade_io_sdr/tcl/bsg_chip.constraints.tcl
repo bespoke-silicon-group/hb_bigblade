@@ -15,7 +15,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set a_core_clk_name "a_core_clk"
-set a_core_clk_period_ps 900
+set a_core_clk_period_ps 1000
 set a_core_clk_uncertainty_per 3.0
 set a_core_clk_uncertainty_ps [expr min([expr ${a_core_clk_period_ps}*(${a_core_clk_uncertainty_per}/100.0)], 20)]
 
@@ -25,7 +25,7 @@ set a_core_output_delay_per 20.0
 set a_core_output_delay_ps [expr ${a_core_clk_period_ps}*(${a_core_output_delay_per}/100.0)]
 
 set b_core_clk_name "b_core_clk"
-set b_core_clk_period_ps 1100
+set b_core_clk_period_ps 1000
 set b_core_clk_uncertainty_per 3.0
 set b_core_clk_uncertainty_ps [expr min([expr ${b_core_clk_period_ps}*(${b_core_clk_uncertainty_per}/100.0)], 20)]
 
