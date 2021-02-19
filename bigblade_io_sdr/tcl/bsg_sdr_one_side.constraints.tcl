@@ -70,7 +70,7 @@ set load_lib_pin $LIB_CELLS(invx8,load_pin)
 set core_output_pins [filter_collection [all_outputs] "name=~core*" ]
 # These paths are actually async, but STA doesn't like that
 append_to_collection ${core_output_pins} [get_ports link_token_o]
-set link_output_pins [filter_collection [all_outputs] "name=~link*" ] "name!~*token*"]
+set link_output_pins [filter_collection [filter_collection [all_outputs] "name=~link*" ] "name!~*token*"]
 set_output_delay ${core_output_delay_ps} -clock ${core_clk_name} ${core_output_pins}
 set_output_delay ${link_output_delay_ps} -clock ${link_clk_name} ${link_output_pins}
 set_load [load_of [get_lib_pin */${load_lib_pin}]] ${core_output_pins}
