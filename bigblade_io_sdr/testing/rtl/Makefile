@@ -32,6 +32,7 @@ export BSG_PADMAPPING        ?=default
 VCS_OPTIONS := -full64
 VCS_OPTIONS += -notice
 VCS_OPTIONS += -debug_pp
+VCS_OPTIONS += +vcs+vcdpluson
 VCS_OPTIONS += -V
 VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
@@ -82,7 +83,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ## Run Targets
 ########################################
 
-run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+run: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
 run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr

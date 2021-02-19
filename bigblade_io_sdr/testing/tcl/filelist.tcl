@@ -39,9 +39,6 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_mem/bsg_cam_1r1w_tag_array.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1r1w.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_synth.v
-  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1rw_sync_mask_write_byte_dma.v
-  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1r1w_sync_mask_write_byte_dma.v
-  $basejump_stl_dir/bsg_mem/bsg_mem_dma.cpp
   $basejump_stl_dir/bsg_misc/bsg_buf.v
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
@@ -71,5 +68,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bsg_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
+
+  $basejump_stl_dir/testing/bsg_link/bsg_link_sdr/bsg_link_sdr_test_node.v
 "]
 
