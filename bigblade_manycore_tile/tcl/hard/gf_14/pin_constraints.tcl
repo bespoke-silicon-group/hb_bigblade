@@ -198,13 +198,17 @@ set_individual_pin_constraints -ports $reset_out_pin -allowed_layers "K4" -locat
 
 # my cord
 set cord_in_pins [list]
-append_to_collection cord_in_pins [get_ports -filter "name=~my_*_i*"]
-append_to_collection cord_in_pins [get_ports -filter "name=~pod_*_i*"]
+append_to_collection cord_in_pins [get_ports -filter "name=~my_x_i*"]
+append_to_collection cord_in_pins [get_ports -filter "name=~pod_x_i*"]
+append_to_collection cord_in_pins [get_ports -filter "name=~my_y_i*"]
+append_to_collection cord_in_pins [get_ports -filter "name=~pod_y_i*"]
 place_pins_k2_k4 $cord_in_pins [expr $tile_llx+(0.128*238)] $tile_ury
 
 set cord_out_pins [list]
-append_to_collection cord_out_pins [get_ports -filter "name=~my_*_o*"]
-append_to_collection cord_out_pins [get_ports -filter "name=~pod_*_o*"]
+append_to_collection cord_out_pins [get_ports -filter "name=~my_x_o*"]
+append_to_collection cord_out_pins [get_ports -filter "name=~pod_x_o*"]
+append_to_collection cord_out_pins [get_ports -filter "name=~my_y_o*"]
+append_to_collection cord_out_pins [get_ports -filter "name=~pod_y_o*"]
 place_pins_k2_k4 $cord_out_pins [expr $tile_llx+(0.128*238)] $tile_lly
 
 
