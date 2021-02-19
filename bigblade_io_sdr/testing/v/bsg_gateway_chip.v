@@ -1,184 +1,203 @@
 `timescale 1ps/1ps
 
-`ifndef BLACKPARROT_CLK_PERIOD
-  `define BLACKPARROT_CLK_PERIOD 2100.0
-`endif
-
-
-  //////////////////////////////////////////////////
-  // This testbench is structured like this, with the overlying network being
-  //   a giant crossbar and infinite memories instead of vcaches
-  // [ IO ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ] 
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // [ 00 ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
-
 module bsg_gateway_chip
+
  import bsg_chip_pkg::*;
 
- import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
- import bp_be_pkg::*;
- import bp_me_pkg::*;
- import bsg_noc_pkg::*;
- import bsg_wormhole_router_pkg::*;
- import bsg_manycore_pkg::*;
- import bsg_tag_pkg::*;
+ ();
 
- #(localparam bp_params_e bp_params_p = e_bp_unicore_cfg `declare_bp_proc_params(bp_params_p)
-  `declare_bp_bedrock_mem_if_widths(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce))
-  ();
+  logic upnode_clk, upnode_reset, upnode_en;
+  logic uplink_clk, uplink_reset, downlink_reset, async_token_reset;
+  logic downstream_clk, downstream_reset;
+  logic downnode_clk, downnode_reset, downnode_error;
+  logic [31:0] upnode_sent, downnode_received;
 
-  //////////////////////////////////////////////////
-  //
-  // Nonsynth Clock Generator(s)
-  //
+  logic uplink_v_li, uplink_ready_lo;
+  logic [width_gp-1:0] uplink_data_li;
 
-  logic clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`BLACKPARROT_CLK_PERIOD)) clk_gen (.o(clk));
+  logic downstream_v_lo, downstream_ready_li;
+  logic [width_gp-1:0] downstream_data_lo;
 
-  //////////////////////////////////////////////////
-  //
-  // Nonsynth Reset Generator(s)
-  //
-
-  logic reset;
-  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
-    reset_gen
-      (.clk_i(clk)
-      ,.async_reset_o(reset)
-      );
-
-  //////////////////////////////////////////////////
-  //
-  // Waveform Dump
-  //
-
-  initial
-    begin
-      $vcdpluson;
-      $vcdplusmemon;
-      $vcdplusautoflushon;
-    end
-
-  initial
-    begin
-      $assertoff();
-      @(posedge clk);
-      @(negedge reset);
-      $asserton();
-    end
-
-  logic trigger_saif;
-  initial
-    begin
-      $set_gate_level_monitoring("rtl_on");
-      $set_toggle_region(DUT);
-      @(posedge clk);
-      @(negedge reset);
-      @(posedge trigger_saif);
-      $toggle_start();
-    end
-
-  final
-    begin
-      $toggle_stop();
-      $toggle_report("run.saif", 1.0e-12, DUT);
-    end
-  assign trigger_saif = '0;
-
-  //////////////////////////////////////////////////
-  //
-  // bsg_tag
-  localparam num_clients_lp = 4;
-  localparam payload_width_lp = 7;
-  localparam max_payload_width_lp = 10;
-  localparam lg_payload_width_lp = `BSG_WIDTH(max_payload_width_lp);
-  localparam rom_data_width_lp = 4+1+`BSG_SAFE_CLOG2(num_clients_lp)+1+lg_payload_width_lp+max_payload_width_lp;
-  localparam rom_addr_width_lp = 12;
-  
-  logic tr_valid_lo, tr_data_lo, tr_done_lo;
-  logic [rom_data_width_lp-1:0] rom_data;
-  logic [rom_addr_width_lp-1:0] rom_addr;
-  bsg_tag_trace_replay
-   #(.rom_addr_width_p(rom_addr_width_lp)
-     ,.rom_data_width_p(rom_data_width_lp)
-     ,.num_clients_p(num_clients_lp)
-     ,.max_payload_width_p(max_payload_width_lp)
-     )
-   tr
-    (.clk_i(clk)
-     ,.reset_i(reset)
-     ,.en_i(1'b1)
-
-     ,.rom_addr_o(rom_addr)
-     ,.rom_data_i(rom_data)
-
-     ,.valid_i(1'b0)
-     ,.data_i('0)
-     ,.ready_o()
-
-     ,.valid_o(tr_valid_lo)
-     ,.en_r_o()
-     ,.tag_data_o(tr_data_lo)
-     ,.yumi_i(tr_valid_lo)
-     
-     ,.done_o(tr_done_lo)
-     ,.error_o()
-     );  
-
-  bsg_nonsynth_test_rom
-   #(.filename_p("trace.tr")
-     ,.data_width_p(rom_data_width_lp)
-     ,.addr_width_p(rom_addr_width_lp)
-     )
-   rom
-    (.addr_i(rom_addr)
-     ,.data_o(rom_data)
-     );
-
-  bsg_tag_s [3:0] bsg_tag_li;
-  bsg_tag_master
-   #(.els_p(num_clients_lp), .lg_width_p(lg_payload_width_lp))
-   btm
-    (.clk_i(clk)
-     ,.data_i(tr_valid_lo & tr_data_lo)
-     ,.en_i(1'b1)
-     ,.clients_r_o(bsg_tag_li)
-     );
+  bsg_link_sdr_test_node
+ #(.num_channels_p      (8)
+  ,.channel_width_p     (width_gp/8)
+  ,.is_downstream_node_p(0)
+  ) upnode
+  (// Node side
+   .node_clk_i  (upnode_clk)
+  ,.node_reset_i(upnode_reset)
+  ,.node_en_i   (upnode_en)
+  ,.error_o     ()
+  ,.sent_o      (upnode_sent)
+  ,.received_o  ()
+  // Link side
+  ,.clk_i       (uplink_clk)
+  ,.reset_i     (uplink_reset)
+  ,.v_i         (1'b0)
+  ,.data_i      ('0)
+  ,.ready_o     ()
+  ,.v_o         (uplink_v_li)
+  ,.data_o      (uplink_data_li)
+  ,.yumi_i      (uplink_v_li & uplink_ready_lo)
+  );
 
   //////////////////////////////////////////////////
   //
   // DUT
   //
-  // TODO: Connect to test node
-  bsg_chip
-   DUT
-   (.uplink_clk_i
-   ,.uplink_reset_i
-   ,.async_token_reset_i
-   ,.uplink_data_i
-   ,.uplink_v_i
-   ,.uplink_ready_o
+  bsg_chip DUT
+  (.a_core_clk_i             (uplink_clk)
+  ,.a_core_uplink_reset_i    (uplink_reset)
+  ,.a_core_downlink_reset_i  (1'b1)
+  ,.a_core_downstream_reset_i(1'b1)
+  ,.a_async_token_reset_i    (async_token_reset)
 
-   ,.link_clk_o
-   ,.link_data_o
-   ,.link_v_o
-   ,.link_token_i
+  ,.a_core_data_i            (uplink_data_li)
+  ,.a_core_v_i               (uplink_v_li)
+  ,.a_core_ready_o           (uplink_ready_lo)
 
-   ,.downstream_clk_i
-   ,.downstream_reset_i
-   ,.downstream_data_o
-   ,.downstream_v_o
-   ,.downstream_ready_i
+  ,.a_core_data_o            ()
+  ,.a_core_v_o               ()
+  ,.a_core_yumi_i            (1'b0)
 
-   ,.link_clk_i
-   ,.link_data_i
-   ,.link_v_i
-   ,.link_token_o
-   );
+  ,.b_core_clk_i             (downstream_clk)
+  ,.b_core_uplink_reset_i    (1'b1)
+  ,.b_core_downlink_reset_i  (downlink_reset)
+  ,.b_core_downstream_reset_i(downstream_reset)
+  ,.b_async_token_reset_i    (1'b0)
+
+  ,.b_core_data_i            ('0)
+  ,.b_core_v_i               (1'b0)
+  ,.b_core_ready_o           ()
+
+  ,.b_core_data_o            (downstream_data_lo)
+  ,.b_core_v_o               (downstream_v_lo)
+  ,.b_core_yumi_i            (downstream_v_lo & downstream_ready_li)
+  );
+
+  bsg_link_sdr_test_node
+ #(.num_channels_p      (8)
+  ,.channel_width_p     (width_gp/8)
+  ,.is_downstream_node_p(1)
+  ) downnode
+  (// Node side
+   .node_clk_i  (downnode_clk)
+  ,.node_reset_i(downnode_reset)
+  ,.node_en_i   ()
+  ,.error_o     (downnode_error)
+  ,.sent_o      ()
+  ,.received_o  (downnode_received)
+  // Link side
+  ,.clk_i       (downstream_clk)
+  ,.reset_i     (downstream_reset)
+  ,.v_i         (downstream_v_lo)
+  ,.data_i      (downstream_data_lo)
+  ,.ready_o     (downstream_ready_li)
+  ,.v_o         ()
+  ,.data_o      ()
+  ,.yumi_i      (1'b0)
+  );
+
+  // Simulation of Clock
+  always #600 upnode_clk     = ~upnode_clk;
+  always #600 uplink_clk     = ~uplink_clk;
+  always #600 downstream_clk = ~downstream_clk;
+  always #600 downnode_clk   = ~downnode_clk;
+
+  initial 
+  begin
+
+    $display("Start Simulation\n");
+
+    // Init
+    upnode_clk     = 1;
+    uplink_clk     = 1;
+    downstream_clk = 1;
+    downnode_clk   = 1;
+
+    uplink_reset      = 1;
+    async_token_reset = 0;
+    upnode_reset      = 1;
+    downnode_reset    = 1;
+    downstream_reset  = 1;
+
+    upnode_en = 0;
+
+    #100000;
+
+    // async token reset
+    async_token_reset = 1;
+    async_token_reset = 1;
+
+    #100000;
+
+    async_token_reset = 0;
+    async_token_reset = 0;
+
+    #100000;
+
+    // upstream io reset
+    @(posedge uplink_clk); #1;
+    uplink_reset = 0;
+
+    #10000;
+
+    // reset signals propagate to downstream after io_clk is generated
+    @(posedge uplink_clk); #1;
+    downlink_reset = 1;
+
+    #100000;
+
+    // downstream IO reset
+    @(posedge uplink_clk); #1;
+    downlink_reset = 0;
+
+    #100000;
+
+    // core link reset
+    @(posedge downstream_clk); #1;
+    downstream_reset = 0;
+
+    #100000
+
+    // node reset
+    @(posedge upnode_clk); #1;
+    upnode_reset = 0;
+    @(posedge downnode_clk); #1;
+    downnode_reset = 0;
+
+    #100000
+
+    // node enable
+    @(posedge upnode_clk); #1;
+    upnode_en = 1;
+
+    #5000000
+
+    // node disable
+    @(posedge upnode_clk); #1;
+    upnode_en = 0;
+
+    #500000
+
+    assert(downnode_error == 0)
+    else 
+      begin
+        $error("\nFAIL... Error in test node");
+        $finish;
+      end
+
+    assert(upnode_sent == downnode_received)
+    else 
+      begin
+        $error("\nFAIL... Test node sent %d packets but received only %d\n", upnode_sent, downnode_received);
+        $finish;
+      end
+
+    $display("\nPASS!\n");
+    $display("Test node sent and received %d packets\n", upnode_sent);
+    $finish;
+
+  end
 
 endmodule
-
