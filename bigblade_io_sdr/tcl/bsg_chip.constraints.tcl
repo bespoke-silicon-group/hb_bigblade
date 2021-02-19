@@ -65,8 +65,8 @@ set_load [load_of [get_lib_pin */${load_lib_pin}]] [all_outputs]
 
 ########################################
 ## False
-set_false_path -from [get_ports a_downlink_reset_i]
-set_false_path -from [get_ports b_downlink_reset_i]
+set_false_path -from [get_ports a_core_downlink_reset_i]
+set_false_path -from [get_ports b_core_downlink_reset_i]
 set_false_path -from [get_ports a_async_token_reset_i]
 set_false_path -from [get_ports b_async_token_reset_i]
 
