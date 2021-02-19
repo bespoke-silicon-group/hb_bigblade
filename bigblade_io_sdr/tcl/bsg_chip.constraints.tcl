@@ -14,51 +14,53 @@ set_app_var case_analysis_propagate_through_icg true
 
 ########################################
 ## Clock Setup
-set a_down_clk_name "a_down_clk"
-set a_down_clk_period_ps 900
-set a_down_clk_uncertainty_per 3.0
-set a_down_clk_uncertainty_ps [expr min([expr ${a_down_clk_period_ps}*(${a_down_clk_uncertainty_per}/100.0)], 20)]
+set a_core_clk_name "a_core_clk"
+set a_core_clk_period_ps 900
+set a_core_clk_uncertainty_per 3.0
+set a_core_clk_uncertainty_ps [expr min([expr ${a_core_clk_period_ps}*(${a_core_clk_uncertainty_per}/100.0)], 20)]
 
-set a_down_input_delay_per  20.0
-set a_down_input_delay_ps  [expr ${a_down_clk_period_ps}*(${a_down_input_delay_per}/100.0)]
-set a_down_output_delay_per 20.0
-set a_down_output_delay_ps [expr ${a_down_clk_period_ps}*(${a_down_output_delay_per}/100.0)]
+set a_core_input_delay_per  20.0
+set a_core_input_delay_ps  [expr ${a_core_clk_period_ps}*(${a_core_input_delay_per}/100.0)]
+set a_core_output_delay_per 20.0
+set a_core_output_delay_ps [expr ${a_core_clk_period_ps}*(${a_core_output_delay_per}/100.0)]
 
-set b_down_clk_name "b_down_clk"
-set b_down_clk_period_ps 1100
-set b_down_clk_uncertainty_per 3.0
-set b_down_clk_uncertainty_ps [expr min([expr ${b_down_clk_period_ps}*(${b_down_clk_uncertainty_per}/100.0)], 20)]
+set b_core_clk_name "b_core_clk"
+set b_core_clk_period_ps 1100
+set b_core_clk_uncertainty_per 3.0
+set b_core_clk_uncertainty_ps [expr min([expr ${b_core_clk_period_ps}*(${b_core_clk_uncertainty_per}/100.0)], 20)]
 
-set b_down_input_delay_per  20.0
-set b_down_input_delay_ps  [expr ${b_down_clk_period_ps}*(${b_down_input_delay_per}/100.0)]
-set b_down_output_delay_per 20.0
-set b_down_output_delay_ps [expr ${b_down_clk_period_ps}*(${b_down_output_delay_per}/100.0)]
+set b_core_input_delay_per  20.0
+set b_core_input_delay_ps  [expr ${b_core_clk_period_ps}*(${b_core_input_delay_per}/100.0)]
+set b_core_output_delay_per 20.0
+set b_core_output_delay_ps [expr ${b_core_clk_period_ps}*(${b_core_output_delay_per}/100.0)]
 
 ########################################
 ## Reg2Reg
-create_clock -period ${a_down_clk_period_ps} -name ${a_down_clk_name} [get_ports "a_downstream_clk_i"]
-create_clock -period ${b_down_clk_period_ps} -name ${b_down_clk_name} [get_ports "b_downstream_clk_i"]
-set_clock_uncertainty ${a_down_clk_uncertainty_ps} [get_clocks ${a_down_clk_name}]
-set_clock_uncertainty ${b_down_clk_uncertainty_ps} [get_clocks ${b_down_clk_name}]
-create_generated_clock -name "a_tkn_clk" -source [get_ports "a_downstream_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins a_sdr/link_token_o]
-create_generated_clock -name "b_tkn_clk" -source [get_ports "b_downstream_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins b_sdr/link_token_o]
+create_clock -period ${a_core_clk_period_ps} -name ${a_core_clk_name} [get_ports "a_core_clk_i"]
+create_clock -period ${b_core_clk_period_ps} -name ${b_core_clk_name} [get_ports "b_core_clk_i"]
+set_clock_uncertainty ${a_core_clk_uncertainty_ps} [get_clocks ${a_core_clk_name}]
+set_clock_uncertainty ${b_core_clk_uncertainty_ps} [get_clocks ${b_core_clk_name}]
+create_generated_clock -name "a_link_clk" -source [get_ports "a_core_clk_i"] -edges {2 3 4} -edge_shift {0 0 0} [get_pins a_sdr/link_clk_o]
+create_generated_clock -name "b_link_clk" -source [get_ports "b_core_clk_i"] -edges {2 3 4} -edge_shift {0 0 0} [get_pins b_sdr/link_clk_o]
+create_generated_clock -name "a_tkn_clk" -source [get_ports "a_core_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins a_sdr/link_token_o]
+create_generated_clock -name "b_tkn_clk" -source [get_ports "b_core_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins b_sdr/link_token_o]
 
 ########################################
 ## In2Reg
 set driving_lib_cell $LIB_CELLS(invx2)
-set a_down_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~a_*"]
-set b_down_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~b_*"]
-set_input_delay ${a_down_input_delay_ps} -clock ${a_down_clk_name} ${a_down_input_pins}
-set_input_delay ${b_down_input_delay_ps} -clock ${b_down_clk_name} ${b_down_input_pins}
+set a_core_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~a_*"]
+set b_core_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~b_*"]
+set_input_delay ${a_core_input_delay_ps} -clock ${a_core_clk_name} ${a_core_input_pins}
+set_input_delay ${b_core_input_delay_ps} -clock ${b_core_clk_name} ${b_core_input_pins}
 set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
 
 ########################################
 ## Reg2Out
 set load_lib_pin $LIB_CELLS(invx8,load_pin)
-set a_down_output_pins [filter_collection [all_outputs] "name=~a_*"]
-set b_down_output_pins [filter_collection [all_outputs] "name=~b_*"]
-set_output_delay ${a_down_output_delay_ps} -clock ${a_down_clk_name} ${a_down_output_pins}
-set_output_delay ${b_down_output_delay_ps} -clock ${b_down_clk_name} ${b_down_output_pins}
+set a_core_output_pins [filter_collection [all_outputs] "name=~a_*"]
+set b_core_output_pins [filter_collection [all_outputs] "name=~b_*"]
+set_output_delay ${a_core_output_delay_ps} -clock ${a_core_clk_name} ${a_core_output_pins}
+set_output_delay ${b_core_output_delay_ps} -clock ${b_core_clk_name} ${b_core_output_pins}
 set_load [load_of [get_lib_pin */${load_lib_pin}]] [all_outputs]
 
 ########################################
