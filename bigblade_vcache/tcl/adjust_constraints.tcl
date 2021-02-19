@@ -21,20 +21,14 @@ set ver_output_ports [list]
 set wh_input_ports  [list]
 set wh_output_ports [list]
 
-for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
-  for {set dir 1} {$dir <= 2} {incr dir} {
-    for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
-      append_to_collection wh_input_ports  [get_ports "wh_link_sif_i[$rf][$dir][$i]"]
-      append_to_collection wh_output_ports [get_ports "wh_link_sif_o[$rf][$dir][$i]"]
-    }
-  }
+for {set i 0} {$i < $HB_WH_LINK_WIDTH_P*2*$HB_WH_RUCHE_FACTOR_P} {incr i} {
+  append_to_collection wh_input_ports  [get_ports "wh_link_sif_i[$i]"]
+  append_to_collection wh_output_ports [get_ports "wh_link_sif_o[$i]"]
 }
 
-for {set dir 3} {$dir <= 4} {incr dir} {
-  for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
-    append_to_collection ver_input_ports  [get_ports "ver_link_sif_i[$dir][$i]"]
-    append_to_collection ver_output_ports [get_ports "ver_link_sif_o[$dir][$i]"]
-  }
+for {set i 0} {$i < $HB_LINK_WIDTH_P*2} {incr i} {
+  append_to_collection ver_input_ports  [get_ports "ver_link_sif_i[$i]"]
+  append_to_collection ver_output_ports [get_ports "ver_link_sif_o[$i]"]
 }
 
 # N=0
@@ -141,32 +135,5 @@ constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
 
 
 
-# ungrouping
-set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_decode"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_mux_segmented"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_mux_one_hot"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_expand_bitmask"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
-
-
-# derating
-set cells_to_derate [list]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~gf14_*"]
-append_to_collection cells_to_derate [get_cells -quiet -hier -filter "ref_name=~IN12LP_*"]
-
-if { [sizeof $cells_to_derate] > 0 } {
-  foreach_in_collection cell $cells_to_derate {
-    set_timing_derate -cell_delay -early 0.97 $cell
-    set_timing_derate -cell_delay -late  1.03 $cell
-    set_timing_derate -cell_check -early 0.97 $cell
-    set_timing_derate -cell_check -late  1.03 $cell
-  }
-}
 
 puts "BSG-info: Completed script [info script]\n"
