@@ -92,11 +92,11 @@ set ruche_max_delay 150
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
   constraint_input_ports $clk_name $rev_data_in_ports($i)      885   200
-  constraint_input_ports $clk_name $rev_valid_in_ports($i)     800   200
+  constraint_input_ports $clk_name $rev_valid_in_ports($i)     700   200
   constraint_output_ports $clk_name $rev_ready_out_ports($i)   820   200
 
   constraint_input_ports $clk_name $fwd_data_in_ports($i)      885   200
-  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     795   200
+  constraint_input_ports $clk_name $fwd_valid_in_ports($i)     695   200
   constraint_output_ports $clk_name $fwd_ready_out_ports($i)   800   200
 }
 
@@ -105,27 +105,27 @@ for {set i 0} {$i < 6} {incr i} {
 for {set i 0} {$i < 2} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    405   -80
   constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -95
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     635   -70
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     535   -70
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    435   -80
   constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -95
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     600   -70
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     500   -70
 }
 
 for {set i 2} {$i < 4} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    490   -80
   constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -95
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     640   -70
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     540   -70
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    460   -80
   constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -95
-  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     610   -70
+  constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     510   -70
 }
 
 for {set i 4} {$i < 6} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    410   -40
   constraint_output_ports $clk_name $rev_data_out_ports($i)     300   -55
-  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     805   -30
+  constraint_input_ports  $clk_name $rev_ready_in_ports($i)     705   -30
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    450   -40
   constraint_output_ports $clk_name $fwd_data_out_ports($i)     305   -55
@@ -151,20 +151,20 @@ set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
 
 # reset ports
-constraint_input_ports $clk_name $reset_in_port  400 40
-constraint_output_ports $clk_name $reset_out_port 400 40
+constraint_input_ports $clk_name $reset_in_port  500 40
+constraint_output_ports $clk_name $reset_out_port 500 40
 
 set cord_in_ports [list]
 append_to_collection cord_in_ports [get_ports my_*_i*]
 append_to_collection cord_in_ports [get_ports pod_*_i*]
-constraint_input_ports $clk_name $cord_in_ports 400 40
+constraint_input_ports $clk_name $cord_in_ports 500 40
 #set_multicycle_path 2 -from $cord_in_ports -setup
 #set_multicycle_path 1 -from $cord_in_ports -hold
 
 set cord_out_ports [list]
 append_to_collection cord_out_ports [get_ports my_*_o*]
 append_to_collection cord_out_ports [get_ports pod_*_o*]
-constraint_output_ports $clk_name $cord_out_ports 400 40
+constraint_output_ports $clk_name $cord_out_ports 500 40
 #set_multicycle_path 2 -to $cord_out_ports -setup
 #set_multicycle_path 1 -to $cord_out_ports -hold
 
