@@ -15,8 +15,7 @@ package bsg_chip_pkg;
   parameter addr_width_gp   = 28; // word addr
   parameter data_width_gp   = 32;
   parameter ruche_factor_X_gp = 3;
-  parameter tieoff_west_gp  = 0;
-  parameter tieoff_east_gp  = 0;
+  parameter tieoff_west_not_east_gp = 0;
 
 endpackage // bsg_chip_pkg
 

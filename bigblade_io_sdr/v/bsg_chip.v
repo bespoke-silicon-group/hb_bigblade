@@ -13,8 +13,7 @@ module bsg_chip
   ,parameter x_cord_width_p   = x_cord_width_gp
   ,parameter y_cord_width_p   = y_cord_width_gp
   ,parameter ruche_factor_X_p = ruche_factor_X_gp
-  ,parameter tieoff_west_p    = tieoff_west_gp
-  ,parameter tieoff_east_p    = tieoff_east_gp
+  ,parameter tieoff_west_not_east_p = tieoff_west_not_east_gp
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -29,11 +28,14 @@ module bsg_chip
   (input  core_clk_i
   ,input  core_reset_i
 
-  ,input  [S:W][link_sif_width_lp-1:0] core_link_sif_i
-  ,output [S:W][link_sif_width_lp-1:0] core_link_sif_o
+  ,input  [S:N][link_sif_width_lp-1:0] core_ver_link_sif_i
+  ,output [S:N][link_sif_width_lp-1:0] core_ver_link_sif_o
 
-  ,input  [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_i
-  ,output [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_o
+  ,input  [link_sif_width_lp-1:0] core_hor_link_sif_i
+  ,output [link_sif_width_lp-1:0] core_hor_link_sif_o
+
+  ,input  [ruche_x_link_sif_width_lp-1:0] core_ruche_link_i
+  ,output [ruche_x_link_sif_width_lp-1:0] core_ruche_link_o
 
   ,input  [x_cord_width_p-1:0] core_global_x_i
   ,input  [y_cord_width_p-1:0] core_global_y_i
@@ -77,8 +79,7 @@ module bsg_chip
   ,.x_cord_width_p                 (x_cord_width_p                 )
   ,.y_cord_width_p                 (y_cord_width_p                 )
   ,.ruche_factor_X_p               (ruche_factor_X_p               )
-  ,.tieoff_west_p                  (tieoff_west_p                  )
-  ,.tieoff_east_p                  (tieoff_east_p                  )
+  ,.tieoff_west_not_east_p         (tieoff_west_not_east_p         )
   ) sdr_link
   (.*);
 
