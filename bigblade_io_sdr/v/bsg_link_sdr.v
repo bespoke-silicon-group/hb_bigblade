@@ -1,24 +1,29 @@
 
-module bsg_sdr_one_side
- import bsg_chip_pkg::*;
+module bsg_link_sdr
+
+ #(parameter width_p                         = "inv"
+  ,parameter lg_fifo_depth_p                 = "inv"
+  ,parameter lg_credit_to_token_decimation_p = "inv"
+  )
+
   (
    // No constraint, false path?? no false path in last tapeout
      input core_clk_i
    , input core_uplink_reset_i
-   , input core_downlink_reset_i
    , input core_downstream_reset_i
+   , input async_downlink_reset_i
    , input async_token_reset_i
 
    , input                 core_v_i
-   , input  [width_gp-1:0] core_data_i
+   , input  [width_p-1:0]  core_data_i
    , output                core_ready_o
 
    , output                core_v_o
-   , output [width_gp-1:0] core_data_o
+   , output [width_p-1:0]  core_data_o
    , input                 core_yumi_i
 
    , output                link_clk_o
-   , output [width_gp-1:0] link_data_o
+   , output [width_p-1:0]  link_data_o
    , output                link_v_o
    // Local constraint
    // Max: Link clk / 2 or core clk / 2
@@ -26,16 +31,23 @@ module bsg_sdr_one_side
 
    // Max: Core clk / 1
    , input                 link_clk_i
-   , input  [width_gp-1:0] link_data_i
+   , input  [width_p-1:0]  link_data_i
    , input                 link_v_i
    // Constrain at top level -- generated clock
    , output                link_token_o
    );
 
+  logic downlink_reset_sync;
+  bsg_sync_sync #(.width_p(1)) bss
+  (.oclk_i     (link_clk_i            )
+  ,.iclk_data_i(async_downlink_reset_i)
+  ,.oclk_data_o(downlink_reset_sync   )
+  );
+
   bsg_link_sdr_upstream
- #(.width_p                        (width_gp)
-  ,.lg_fifo_depth_p                (lg_fifo_depth_gp)
-  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_gp)
+ #(.width_p                        (width_p)
+  ,.lg_fifo_depth_p                (lg_fifo_depth_p)
+  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
   ) uplink
   (// Core side
    .io_clk_i           (core_clk_i)
@@ -51,18 +63,10 @@ module bsg_sdr_one_side
   ,.token_clk_i        (link_token_i)
   );
 
-  logic downlink_reset_sync;
-
-  bsg_sync_sync #(.width_p(1)) bss
-  (.oclk_i     (link_clk_i           )
-  ,.iclk_data_i(core_downlink_reset_i)
-  ,.oclk_data_o(downlink_reset_sync  )
-  );
-
   bsg_link_sdr_downstream
- #(.width_p                        (width_gp)
-  ,.lg_fifo_depth_p                (lg_fifo_depth_gp)
-  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_gp)
+ #(.width_p                        (width_p)
+  ,.lg_fifo_depth_p                (lg_fifo_depth_p)
+  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
   ) downlink
   (// Core side
    .core_clk_i        (core_clk_i)
@@ -79,4 +83,3 @@ module bsg_sdr_one_side
   );
 
 endmodule
-
