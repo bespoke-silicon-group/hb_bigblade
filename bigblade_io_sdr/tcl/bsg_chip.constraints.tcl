@@ -99,6 +99,28 @@ set_false_path -to [get_ports async_downstream_reset_o]
 set_false_path -to [get_ports async_token_reset_o]
 
 ########################################
+## CDC
+set_max_delay ${core_clk_period_ps} -from "fwd_link_clk" -to ${core_clk_name} -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from "rev_link_clk" -to ${core_clk_name} -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from ${core_clk_name} -to "fwd_link_clk" -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from ${core_clk_name} -to "rev_link_clk" -ignore_clock_latency
+
+set_min_delay 0 -from "fwd_link_clk" -to ${core_clk_name} -ignore_clock_latency
+set_min_delay 0 -from "rev_link_clk" -to ${core_clk_name} -ignore_clock_latency
+set_min_delay 0 -from ${core_clk_name} -to "fwd_link_clk" -ignore_clock_latency
+set_min_delay 0 -from ${core_clk_name} -to "rev_link_clk" -ignore_clock_latency
+
+set_max_delay ${core_clk_period_ps} -from "fwd_token_clk" -to ${core_clk_name} -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from "rev_token_clk" -to ${core_clk_name} -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from ${core_clk_name} -to "fwd_token_clk" -ignore_clock_latency
+set_max_delay ${core_clk_period_ps} -from ${core_clk_name} -to "rev_token_clk" -ignore_clock_latency
+
+set_min_delay 0 -from "fwd_token_clk" -to ${core_clk_name} -ignore_clock_latency
+set_min_delay 0 -from "rev_token_clk" -to ${core_clk_name} -ignore_clock_latency
+set_min_delay 0 -from ${core_clk_name} -to "fwd_token_clk" -ignore_clock_latency
+set_min_delay 0 -from ${core_clk_name} -to "rev_token_clk" -ignore_clock_latency
+
+########################################
 ## Derate
 bsg_chip_derate_cells
 bsg_chip_derate_mems
