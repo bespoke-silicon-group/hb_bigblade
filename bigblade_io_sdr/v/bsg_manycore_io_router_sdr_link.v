@@ -12,8 +12,7 @@ module bsg_manycore_io_router_sdr_link
   ,parameter x_cord_width_p   = "inv"
   ,parameter y_cord_width_p   = "inv"
   ,parameter ruche_factor_X_p = "inv"
-  ,parameter tieoff_west_p    = "inv"
-  ,parameter tieoff_east_p    = "inv"
+  ,parameter tieoff_west_not_east_p = "inv"
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -28,11 +27,14 @@ module bsg_manycore_io_router_sdr_link
   (input  core_clk_i
   ,input  core_reset_i
 
-  ,input  [S:W][link_sif_width_lp-1:0] core_link_sif_i
-  ,output [S:W][link_sif_width_lp-1:0] core_link_sif_o
+  ,input  [S:N][link_sif_width_lp-1:0] core_ver_link_sif_i
+  ,output [S:N][link_sif_width_lp-1:0] core_ver_link_sif_o
 
-  ,input  [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_i
-  ,output [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_o
+  ,input  [link_sif_width_lp-1:0] core_hor_link_sif_i
+  ,output [link_sif_width_lp-1:0] core_hor_link_sif_o
+
+  ,input  [ruche_x_link_sif_width_lp-1:0] core_ruche_link_i
+  ,output [ruche_x_link_sif_width_lp-1:0] core_ruche_link_o
 
   ,input  [x_cord_width_p-1:0] core_global_x_i
   ,input  [y_cord_width_p-1:0] core_global_y_i
@@ -70,6 +72,32 @@ module bsg_manycore_io_router_sdr_link
 
   `declare_bsg_manycore_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
   bsg_manycore_link_sif_s proc_link_sif_li, proc_link_sif_lo;
+  bsg_manycore_link_sif_s [S:W] core_link_sif_li, core_link_sif_lo;
+
+  `declare_bsg_manycore_ruche_x_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
+  bsg_manycore_ruche_x_link_sif_s [E:W] core_ruche_link_li, core_ruche_link_lo;
+
+  assign core_link_sif_li[S:N] = core_ver_link_sif_i;
+  assign core_ver_link_sif_o = core_link_sif_lo[S:N];
+
+  if (tieoff_west_not_east_p)
+  begin
+    assign core_link_sif_li  [E] = core_hor_link_sif_i;
+    assign core_ruche_link_li[E] = core_ruche_link_i;
+    assign core_link_sif_li  [W] = '0;
+    assign core_ruche_link_li[W] = '0;
+    assign core_hor_link_sif_o = core_link_sif_lo  [E];
+    assign core_ruche_link_o   = core_ruche_link_lo[E];
+  end
+  else
+  begin
+    assign core_link_sif_li  [E] = '0;
+    assign core_ruche_link_li[E] = '0;
+    assign core_link_sif_li  [W] = core_hor_link_sif_i;
+    assign core_ruche_link_li[W] = core_ruche_link_i;
+    assign core_hor_link_sif_o = core_link_sif_lo  [W];
+    assign core_ruche_link_o   = core_ruche_link_lo[W];
+  end
 
   bsg_manycore_hor_io_router
  #(.addr_width_p    (addr_width_p)
@@ -77,20 +105,20 @@ module bsg_manycore_io_router_sdr_link
   ,.x_cord_width_p  (x_cord_width_p)
   ,.y_cord_width_p  (y_cord_width_p)
   ,.ruche_factor_X_p(ruche_factor_X_p)
-  ,.tieoff_west_p   (tieoff_west_p)
-  ,.tieoff_east_p   (tieoff_east_p)
+  ,.tieoff_west_p   (tieoff_west_not_east_p)
+  ,.tieoff_east_p   (tieoff_west_not_east_p == 0)
   ) io_rtr
   (.clk_i           (core_clk_i)
   ,.reset_i         (core_reset_i)
 
-  ,.link_sif_i      (core_link_sif_i)
-  ,.link_sif_o      (core_link_sif_o)
+  ,.link_sif_i      (core_link_sif_li)
+  ,.link_sif_o      (core_link_sif_lo)
 
   ,.proc_link_sif_i (proc_link_sif_li)
   ,.proc_link_sif_o (proc_link_sif_lo)
 
-  ,.ruche_link_i    (core_ruche_link_i)
-  ,.ruche_link_o    (core_ruche_link_o)
+  ,.ruche_link_i    (core_ruche_link_li)
+  ,.ruche_link_o    (core_ruche_link_lo)
 
   ,.global_x_i      (core_global_x_i)
   ,.global_y_i      (core_global_y_i)
