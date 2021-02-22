@@ -14,61 +14,89 @@ set_app_var case_analysis_propagate_through_icg true
 
 ########################################
 ## Clock Setup
-set a_core_clk_name "a_core_clk"
-set a_core_clk_period_ps 1000
-set a_core_clk_uncertainty_per 3.0
-set a_core_clk_uncertainty_ps [expr min([expr ${a_core_clk_period_ps}*(${a_core_clk_uncertainty_per}/100.0)], 20)]
+set core_clk_name "core_clk"
+set core_clk_period_ps 1000
+set core_clk_uncertainty_per 3.0
+set core_clk_uncertainty_ps [expr min([expr ${core_clk_period_ps}*(${core_clk_uncertainty_per}/100.0)], 20)]
 
-set a_core_input_delay_per  20.0
-set a_core_input_delay_ps  [expr ${a_core_clk_period_ps}*(${a_core_input_delay_per}/100.0)]
-set a_core_output_delay_per 20.0
-set a_core_output_delay_ps [expr ${a_core_clk_period_ps}*(${a_core_output_delay_per}/100.0)]
+set core_input_delay_per  20.0
+set core_input_delay_ps  [expr ${core_clk_period_ps}*(${core_input_delay_per}/100.0)]
+set core_output_delay_per 20.0
+set core_output_delay_ps [expr ${core_clk_period_ps}*(${core_output_delay_per}/100.0)]
 
-set b_core_clk_name "b_core_clk"
-set b_core_clk_period_ps 1000
-set b_core_clk_uncertainty_per 3.0
-set b_core_clk_uncertainty_ps [expr min([expr ${b_core_clk_period_ps}*(${b_core_clk_uncertainty_per}/100.0)], 20)]
+set link_clk_name "link_clk"
+set link_clk_period_ps 1000
+set link_clk_uncertainty_per 3.0
+set link_clk_uncertainty_ps [expr min([expr ${link_clk_period_ps}*(${link_clk_uncertainty_per}/100.0)], 20)]
 
-set b_core_input_delay_per  20.0
-set b_core_input_delay_ps  [expr ${b_core_clk_period_ps}*(${b_core_input_delay_per}/100.0)]
-set b_core_output_delay_per 20.0
-set b_core_output_delay_ps [expr ${b_core_clk_period_ps}*(${b_core_output_delay_per}/100.0)]
+set link_input_delay_per  20.0
+set link_input_delay_ps  [expr ${link_clk_period_ps}*(${link_input_delay_per}/100.0)]
+set link_output_delay_per 20.0
+set link_output_delay_ps [expr ${link_clk_period_ps}*(${link_output_delay_per}/100.0)]
+
+set token_clk_name "token_clk"
+set token_clk_period_ps 2000
+set token_clk_uncertainty_per 3.0
+set token_clk_uncertainty_ps [expr min([expr ${token_clk_period_ps}*(${token_clk_uncertainty_per}/100.0)], 20)]
+
+set token_input_delay_per  20.0
+set token_input_delay_ps  [expr ${token_clk_period_ps}*(${token_input_delay_per}/100.0)]
+set token_output_delay_per 20.0
+set token_output_delay_ps [expr ${token_clk_period_ps}*(${token_output_delay_per}/100.0)]
 
 ########################################
 ## Reg2Reg
-create_clock -period ${a_core_clk_period_ps} -name ${a_core_clk_name} [get_ports "a_core_clk_i"]
-create_clock -period ${b_core_clk_period_ps} -name ${b_core_clk_name} [get_ports "b_core_clk_i"]
-set_clock_uncertainty ${a_core_clk_uncertainty_ps} [get_clocks ${a_core_clk_name}]
-set_clock_uncertainty ${b_core_clk_uncertainty_ps} [get_clocks ${b_core_clk_name}]
-create_generated_clock -name "a_link_clk" -source [get_ports "a_core_clk_i"] -edges {2 3 4} -edge_shift {0 0 0} [get_pins a_sdr/link_clk_o]
-create_generated_clock -name "b_link_clk" -source [get_ports "b_core_clk_i"] -edges {2 3 4} -edge_shift {0 0 0} [get_pins b_sdr/link_clk_o]
-create_generated_clock -name "a_tkn_clk" -source [get_ports "a_core_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins a_sdr/link_token_o]
-create_generated_clock -name "b_tkn_clk" -source [get_ports "b_core_clk_i"] -edges {1 3 5} -edge_shift {0 0 0} [get_pins b_sdr/link_token_o]
+create_clock -period ${core_clk_period_ps} -name ${core_clk_name} [get_ports "core_clk_i"]
+set_clock_uncertainty ${core_clk_uncertainty_ps} [get_clocks ${core_clk_name}]
+create_clock -period ${link_clk_period_ps} -name "fwd_link_clk" [get_ports "io_fwd_link_clk_i"]
+set_clock_uncertainty ${link_clk_uncertainty_ps} [get_clocks "fwd_link_clk"]
+create_clock -period ${link_clk_period_ps} -name "rev_link_clk" [get_ports "io_rev_link_clk_i"]
+set_clock_uncertainty ${link_clk_uncertainty_ps} [get_clocks "rev_link_clk"]
+create_clock -period ${token_clk_period_ps} -name "fwd_token_clk" [get_ports "io_fwd_link_token_i"]
+set_clock_uncertainty ${token_clk_uncertainty_ps} [get_clocks "fwd_token_clk"]
+create_clock -period ${token_clk_period_ps} -name "rev_token_clk" [get_ports "io_rev_link_token_i"]
+set_clock_uncertainty ${token_clk_uncertainty_ps} [get_clocks "rev_token_clk"]
 
 ########################################
 ## In2Reg
 set driving_lib_cell $LIB_CELLS(invx2)
-set a_core_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~a_*"]
-set b_core_input_pins [filter_collection [filter_collection [all_inputs] "name!~*clk*"] "name=~b_*"]
-set_input_delay ${a_core_input_delay_ps} -clock ${a_core_clk_name} ${a_core_input_pins}
-set_input_delay ${b_core_input_delay_ps} -clock ${b_core_clk_name} ${b_core_input_pins}
+
+set core_input_pins [filter_collection [filter_collection [all_inputs] "name=~core*" ] "name!~*clk*"]
+set_input_delay ${core_input_delay_ps} -clock ${core_clk_name} ${core_input_pins}
+
+set fwd_link_input_pins [filter_collection [filter_collection [filter_collection [all_inputs] "name=~io_fwd_link*" ] "name!~*clk*"] "name!~*token*"]
+set rev_link_input_pins [filter_collection [filter_collection [filter_collection [all_inputs] "name=~io_rev_link*" ] "name!~*clk*"] "name!~*token*"]
+set_input_delay ${link_input_delay_ps} -clock "fwd_link_clk" ${fwd_link_input_pins}
+set_input_delay ${link_input_delay_ps} -clock "rev_link_clk" ${rev_link_input_pins}
+
 set_driving_cell -no_design_rule -lib_cell ${driving_lib_cell} [remove_from_collection [all_inputs] [get_ports *clk*]]
 
 ########################################
 ## Reg2Out
 set load_lib_pin $LIB_CELLS(invx8,load_pin)
-set a_core_output_pins [filter_collection [all_outputs] "name=~a_*"]
-set b_core_output_pins [filter_collection [all_outputs] "name=~b_*"]
-set_output_delay ${a_core_output_delay_ps} -clock ${a_core_clk_name} ${a_core_output_pins}
-set_output_delay ${b_core_output_delay_ps} -clock ${b_core_clk_name} ${b_core_output_pins}
-set_load [load_of [get_lib_pin */${load_lib_pin}]] [all_outputs]
+
+set core_output_pins [filter_collection [all_outputs] "name=~core_*"]
+set_output_delay ${core_output_delay_ps} -clock ${core_clk_name} ${core_output_pins}
+set_load [load_of [get_lib_pin */${load_lib_pin}]] ${core_output_pins}
+
+set fwd_link_output_pins [filter_collection [filter_collection [all_outputs] "name=~io_fwd_link*" ] "name!~*token*"]
+set rev_link_output_pins [filter_collection [filter_collection [all_outputs] "name=~io_rev_link*" ] "name!~*token*"]
+set_output_delay ${link_output_delay_ps} -clock ${core_clk_name} ${fwd_link_output_pins}
+set_output_delay ${link_output_delay_ps} -clock ${core_clk_name} ${rev_link_output_pins}
+set_load [load_of [get_lib_pin */${load_lib_pin}]] ${fwd_link_output_pins}
+set_load [load_of [get_lib_pin */${load_lib_pin}]] ${rev_link_output_pins}
 
 ########################################
 ## False
-set_false_path -from [get_ports a_core_downlink_reset_i]
-set_false_path -from [get_ports b_core_downlink_reset_i]
-set_false_path -from [get_ports a_async_token_reset_i]
-set_false_path -from [get_ports b_async_token_reset_i]
+set_false_path -from [get_ports async_uplink_reset_i]
+set_false_path -from [get_ports async_downlink_reset_i]
+set_false_path -from [get_ports async_downstream_reset_i]
+set_false_path -from [get_ports async_token_reset_i]
+
+set_false_path -to [get_ports async_uplink_reset_o]
+set_false_path -to [get_ports async_downlink_reset_o]
+set_false_path -to [get_ports async_downstream_reset_o]
+set_false_path -to [get_ports async_token_reset_o]
 
 ########################################
 ## Derate
