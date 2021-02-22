@@ -17,6 +17,10 @@ basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
 basejump_stl_commit  :=dev-bsg_link_sdr
 
+bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
+bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
+bsg_manycore_commit  :=ci_bigblade
+
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
 bsg_14_commit        :=master
