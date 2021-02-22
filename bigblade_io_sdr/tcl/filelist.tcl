@@ -4,6 +4,7 @@
 #------------------------------------------------------------
 
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
+set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 
 set bsg_packaging_dir $::env(BSG_PACKAGING_DIR)
@@ -88,7 +89,19 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_link/bsg_link_source_sync_downstream.v
     $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
+    $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
+    $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
+    $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
+    $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
+    $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
+
+    $bsg_manycore_dir/v/bsg_manycore_pkg.v
+    $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
+    $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
+
     $bsg_designs_target_dir/v/bsg_chip_pkg.v
+    $bsg_designs_target_dir/v/bsg_manycore_io_router_sdr_link.v
+    $bsg_designs_target_dir/v/bsg_link_sdr.v
     $bsg_designs_target_dir/v/bsg_chip.v
-    $bsg_designs_target_dir/v/bsg_sdr_one_side.v
+
 "]
