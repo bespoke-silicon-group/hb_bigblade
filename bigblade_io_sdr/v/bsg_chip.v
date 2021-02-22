@@ -1,95 +1,85 @@
 
-
 module bsg_chip
+
  import bsg_chip_pkg::*;
-  (
-     input  a_core_clk_i
-   , input  a_core_uplink_reset_i
-   , input  a_core_downlink_reset_i
-   , input  a_core_downstream_reset_i
-   , input  a_async_token_reset_i
+ import bsg_noc_pkg::*;
+ import bsg_manycore_pkg::*;
 
-   , input  [width_gp-1:0] a_core_data_i
-   , input                 a_core_v_i
-   , output                a_core_ready_o
+ #(parameter lg_fifo_depth_p                 = lg_fifo_depth_gp
+  ,parameter lg_credit_to_token_decimation_p = lg_credit_to_token_decimation_gp
 
-   , output [width_gp-1:0] a_core_data_o
-   , output                a_core_v_o
-   , input                 a_core_yumi_i
+  ,parameter addr_width_p     = addr_width_gp
+  ,parameter data_width_p     = data_width_gp
+  ,parameter x_cord_width_p   = x_cord_width_gp
+  ,parameter y_cord_width_p   = y_cord_width_gp
+  ,parameter ruche_factor_X_p = ruche_factor_X_gp
+  ,parameter tieoff_west_p    = tieoff_west_gp
+  ,parameter tieoff_east_p    = tieoff_east_gp
 
-   , input  b_core_clk_i
-   , input  b_core_uplink_reset_i
-   , input  b_core_downlink_reset_i
-   , input  b_core_downstream_reset_i
-   , input  b_async_token_reset_i
+  ,parameter link_sif_width_lp =
+    `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
+  ,parameter ruche_x_link_sif_width_lp =
+    `bsg_manycore_ruche_x_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
+  ,parameter fwd_width_lp =
+    `bsg_manycore_packet_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
+  ,parameter rev_width_lp =
+    `bsg_manycore_return_packet_width(x_cord_width_p,y_cord_width_p,data_width_p)
+  )
 
-   , input  [width_gp-1:0] b_core_data_i
-   , input                 b_core_v_i
-   , output                b_core_ready_o
+  (input  core_clk_i
+  ,input  core_reset_i
 
-   , output [width_gp-1:0] b_core_data_o
-   , output                b_core_v_o
-   , input                 b_core_yumi_i
-   );
+  ,input  [S:W][link_sif_width_lp-1:0] core_link_sif_i
+  ,output [S:W][link_sif_width_lp-1:0] core_link_sif_o
 
-  logic a_link_clk_lo, b_link_clk_lo;
-  logic [width_gp-1:0] a_link_data_lo, b_link_data_lo;
-  logic a_link_v_lo, b_link_v_lo;
-  logic a_link_token_li, b_link_token_li;
+  ,input  [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_i
+  ,output [E:W][ruche_x_link_sif_width_lp-1:0] core_ruche_link_o
 
-  bsg_sdr_one_side
-   a_sdr
-   ( .core_clk_i              (a_core_clk_i)
-    ,.core_uplink_reset_i     (a_core_uplink_reset_i)
-    ,.core_downlink_reset_i   (a_core_downlink_reset_i)
-    ,.core_downstream_reset_i (a_core_downstream_reset_i)
-    ,.async_token_reset_i     (a_async_token_reset_i)
+  ,input  [x_cord_width_p-1:0] core_global_x_i
+  ,input  [y_cord_width_p-1:0] core_global_y_i
 
-    ,.core_data_i (a_core_data_i)
-    ,.core_v_i    (a_core_v_i)
-    ,.core_ready_o(a_core_ready_o)
+  ,input  async_uplink_reset_i
+  ,input  async_downlink_reset_i
+  ,input  async_downstream_reset_i
+  ,input  async_token_reset_i
 
-    ,.core_data_o (a_core_data_o)
-    ,.core_v_o    (a_core_v_o)
-    ,.core_yumi_i (a_core_yumi_i)
+  ,output async_uplink_reset_o
+  ,output async_downlink_reset_o
+  ,output async_downstream_reset_o
+  ,output async_token_reset_o
 
-    ,.link_clk_o  (a_link_clk_lo)
-    ,.link_data_o (a_link_data_lo)
-    ,.link_v_o    (a_link_v_lo)
-    ,.link_token_i(a_link_token_li)
+  ,output                    io_fwd_link_clk_o
+  ,output [fwd_width_lp-1:0] io_fwd_link_data_o
+  ,output                    io_fwd_link_v_o
+  ,input                     io_fwd_link_token_i
 
-    ,.link_clk_i  (b_link_clk_lo)
-    ,.link_data_i (b_link_data_lo)
-    ,.link_v_i    (b_link_v_lo)
-    ,.link_token_o(b_link_token_li)
-    );
+  ,input                     io_fwd_link_clk_i
+  ,input  [fwd_width_lp-1:0] io_fwd_link_data_i
+  ,input                     io_fwd_link_v_i
+  ,output                    io_fwd_link_token_o
 
-  bsg_sdr_one_side
-   b_sdr
-   ( .core_clk_i              (b_core_clk_i)
-    ,.core_uplink_reset_i     (b_core_uplink_reset_i)
-    ,.core_downlink_reset_i   (b_core_downlink_reset_i)
-    ,.core_downstream_reset_i (b_core_downstream_reset_i)
-    ,.async_token_reset_i     (b_async_token_reset_i)
+  ,output                    io_rev_link_clk_o
+  ,output [rev_width_lp-1:0] io_rev_link_data_o
+  ,output                    io_rev_link_v_o
+  ,input                     io_rev_link_token_i
 
-    ,.core_data_i (b_core_data_i)
-    ,.core_v_i    (b_core_v_i)
-    ,.core_ready_o(b_core_ready_o)
+  ,input                     io_rev_link_clk_i
+  ,input  [rev_width_lp-1:0] io_rev_link_data_i
+  ,input                     io_rev_link_v_i
+  ,output                    io_rev_link_token_o
+  );
 
-    ,.core_data_o (b_core_data_o)
-    ,.core_v_o    (b_core_v_o)
-    ,.core_yumi_i (b_core_yumi_i)
-
-    ,.link_clk_o  (b_link_clk_lo)
-    ,.link_data_o (b_link_data_lo)
-    ,.link_v_o    (b_link_v_lo)
-    ,.link_token_i(b_link_token_li)
-
-    ,.link_clk_i  (a_link_clk_lo)
-    ,.link_data_i (a_link_data_lo)
-    ,.link_v_i    (a_link_v_lo)
-    ,.link_token_o(a_link_token_li)
-    );
+  bsg_manycore_io_router_sdr_link
+ #(.lg_fifo_depth_p                (lg_fifo_depth_p                )
+  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.addr_width_p                   (addr_width_p                   )
+  ,.data_width_p                   (data_width_p                   )
+  ,.x_cord_width_p                 (x_cord_width_p                 )
+  ,.y_cord_width_p                 (y_cord_width_p                 )
+  ,.ruche_factor_X_p               (ruche_factor_X_p               )
+  ,.tieoff_west_p                  (tieoff_west_p                  )
+  ,.tieoff_east_p                  (tieoff_east_p                  )
+  ) sdr_link
+  (.*);
 
 endmodule
-
