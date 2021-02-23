@@ -4,6 +4,7 @@
 #------------------------------------------------------------
 
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
+set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 set board_dir              $::env(BOARD_DIR)
 set bsg_designs_dir        $::env(BSG_DESIGNS_DIR)
@@ -65,10 +66,12 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
 
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bsg_chip.v
-  $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
-  $basejump_stl_dir/testing/bsg_link/bsg_link_sdr/bsg_link_sdr_test_node.v
+  $bsg_designs_target_dir/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/v/bsg_link_sdr.v
+  $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
+  $bsg_designs_target_dir/testing/v/bsg_manycore_io_router_sdr_link_test_node.v
+
 "]
 
