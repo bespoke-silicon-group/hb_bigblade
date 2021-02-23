@@ -16,6 +16,7 @@ include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
+export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -51,7 +52,7 @@ VCS_OPTIONS += +vcs+lic+wait
 ########################################
 
 BSG_TOP_SIM_MODULE = bsg_gateway_chip
-BSG_CHIP_INSTANCE_PATH = bsg_gateway_chip.DUT
+BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).DUT
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
@@ -107,4 +108,9 @@ $(BSG_OUT_DIR):
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
-
+	rm -rf DVEfiles
+	rm -rf stack.info.*
+	rm -f  vc_hdrs.h
+	rm -f  vcdplus.vpd
+	rm -f  inter.vpd
+	rm -f  ucli.key
