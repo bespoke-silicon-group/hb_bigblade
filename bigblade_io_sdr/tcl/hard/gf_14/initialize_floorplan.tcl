@@ -1,11 +1,14 @@
+puts "BSG-info: Running script [info script]\n"
 
-set tile_width [round_up_to_nearest 50 [unit_width]]
-set tile_height [round_up_to_nearest 50 [unit_height]]
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
-initialize_floorplan        \
-  -control_type die         \
+
+initialize_floorplan \
+  -control_type core \
   -coincident_boundary true \
-  -shape R                  \
-  -core_offset 0.0          \
-  -side_length [list $tile_width $tile_height]
+  -shape R \
+  -side_length [list $grid_width $tile_height]
 
+
+
+puts "BSG-info: Completed script [info script]\n"
