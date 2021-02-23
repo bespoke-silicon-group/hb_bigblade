@@ -76,8 +76,6 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v  
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v 
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v       
-    $basejump_stl_dir/bsg_test/test_bsg_data_gen.v
-    $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
     $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
     $basejump_stl_dir/bsg_fsb/bsg_fsb_pkg.v
@@ -100,8 +98,8 @@ set SVERILOG_SOURCE_FILES [join "
     $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
 
     $bsg_designs_target_dir/v/bsg_chip_pkg.v
-    $bsg_designs_target_dir/v/bsg_manycore_io_router_sdr_link.v
     $bsg_designs_target_dir/v/bsg_link_sdr.v
+    $bsg_designs_target_dir/v/bsg_manycore_io_router_sdr_link.v
     $bsg_designs_target_dir/v/bsg_chip.v
 
 "]

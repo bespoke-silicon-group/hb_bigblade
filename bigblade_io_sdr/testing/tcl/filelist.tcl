@@ -66,6 +66,19 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
 
+  $basejump_stl_dir/bsg_async/bsg_sync_sync.v
+  $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_downstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
+  $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
+  $basejump_stl_dir/bsg_test/test_bsg_data_gen.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
+
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
