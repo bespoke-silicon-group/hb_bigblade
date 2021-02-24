@@ -1,11 +1,11 @@
-.DEFAULT_GOAL=run_all
+.DEFAULT_GOAL=run
 .SECONDARY:
 
 # Note: most variables that are file/dir paths are ?= because they can be
 # overriden by the chip repo if this makefile is called from the chip
 # infrastructure.
 
-export BSG_DESIGNS_DIR        ?= $(abspath ../../../../)
+export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(abspath ../../)
 
 BSG_WORK_DIR := $(abspath ./)
@@ -16,6 +16,7 @@ include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
+export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -27,7 +28,7 @@ export BSG_PADMAPPING        ?=default
 # Additional setup for RTL-Hard
 export BSG_CHIP_DIR             ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_14
 export PREP_MEMGEN_RUN_DIR      ?= $(BSG_CHIP_DIR)/.pdk_prep/memgen
-export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
+export BSG_TOPLEVEL_DESIGN_TYPE ?=bsg_chip
 export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
@@ -41,6 +42,7 @@ include $(BSG_CHIP_DIR)/cad/setup/Makefile.include
 VCS_OPTIONS := -full64
 VCS_OPTIONS += -notice
 VCS_OPTIONS += -debug_pp
+VCS_OPTIONS += +vcs+vcdpluson
 VCS_OPTIONS += -V
 VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
@@ -101,31 +103,40 @@ VCS_OPTIONS += -negdelay
 VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/bsg_chip/$(corner)_$(rc_corner)/results/bsg_chip.sdf.gz
 VCS_OPTIONS += -sdfretain
 
+EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
+BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
+BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/bsg_chip_chip_finish.v
+BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/bsg_chip/results/bsg_chip_chip_finish.v.gz
+
+VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
+
+# grab all of the sync flops
+$(BSG_CDC_PATH_FILE): $(BSG_CHIP_NETLIST_V_GZ)
+	cp $(BSG_CHIP_NETLIST_V_GZ) $(BSG_CHIP_NETLIST_V).gz
+	gzip -d $(BSG_CHIP_NETLIST_V).gz
+	python $(EXPAND_VERILOG) $(BSG_CHIP_NETLIST_V)| grep "_hard_sync_int" | awk '{ print "instance { $(BSG_CHIP_INSTANCE_PATH)." $$$$2 " } { noTiming };" }' | sort > $@
+
 ########################################
 ## Run Targets
 ########################################
 
-BSG_RUN_DIRS := $(addsuffix /run, $(addprefix $(BSG_OUT_DIR)/, $(PROG_LIST)))
-run_all: $(BSG_OUT_SIM)
-	$(MAKE) $(BSG_RUN_DIRS)
+run: $(BSG_OUT_SIM)
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/run: $(BSG_OUT_SIM)
-	cd $(@D); ../simv | tee -i run.log
+run-no-tee: $(BSG_OUT_SIM)
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/run-no-tee: $(BSG_OUT_SIM)
-	cd $(@D); ../simv
+rerun: $(BSG_OUT_SIM)
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/rerun: $(BSG_OUT_SIM)
-	cd $(@D); ../simv | tee -i run.log
+rerun-no-tee: $(BSG_OUT_SIM)
+	cd $$(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/rerun-no-tee: $(BSG_OUT_SIM)
-	cd $(@D); ../simv
-
-%/view:
-	cd $(@D); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
+view:
+	cd $(BSG_OUT_DIR); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)
+$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_CDC_PATH_FILE)
 	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):
@@ -133,4 +144,12 @@ $(BSG_OUT_DIR):
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
+	rm -rf DVEfiles
+	rm -rf stack.info.*
+	rm -f  vc_hdrs.h
+	rm -f  vcdplus.vpd
+	rm -f  inter.vpd
+	rm -f  ucli.key
+	rm -f  sdfAnnotateInfo
+
 
