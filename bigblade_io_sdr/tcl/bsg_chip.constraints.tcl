@@ -188,13 +188,13 @@ set_false_path -to   [get_ports async_*_reset_o]
 set link_clk_period_ps        1000
 set link_clk_uncertainty_ps   20
 
-set token_clk_period_ps       2000
+set token_clk_period_ps       [expr 2*$link_clk_period_ps]
 set token_clk_uncertainty_ps  20
 
-set max_io_skew_ps            25
-set io_max_output_delay       [expr ($core_clk_period_ps/4)-$max_io_skew_ps]
-set io_min_output_delay       [expr $max_io_skew_ps-($core_clk_period_ps/4)]
-set io_max_input_delay        [expr ($link_clk_period_ps/2)-$max_io_skew_ps]
+set max_io_skew_ps            50
+set io_max_output_delay       [expr ($core_clk_period_ps/2)-$max_io_skew_ps]
+set io_min_output_delay       [expr $max_io_skew_ps-($core_clk_period_ps/2)]
+set io_max_input_delay        [expr ($link_clk_period_ps)-$max_io_skew_ps]
 set io_min_input_delay        [expr $max_io_skew_ps]
 
 # upstream (fwd)

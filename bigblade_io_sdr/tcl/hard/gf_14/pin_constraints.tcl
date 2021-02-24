@@ -72,11 +72,11 @@ for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
   append_to_collection south_input_pins [get_ports "core_ver_link_sif_i[$idx]"]
 }
 
-place_pins_k2_k4 $north_input_pins  [expr 0.128*8] $core_ury 
-place_pins_k2_k4 $south_output_pins [expr 0.128*8] $core_lly
+place_pins_k2_k4 $north_input_pins  [expr 0.128*58] $core_ury 
+place_pins_k2_k4 $south_output_pins [expr 0.128*58] $core_lly
 
-place_pins_c5 $north_output_pins  [expr 0.08*16] $core_ury 
-place_pins_c5 $south_input_pins   [expr 0.08*16] $core_lly
+place_pins_c5 $north_output_pins  [expr 0.08*66] $core_ury 
+place_pins_c5 $south_input_pins   [expr 0.08*66] $core_lly
 
 
 
@@ -102,70 +102,6 @@ append_to_collection south_misc_pins [get_ports async_downlink_reset_o]
 append_to_collection south_misc_pins [get_ports async_downstream_reset_o]
 append_to_collection south_misc_pins [get_ports async_token_reset_o]
 place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*30] $core_lly
-
-
-
-proc place_pins_k1_k3 {pins start_y x} {
-  set i 0
-  set curr_y $start_y
-
-  while {$i < [sizeof_collection $pins]} {
-
-    set pin [index_collection $pins $i]
-
-    set layer ""
-    if {$i % 2 == 0} {
-      set layer "K1"
-    } else {
-      set layer "K3"
-    }
-
-    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
-      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$x $curr_y"
-      incr i
-    }
-
-    set curr_y [expr $curr_y + 0.128]
-  }
-}
-
-# east upstream
-set east_upstream_pins [list]
-
-append_to_collection east_upstream_pins [get_ports io_rev_link_clk_o]
-for {set i 0} {$i < [sizeof_collection [get_ports io_rev_link_data_o]]} {incr i } {
-  append_to_collection east_upstream_pins [get_ports io_rev_link_data_o[$i]]
-}
-append_to_collection east_upstream_pins [get_ports io_rev_link_v_o]
-append_to_collection east_upstream_pins [get_ports io_rev_link_token_i]
-
-append_to_collection east_upstream_pins [get_ports io_fwd_link_clk_o]
-for {set i 0} {$i < [sizeof_collection [get_ports io_fwd_link_data_o]]} {incr i } {
-  append_to_collection east_upstream_pins [get_ports io_fwd_link_data_o[$i]]
-}
-append_to_collection east_upstream_pins [get_ports io_fwd_link_v_o]
-append_to_collection east_upstream_pins [get_ports io_fwd_link_token_i]
-
-place_pins_k1_k3 $east_upstream_pins $TILE_WEST_OUTPUT_OFFSET $core_llx
-
-# east downstream
-set east_downstream_pins [list]
-
-append_to_collection east_downstream_pins [get_ports io_rev_link_clk_i]
-for {set i 0} {$i < [sizeof_collection [get_ports io_rev_link_data_i]]} {incr i } {
-  append_to_collection east_downstream_pins [get_ports io_rev_link_data_i[$i]]
-}
-append_to_collection east_downstream_pins [get_ports io_rev_link_v_i]
-append_to_collection east_downstream_pins [get_ports io_rev_link_token_o]
-
-append_to_collection east_downstream_pins [get_ports io_fwd_link_clk_i]
-for {set i 0} {$i < [sizeof_collection [get_ports io_fwd_link_data_i]]} {incr i } {
-  append_to_collection east_downstream_pins [get_ports io_fwd_link_data_i[$i]]
-}
-append_to_collection east_downstream_pins [get_ports io_fwd_link_v_i]
-append_to_collection east_downstream_pins [get_ports io_fwd_link_token_o]
-
-place_pins_k1_k3 $east_downstream_pins $TILE_WEST_INPUT_OFFSET $core_llx
 
 
 
