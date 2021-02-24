@@ -53,7 +53,7 @@ module bsg_gateway_chip
   logic downnode_en, downnode_error;
   logic [31:0] downnode_sent, downnode_received;
 
-  localparam up_x_cord_lp = 7;
+  localparam up_x_cord_lp = (tieoff_west_not_east_p)? 9 : 7;
   localparam up_y_cord_lp = 4;
   localparam down_x_cord_lp = 8;
   localparam down_y_cord_lp = 4;
