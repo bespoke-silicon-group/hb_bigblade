@@ -58,6 +58,30 @@ module bsg_gateway_chip
   localparam down_x_cord_lp = 8;
   localparam down_y_cord_lp = 4;
 
+
+  // Avoid X bits going into DUT
+  bsg_manycore_link_sif_s upnode_link_sif_lo_raw, downnode_link_sif_lo_raw;
+  always_comb
+    begin
+      for (integer i = 0; i < link_sif_width_lp; i++)
+        begin
+          if (upnode_link_sif_lo_raw[i] === 1'bX) upnode_link_sif_lo[i] = 1'b0;
+          else upnode_link_sif_lo[i] = upnode_link_sif_lo_raw[i];
+          if (downnode_link_sif_lo_raw[i] === 1'bX) downnode_link_sif_lo[i] = 1'b0;
+          else downnode_link_sif_lo[i] = downnode_link_sif_lo_raw[i];
+        end
+    end
+
+  // Add delay to synchronous signals going into DUT
+  logic upnode_reset_dly;
+  bsg_manycore_link_sif_s upnode_link_sif_lo_dly;
+
+  bsg_nonsynth_delay_line #(.width_p(1),.delay_p(500)) upnode_reset_bndl
+    (.i(upnode_reset),.o(upnode_reset_dly));
+  bsg_nonsynth_delay_line #(.width_p(link_sif_width_lp),.delay_p(500)) upnode_link_bndl
+    (.i(upnode_link_sif_lo),.o(upnode_link_sif_lo_dly));
+
+
   bsg_manycore_io_router_sdr_link_test_node
  #(.addr_width_p   (addr_width_p)
   ,.data_width_p   (data_width_p)
@@ -79,7 +103,7 @@ module bsg_gateway_chip
   ,.dest_y_i   (y_cord_width_p'(down_y_cord_lp))
 
   ,.links_sif_i(upnode_link_sif_li)
-  ,.links_sif_o(upnode_link_sif_lo)
+  ,.links_sif_o(upnode_link_sif_lo_raw)
   );
 
 
@@ -89,12 +113,12 @@ module bsg_gateway_chip
   //
   bsg_chip DUT
   (.core_clk_i              (upnode_clk) 
-  ,.core_reset_i            (upnode_reset)
+  ,.core_reset_i            (upnode_reset_dly)
 
   ,.core_ver_link_sif_i     ('0)
   ,.core_ver_link_sif_o     ()
 
-  ,.core_hor_link_sif_i     (upnode_link_sif_lo)
+  ,.core_hor_link_sif_i     (upnode_link_sif_lo_dly)
   ,.core_hor_link_sif_o     (upnode_link_sif_li)
 
   ,.core_ruche_link_i       ('0)
@@ -227,7 +251,7 @@ module bsg_gateway_chip
   ,.dest_y_i   (y_cord_width_p'(up_y_cord_lp))
 
   ,.links_sif_i(downnode_link_sif_li)
-  ,.links_sif_o(downnode_link_sif_lo)
+  ,.links_sif_o(downnode_link_sif_lo_raw)
   );
 
   // Simulation of Clock
