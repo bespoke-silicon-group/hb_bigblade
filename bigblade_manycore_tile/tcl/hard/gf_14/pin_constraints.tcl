@@ -189,27 +189,20 @@ place_pins_k2_k4 $south_output_pins [expr $tile_llx+$NORTH_INPUT_OFFSET] $tile_l
 # clock
 set clk_pin   [get_ports -filter "name=~clk_i"]
 set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K3" -location "$tile_urx [expr 0.128*740]"
-# reset
-set reset_in_pin [get_ports  -filter "name=~reset_i"]
-set_individual_pin_constraints -ports $reset_in_pin -allowed_layers "K4" -location "[expr $tile_llx+(0.128*234)] $tile_ury"
-set reset_out_pin [get_ports  -filter "name=~reset_o"]
-set_individual_pin_constraints -ports $reset_out_pin -allowed_layers "K4" -location "[expr $tile_llx+(0.128*234)] $tile_lly"
 
 
 # my cord
-set cord_in_pins [list]
-append_to_collection cord_in_pins [get_ports -filter "name=~my_x_i*"]
-append_to_collection cord_in_pins [get_ports -filter "name=~pod_x_i*"]
-append_to_collection cord_in_pins [get_ports -filter "name=~my_y_i*"]
-append_to_collection cord_in_pins [get_ports -filter "name=~pod_y_i*"]
-place_pins_k2_k4 $cord_in_pins [expr $tile_llx+(0.128*238)] $tile_ury
+set cord_reset_in_pins [list]
+append_to_collection cord_reset_in_pins [get_ports reset_i]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports global_x_i*] name]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports global_y_i*] name]
+place_pins_k2_k4 $cord_reset_in_pins [expr $tile_llx+(0.128*234)] $tile_ury
 
-set cord_out_pins [list]
-append_to_collection cord_out_pins [get_ports -filter "name=~my_x_o*"]
-append_to_collection cord_out_pins [get_ports -filter "name=~pod_x_o*"]
-append_to_collection cord_out_pins [get_ports -filter "name=~my_y_o*"]
-append_to_collection cord_out_pins [get_ports -filter "name=~pod_y_o*"]
-place_pins_k2_k4 $cord_out_pins [expr $tile_llx+(0.128*238)] $tile_lly
+set cord_reset_out_pins [list]
+append_to_collection cord_reset_out_pins [get_ports reset_o]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports global_x_o*] name]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports global_y_o*] name]
+place_pins_k2_k4 $cord_reset_out_pins [expr $tile_llx+(0.128*234)] $tile_lly
 
 
 
