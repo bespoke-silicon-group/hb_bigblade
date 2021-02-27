@@ -155,26 +155,22 @@ place_wh_pins_k1_k3 $east_output_pins [expr $vcache_lly+$VCACHE_WEST_INPUT_OFFSE
 
 
 
-# clock reset
+# clock pin
 set clk_pin   [get_ports -filter "name=~clk_i"]
 set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K3" -location "$vcache_urx [expr 0.128*588]"
-set reset_in_pin [get_ports -filter "name=~reset_i"]
-set_individual_pin_constraints -ports $reset_in_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*234)] $vcache_ury"
-set reset_out_pin [get_ports -filter "name=~reset_o"]
-set_individual_pin_constraints -ports $reset_out_pin -allowed_layers "K4" -location "[expr $vcache_llx+(0.128*234)] $vcache_lly"
 
 
+# cord reset pins
+set cord_reset_in_pins [list]
+append_to_collection cord_reset_in_pins [get_ports "reset_i"]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports "global_*_i*"] name]
+append_to_collection cord_reset_in_pins [get_ports "wh_dest_east_not_west_i"]
+place_pins_k2_k4 $cord_reset_in_pins [expr $vcache_llx+(0.128*234)] $vcache_ury
 
-# cord pins
-set cord_in_pins [list]
-append_to_collection cord_in_pins [get_ports -filter "name=~global_*_i*"]
-append_to_collection cord_in_pins [get_ports -filter "name=~wh_dest_east_not_west_i"]
-append_to_collection cord_in_pins [get_ports -filter "name=~my_wh_cid_i*"]
-place_pins_k2_k4 $cord_in_pins [expr $vcache_llx+(0.128*238)] $vcache_ury
-
-set cord_out_pins [list]
-append_to_collection cord_out_pins [get_ports -filter "name=~global_*_o*"]
-place_pins_k2_k4 $cord_out_pins [expr $vcache_llx+(0.128*238)] $vcache_lly
+set cord_reset_out_pins [list]
+append_to_collection cord_reset_out_pins [get_ports "reset_o"]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports "global_*_o*"] name]
+place_pins_k2_k4 $cord_reset_out_pins [expr $vcache_llx+(0.128*234)] $vcache_lly
 
 
 
