@@ -10,14 +10,16 @@ module bsg_link_osdr_phy
   ,output [width_p-1:0] data_o
   );
 
-  wire clk_r_p, clk_r_n;
+  wire clk_r_p, clk_r_n, clk_o_buf;
 
-  SC7P5T_CKXOR2X2_SSC16R BSG_CKXOR2_DONT_TOUCH
-  (.Z(clk_o),.CLK(clk_r_p),.EN(clk_r_n));
+  SC7P5T_CKXOR2X1_SSC16R BSG_CKXOR2_DONT_TOUCH
+  (.Z(clk_o_buf),.CLK(clk_r_p),.EN(clk_r_n));
+  SC7P5T_CKBUFX24_SSC16R BSG_CKBUF_DONT_TOUCH
+  (.CLK(clk_o_buf),.Z(clk_o));
 
-  SC7P5T_DFFRQX2_SSC16R BSG_DFFRQ_DONT_TOUCH
+  SC7P5T_DFFRQX1_SSC16R BSG_DFFRQ_DONT_TOUCH
   (.D(~clk_r_p),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_p));
-  SC7P5T_DFFNRQX2_SSC16R BSG_DFFNRQ_DONT_TOUCH
+  SC7P5T_DFFNRQX1_SSC16R BSG_DFFNRQ_DONT_TOUCH
   (.D(~clk_r_n),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_n));
 
   for (genvar i = 0; i < width_p; i++)
