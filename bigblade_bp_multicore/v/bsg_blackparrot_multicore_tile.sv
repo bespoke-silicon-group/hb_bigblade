@@ -22,11 +22,11 @@ module bsg_blackparrot_multicore_tile
   (input                                                clk_i
    , input                                              reset_i
 
-   , input [3:0][mc_y_cord_width_gp-1:0]                my_mc_y_cords_i
+   , input [2:0][mc_y_cord_width_gp-1:0]                my_mc_y_cords_i
    , input [coh_noc_cord_width_p-1:0]                   my_bp_cord_i
 
-   , input [3:0][mc_link_sif_width_lp-1:0]              mc_links_i
-   , output logic [3:0][mc_link_sif_width_lp-1:0]       mc_links_o
+   , input [2:0][mc_link_sif_width_lp-1:0]              mc_links_i
+   , output logic [2:0][mc_link_sif_width_lp-1:0]       mc_links_o
 
    , input [S:N][coh_noc_ral_link_width_lp-1:0]         lce_req_links_i
    , output logic [S:N][coh_noc_ral_link_width_lp-1:0]  lce_req_links_o
@@ -144,11 +144,6 @@ module bsg_blackparrot_multicore_tile
   logic cce_io_cmd_v_lo, cce_io_cmd_ready_li, lce_io_cmd_v_li, lce_io_cmd_yumi_lo;
   bp_bedrock_cce_mem_msg_s cce_io_resp_li, lce_io_resp_lo;
   logic cce_io_resp_v_li, cce_io_resp_yumi_lo, lce_io_resp_v_lo, lce_io_resp_ready_li;
-
-  bp_bedrock_io_mem_msg_s mc_cmd_lo;
-  logic mc_cmd_v_lo, mc_cmd_ready_li;
-  bp_bedrock_io_mem_msg_s mc_resp_li;
-  logic mc_resp_v_li, mc_resp_yumi_lo;
 
   bp_bedrock_io_mem_msg_s mmio_cmd_lo;
   logic mmio_cmd_v_lo, mmio_cmd_ready_li;
@@ -294,18 +289,14 @@ module bsg_blackparrot_multicore_tile
 
   // TODO: Better arbitration? Loopback?
   wire [3:0] device_cmd_li = cce_io_cmd_lo.header.addr[20+:4];
-  wire is_mc_cmd           = (device_cmd_li == mc_dev_gp);
 
-  assign mc_cmd_lo = cce_io_cmd_lo;
-  assign mc_cmd_v_lo = is_mc_cmd & cce_io_cmd_v_lo;
   assign mmio_cmd_lo = cce_io_cmd_lo;
-  assign mmio_cmd_v_lo = ~is_mc_cmd & cce_io_cmd_v_lo;
-  assign cce_io_cmd_ready_li = mc_cmd_ready_li & mmio_cmd_ready_li;
+  assign mmio_cmd_v_lo = cce_io_cmd_v_lo;
+  assign cce_io_cmd_ready_li = mmio_cmd_ready_li;
 
-  assign cce_io_resp_li = mmio_resp_v_li ? mmio_resp_li : mc_resp_li;
-  assign cce_io_resp_v_li = mmio_resp_v_li | mc_resp_v_li;
+  assign cce_io_resp_li = mmio_resp_li;
+  assign cce_io_resp_v_li = mmio_resp_v_li;
   assign mmio_resp_yumi_lo = mmio_resp_v_li & cce_io_resp_yumi_lo;
-  assign mc_resp_yumi_lo = ~mmio_resp_v_li & cce_io_resp_yumi_lo;
 
   assign lce_io_cmd_li = mmio_cmd_li;
   assign lce_io_cmd_v_li = mmio_cmd_v_li;
@@ -315,39 +306,12 @@ module bsg_blackparrot_multicore_tile
   assign mmio_resp_v_lo = lce_io_resp_v_lo;
   assign lce_io_resp_ready_li = mmio_resp_ready_li;
 
-  wire [mc_x_cord_width_gp-1:0] host_fifo_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_fifo_y_cord_li = my_mc_y_cords_i[0];
-  bp_cce_to_mc_fifo
-   #(.bp_params_p(bp_params_p)
-     ,.mc_x_cord_width_p(mc_x_cord_width_gp)
-     ,.mc_y_cord_width_p(mc_y_cord_width_gp)
-     ,.mc_data_width_p(mc_data_width_gp)
-     ,.mc_addr_width_p(mc_addr_width_gp)
-     )
-   host_fifo_link
-    (.clk_i(clk_i)
-     ,.reset_i(reset_r)
-
-     ,.io_cmd_i(mc_cmd_lo)
-     ,.io_cmd_v_i(mc_cmd_v_lo)
-     ,.io_cmd_ready_o(mc_cmd_ready_li)
-
-     ,.io_resp_o(mc_resp_li)
-     ,.io_resp_v_o(mc_resp_v_li)
-     ,.io_resp_yumi_i(mc_resp_yumi_lo)
-
-     ,.link_sif_i(mc_links_i[0])
-     ,.link_sif_o(mc_links_o[0])
-
-     ,.my_x_i(host_fifo_x_cord_li)
-     ,.my_y_i(host_fifo_y_cord_li)
-     );
-
   wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = my_mc_y_cords_i[1];
-  bp_cce_to_mc_mmio
+  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = my_mc_y_cords_i[0];
+  bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
-     ,.mc_max_outstanding_p(32)
+     ,.host_enable_p(1)
+     ,.mc_max_outstanding_p(mc_max_outstanding_host_gp)
      ,.mc_x_cord_width_p(mc_x_cord_width_gp)
      ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
      ,.mc_y_cord_width_p(mc_y_cord_width_gp)
@@ -360,7 +324,7 @@ module bsg_blackparrot_multicore_tile
      ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
      ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
      )
-   host_mmio_link
+   host_link
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
@@ -380,8 +344,8 @@ module bsg_blackparrot_multicore_tile
      ,.io_resp_v_i(mmio_resp_v_lo)
      ,.io_resp_ready_o(mmio_resp_ready_li)
 
-     ,.link_sif_i(mc_links_i[1])
-     ,.link_sif_o(mc_links_o[1])
+     ,.link_sif_i(mc_links_i[0])
+     ,.link_sif_o(mc_links_o[0])
 
      ,.my_x_i(host_mmio_x_cord_li)
      ,.my_y_i(host_mmio_y_cord_li)
@@ -406,10 +370,10 @@ module bsg_blackparrot_multicore_tile
     begin : d
       wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
       wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = my_mc_y_cords_i[2+i];
-      bp_cce_to_mc_mmio
+      bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
-         // TODO: Magic number
-         ,.mc_max_outstanding_p(32)
+         ,.host_enable_p(0)
+         ,.mc_max_outstanding_p(mc_max_outstanding_dram_gp)
          ,.mc_x_cord_width_p(mc_x_cord_width_gp)
          ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
          ,.mc_y_cord_width_p(mc_y_cord_width_gp)
@@ -442,8 +406,8 @@ module bsg_blackparrot_multicore_tile
          ,.io_resp_v_i('0)
          ,.io_resp_ready_o()
 
-         ,.link_sif_i(mc_links_i[2+i])
-         ,.link_sif_o(mc_links_o[2+i])
+         ,.link_sif_i(mc_links_i[1+i])
+         ,.link_sif_o(mc_links_o[1+i])
 
          ,.my_x_i(host_dram_x_cord_li)
          ,.my_y_i(host_dram_y_cord_li)

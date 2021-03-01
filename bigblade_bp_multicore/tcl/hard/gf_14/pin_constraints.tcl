@@ -9,23 +9,22 @@ set_block_pin_constraints -allowed_layers { C4 C5 K1 K2 K3 K4 }
 set tile_width  [core_width]
 set tile_height [core_height]
 
-set tile_req_pins_o       [get_ports -filter "name=~coh_lce_req_link_o*"]
-set tile_req_pins_i       [get_ports -filter "name=~coh_lce_req_link_i*"]
-set tile_cmd_pins_o       [get_ports -filter "name=~coh_lce_cmd_link_o*"]
-set tile_cmd_pins_i       [get_ports -filter "name=~coh_lce_cmd_link_i*"]
-set tile_resp_pins_o      [get_ports -filter "name=~coh_lce_resp_link_o*"]
-set tile_resp_pins_i      [get_ports -filter "name=~coh_lce_resp_link_i*"]
+set tile_req_pins_o       [get_ports -filter "name=~bp_lce_req_link_o*"]
+set tile_req_pins_i       [get_ports -filter "name=~bp_lce_req_link_i*"]
+set tile_cmd_pins_o       [get_ports -filter "name=~bp_lce_cmd_link_o*"]
+set tile_cmd_pins_i       [get_ports -filter "name=~bp_lce_cmd_link_i*"]
+set tile_resp_pins_o      [get_ports -filter "name=~bp_lce_resp_link_o*"]
+set tile_resp_pins_i      [get_ports -filter "name=~bp_lce_resp_link_i*"]
 
-set tile_mem_cmd_pins_o   [get_ports -filter "name=~mem_cmd_link_o*"]
-set tile_mem_cmd_pins_i   [get_ports -filter "name=~mem_cmd_link_i*"]
-set tile_mem_resp_pins_o  [get_ports -filter "name=~mem_resp_link_o*"]
-set tile_mem_resp_pins_i  [get_ports -filter "name=~mem_resp_link_i*"]
+set ver_link_pins_i [get_ports -filter "name=~mc_ver_links_i*"]
+set ver_link_pins_o [get_ports -filter "name=~mc_ver_links_o*"]
 
-set tile_req_pin_len       [expr [sizeof_collection $tile_req_pins_o] / 4]
-set tile_cmd_pin_len       [expr [sizeof_collection $tile_cmd_pins_o] / 4]
-set tile_resp_pin_len      [expr [sizeof_collection $tile_resp_pins_o] / 4]
-set tile_mem_cmd_pin_len   [expr [sizeof_collection $tile_mem_cmd_pins_o] / 1]
-set tile_mem_resp_pin_len  [expr [sizeof_collection $tile_mem_resp_pins_o] / 1]
+set ver_link_pin_len  [expr [sizeof_collection $ver_link_pins_i ] / 2]
+
+set link_pin_i_N [index_collection $ver_link_pins_i [expr 1*$ver_link_pin_len] [expr 2*$ver_link_pin_len-1]]
+set link_pin_o_N [index_collection $ver_link_pins_o [expr 1*$ver_link_pin_len] [expr 2*$ver_link_pin_len-1]]
+set link_pin_i_S [index_collection $ver_link_pins_i [expr 0*$ver_link_pin_len] [expr 1*$ver_link_pin_len-1]]
+set link_pin_o_S [index_collection $ver_link_pins_o [expr 0*$ver_link_pin_len] [expr 1*$ver_link_pin_len-1]]
 
 # TODO: Refactor make list indexed by NSEW
 set tile_req_pins_o_S      [index_collection $tile_req_pins_o       [expr 0*$tile_req_pin_len]        [expr 1*$tile_req_pin_len-1]]
@@ -97,4 +96,26 @@ append_to_collection misc_pins [get_ports -filter "name=~host*"]
 
 #set start_x [expr $tile_width - 0.08*400]
 set_individual_pin_constraints -ports $misc_pins -allowed_layers "C5" -side 2
+
+# Read horizontal pins from csv file
+
+set fh [open $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/bp_pin_y.csv r]
+set contents [read $fh]
+
+set i 0
+foreach line [split $contents] {
+  set pin [lindex [split $line ,] 0]
+  set pos [lindex [split $line ,] 1]
+
+  if {$i % 2 == 0} {
+    set layer "K1"
+  } else {
+    set layer "K3"
+  }
+  incr i
+
+  #puts "Placing $pin $layer $pos"
+  if {$line  == ""} break
+  set_individual_pin_constraints -ports [get_ports $pin] -allowed_layers [get_layers $layer] -location "$tile_width $pos"
+}
 

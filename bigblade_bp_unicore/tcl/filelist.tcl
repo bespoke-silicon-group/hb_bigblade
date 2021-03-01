@@ -87,6 +87,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_counter_set_en.v
   $basejump_stl_dir/bsg_misc/bsg_counter_set_down.v
   $basejump_stl_dir/bsg_misc/bsg_counter_up_down.v
@@ -165,7 +166,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_common_dir/src/v/bsg_fifo_1r1w_rolly.sv
   $bp_common_dir/src/v/bsg_bus_pack.sv
   $bp_be_dir/src/v/bp_be_top.sv
-  $bp_be_dir/src/v/bp_be_calculator/bp_be_bypass.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_calculator_top.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_csr.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_fp_to_rec.sv
@@ -265,6 +265,8 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
+  $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_passthrough.v
+  $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_passthrough.v
   $basejump_stl_dir/bsg_link/bsg_link_ddr_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_ddr_upstream.v
   $basejump_stl_dir/bsg_link/bsg_link_oddr_phy.v
@@ -278,6 +280,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_buf_ctrl.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_misc/bsg_reduce.v
+  $basejump_stl_dir/bsg_misc/bsg_reduce_segmented.v
   $basejump_stl_dir/bsg_misc/bsg_nor2.v
   $basejump_stl_dir/bsg_misc/bsg_nor3.v
   $basejump_stl_dir/bsg_misc/bsg_muxi2_gatestack.v
@@ -308,14 +311,14 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/vanilla_bean/hash_function.v
 
-  $bsg_designs_target_dir/v/bp_cce_to_mc_fifo.sv
-  $bsg_designs_target_dir/v/bp_cce_to_mc_mmio.sv
+  $bsg_designs_target_dir/v/bp_cce_to_mc_bridge.sv
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
+  $bsg_designs_target_dir/v/bp_cce_serializer.sv
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
-  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_node.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_small.sv
 "]
 
   #$bsg_designs_target_dir/v/bsg_chip.v

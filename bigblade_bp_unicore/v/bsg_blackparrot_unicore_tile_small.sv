@@ -2,7 +2,7 @@
 `include "bp_common_defines.svh"
 `include "bp_me_defines.svh"
 
-module bsg_blackparrot_unicore_tile
+module bsg_blackparrot_unicore_tile_small
  import bsg_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
@@ -22,10 +22,10 @@ module bsg_blackparrot_unicore_tile
   (input                                          clk_i
    , input                                        reset_i
 
-   , input bsg_tag_s [2:0]                        bsg_tag_i
+   , input bsg_tag_s [1:0]                        bsg_tag_i
 
-   , input [2:0][mc_link_sif_width_lp-1:0]        links_i
-   , output logic [2:0][mc_link_sif_width_lp-1:0] links_o
+   , input [1:0][mc_link_sif_width_lp-1:0]        links_i
+   , output logic [1:0][mc_link_sif_width_lp-1:0] links_o
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
@@ -44,8 +44,8 @@ module bsg_blackparrot_unicore_tile
      );
 
   wire [mc_x_cord_width_gp-1:0] mc_global_x_li = '0;
-  logic [2:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
-  for (genvar i = 0; i < 3; i++)
+  logic [1:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
+  for (genvar i = 0; i < 2; i++)
     begin : btc
       bsg_tag_client
        #(.width_p(mc_y_cord_width_gp), .default_p(0))
@@ -102,13 +102,13 @@ module bsg_blackparrot_unicore_tile
      ,.mem_resp_yumi_o(mem_resp_yumi_lo)
      );
 
-  bp_bedrock_dram_mem_msg_s [1:0] dram_cmd_lo;
-  logic [1:0] dram_cmd_v_lo, dram_cmd_ready_li;
-  bp_bedrock_dram_mem_msg_s [1:0] dram_resp_li;
-  logic [1:0] dram_resp_v_li, dram_resp_yumi_lo;
-  bp_cce_splitter
+  bp_bedrock_dram_mem_msg_s dram_cmd_lo;
+  logic dram_cmd_v_lo, dram_cmd_ready_li;
+  bp_bedrock_dram_mem_msg_s dram_resp_li;
+  logic dram_resp_v_li, dram_resp_yumi_lo;
+  bp_cce_serializer
    #(.bp_params_p(bp_params_p))
-   dram_splitter
+   dram_serilizer
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
@@ -174,53 +174,50 @@ module bsg_blackparrot_unicore_tile
      ,.my_y_i(host_mmio_y_cord_li)
      );
 
-  for (genvar i = 0; i < 2; i++)
-    begin : d
-      wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
-      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = mc_global_y_li[1+i];
-      bp_cce_to_mc_bridge
-       #(.bp_params_p(bp_params_p)
-         ,.host_enable_p(0)
-         ,.mc_max_outstanding_p(mc_max_outstanding_dram_gp)
-         ,.mc_x_cord_width_p(mc_x_cord_width_gp)
-         ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
-         ,.mc_y_cord_width_p(mc_y_cord_width_gp)
-         ,.mc_y_subcord_width_p(mc_y_subcord_width_gp)
-         ,.mc_data_width_p(mc_data_width_gp)
-         ,.mc_addr_width_p(mc_addr_width_gp)
-         ,.mc_vcache_block_size_in_words_p(mc_vcache_block_size_in_words_gp)
-         ,.mc_vcache_size_p(mc_vcache_size_gp)
-         ,.mc_vcache_sets_p(mc_vcache_sets_gp)
-         ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
-         ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
-         )
-       dram_link
-        (.clk_i(clk_i)
-         ,.reset_i(reset_r)
+  wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
+  wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = mc_global_y_li[1];
+  bp_cce_to_mc_bridge
+   #(.bp_params_p(bp_params_p)
+     ,.host_enable_p(0)
+     ,.mc_max_outstanding_p(mc_max_outstanding_dram_gp)
+     ,.mc_x_cord_width_p(mc_x_cord_width_gp)
+     ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
+     ,.mc_y_cord_width_p(mc_y_cord_width_gp)
+     ,.mc_y_subcord_width_p(mc_y_subcord_width_gp)
+     ,.mc_data_width_p(mc_data_width_gp)
+     ,.mc_addr_width_p(mc_addr_width_gp)
+     ,.mc_vcache_block_size_in_words_p(mc_vcache_block_size_in_words_gp)
+     ,.mc_vcache_size_p(mc_vcache_size_gp)
+     ,.mc_vcache_sets_p(mc_vcache_sets_gp)
+     ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
+     ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
+     )
+   dram_link
+    (.clk_i(clk_i)
+     ,.reset_i(reset_r)
 
-         ,.io_cmd_i(dram_cmd_lo[i])
-         ,.io_cmd_v_i(dram_cmd_v_lo[i])
-         ,.io_cmd_ready_o(dram_cmd_ready_li[i])
+     ,.io_cmd_i(dram_cmd_lo)
+     ,.io_cmd_v_i(dram_cmd_v_lo)
+     ,.io_cmd_ready_o(dram_cmd_ready_li)
 
-         ,.io_resp_o(dram_resp_li[i])
-         ,.io_resp_v_o(dram_resp_v_li[i])
-         ,.io_resp_yumi_i(dram_resp_yumi_lo[i])
+     ,.io_resp_o(dram_resp_li)
+     ,.io_resp_v_o(dram_resp_v_li)
+     ,.io_resp_yumi_i(dram_resp_yumi_lo)
 
-         ,.io_cmd_o()
-         ,.io_cmd_v_o()
-         ,.io_cmd_yumi_i('0)
+     ,.io_cmd_o()
+     ,.io_cmd_v_o()
+     ,.io_cmd_yumi_i('0)
 
-         ,.io_resp_i('0)
-         ,.io_resp_v_i('0)
-         ,.io_resp_ready_o()
+     ,.io_resp_i('0)
+     ,.io_resp_v_i('0)
+     ,.io_resp_ready_o()
 
-         ,.link_sif_i(links_i[1+i])
-         ,.link_sif_o(links_o[1+i])
+     ,.link_sif_i(links_i[1])
+     ,.link_sif_o(links_o[1])
 
-         ,.my_x_i(host_dram_x_cord_li)
-         ,.my_y_i(host_dram_y_cord_li)
-         );
-    end
+     ,.my_x_i(host_dram_x_cord_li)
+     ,.my_y_i(host_dram_y_cord_li)
+     );
 
 endmodule
 

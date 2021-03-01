@@ -40,6 +40,10 @@ package bsg_chip_pkg;
   localparam mc_vcache_block_size_in_words_gp = 8;
   localparam mc_vcache_size_gp = mc_vcache_ways_gp*mc_vcache_sets_gp*mc_vcache_block_size_in_words_gp;
 
+  // Number of outstanding MMIO requests to manycore
+  localparam mc_max_outstanding_host_gp = 4;
+  localparam mc_max_outstanding_dram_gp = 8;
+
 endpackage // bsg_chip_pkg
 
 `endif // BSG_CHIP_PKG_V

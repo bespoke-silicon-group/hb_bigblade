@@ -31,6 +31,13 @@ export BSG_FLOW_STYLE :=flat
 export BSG_FLOW_USE_DP :=true
 #export BSG_FLOW_USE_DP :=false
 
+# Determines if the flow should generate an ETM (ndm + db files) for the toplevel block. The primary
+# difference is that during PTSI, model extraction will be performed to generate .db files that can
+# be used in higher level of the hierarchy. Other aspects of the flow might also change to allow for
+# higher-level integration.
+
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM :=true
+
 # Select the target package. Inside of bsg_packaging there multiple packages to
 # choose from that determine the intended package for the ASIC.
 
@@ -97,6 +104,7 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 #     Runtime exploration is designed to be quick and used for early experiments
 #export DC_FLOW_RMPLUS_FLOW :=hplp
 export DC_FLOW_RMPLUS_FLOW :=rtm_exp
+#export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are

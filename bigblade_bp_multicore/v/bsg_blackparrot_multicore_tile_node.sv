@@ -22,14 +22,11 @@ module bsg_blackparrot_multicore_tile_node
    , input                                                mc_clk_i
    , input                                                mc_reset_i
 
-   , input [pod_y_cord_width_gp-1:0]                      my_y_pod_i
-   , input [bp_y_cord_width_gp-1:0]                       my_y_bp_cord_i
-
    , input [E:E][mc_ruche_x_link_sif_width_lp-1:0]        mc_ruche_links_i
    , output logic [E:E][mc_ruche_x_link_sif_width_lp-1:0] mc_ruche_links_o
 
-   , input [3:0][E:E][mc_link_sif_width_lp-1:0]           mc_hor_links_i
-   , output logic [3:0][E:E][mc_link_sif_width_lp-1:0]    mc_hor_links_o
+   , input [2:0][E:E][mc_link_sif_width_lp-1:0]           mc_hor_links_i
+   , output logic [2:0][E:E][mc_link_sif_width_lp-1:0]    mc_hor_links_o
 
    , input [S:N][mc_link_sif_width_lp-1:0]                mc_ver_links_i
    , output logic [S:N][mc_link_sif_width_lp-1:0]         mc_ver_links_o
@@ -49,8 +46,8 @@ module bsg_blackparrot_multicore_tile_node
   `declare_bsg_ready_and_link_sif_s(coh_noc_flit_width_p, bp_coh_ready_and_link_s);
 
   wire [mc_x_cord_width_gp-1:0] mc_global_x_li = '0;
-  logic [3:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
-  for (genvar i = 0; i < 4; i++)
+  logic [2:0][mc_y_cord_width_gp-1:0] mc_global_y_li;
+  for (genvar i = 0; i < 3; i++)
     begin : rof1
       wire [mc_y_subcord_width_gp-1:0] y_subcord_li = (my_y_bp_cord_i << 2'b10) + i;
       assign mc_global_y_li[i] = {my_y_pod_i, y_subcord_li};
@@ -60,7 +57,7 @@ module bsg_blackparrot_multicore_tile_node
   wire [coh_noc_y_cord_width_p-1:0] my_bp_y_cord_li = 1'b1;
   wire [coh_noc_cord_width_p-1:0] my_bp_cord_li = {my_bp_y_cord_li, my_bp_x_cord_li};
 
-  bsg_manycore_link_sif_s [3:0] bp_proc_links_li, bp_proc_links_lo;
+  bsg_manycore_link_sif_s [2:0] bp_proc_links_li, bp_proc_links_lo;
   bsg_blackparrot_multicore_tile
    tile
     (.clk_i(bp_clk_i)
@@ -82,9 +79,9 @@ module bsg_blackparrot_multicore_tile_node
      ,.lce_resp_links_o(bp_lce_resp_links_o)
      );
 
-  bsg_manycore_link_sif_s [3:0][E:W] mc_hor_links_li, mc_hor_links_lo;
-  bsg_manycore_link_sif_s [3:0] mc_proc_links_li, mc_proc_links_lo;
-  for (genvar i = 0; i < 4; i++)
+  bsg_manycore_link_sif_s [2:0][E:W] mc_hor_links_li, mc_hor_links_lo;
+  bsg_manycore_link_sif_s [2:0] mc_proc_links_li, mc_proc_links_lo;
+  for (genvar i = 0; i < 3; i++)
     begin : rof2
       bsg_async_noc_link
        #(.width_p($bits(bsg_manycore_fwd_link_sif_s)-2), .lg_size_p(3))
@@ -123,11 +120,10 @@ module bsg_blackparrot_multicore_tile_node
       assign mc_hor_links_o[i][E] = mc_hor_links_lo[i][E];
     end
 
-  bsg_manycore_ruche_x_link_sif_s [3:0][E:W] mc_ruche_links_li, mc_ruche_links_lo;
+  bsg_manycore_ruche_x_link_sif_s [2:0][E:W] mc_ruche_links_li, mc_ruche_links_lo;
   assign mc_ruche_links_li[0]    = '0;
   assign mc_ruche_links_li[1][W] = '0;
   assign mc_ruche_links_li[2]    = '0;
-  assign mc_ruche_links_li[3]    = '0;
 
   assign mc_ruche_links_li[1][E] = mc_ruche_links_i;
   assign mc_ruche_links_o = mc_ruche_links_lo[1][E];
@@ -137,9 +133,9 @@ module bsg_blackparrot_multicore_tile_node
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
      ,.ruche_factor_X_p(ruche_factor_X_gp)
-     ,.tieoff_west_p(4'b1111)
-     ,.tieoff_east_p(4'b0000)
-     ,.num_row_p(4)
+     ,.tieoff_west_p(3'b111)
+     ,.tieoff_east_p(3'b000)
+     ,.num_row_p(3)
      )
    io_routers
     (.clk_i(mc_clk_i)

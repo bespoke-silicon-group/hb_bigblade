@@ -12,7 +12,9 @@
     {"name": "gf14_1rw_d128_w116_m2_bit",  "width": 116, "depth":  128, "mux": 2, "mask": 1, "banks": 1, "type": "rf"   },
     {"name": "gf14_1rw_d128_w15_m4_bit",   "width":  15, "depth":  128, "mux": 4, "mask": 1, "banks": 1, "type": "rf"   },
 
-    {"name": "gf14_1rw_d256_w34_m2",       "width":  34, "depth":  256, "mux": 2, "mask": 0, "banks": 1, "type": "rf"   }
+    {"name": "gf14_1rw_d256_w34_m2",       "width":  34, "depth":  256, "mux": 2, "mask": 0, "banks": 1, "type": "rf"   },
+    {"name": "gf14_1rw_d40_w124_m2_bit",   "width": 124, "depth":   40, "mux": 2, "mask": 1, "banks": 1, "type": "rf"   }
+
   ],
   "dont_compile": [
   ]

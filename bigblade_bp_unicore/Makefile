@@ -37,13 +37,18 @@ blackparrot_dir     :=$(THIS_DIR)/black-parrot
 blackparrot_url     :=$(GITHUB)black-parrot/black-parrot
 blackparrot_commit  :=tapeout_bigblade
 
-manycore_dir        :=$(THIS_DIR)/bsg_manycore
-manycore_url        :=$(GITHUB)bespoke-silicon-group/bsg_manycore
-manycore_commit     :=ci_bigblade
+bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
+bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
+bsg_manycore_commit  :=ci_bigblade
+
+prep_dir := .pdk_prep
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
-all: $(all_repos)
+$(prep_dir): $(bsg_14.repo)
+	ln -nsf $(bsg_14_dir)/.pdk_prep $@
+
+all: $(all_repos) $(prep_dir)
 	$(MAKE) -C $(blackparrot_dir) prep_lite
 
 %.repo:
