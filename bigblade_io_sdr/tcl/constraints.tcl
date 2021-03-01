@@ -188,12 +188,12 @@ set_false_path -to   [get_ports async_*_reset_o]
 proc constraint_input_sdr_ports {clk_name ports max_delay min_delay} {
   set_input_delay -max $max_delay -clock $clk_name -source_latency_included -network_latency_included $ports
   set_input_delay -min $min_delay -clock $clk_name -source_latency_included -network_latency_included -add_delay $ports
-  set_driving_cell -no_design_rule -lib_cell "SC7P5T_DFFQX1_SSC16R" $ports
+  set_driving_cell -no_design_rule -lib_cell "SC7P5T_DFFQX1_SSC14R" $ports
 }
 proc constraint_output_sdr_ports {clk_name ports max_delay min_delay} {
   set_output_delay -max $max_delay -clock $clk_name $ports
   set_output_delay -min $min_delay -clock $clk_name -add_delay $ports
-  set_load [load_of [get_lib_pin "*/SC7P5T_DFFQX1_SSC16R/D"]] $ports
+  set_load [load_of [get_lib_pin "*/SC7P5T_BUFX1_SSC14R/A"]] $ports
 }
 
 set link_clk_period_ps        1000
@@ -210,7 +210,7 @@ set io_min_input_delay        [expr $max_io_skew_ps]
 
 # upstream (fwd)
 create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name "fwd_out_clk" [get_ports io_fwd_link_clk_o]
-set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX24_SSC16R/CLK"]] [get_ports io_fwd_link_clk_o]
+set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX1_SSC14R/CLK"]] [get_ports io_fwd_link_clk_o]
 constraint_output_sdr_ports "fwd_out_clk" [get_ports io_fwd_link_data_o]  $io_max_output_delay $io_min_output_delay
 constraint_output_sdr_ports "fwd_out_clk" [get_ports io_fwd_link_v_o]     $io_max_output_delay $io_min_output_delay
 create_clock -period $token_clk_period_ps -name "fwd_tkn_clk" [get_ports io_fwd_link_token_i]
@@ -218,7 +218,7 @@ set_clock_uncertainty $token_clk_uncertainty_ps [get_clock "fwd_tkn_clk"]
 
 # upstream (rev)
 create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name "rev_out_clk" [get_ports io_rev_link_clk_o]
-set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX24_SSC16R/CLK"]] [get_ports io_rev_link_clk_o]
+set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX1_SSC14R/CLK"]] [get_ports io_rev_link_clk_o]
 constraint_output_sdr_ports "rev_out_clk" [get_ports io_rev_link_data_o]  $io_max_output_delay $io_min_output_delay
 constraint_output_sdr_ports "rev_out_clk" [get_ports io_rev_link_v_o]     $io_max_output_delay $io_min_output_delay
 create_clock -period $token_clk_period_ps -name "rev_tkn_clk" [get_ports io_rev_link_token_i]
@@ -227,14 +227,14 @@ set_clock_uncertainty $token_clk_uncertainty_ps [get_clock "rev_tkn_clk"]
 # downstream (fwd)
 create_clock -period $link_clk_period_ps -name "fwd_in_clk" [get_ports io_fwd_link_clk_i]
 set_clock_uncertainty $link_clk_uncertainty_ps [get_clock "fwd_in_clk"]
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX24_SSC16R" [get_ports io_fwd_link_clk_i]
+set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports io_fwd_link_clk_i]
 constraint_input_sdr_ports "fwd_in_clk" [get_ports io_fwd_link_data_i] $io_max_input_delay $io_min_input_delay
 constraint_input_sdr_ports "fwd_in_clk" [get_ports io_fwd_link_v_i]    $io_max_input_delay $io_min_input_delay
 
 # downstream (rev)
 create_clock -period $link_clk_period_ps -name "rev_in_clk" [get_ports io_rev_link_clk_i]
 set_clock_uncertainty $link_clk_uncertainty_ps [get_clock "rev_in_clk"]
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX24_SSC16R" [get_ports io_rev_link_clk_i]
+set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports io_rev_link_clk_i]
 constraint_input_sdr_ports "rev_in_clk" [get_ports io_rev_link_data_i] $io_max_input_delay $io_min_input_delay
 constraint_input_sdr_ports "rev_in_clk" [get_ports io_rev_link_v_i]    $io_max_input_delay $io_min_input_delay
 

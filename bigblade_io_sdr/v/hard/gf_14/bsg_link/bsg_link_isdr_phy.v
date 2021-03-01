@@ -9,12 +9,16 @@ module bsg_link_isdr_phy
   ,output [width_p-1:0] data_o
   );
 
-  SC7P5T_CKBUFX24_SSC16R BSG_CKBUF_DONT_TOUCH (.CLK(clk_i),.Z(clk_o));
+  SC7P5T_CKBUFX1_SSC14R BSG_CKBUF_DONT_TOUCH (.CLK(clk_i),.Z(clk_o));
+
+  wire [width_p-1:0] data_i_buf;
 
   for (genvar i = 0; i < width_p; i++)
   begin: data
-    SC7P5T_DFFQX1_SSC16R BSG_DFFQ_DONT_TOUCH
-    (.D(data_i[i]),.CLK(clk_o),.Q(data_o[i]));
+    SC7P5T_BUFX1_SSC14R BSG_BUF_DONT_TOUCH
+    (.A(data_i[i]),.Z(data_i_buf[i]));
+    SC7P5T_DFFQX1_SSC14R BSG_DFFQ_DONT_TOUCH
+    (.D(data_i_buf[i]),.CLK(clk_o),.Q(data_o[i]));
   end
 
 endmodule
