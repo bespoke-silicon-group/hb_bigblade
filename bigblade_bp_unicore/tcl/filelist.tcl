@@ -87,6 +87,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_counter_set_en.v
   $basejump_stl_dir/bsg_misc/bsg_counter_set_down.v
   $basejump_stl_dir/bsg_misc/bsg_counter_up_down.v
@@ -264,6 +265,8 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
+  $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_passthrough.v
+  $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_passthrough.v
   $basejump_stl_dir/bsg_link/bsg_link_ddr_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_ddr_upstream.v
   $basejump_stl_dir/bsg_link/bsg_link_oddr_phy.v

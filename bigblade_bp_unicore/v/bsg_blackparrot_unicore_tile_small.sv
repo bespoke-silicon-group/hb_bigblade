@@ -50,12 +50,12 @@ module bsg_blackparrot_unicore_tile_small
       bsg_tag_client
        #(.width_p(mc_y_cord_width_gp), .default_p(0))
        btc
-        (.bsg_tag_i(bsg_tag_i)
+        (.bsg_tag_i(bsg_tag_i[i])
 
          ,.recv_clk_i(clk_i)
          ,.recv_reset_i(1'b0)
          ,.recv_new_r_o()
-         ,.recv_data_r_o(mc_global_y_li)
+         ,.recv_data_r_o(mc_global_y_li[i])
          );
     end
 

@@ -88,7 +88,7 @@ module bp_cce_serializer
       io_cmd_cast_o.data = io_cmd_data_li;
     end
 
-  logic [word_width_gp-1:0] io_resp_data_li;
+  logic [dword_width_gp-1:0] io_resp_data_li;
   logic io_resp_ready_lo;
   bsg_serial_in_parallel_out_passthrough
    #(.width_p(word_width_gp), .els_p(2))
@@ -96,7 +96,7 @@ module bp_cce_serializer
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
 
-     ,.data_i(io_resp_i)
+     ,.data_i(io_resp_cast_i.data)
      ,.v_i(io_resp_v_i)
      ,.ready_and_o(io_resp_ready_lo)
 
