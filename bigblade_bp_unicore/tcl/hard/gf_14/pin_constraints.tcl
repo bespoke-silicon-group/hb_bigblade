@@ -8,9 +8,10 @@ set tile_height [core_height]
 set k_pitch 0.128
 set c_pitch 0.160
 
-set                  misc_pins [get_ports -filter "name=~*clk*"]
-append_to_collection misc_pins [get_ports -filter "name=~*reset*"]
-append_to_collection misc_pins [get_ports -filter "name=~*bsg_tag*"]
+set                  misc_pins [get_ports -filter "name=~clk_i"]
+append_to_collection misc_pins [get_ports -filter "name=~reset_i"]
+append_to_collection misc_pins [get_ports -filter "name=~global_y_cord_i*"]
+append_to_collection misc_pins [get_ports -filter "name=~async_*"]
 
 set misc_pins_len [expr [sizeof_collection $misc_pins]]
 set start_x [expr ($tile_width / 2)  - (2*$c_pitch*$misc_pins_len/2)]
@@ -18,10 +19,10 @@ set last_loc [bsg_pins_line_constraint $misc_pins "C5" top $start_x "self" {} 2 
 
 # Read horizontal pins from csv file
 
-set hor_pins [get_ports -filter "name=~*link*"]
+set hor_pins [get_ports -filter "name=~io_*link*"]
 set hor_pins_len [expr [sizeof_collection $hor_pins]]
 
-set start_y [expr ($tile_height / 2) - (4*$k_pitch*$hor_pins_len/2)]
+set start_y [expr ($tile_height / 2) - ($k_pitch*$hor_pins_len/2)]
 #set start_y [expr 100]
 set last_loc [bsg_pins_line_constraint $hor_pins "K1 K3" right $start_y "self" {} 1 0]
 

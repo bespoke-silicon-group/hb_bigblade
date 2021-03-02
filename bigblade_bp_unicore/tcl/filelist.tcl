@@ -316,7 +316,13 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
   $bsg_designs_target_dir/v/bp_cce_serializer.sv
 
-  $bsg_designs_target_dir/../
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr.v
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_unicore_lite.sv
@@ -325,4 +331,3 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_sdr.sv
 "]
 
-  #$bsg_designs_target_dir/v/bsg_chip.v

@@ -1,0 +1,31 @@
+
+module bsg_link_osdr_phy
+
+ #(parameter width_p = "inv")
+
+  (input                clk_i
+  ,input                reset_i
+  ,input  [width_p-1:0] data_i
+  ,output               clk_o
+  ,output [width_p-1:0] data_o
+  );
+
+  wire clk_r_p, clk_r_n, clk_o_buf;
+
+  SC7P5T_CKXOR2X1_SSC14R BSG_CKXOR2_DONT_TOUCH
+  (.Z(clk_o_buf),.CLK(clk_r_p),.EN(clk_r_n));
+  SC7P5T_CKBUFX1_SSC14R BSG_CKBUF_DONT_TOUCH
+  (.CLK(clk_o_buf),.Z(clk_o));
+
+  SC7P5T_DFFRQX1_SSC14R BSG_DFFRQ_DONT_TOUCH
+  (.D(~clk_r_p),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_p));
+  SC7P5T_DFFNRQX1_SSC14R BSG_DFFNRQ_DONT_TOUCH
+  (.D(~clk_r_n),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_n));
+
+  for (genvar i = 0; i < width_p; i++)
+  begin: data
+    SC7P5T_DFFQX1_SSC14R BSG_DFFQ_DONT_TOUCH
+    (.D(data_i[i]),.CLK(clk_i),.Q(data_o[i]));
+  end
+
+endmodule
