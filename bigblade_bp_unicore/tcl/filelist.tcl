@@ -262,6 +262,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
   $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
+  $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
@@ -315,10 +316,13 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
   $bsg_designs_target_dir/v/bp_cce_serializer.sv
 
+  $bsg_designs_target_dir/../
+
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_small.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_sdr.sv
 "]
 
   #$bsg_designs_target_dir/v/bsg_chip.v

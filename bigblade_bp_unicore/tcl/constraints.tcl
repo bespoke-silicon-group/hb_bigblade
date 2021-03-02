@@ -2,7 +2,7 @@ puts "BSG-info: Running script [info script]\n"
 
 ########################################
 ## Source common scripts
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_cdc.constraints.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_sdr.constraints.tcl
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_misc.tcl
 
 ########################################
@@ -21,69 +21,62 @@ set bp_clk_period_ps       1000
 set bp_clk_uncertainty_per 3.0
 set bp_clk_uncertainty_ps  [expr min([expr ${bp_clk_period_ps}*(${bp_clk_uncertainty_per}/100.0)], 20)]
 
-set tag_clk_name "tag_clk" ;# clock for bsg_tag
-set tag_clk_period_ps       6666.0 ;# 150 MHz
-set tag_clk_uncertainty_per 3.0
-set tag_clk_uncertainty_ps  [expr min([expr ${tag_clk_period_ps}*(${tag_clk_uncertainty_per}/100.0)], 20)]
-
-set bp_input_delay_min_per 2.0
-set bp_input_delay_min_ps  [expr ${bp_clk_period_ps}*(${bp_input_delay_min_per}/100.0)]
-set bp_input_delay_max_per 70.0
-set bp_input_delay_max_ps  [expr ${bp_clk_period_ps}*(${bp_input_delay_max_per}/100.0)]
-
-set bp_output_delay_min_per 2.0
-set bp_output_delay_min_ps  [expr ${bp_clk_period_ps}*(${bp_output_delay_min_per}/100.0)]
-set bp_output_delay_max_per 20.0
-set bp_output_delay_max_ps  [expr ${bp_clk_period_ps}*(${bp_output_delay_max_per}/100.0)]
-
-set tag_input_delay_min_per  2.0
-set tag_input_delay_min_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_min_per}/100.0)]
-set tag_input_delay_max_per  70.0
-set tag_input_delay_max_ps  [expr ${tag_clk_period_ps}*(${tag_input_delay_max_per}/100.0)]
-
-set tag_output_delay_min_per  2.0
-set tag_output_delay_min_ps  [expr ${tag_clk_period_ps}*(${tag_output_delay_min_per}/100.0)]
-set tag_output_delay_max_per  20.0
-set tag_output_delay_max_ps  [expr ${tag_clk_period_ps}*(${tag_output_delay_max_per}/100.0)]
-
 ########################################
 ## Reg2Reg
 create_clock -period ${bp_clk_period_ps} -name ${bp_clk_name} [get_ports "clk_i"]
 set_clock_uncertainty ${bp_clk_uncertainty_ps} [get_clocks ${bp_clk_name}]
 
-set tag_clk_pins [get_ports {bsg_tag_i[*][clk]}]
-create_clock -period ${tag_clk_period_ps} -name ${tag_clk_name} ${tag_clk_pins}
-set_clock_uncertainty ${tag_clk_uncertainty_ps} [get_clocks ${tag_clk_name}]
-
 ########################################
-## In2Reg
-set bp_input_pins [filter_collection [filter_collection [all_inputs] "name=~*links*"] "name!~*clk*"]
-add_to_collection $bp_input_pins [get_ports reset_i]
-set_input_delay -min ${bp_input_delay_min_ps} -clock ${bp_clk_name} ${bp_input_pins}
-set_input_delay -max ${bp_input_delay_max_ps} -clock ${bp_clk_name} ${bp_input_pins}
-set tag_input_pins [filter_collection [filter_collection [all_inputs] "name=~bsg_tag*"] "name!~*clk*"]
-set_input_delay -min ${tag_input_delay_min_ps} -clock ${tag_clk_name} ${tag_input_pins}
-set_input_delay -max ${tag_input_delay_max_ps} -clock ${tag_clk_name} ${tag_input_pins}
-set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+## 
+set fwd_out_clk_name "fwd_out_clk"
+set fwd_tkn_clk_name "fwd_tkn_clk"
+create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name ${fwd_out_clk} [get_ports io_fwd_link_clk_o]
+set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX1_SSC14R/CLK"]] [get_ports io_fwd_link_clk_o]
+constrain_output_sdr_ports ${fwd_out_clk} [get_ports io_fwd_link_data_o]  $io_max_output_delay $io_min_output_delay
+constrain_output_sdr_ports ${fwd_out_clk} [get_ports io_fwd_link_v_o]     $io_max_output_delay $io_min_output_delay
+create_clock -period $token_clk_period_ps -name ${fwd_tkn_clk} [get_ports io_fwd_link_token_i]
+set_clock_uncertainty $token_clk_uncertainty_ps [get_clock ${fwd_tkn_clk}]
 
-########################################
-## Reg2Out
-set_output_delay -min ${bp_output_delay_min_ps} -clock ${bp_clk_name} ${bp_output_pins}
-set_output_delay -max ${bp_output_delay_max_ps} -clock ${bp_clk_name} ${bp_output_pins}
-set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
-set_load -max [load_of [get_lib_pin */$LIB_CELLS(invx8,load_pin)]] [all_outputs]
+# upstream (rev)
+set rev_out_clk_name "rev_out_clk"
+set rev_tkn_clk_name "rev_tkn_clk"
+create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name ${rev_out_clk_name} [get_ports io_rev_link_clk_o]
+set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX1_SSC14R/CLK"]] [get_ports io_rev_link_clk_o]
+constrain_output_sdr_ports ${rev_out_clk_name} [get_ports io_rev_link_data_o]  ${io_max_output_delay} ${io_min_output_delay}
+constrain_output_sdr_ports ${rev_out_clk_name} [get_ports io_rev_link_v_o]     ${io_max_output_delay} ${io_min_output_delay}
+create_clock -period ${token_clk_period_ps} -name ${rev_tkn_clk_name} [get_ports io_rev_link_token_i]
+set_clock_uncertainty ${token_clk_uncertainty_ps} [get_clock ${rev_tkn_clk_name}]
+
+# downstream (fwd)
+set fwd_in_clk_name "fwd_in_clk"
+create_clock -period $link_clk_period_ps -name ${fwd_in_clk_name} [get_ports io_fwd_link_clk_i]
+set_clock_uncertainty $link_clk_uncertainty_ps [get_clock ${fwd_in_clk_name}]
+set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports io_fwd_link_clk_i]
+constrain_input_sdr_ports ${fwd_in_clk_name} [get_ports io_fwd_link_data_i] ${io_max_input_delay} ${io_min_input_delay}
+constrain_input_sdr_ports ${fwd_in_clk_name} [get_ports io_fwd_link_v_i]    ${io_max_input_delay} ${io_min_input_delay}
+
+# downstream (rev)
+set rev_in_clk_name "rev_in_clk"
+create_clock -period $link_clk_period_ps -name ${rev_in_clk} [get_ports io_rev_link_clk_i]
+set_clock_uncertainty $link_clk_uncertainty_ps [get_clock ${rev_in_clk}]
+set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports io_rev_link_clk_i]
+constrain_input_sdr_ports ${rev_in_clk} [get_ports io_rev_link_data_i] ${io_max_input_delay} ${io_min_input_delay}
+constrain_input_sdr_ports ${rev_in_clk} [get_ports io_rev_link_v_i]    ${io_max_input_delay} ${io_min_input_delay}
 
 ########################################
 ## Disabled or false paths
 bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
 bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
+set_false_path -from [get_ports global_*_cord_i]
+set_false_path -from [get_ports async_*_reset_i]
+set_false_path -to [get_ports async_*_reset_o]
+
 ########################################
 ## CDC Paths
 update_timing
-bsg_chip_async_constraints
-bsg_chip_cdc_constraints [all_clocks]
+#bsg_chip_async_constraints
+#bsg_chip_cdc_constraints [all_clocks]
 
 ########################################
 ## Derate

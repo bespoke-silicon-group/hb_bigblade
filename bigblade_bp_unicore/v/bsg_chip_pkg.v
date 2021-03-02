@@ -3,7 +3,7 @@
 
 package bsg_chip_pkg;
 
-  `include "bsg_defines.v"
+  `include "bp_common_defines.svh"
 
   import bp_common_pkg::*;
 
@@ -43,6 +43,9 @@ package bsg_chip_pkg;
   // Number of outstanding MMIO requests to manycore
   localparam mc_max_outstanding_host_gp = 4;
   localparam mc_max_outstanding_dram_gp = 8;
+
+  localparam sdr_lg_fifo_depth_gp = 3;
+  localparam sdr_lg_credit_to_token_decimation_gp = 0;
 
 endpackage // bsg_chip_pkg
 
