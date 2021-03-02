@@ -18,10 +18,10 @@ module bsg_link_osdr_phy
   SC7P5T_CKBUFX2_SSC14R BSG_OSDR_CKBUF_DONT_TOUCH
   (.CLK(clk_o_buf),.Z(clk_o));
 
-  SC7P5T_DFFRQX1_SSC14R BSG_OSDR_DFFRQ_DONT_TOUCH
-  (.D(~clk_r_p),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_p));
-  SC7P5T_DFFNRQX1_SSC14R BSG_OSDR_DFFNRQ_DONT_TOUCH
-  (.D(~clk_r_n),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_n));
+  SC7P5T_DFFQX1_SSC14R BSG_OSDR_DFFPOS_DONT_TOUCH
+  (.D(~(clk_r_p|reset_i)),.CLK(clk_i),.Q(clk_r_p));
+  SC7P5T_DFFNQX1_SSC14R BSG_OSDR_DFFNEG_DONT_TOUCH
+  (.D(~(clk_r_n|reset_i)),.CLK(clk_i),.Q(clk_r_n));
 
   for (genvar i = 0; i < width_p; i++)
   begin: data
