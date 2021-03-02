@@ -68,6 +68,7 @@ set TESTING_SOURCE_FILES [join "
 
   $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
   $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
@@ -82,7 +83,6 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bsg_link_sdr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_manycore_io_router_sdr_link_test_node.v
 

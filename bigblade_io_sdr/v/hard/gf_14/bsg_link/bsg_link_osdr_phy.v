@@ -11,21 +11,24 @@ module bsg_link_osdr_phy
   );
 
   wire clk_r_p, clk_r_n, clk_o_buf;
+  wire [width_p-1:0] data_o_buf;
 
-  SC7P5T_CKXOR2X1_SSC14R BSG_CKXOR2_DONT_TOUCH
+  SC7P5T_CKXOR2X1_SSC14R BSG_OSDR_CKXOR2_DONT_TOUCH
   (.Z(clk_o_buf),.CLK(clk_r_p),.EN(clk_r_n));
-  SC7P5T_CKBUFX1_SSC14R BSG_CKBUF_DONT_TOUCH
+  SC7P5T_CKBUFX2_SSC14R BSG_OSDR_CKBUF_DONT_TOUCH
   (.CLK(clk_o_buf),.Z(clk_o));
 
-  SC7P5T_DFFRQX1_SSC14R BSG_DFFRQ_DONT_TOUCH
+  SC7P5T_DFFRQX1_SSC14R BSG_OSDR_DFFRQ_DONT_TOUCH
   (.D(~clk_r_p),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_p));
-  SC7P5T_DFFNRQX1_SSC14R BSG_DFFNRQ_DONT_TOUCH
+  SC7P5T_DFFNRQX1_SSC14R BSG_OSDR_DFFNRQ_DONT_TOUCH
   (.D(~clk_r_n),.CLK(clk_i),.RESET(~reset_i),.Q(clk_r_n));
 
   for (genvar i = 0; i < width_p; i++)
   begin: data
-    SC7P5T_DFFQX1_SSC14R BSG_DFFQ_DONT_TOUCH
-    (.D(data_i[i]),.CLK(clk_i),.Q(data_o[i]));
+    SC7P5T_DFFQX1_SSC14R BSG_OSDR_DFFQ_DONT_TOUCH
+    (.D(data_i[i]),.CLK(clk_i),.Q(data_o_buf[i]));
+    SC7P5T_BUFX2_SSC14R BSG_OSDR_BUF_DONT_TOUCH
+    (.A(data_o_buf[i]),.Z(data_o[i]));
   end
 
 endmodule
