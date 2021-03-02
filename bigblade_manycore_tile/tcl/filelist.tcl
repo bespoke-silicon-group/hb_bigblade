@@ -25,9 +25,11 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_counter_set_down.v
   $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
   $basejump_stl_dir/bsg_misc/bsg_mux.v
+  $basejump_stl_dir/bsg_misc/bsg_mux_bitwise.v
   $basejump_stl_dir/bsg_misc/bsg_dff.v
   $basejump_stl_dir/bsg_misc/bsg_dff_en.v
   $basejump_stl_dir/bsg_misc/bsg_dff_en_bypass.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_reset_en_bypass.v
   $basejump_stl_dir/bsg_misc/bsg_dff_reset.v
   $basejump_stl_dir/bsg_misc/bsg_dff_reset_en.v
   $basejump_stl_dir/bsg_misc/bsg_dff_reset_set_clear.v
@@ -51,6 +53,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_expand_bitmask.v
   $basejump_stl_dir/bsg_misc/bsg_mux_segmented.v
   $basejump_stl_dir/bsg_misc/bsg_mux_one_hot.v
+  $basejump_stl_dir/bsg_misc/bsg_lru_pseudo_tree_backup.v
   $basejump_stl_dir/bsg_misc/bsg_lru_pseudo_tree_encode.v
   $basejump_stl_dir/bsg_misc/bsg_lru_pseudo_tree_decode.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
@@ -165,6 +168,8 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
   $bsg_manycore_dir/v/bsg_manycore_eva_to_npa.v
+  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
+  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_ruche_buffer.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_manycore_proc_vanilla.v
   $bsg_manycore_dir/v/vanilla_bean/network_rx.v
@@ -190,9 +195,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/vanilla_bean/fpu_fdiv_fsqrt.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma_round.v
-
-
 "]
 
-
 #  $basejump_stl_dir/bsg_clk_gen/bsg_dly_line.v
+
