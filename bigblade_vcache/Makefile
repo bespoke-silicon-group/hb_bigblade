@@ -19,3 +19,4 @@ bsg_14:
 bsg_manycore:
 	git clone git@github.com:bespoke-silicon-group/bsg_manycore.git $@
 	cd $@ ; git checkout $(commit) ;
+	cd $@ ; git submodule update --init imports/HardFloat;
