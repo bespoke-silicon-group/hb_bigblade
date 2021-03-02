@@ -186,19 +186,23 @@ place_pins_k2_k4 $north_input_pins  [expr $tile_llx+$NORTH_INPUT_OFFSET] $tile_u
 place_pins_k2_k4 $south_output_pins [expr $tile_llx+$NORTH_INPUT_OFFSET] $tile_lly
 
 
-# clock reset
+# clock
 set clk_pin   [get_ports -filter "name=~clk_i"]
-set reset_pin [get_ports  -filter "name=~reset_i"]
-set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K4" -location "[expr $tile_llx+(0.128*230)] $tile_ury"
-set_individual_pin_constraints -ports $reset_pin -allowed_layers "K4" -location "[expr $tile_llx+(0.128*234)] $tile_ury"
+set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K3" -location "$tile_urx [expr 0.128*740]"
 
 
 # my cord
-set cord_pins [list]
-append_to_collection cord_pins [get_ports -filter "name=~my_*_i*"]
-append_to_collection cord_pins [get_ports -filter "name=~pod_*_i*"]
-place_pins_k2_k4 $cord_pins [expr $tile_llx+(0.128*882)] $tile_lly
+set cord_reset_in_pins [list]
+append_to_collection cord_reset_in_pins [get_ports reset_i]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports global_x_i*] name]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports global_y_i*] name]
+place_pins_k2_k4 $cord_reset_in_pins [expr $tile_llx+(0.128*234)] $tile_ury
 
+set cord_reset_out_pins [list]
+append_to_collection cord_reset_out_pins [get_ports reset_o]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports global_x_o*] name]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports global_y_o*] name]
+place_pins_k2_k4 $cord_reset_out_pins [expr $tile_llx+(0.128*234)] $tile_lly
 
 
 
