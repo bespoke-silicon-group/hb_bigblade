@@ -17,7 +17,7 @@ module bsg_link_isdr_phy
   begin: data
     SC7P5T_BUFX2_SSC14R BSG_ISDR_BUF_DONT_TOUCH
     (.A(data_i[i]),.Z(data_i_buf[i]));
-    SC7P5T_DFFQX1_SSC14R BSG_ISDR_DFFQ_DONT_TOUCH
+    SC7P5T_DFFQX1_SSC14R BSG_ISDR_DFFQ
     (.D(data_i_buf[i]),.CLK(clk_o),.Q(data_o[i]));
   end
 
