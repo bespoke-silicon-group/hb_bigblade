@@ -164,8 +164,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_manycore_eva_to_npa.v
   $bsg_manycore_dir/v/bsg_ruche_buffer.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_manycore_proc_vanilla.v
