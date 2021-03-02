@@ -1,14 +1,7 @@
 
 # set_dont_touch
-set_dont_touch [get_nets io_fwd_link_clk_o] true
-set_dont_touch [get_nets io_fwd_link_data_o[*]] true
-set_dont_touch [get_nets io_fwd_link_v_o] true
-set_dont_touch [get_nets io_rev_link_clk_o] true
-set_dont_touch [get_nets io_rev_link_data_o[*]] true
-set_dont_touch [get_nets io_rev_link_v_o] true
-set_dont_touch [get_nets io_fwd_link_clk_i] true
-set_dont_touch [get_nets io_fwd_link_data_i[*]] true
-set_dont_touch [get_nets io_fwd_link_v_i] true
-set_dont_touch [get_nets io_rev_link_clk_i] true
-set_dont_touch [get_nets io_rev_link_data_i[*]] true
-set_dont_touch [get_nets io_rev_link_v_i] true
+# inputs
+set_dont_touch_network -no_propagate [get_ports io_*_link_data_i[*]]
+set_dont_touch_network -no_propagate [get_ports io_*_link_v_i]
+# outputs
+set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_BUF_DONT_TOUCH/Z"]
