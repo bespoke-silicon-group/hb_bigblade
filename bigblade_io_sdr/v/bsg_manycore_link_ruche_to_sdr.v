@@ -1,5 +1,5 @@
 
-module bsg_manycore_io_router_sdr_link
+module bsg_manycore_link_ruche_to_sdr
 
  import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
