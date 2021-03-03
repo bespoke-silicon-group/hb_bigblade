@@ -70,6 +70,14 @@ module bsg_manycore_io_router_sdr_link
   ,output                    io_rev_link_token_o
   );
 
+  //-------------------------------------------
+  //As the manycore will distribute across large area, it will take long
+  //time for the reset signal to propgate. We should register the reset
+  //signal in each tile
+  logic core_reset_r;
+  bsg_dff #(.width_p(1)) dff_core_reset
+  (.clk_i(core_clk_i),.data_i(core_reset_i),.data_o(core_reset_r));
+
   `declare_bsg_manycore_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
   bsg_manycore_link_sif_s proc_link_sif_li, proc_link_sif_lo;
   bsg_manycore_link_sif_s [S:W] core_link_sif_li, core_link_sif_lo;
@@ -109,7 +117,7 @@ module bsg_manycore_io_router_sdr_link
   ,.tieoff_east_p   (tieoff_west_not_east_p == 0)
   ) io_rtr
   (.clk_i           (core_clk_i)
-  ,.reset_i         (core_reset_i)
+  ,.reset_i         (core_reset_r)
 
   ,.link_sif_i      (core_link_sif_li)
   ,.link_sif_o      (core_link_sif_lo)
