@@ -1,4 +1,4 @@
-all: | bsg_cadenv bsg_packaging basejump_stl bsg_14
+all: | bsg_cadenv bsg_manycore basejump_stl bsg_14
 
 bsg_cadenv:    commit=master
 basejump_stl:  commit=master
@@ -19,3 +19,4 @@ bsg_14:
 bsg_manycore:
 	git clone git@github.com:bespoke-silicon-group/bsg_manycore.git $@
 	cd $@ ; git checkout $(commit) ;
+	cd $@ ; git submodule update --init imports/HardFloat;
