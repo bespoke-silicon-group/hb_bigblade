@@ -116,62 +116,62 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 #   FIFO input constraints
 #   N/S ver link
 for {set i 0} {$i <= 1} {incr i} {
-  constraint_input_ports $core_clk_name   $ver_rev_data_in_ports($i)     500 0
-  constraint_input_ports $core_clk_name   $ver_rev_valid_in_ports($i)    500 0
-  constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports($i)  500 0
+  constraint_input_ports $core_clk_name   $ver_rev_data_in_ports($i)     930 0
+  constraint_input_ports $core_clk_name   $ver_rev_valid_in_ports($i)    850 0
+  constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports($i)   870 0
 
-  constraint_input_ports $core_clk_name   $ver_fwd_data_in_ports($i)     500 0
-  constraint_input_ports $core_clk_name   $ver_fwd_valid_in_ports($i)    500 0
-  constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports($i)  500 0
+  constraint_input_ports $core_clk_name   $ver_fwd_data_in_ports($i)     930 0
+  constraint_input_ports $core_clk_name   $ver_fwd_valid_in_ports($i)    840 0
+  constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports($i)   880 0
 }
 
 # hor link
-constraint_input_ports $core_clk_name   $hor_rev_data_in_ports     500 0
-constraint_input_ports $core_clk_name   $hor_rev_valid_in_ports    500 0
-constraint_output_ports $core_clk_name  $hor_rev_ready_out_ports  500 0
+constraint_input_ports $core_clk_name   $hor_rev_data_in_ports          930 0
+constraint_input_ports $core_clk_name   $hor_rev_valid_in_ports         870 0
+constraint_output_ports $core_clk_name  $hor_rev_ready_out_ports        870 0
 
-constraint_input_ports $core_clk_name   $hor_fwd_data_in_ports     500 0
-constraint_input_ports $core_clk_name   $hor_fwd_valid_in_ports    500 0
-constraint_output_ports $core_clk_name  $hor_fwd_ready_out_ports  500 0
+constraint_input_ports $core_clk_name   $hor_fwd_data_in_ports          930 0
+constraint_input_ports $core_clk_name   $hor_fwd_valid_in_ports         850 0
+constraint_output_ports $core_clk_name  $hor_fwd_ready_out_ports        880 0
 
 # ruche link
-constraint_input_ports $core_clk_name   $ruche_rev_data_in_ports     500 0
-constraint_input_ports $core_clk_name   $ruche_rev_valid_in_ports    500 0
-constraint_output_ports $core_clk_name  $ruche_rev_ready_out_ports  500 0
+constraint_input_ports $core_clk_name   $ruche_rev_data_in_ports        930 0
+constraint_input_ports $core_clk_name   $ruche_rev_valid_in_ports       840 0
+constraint_output_ports $core_clk_name  $ruche_rev_ready_out_ports      870 0
 
-constraint_input_ports $core_clk_name   $ruche_fwd_data_in_ports     500 0
-constraint_input_ports $core_clk_name   $ruche_fwd_valid_in_ports    500 0
-constraint_output_ports $core_clk_name  $ruche_fwd_ready_out_ports   500 0
+constraint_input_ports $core_clk_name   $ruche_fwd_data_in_ports        500 0
+constraint_input_ports $core_clk_name   $ruche_fwd_valid_in_ports       500 0
+constraint_output_ports $core_clk_name  $ruche_fwd_ready_out_ports      550 0
 
 # router output constraints
 # N/S ver link
 for {set i 0} {$i <= 1} {incr i} {
-  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   500 0
-  constraint_output_ports $core_clk_name $ver_rev_valid_out_ports($i)  500 0
-  constraint_input_ports  $core_clk_name $ver_rev_ready_in_ports($i)   500 0
+  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   510 0
+  constraint_output_ports $core_clk_name $ver_rev_valid_out_ports($i)  680 0
+  constraint_input_ports  $core_clk_name $ver_rev_ready_in_ports($i)   780 0
 
-  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   500 0
-  constraint_output_ports $core_clk_name $ver_fwd_valid_out_ports($i)  500 0
-  constraint_input_ports  $core_clk_name $ver_fwd_ready_in_ports($i)   500 0
+  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   520 0
+  constraint_output_ports $core_clk_name $ver_fwd_valid_out_ports($i)  680 0
+  constraint_input_ports  $core_clk_name $ver_fwd_ready_in_ports($i)   760 0
 }
 
 # hor link
-constraint_output_ports $core_clk_name $hor_rev_data_out_ports   500 0
-constraint_output_ports $core_clk_name $hor_rev_valid_out_ports  500 0
-constraint_input_ports  $core_clk_name $hor_rev_ready_in_ports   500 0
+constraint_output_ports $core_clk_name $hor_rev_data_out_ports   550 0
+constraint_output_ports $core_clk_name $hor_rev_valid_out_ports  690 0
+constraint_input_ports  $core_clk_name $hor_rev_ready_in_ports   790 0
 
-constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   500 0
-constraint_output_ports $core_clk_name $hor_fwd_valid_out_ports  500 0
-constraint_input_ports  $core_clk_name $hor_fwd_ready_in_ports   500 0
+constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   590 0
+constraint_output_ports $core_clk_name $hor_fwd_valid_out_ports  750 0
+constraint_input_ports  $core_clk_name $hor_fwd_ready_in_ports   840 0
 
 # ruche link
-constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   500 0
-constraint_output_ports $core_clk_name $ruche_rev_valid_out_ports  500 0
-constraint_input_ports  $core_clk_name $ruche_rev_ready_in_ports   500 0
+constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   550 0
+constraint_output_ports $core_clk_name $ruche_rev_valid_out_ports  900 0
+constraint_input_ports  $core_clk_name $ruche_rev_ready_in_ports   510 0
 
-constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   500 0
-constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  500 0
-constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   500 0
+constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   560 0
+constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  760 0
+constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   830 0
 
 
 # core reset
@@ -269,6 +269,13 @@ set_dont_touch_network -no_propagate [get_ports io_*_link_v_i]
 # outputs
 set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_BUF_DONT_TOUCH/Z"]
 
+
+# ungroup
+
+set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
 
 ## Derate
 bsg_chip_derate_cells
