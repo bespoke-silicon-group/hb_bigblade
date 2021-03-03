@@ -82,8 +82,8 @@ export BSG_POWER_INTENT :=sv_standard
 #     puts the CAD flow into the highest effort signoff quality mode we have.
 # - tt_only
 #     puts the CAD flow into a single scenario mode (typical corner).
-#export BSG_CAD_SETUP :=tt_only
-export BSG_CAD_SETUP :=default
+export BSG_CAD_SETUP :=tt_only
+#export BSG_CAD_SETUP :=default
 
 # Overrides the default memgen.json in bsg_14. Only these memories will be
 # generated when running make prep; however, SRAMs which have already been
@@ -103,8 +103,8 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 # - rtm_exp
 #     Runtime exploration is designed to be quick and used for early experiments
 #export DC_FLOW_RMPLUS_FLOW :=hplp
-#export DC_FLOW_RMPLUS_FLOW :=rtm_exp
-export DC_FLOW_RMPLUS_FLOW :=
+export DC_FLOW_RMPLUS_FLOW :=rtm_exp
+#export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are
