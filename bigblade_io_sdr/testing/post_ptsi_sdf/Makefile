@@ -98,7 +98,7 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifdef EAST_NOT_WEST
+ifeq ($(EAST_NOT_WEST),1)
 VCS_OPTIONS += +define+EAST_NOT_WEST=1
 BSG_CHIP_DUT_TYPE = east
 else
