@@ -25,7 +25,7 @@ module bsg_link_osdr_phy
 
   for (genvar i = 0; i < width_p; i++)
   begin: data
-    SC7P5T_DFFQX1_SSC14R BSG_OSDR_DFFQ_DONT_TOUCH
+    SC7P5T_DFFQX1_SSC14R BSG_OSDR_DFFQ
     (.D(data_i[i]),.CLK(clk_i),.Q(data_o_buf[i]));
     SC7P5T_BUFX2_SSC14R BSG_OSDR_BUF_DONT_TOUCH
     (.A(data_o_buf[i]),.Z(data_o[i]));
