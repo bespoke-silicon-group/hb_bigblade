@@ -2,19 +2,24 @@
 
 module bsg_gateway_chip
 
- import bsg_chip_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
 
- #(parameter lg_fifo_depth_p                 = lg_fifo_depth_gp
-  ,parameter lg_credit_to_token_decimation_p = lg_credit_to_token_decimation_gp
+ #(parameter toplevel_lg_fifo_depth_p                 = "inv"
+  ,parameter toplevel_lg_credit_to_token_decimation_p = "inv"
+  ,parameter toplevel_addr_width_p                    = "inv"
+  ,parameter toplevel_data_width_p                    = "inv"
+  ,parameter toplevel_x_cord_width_p                  = "inv"
+  ,parameter toplevel_y_cord_width_p                  = "inv"
+  ,parameter toplevel_ruche_factor_X_p                = "inv"
 
-  ,parameter addr_width_p     = addr_width_gp
-  ,parameter data_width_p     = data_width_gp
-  ,parameter x_cord_width_p   = x_cord_width_gp
-  ,parameter y_cord_width_p   = y_cord_width_gp
-  ,parameter ruche_factor_X_p = ruche_factor_X_gp
-  ,parameter tieoff_west_not_east_p = tieoff_west_not_east_gp
+  ,parameter lg_fifo_depth_p                 = toplevel_lg_fifo_depth_p
+  ,parameter lg_credit_to_token_decimation_p = toplevel_lg_credit_to_token_decimation_p
+  ,parameter addr_width_p                    = toplevel_addr_width_p
+  ,parameter data_width_p                    = toplevel_data_width_p
+  ,parameter x_cord_width_p                  = toplevel_x_cord_width_p
+  ,parameter y_cord_width_p                  = toplevel_y_cord_width_p
+  ,parameter ruche_factor_X_p                = toplevel_ruche_factor_X_p
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -53,7 +58,7 @@ module bsg_gateway_chip
   logic downnode_en, downnode_error;
   logic [31:0] downnode_sent, downnode_received;
 
-  localparam up_x_cord_lp = (tieoff_west_not_east_p)? 9 : 7;
+  localparam up_x_cord_lp = 9;
   localparam up_y_cord_lp = 4;
   localparam down_x_cord_lp = 8;
   localparam down_y_cord_lp = 4;
@@ -82,7 +87,7 @@ module bsg_gateway_chip
     (.i(upnode_link_sif_lo),.o(upnode_link_sif_lo_dly));
 
 
-  bsg_manycore_io_router_sdr_link_test_node
+  bsg_manycore_link_ruche_to_sdr_test_node
  #(.addr_width_p   (addr_width_p)
   ,.data_width_p   (data_width_p)
   ,.x_cord_width_p (x_cord_width_p)
@@ -111,7 +116,15 @@ module bsg_gateway_chip
   //
   // DUT
   //
-  bsg_chip DUT
+  bsg_manycore_link_ruche_to_sdr_west
+ #(.lg_fifo_depth_p                (lg_fifo_depth_p                )
+  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.addr_width_p                   (addr_width_p                   )
+  ,.data_width_p                   (data_width_p                   )
+  ,.x_cord_width_p                 (x_cord_width_p                 )
+  ,.y_cord_width_p                 (y_cord_width_p                 )
+  ,.ruche_factor_X_p               (ruche_factor_X_p               )
+  ) DUT
   (.core_clk_i              (upnode_clk) 
   ,.core_reset_i            (upnode_reset_dly)
 
@@ -230,7 +243,7 @@ module bsg_gateway_chip
   ,.link_token_o(rev_link_token_li)
   );
 
-  bsg_manycore_io_router_sdr_link_test_node
+  bsg_manycore_link_ruche_to_sdr_test_node
  #(.addr_width_p   (addr_width_p)
   ,.data_width_p   (data_width_p)
   ,.x_cord_width_p (x_cord_width_p)

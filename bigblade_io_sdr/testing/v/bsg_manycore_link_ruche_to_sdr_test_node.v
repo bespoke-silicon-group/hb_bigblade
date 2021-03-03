@@ -1,5 +1,5 @@
 
-module  bsg_manycore_io_router_sdr_link_test_node
+module  bsg_manycore_link_ruche_to_sdr_test_node
 
  import bsg_manycore_pkg::*;
 

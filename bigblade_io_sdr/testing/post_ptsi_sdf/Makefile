@@ -28,7 +28,7 @@ export BSG_PADMAPPING        ?=default
 # Additional setup for RTL-Hard
 export BSG_CHIP_DIR             ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_14
 export PREP_MEMGEN_RUN_DIR      ?= $(BSG_CHIP_DIR)/.pdk_prep/memgen
-export BSG_TOPLEVEL_DESIGN_TYPE ?=bsg_chip
+export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
 export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
@@ -90,8 +90,19 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 	/usr/bin/tclsh bsg_config.tcl
 
 ########################################
+## Toplevel Parameters
+########################################
+
+BSG_TOPLEVEL_PARAMS_DIR ?= $(BSG_DESIGNS_TARGET_DIR)/tcl/parameters.tcl
+BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
+
+VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
+
+########################################
 ## SDF Annotation
 ########################################
+
+BSG_CHIP_TOP_MODULE_NAME = bsg_manycore_link_ruche_to_sdr_west
 
 sdf_corner = max
 corner     = tt_0p80v_25c
@@ -100,13 +111,13 @@ rc_corner  = nominal
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
 #VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/bsg_chip/$(corner)_$(rc_corner)/results/bsg_chip.sdf.gz
+VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_TOP_MODULE_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_TOP_MODULE_NAME).sdf.gz
 VCS_OPTIONS += -sdfretain
 
 EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
 BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
-BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/bsg_chip_chip_finish.v
-BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/bsg_chip/results/bsg_chip_chip_finish.v.gz
+BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_TOP_MODULE_NAME)_chip_finish.v
+BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_TOP_MODULE_NAME)/results/$(BSG_CHIP_TOP_MODULE_NAME)_chip_finish.v.gz
 
 VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
 
