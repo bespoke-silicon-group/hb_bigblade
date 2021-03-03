@@ -1,5 +1,5 @@
 
-module  bsg_manycore_io_router_sdr_link_test_node
+module  bsg_manycore_link_ruche_to_sdr_test_node
 
  import bsg_manycore_pkg::*;
 
@@ -40,6 +40,14 @@ module  bsg_manycore_io_router_sdr_link_test_node
   ,output [link_sif_width_lp-1:0] links_sif_o
   );
 
+  //-------------------------------------------
+  //As the manycore will distribute across large area, it will take long
+  //time for the reset signal to propgate. We should register the reset
+  //signal in each tile
+  logic reset_r;
+  bsg_dff #(.width_p(1)) dff_reset
+  (.clk_i(clk_i),.data_i(reset_i),.data_o(reset_r));
+
   // Define link packets
   `declare_bsg_manycore_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
   // Define req and resp packets
@@ -59,7 +67,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
  #(.width_p(rev_width_lp)
   ) rev_in_fifo
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.ready_o(links_sif_lo.rev.ready_and_rev)
   ,.v_i    (links_sif_li.rev.v)
   ,.data_i (links_sif_li.rev.data)
@@ -73,7 +81,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
  #(.width_p(fwd_width_lp)
   ) fwd_out_fifo
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.ready_o(fwd_out_ready)
   ,.v_i    (fwd_out_v)
   ,.data_i (fwd_out_data)
@@ -90,7 +98,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
   ,.num_channels_p(num_channels_p)
   ) gen_out
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.yumi_i (fwd_out_v & fwd_out_ready)
   ,.o      (data_gen)
   );
@@ -109,20 +117,20 @@ module  bsg_manycore_io_router_sdr_link_test_node
   ,.num_channels_p(num_channels_p)
   ) gen_in
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.yumi_i (rev_in_v)
   ,.o      (data_check)
   );
 
   // synopsys translate_off
   always_ff @(negedge clk_i)
-    if (rev_in_v & ~reset_i)
+    if (rev_in_v & ~reset_r)
       assert(data_check == rev_in_data.data)
         else $error("check mismatch %x %x ", data_check,rev_in_data.data);
   // synopsys translate_on
 
   always_ff @(posedge clk_i)
-    if (reset_i) 
+    if (reset_r) 
         error_o <= 0;
     else 
         if (rev_in_v & data_check != rev_in_data.data)
@@ -136,7 +144,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
   ,.init_val_p(0)
   ) sent_count
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.clear_i(1'b0)
   ,.up_i   (fwd_out_v & fwd_out_ready)
   ,.count_o(sent_o)
@@ -147,7 +155,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
   ,.init_val_p(0)
   ) received_count
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.clear_i(1'b0)
   ,.up_i   (rev_in_v)
   ,.count_o(received_o)
@@ -164,7 +172,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
  #(.width_p(fwd_width_lp)
   ) fwd_in_fifo
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.ready_o(links_sif_lo.fwd.ready_and_rev)
   ,.v_i    (links_sif_li.fwd.v)
   ,.data_i (links_sif_li.fwd.data)
@@ -186,7 +194,7 @@ module  bsg_manycore_io_router_sdr_link_test_node
  #(.width_p(rev_width_lp)
   ) rev_out_fifo
   (.clk_i  (clk_i)
-  ,.reset_i(reset_i)
+  ,.reset_i(reset_r)
   ,.ready_o(rev_out_ready)
   ,.v_i    (rev_out_v)
   ,.data_i (rev_out_data)

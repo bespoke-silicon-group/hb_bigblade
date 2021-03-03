@@ -6,7 +6,7 @@ export BSG_PINOUT               :=bsg_asic_cloud
 export BSG_PACKAGING_FOUNDRY    :=gf_14_invecas_1p8v
 export BSG_PADMAPPING           :=default
 
-#export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json 
+export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json 
 
 export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
 

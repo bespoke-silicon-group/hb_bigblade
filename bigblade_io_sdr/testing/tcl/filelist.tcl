@@ -82,9 +82,8 @@ set TESTING_SOURCE_FILES [join "
 
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
-  $bsg_designs_target_dir/testing/v/bsg_manycore_io_router_sdr_link_test_node.v
+  $bsg_designs_target_dir/testing/v/bsg_manycore_link_ruche_to_sdr_test_node.v
 
 "]
 
