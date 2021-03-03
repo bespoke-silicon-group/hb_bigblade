@@ -1,0 +1,31 @@
+set HB_NUM_TILES_X_P        16
+set HB_NUM_TILES_Y_P        8
+
+
+set HB_LINK_WIDTH_P         154
+set HB_RUCHE_LINK_WIDTH_P   140
+set HB_RUCHE_FACTOR_P       3
+
+set HB_WH_LINK_WIDTH_P      34
+set HB_WH_RUCHE_FACTOR_P    2
+
+# LOCAL LINK indexing
+set HB_REV_PACKET_WIDTH     53
+set HB_REV_READY_IDX        53
+set HB_REV_VALID_IDX        54
+
+set HB_FWD_START_IDX        55
+set HB_FWD_PACKET_WIDTH     97
+set HB_FWD_READY_IDX        152
+set HB_FWD_VALID_IDX        153
+
+
+# RUCHE LINK indexing
+set HB_RUCHE_REV_PACKET_WIDTH     46
+set HB_RUCHE_REV_READY_IDX        46
+set HB_RUCHE_REV_VALID_IDX        47
+
+set HB_RUCHE_FWD_START_IDX        48
+set HB_RUCHE_FWD_PACKET_WIDTH     90
+set HB_RUCHE_FWD_READY_IDX        138
+set HB_RUCHE_FWD_VALID_IDX        139
