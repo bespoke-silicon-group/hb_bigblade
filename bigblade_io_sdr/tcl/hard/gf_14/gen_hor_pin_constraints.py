@@ -2,17 +2,15 @@ print("### automatically generated from gen_hor_pin_constraints.py")
 
 ymap = {}
 layermap = {}
-Y_OFFSET = -158.336+(0.128*22)
+Y_OFFSET = 0
 curr_layer = "K1"
 
-with open("../../../../common/pod_pin_y.csv") as f:
+with open("../../../../common/manycore_tile_pin_y.csv") as f:
   for line in f.readlines():
     stripped = line.strip()
-    if not stripped.startswith("pod_mc_y_7"):
-      continue
     
     words = stripped.split(",")
-    key = words[0].split("/")[1]
+    key = words[0]
     yval = float(words[1]) + Y_OFFSET
     ymap[key] = yval
     layermap[key] = curr_layer
