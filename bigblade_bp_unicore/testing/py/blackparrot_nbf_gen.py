@@ -2,8 +2,15 @@
 import math
 import sys
 
-class NBF:
+cfg_base_addr          = 0x2000000
+cfg_reg_reset          = 0x01
+cfg_reg_freeze         = 0x02
+cfg_domain_mask        = 0x09
+cfg_sac_mask           = 0x0a
+cfg_reg_icache_mode    = 0x22
+cfg_reg_dcache_mode    = 0x43
 
+class NBF:
     # Initialize
     def __init__(self, filename):
         self.filename = filename
@@ -15,6 +22,8 @@ class NBF:
         self.cache_size = self.cache_set * self.cache_ways * self.cache_block_size / self.data_width
         self.num_tiles_x = 16
         self.num_tiles_y = 8
+
+        self.cache_block_size_words = self.cache_block_size // 32
 
     # BSG_SAFE_CLOG2(x)
     def safe_clog2(self, x):
@@ -51,16 +60,18 @@ class NBF:
 
     # Initialize DRAMs
     def init_dram(self):
-        cache_size = self.cache_size
-        lg_x = self.safe_clog2(self.num_tiles_x)
-        lg_block_size = self.safe_clog2(self.cache_block_size)
-        lg_set = self.safe_clog2(self.cache_set)
+        # Take into account left column
+        lg_x = self.safe_clog2(self.num_tiles_x+1)
+        lg_block_size = self.safe_clog2(self.cache_block_size_words)
         index_width = self.addr_width-1-lg_block_size-1
+        
+        # Useful for no DRAM condition only
+        lg_set = self.safe_clog2(self.cache_set)
+        cache_size = self.cache_size
 
         f = open(self.filename, "r")
 
         curr_addr = 0
-        count = 0
 
         # hashing for power of 2 banks
         for line in f.readlines():
@@ -72,7 +83,6 @@ class NBF:
                 continue
 
             for word in stripped.split(): 
-                # TODO: This hash function is broken
                 addr = curr_addr
                 data = int(word, 16)
                 x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1) + 1
@@ -84,7 +94,7 @@ class NBF:
                 if y == 0:
                     self.print_nbf(x, 0, epa, data)
                 else:
-                    self.print_nbf(x, num_tiles_y, epa, data)
+                    self.print_nbf(x, self.num_tiles_y, epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
@@ -98,21 +108,10 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        cfg_base_addr          = 0x0000
-        cfg_reg_freeze         = 0x02
-        cfg_domain_mask        = 0x09
-        cfg_sac_mask           = 0x0a
-        cfg_reg_icache_mode    = 0x22
-        cfg_reg_dcache_mode    = 0x43
-
-        self.print_nbf(0, 1, cfg_base_addr + cfg_domain_mask, -1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_sac_mask, -1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_icache_mode, -1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_dcache_mode, -1)
-
-        self.fence()
-
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 0)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_domain_mask, 1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_sac_mask, 1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_icache_mode, 1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
 
     # print finish
     def finish(self):
@@ -124,9 +123,18 @@ class NBF:
 
     # Dump the nbf
     def dump(self):
+        # Freeze BP
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 1)
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 0)
+        # Initialize BP configuration registers
+        self.init_config()
+        self.fence()
+        # Initialize the DRAM
         self.init_dram()
         self.fence()
-        self.init_config()
+        # Unfreeze BP
+        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 0)
         self.fence()
         self.finish()
 
