@@ -118,7 +118,7 @@ key = "link_o[{}]".format(HB_REV_VALID_IDX)
 place_pin(port, key, "$core_llx")
 
 port = "io_rev_link_clk_o"
-key = "ruche_link_o[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_RUCHE_REV_VALID_IDX)
+key = "ruche_link_o[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_REV_PACKET_WIDTH/2)
 place_pin(port, key, "$core_llx")
 
 
@@ -137,7 +137,7 @@ key = "link_o[{}]".format(HB_FWD_VALID_IDX)
 place_pin(port, key, "$core_llx")
 
 port = "io_fwd_link_clk_o"
-key = "ruche_link_o[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_RUCHE_FWD_VALID_IDX)
+key = "ruche_link_o[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_FWD_START_IDX+HB_FWD_PACKET_WIDTH/2)
 place_pin(port, key, "$core_llx")
 
 
@@ -157,7 +157,7 @@ key = "link_i[{}]".format(HB_REV_VALID_IDX)
 place_pin(port, key, "$core_llx")
 
 port = "io_rev_link_clk_i"
-key = "ruche_link_i[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_RUCHE_REV_VALID_IDX)
+key = "ruche_link_i[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_REV_PACKET_WIDTH/2)
 place_pin(port, key, "$core_llx")
 
 # fwd downstream
@@ -175,7 +175,7 @@ key = "link_i[{}]".format(HB_FWD_VALID_IDX)
 place_pin(port, key, "$core_llx")
 
 port = "io_fwd_link_clk_i"
-key = "ruche_link_i[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_RUCHE_FWD_VALID_IDX)
+key = "ruche_link_i[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+HB_FWD_START_IDX+HB_FWD_PACKET_WIDTH/2)
 place_pin(port, key, "$core_llx")
 
 
