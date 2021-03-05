@@ -1,6 +1,6 @@
 # print SDR pins y-coordinates into csv
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
 
 
@@ -35,5 +35,6 @@ proc get_pin_y {pin} {
 foreach_in_collection pin $sdr_pins {
   set y [get_pin_y $pin]
   set name [get_attribute $pin name]
-  puts "$name,$y"
+  set layer [get_attribute $pin layer.name]
+  puts "$name,$y,$layer"
 }
