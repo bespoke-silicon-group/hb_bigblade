@@ -17,11 +17,11 @@ set HARD_SWAP_FILELIST [join "
   $bsg_designs_target_dir/v/hard/gf_14/bsg_mem/bsg_mem_1r1w_sync.v
   $bsg_designs_target_dir/v/hard/gf_14/bsg_mem/bsg_mem_2r1w_sync.v
   $bsg_designs_target_dir/v/hard/gf_14/bsg_mem/bsg_mem_3r1w_sync.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_misc/bsg_mux.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_async/bsg_sync_sync.v
-  $bsg_designs_target_dir/v/hard/gf_14/bsg_async/bsg_launch_sync_sync.v
+  $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_mux.v
+  $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
+  $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
+  $basejump_stl_dir/hard/gf_14/bsg_async/bsg_sync_sync.v
+  $basejump_stl_dir/hard/gf_14/bsg_async/bsg_launch_sync_sync.v
 "]
 
 

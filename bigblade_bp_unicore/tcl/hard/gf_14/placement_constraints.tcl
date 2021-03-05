@@ -60,7 +60,7 @@ set_macro_relative_location \
   -target_corner tl \
   -target_orientation R0 \
   -anchor_corner tl \
-  -offset [list $keepout_margin_x -$keepout_margin_y]
+  -offset [list 0 -$keepout_margin_y]
 
 #####################################
 ### I CACHE DATA
@@ -145,7 +145,7 @@ set_macro_relative_location \
   -target_corner bl \
   -target_orientation R0 \
   -anchor_corner bl \
-  -offset [list $keepout_margin_x 0]
+  -offset [list 0 0]
 
 set dcache_data_ma_east [create_macro_array \
   -num_rows 2 \
