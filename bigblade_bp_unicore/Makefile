@@ -33,9 +33,9 @@ bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(BITBUCKET)taylor-bsg/bsg_packaging
 bsg_packaging_commit :=master
 
-blackparrot_dir     :=$(THIS_DIR)/black-parrot
-blackparrot_url     :=$(GITHUB)black-parrot/black-parrot
-blackparrot_commit  :=tapeout_bigblade
+black-parrot_dir     :=$(THIS_DIR)/black-parrot
+black-parrot_url     :=$(GITHUB)black-parrot/black-parrot
+black-parrot_commit  :=tapeout_bigblade
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
@@ -49,7 +49,7 @@ $(prep_dir): $(bsg_14.repo)
 	ln -nsf $(bsg_14_dir)/.pdk_prep $@
 
 all: $(all_repos) $(prep_dir)
-	$(MAKE) -C $(blackparrot_dir) prep_lite
+	$(MAKE) -C $(black-parrot_dir) -j10 tools libs
 
 %.repo:
 	-git clone $($*_url) $($*_dir)
