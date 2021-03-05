@@ -10,16 +10,17 @@
   //   a giant crossbar and infinite memories instead of vcaches
   // [ IO ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
   // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ] 
-  // [ BP ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ] 
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   // [ 00 ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
 
 module bsg_gateway_chip
  import bsg_chip_pkg::*;
 
  import bp_common_pkg::*;
- import bp_common_aviary_pkg::*;
  import bp_be_pkg::*;
  import bp_me_pkg::*;
  import bsg_noc_pkg::*;
@@ -27,7 +28,8 @@ module bsg_gateway_chip
  import bsg_manycore_pkg::*;
  import bsg_tag_pkg::*;
 
- #(localparam bp_params_e bp_params_p = e_bp_unicore_cfg `declare_bp_proc_params(bp_params_p)
+ #(localparam bp_params_e bp_params_p = e_bp_bigblade_unicore_cfg
+  `declare_bp_proc_params(bp_params_p)
   `declare_bp_bedrock_mem_if_widths(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce))
   ();
 
@@ -92,7 +94,7 @@ module bsg_gateway_chip
   //////////////////////////////////////////////////
   //
   // bsg_tag
-  localparam num_clients_lp = 4;
+  localparam num_clients_lp = 3;
   localparam payload_width_lp = 7;
   localparam max_payload_width_lp = 10;
   localparam lg_payload_width_lp = `BSG_WIDTH(max_payload_width_lp);
@@ -139,7 +141,7 @@ module bsg_gateway_chip
      ,.data_o(rom_data)
      );
 
-  bsg_tag_s [3:0] bsg_tag_li;
+  bsg_tag_s [2:0] bsg_tag_li;
   bsg_tag_master
    #(.els_p(num_clients_lp), .lg_width_p(lg_payload_width_lp))
    btm
@@ -155,37 +157,27 @@ module bsg_gateway_chip
   //
   `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
-  `declare_bsg_manycore_ruche_x_link_sif_s(mc_addr_width_gp,mc_data_width_gp,mc_x_cord_width_gp,mc_y_cord_width_gp);
-  bsg_manycore_ruche_x_link_sif_s [0:0][E:E] mc_ruche_links_li, mc_ruche_links_lo;
-  bsg_manycore_link_sif_s [3:0][E:E] mc_hor_links_li, mc_hor_links_lo;
-  bsg_manycore_link_sif_s [S:N] mc_ver_links_li, mc_ver_links_lo;
+  bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_li, mc_hor_links_lo;
 
-  bsg_blackparrot_unicore_tile_node
+  bsg_blackparrot_unicore_tile
    DUT
-    (.bp_clk_i(blackparrot_clk)
-     ,.bp_reset_i(blackparrot_reset | ~tr_done_lo)
-
-     ,.mc_clk_i(blackparrot_clk)
-     ,.mc_reset_i(blackparrot_reset | ~tr_done_lo)
+    (.clk_i(blackparrot_clk)
+     ,.reset_i(blackparrot_reset | ~tr_done_lo)
 
      ,.bsg_tag_i(bsg_tag_li)
 
-     ,.mc_ruche_links_i(mc_ruche_links_li)
-     ,.mc_ruche_links_o(mc_ruche_links_lo)
-
-     ,.mc_hor_links_i(mc_hor_links_li)
-     ,.mc_hor_links_o(mc_hor_links_lo)
-
-     ,.mc_ver_links_i(mc_ver_links_li)
-     ,.mc_ver_links_o(mc_ver_links_lo)
+     ,.links_i(mc_hor_links_li)
+     ,.links_o(mc_hor_links_lo)
      );
 
+  // Fake network --> Giant crossbar to mimic where hammerblade will sit
   // Network parameters
   localparam cb_num_in_x_lp = mc_num_tiles_x_gp+1;
-  localparam cb_num_in_y_lp = mc_num_tiles_y_gp+1;
+  localparam cb_num_in_y_lp = mc_num_tiles_y_gp;
   localparam cb_num_in_lp = cb_num_in_x_lp*cb_num_in_y_lp;
   localparam cb_fwd_fifo_els_lp = 32;
   localparam cb_rev_fifo_els_lp = 32;
+
   typedef int fifo_els_arr_t[cb_num_in_lp-1:0];
   function logic [cb_num_in_lp-1:0] get_fwd_use_credits();
     logic [cb_num_in_lp-1:0] retval;
@@ -256,6 +248,7 @@ module bsg_gateway_chip
      ,.links_sif_o(link_out)
      );
 
+  // I/O Complex --> At coordinates (0, 0)
   bsg_nonsynth_manycore_io_complex
    #(.addr_width_p(mc_addr_width_gp)
      ,.data_width_p(mc_data_width_gp)
@@ -275,25 +268,30 @@ module bsg_gateway_chip
      ,.loader_done_o()
      );
 
-  for (genvar i = 1; i < 5; i++)
+  // BP <--> Fake network connections
+  // mc_hor_link[0] = I/O
+  // mc_hor_link[1] = DRAM 1
+  // mc_hor_link[2] = DRAM 2
+  for (genvar i = 1; i <= 3; i++)
     begin : bp_connect
       assign link_in[i][0] = mc_hor_links_lo[i-1];
       assign mc_hor_links_li[i-1] = link_out[i][0];
     end
 
   // Inject ruche link to an arbitrary spot in the "manycore". Rev link should come back via crossbar
-  assign link_in[5][0].fwd = `bsg_manycore_ruche_x_link_fwd_inject_src_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].fwd, mc_y_cord_width_gp'(3'd5));
-  assign link_in[5][0].rev = `bsg_manycore_ruche_x_link_rev_inject_dest_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].rev, mc_y_cord_width_gp'(3'd5));
-  assign mc_ruche_links_li[0][E].fwd = {ready_and_rev: 1'b1, default: '0};
-  assign mc_ruche_links_li[0][E].rev = {ready_and_rev: 1'b1, default: '0};
+  // assign link_in[5][0].fwd = `bsg_manycore_ruche_x_link_fwd_inject_src_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].fwd, mc_y_cord_width_gp'(3'd5));
+  // assign link_in[5][0].rev = `bsg_manycore_ruche_x_link_rev_inject_dest_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].rev, mc_y_cord_width_gp'(3'd5));
+  // assign mc_ruche_links_li[0][E].fwd = {ready_and_rev: 1'b1, default: '0};
+  // assign mc_ruche_links_li[0][E].rev = {ready_and_rev: 1'b1, default: '0};
 
-  for (genvar i = 6; i < 8; i++)
+  // Tie off all links below BP
+  for (genvar i = 4; i < 8; i++)
     begin : bp_tieoff
       assign link_in[i][0] = '0;
     end
 
-  // tie off where the manycore would be
-  for (genvar i = 1; i < mc_num_tiles_y_gp; i++)
+  // Tie off where the manycore would be
+  for (genvar i = 1; i < mc_num_tiles_y_gp-1; i++)
     begin : tile_stubs_y
       for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
         begin : tile_stubs_x
@@ -307,7 +305,7 @@ module bsg_gateway_chip
       for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
         begin : mem_col
           localparam x_idx_lp = j;
-          localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp : 0;
+          localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp-1 : 0;
           wire [mc_x_cord_width_gp-1:0] my_x_li = x_idx_lp;
           wire [mc_y_cord_width_gp-1:0] my_y_li = y_idx_lp;
 
@@ -331,10 +329,6 @@ module bsg_gateway_chip
              );
         end
     end
-  assign link_in[mc_num_tiles_y_gp][0] = '0;
-
-  // ver_links are unused with a single tile_node
-  assign mc_ver_links_li = '0;
 
 endmodule
 
