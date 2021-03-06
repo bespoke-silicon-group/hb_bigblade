@@ -11,8 +11,7 @@ set bp_clk_name "bp_clk" ;# main clock running black parrot
 set bp_clk_period_ps [get_attribute [get_clocks ${bp_clk_name}] period]
 set bp_clk_uncertainty_ps 20
 
-set loosen_factor 1.05
-remove_clocks [get_clocks ${bp_clk_name}]
+set loosen_factor 1.10
 create_clock -period [expr ${loosen_factor}*${bp_clk_period_ps}] -name ${bp_clk_name} [get_ports "clk_i"]
 set_clock_uncertainty ${bp_clk_uncertainty_ps} [get_clocks ${bp_clk_name}]
 

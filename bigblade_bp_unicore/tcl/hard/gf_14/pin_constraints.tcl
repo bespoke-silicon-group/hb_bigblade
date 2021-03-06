@@ -39,14 +39,24 @@ for {set i 0} {$i < 3} {incr i} {
     foreach line [split $contents] {
       if {$line  == ""} break
       set pin [lindex [split $line ,] 0]
-      set rel_pos [lindex [split $line ,] 1]
-      set abs_pos [expr $block_offset + $i*$mc_tile_pitch + $rel_pos]
+      set pin_base [regsub -all {\[.*\]} $pin {}]
+      if {$pin != $pin_base} {
+        set pin_index [lindex [split $pin {\[.*\]}] 1]
+        set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 3]
+        set true_pin_index [expr $i*$pin_len + $pin_index]
+        set true_pin ${pin_base}[$true_pin_index]
+      } else {
+        set true_pin_index [expr $i]
+        set true_pin ${pin_base}[$i]
+      }
+      set pos [lindex [split $line ,] 1]
+      set true_pos [expr $block_offset + $i*$mc_tile_pitch + $pos]
       set layer [lindex [split $line ,] 2]
-      puts "Placing $pin $abs_pos $layer"
+      puts "Placing $pin $pin_base $true_pos $layer"
       set_individual_pin_constraints \
-          -ports [get_ports $pin] \
+          -ports [get_ports $true_pin] \
           -allowed_layers [get_layers $layer] \
-          -location "$core_urx $abs_pos"
+          -location "$core_urx $true_pos"
     }
 }
 
