@@ -190,9 +190,13 @@ proc constraint_input_sdr_ports {clk_name ports max_delay min_delay} {
   set_input_delay -min $min_delay -clock $clk_name -source_latency_included -network_latency_included -add_delay $ports
   set_driving_cell -no_design_rule -lib_cell "SC7P5T_BUFX2_SSC14R" $ports
 }
-proc constraint_output_sdr_ports {clk_name ports max_delay min_delay} {
-  set_output_delay -max $max_delay -clock $clk_name $ports
-  set_output_delay -min $min_delay -clock $clk_name -add_delay $ports
+proc constraint_output_sdr_ports {clk_port ports setup_time hold_time} {
+  foreach_in_collection obj $ports {
+    set_data_check -from $clk_port -to $obj -setup $setup_time
+    set_data_check -from $clk_port -to $obj -hold  $hold_time
+    set_multicycle_path -end   -setup 1 -to $obj
+    set_multicycle_path -start -hold  0 -to $obj
+  }
   set_load [load_of [get_lib_pin "*/SC7P5T_BUFX2_SSC14R/A"]] $ports
 }
 
@@ -202,25 +206,24 @@ set link_clk_uncertainty_ps   20
 set token_clk_period_ps       [expr 2*$link_clk_period_ps]
 set token_clk_uncertainty_ps  20
 
-set max_io_skew_ps            100
-set io_max_output_delay       [expr ($core_clk_period_ps/2)-$max_io_skew_ps]
-set io_min_output_delay       [expr $max_io_skew_ps-($core_clk_period_ps/2)]
-set io_max_input_delay        [expr ($link_clk_period_ps)-$max_io_skew_ps]
-set io_min_input_delay        [expr $max_io_skew_ps]
+set max_io_output_skew_ps     100
+set max_io_input_skew_ps      100
+set io_setup_time_output      [expr ($core_clk_period_ps/2)-$max_io_output_skew_ps]
+set io_hold_time_output       [expr ($core_clk_period_ps/2)-$max_io_output_skew_ps]
+set io_max_input_delay        [expr ($link_clk_period_ps)-$max_io_input_skew_ps]
+set io_min_input_delay        [expr $max_io_input_skew_ps]
 
 # upstream (fwd)
-create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name "fwd_out_clk" [get_ports io_fwd_link_clk_o]
 set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX2_SSC14R/CLK"]] [get_ports io_fwd_link_clk_o]
-constraint_output_sdr_ports "fwd_out_clk" [get_ports io_fwd_link_data_o]  $io_max_output_delay $io_min_output_delay
-constraint_output_sdr_ports "fwd_out_clk" [get_ports io_fwd_link_v_o]     $io_max_output_delay $io_min_output_delay
+constraint_output_sdr_ports [get_ports io_fwd_link_clk_o] [get_ports io_fwd_link_data_o]  $io_setup_time_output $io_hold_time_output
+constraint_output_sdr_ports [get_ports io_fwd_link_clk_o] [get_ports io_fwd_link_v_o]     $io_setup_time_output $io_hold_time_output
 create_clock -period $token_clk_period_ps -name "fwd_tkn_clk" [get_ports io_fwd_link_token_i]
 set_clock_uncertainty $token_clk_uncertainty_ps [get_clock "fwd_tkn_clk"]
 
 # upstream (rev)
-create_generated_clock -divide_by 1 -invert -master_clock $core_clk_name -source [get_ports core_clk_i] -name "rev_out_clk" [get_ports io_rev_link_clk_o]
 set_load [load_of [get_lib_pin "*/SC7P5T_CKBUFX2_SSC14R/CLK"]] [get_ports io_rev_link_clk_o]
-constraint_output_sdr_ports "rev_out_clk" [get_ports io_rev_link_data_o]  $io_max_output_delay $io_min_output_delay
-constraint_output_sdr_ports "rev_out_clk" [get_ports io_rev_link_v_o]     $io_max_output_delay $io_min_output_delay
+constraint_output_sdr_ports [get_ports io_rev_link_clk_o] [get_ports io_rev_link_data_o]  $io_setup_time_output $io_hold_time_output
+constraint_output_sdr_ports [get_ports io_rev_link_clk_o] [get_ports io_rev_link_v_o]     $io_setup_time_output $io_hold_time_output
 create_clock -period $token_clk_period_ps -name "rev_tkn_clk" [get_ports io_rev_link_token_i]
 set_clock_uncertainty $token_clk_uncertainty_ps [get_clock "rev_tkn_clk"]
 
@@ -261,6 +264,8 @@ append_to_collection cdc_clocks [get_clocks "rev_tkn_clk"]
 append_to_collection cdc_clocks [get_clocks $core_clk_name]
 bsg_async_icl $cdc_clocks
 
+# disable timing arcs for outputs
+set_disable_timing [get_flat_pins -filter "full_name=~*BSG_OSDR_DFFPOS_DONT_TOUCH/Q"]
 
 # set_dont_touch
 # inputs
@@ -268,6 +273,7 @@ set_dont_touch_network -no_propagate [get_ports io_*_link_data_i[*]]
 set_dont_touch_network -no_propagate [get_ports io_*_link_v_i]
 # outputs
 set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_BUF_DONT_TOUCH/Z"]
+set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_CKBUF_DONT_TOUCH/Z"]
 
 
 # ungroup
