@@ -61,7 +61,7 @@ class NBF:
     # Initialize DRAMs
     def init_dram(self):
         # Take into account left column
-        lg_x = self.safe_clog2(self.num_tiles_x+1)
+        lg_x = self.safe_clog2(self.num_tiles_x)
         lg_block_size = self.safe_clog2(self.cache_block_size_words)
         index_width = self.addr_width-1-lg_block_size-1
         
@@ -94,7 +94,7 @@ class NBF:
                 if y == 0:
                     self.print_nbf(x, 0, epa, data)
                 else:
-                    self.print_nbf(x, self.num_tiles_y, epa, data)
+                    self.print_nbf(x, self.num_tiles_y-1, epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
