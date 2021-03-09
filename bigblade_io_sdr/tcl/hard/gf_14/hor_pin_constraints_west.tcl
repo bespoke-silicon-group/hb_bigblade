@@ -1,4 +1,5 @@
 ### automatically generated from gen_hor_pin_constraints.py
+### east_not_west = 0
 set_individual_pin_constraints -ports core_hor_link_sif_i[0] -allowed_layers K1 -location "$core_urx 2.816"
 set_individual_pin_constraints -ports core_ruche_link_i[0] -allowed_layers K3 -location "$core_urx 2.944"
 set_individual_pin_constraints -ports core_hor_link_sif_i[1] -allowed_layers K1 -location "$core_urx 3.328"

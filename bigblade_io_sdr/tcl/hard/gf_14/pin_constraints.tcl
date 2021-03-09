@@ -82,7 +82,11 @@ place_pins_c5 $south_input_pins   [expr 0.08*66] $core_lly
 
 
 # hor link
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/hor_pin_constraints.tcl
+if {$::env(EAST_NOT_WEST) == 1} {
+  source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/hor_pin_constraints_east.tcl
+} else {
+  source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/hor_pin_constraints_west.tcl
+}
 
 # north misc pins
 set north_misc_pins [list]
