@@ -278,12 +278,6 @@ module bsg_gateway_chip
       assign mc_hor_links_li[i-1] = link_out[i][0];
     end
 
-  // Inject ruche link to an arbitrary spot in the "manycore". Rev link should come back via crossbar
-  // assign link_in[5][0].fwd = `bsg_manycore_ruche_x_link_fwd_inject_src_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].fwd, mc_y_cord_width_gp'(3'd5));
-  // assign link_in[5][0].rev = `bsg_manycore_ruche_x_link_rev_inject_dest_y(mc_x_cord_width_gp,mc_y_cord_width_gp,mc_ruche_links_lo[0][E].rev, mc_y_cord_width_gp'(3'd5));
-  // assign mc_ruche_links_li[0][E].fwd = {ready_and_rev: 1'b1, default: '0};
-  // assign mc_ruche_links_li[0][E].rev = {ready_and_rev: 1'b1, default: '0};
-
   // Tie off all links below BP
   for (genvar i = 4; i < 8; i++)
     begin : bp_tieoff

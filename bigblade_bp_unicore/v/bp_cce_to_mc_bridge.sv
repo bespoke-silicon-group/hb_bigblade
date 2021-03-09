@@ -455,6 +455,23 @@ module bp_cce_to_mc_bridge
                                      ,default : '0
                                      };
     end
+  else
+    begin: no_host
+      assign bp_to_mc_data_li = '0;
+      assign bp_to_mc_ready_lo = 1'b0;
+      assign bp_to_mc_v_lo = 1'b0;
+      assign bp_to_mc_lo = '0;
+
+      assign mc_to_bp_response_li = '0;
+      assign mc_to_bp_response_ready_lo = 1'b0;
+      assign mc_to_bp_response_v_lo = 1'b0;
+      assign mc_to_bp_response_data_lo = '0;
+
+      assign mc_to_bp_request_li = '0;
+      assign mc_to_bp_request_ready_lo = 1'b0;
+      assign mc_to_bp_request_data_lo = '0;
+      assign mc_to_bp_request_v_lo = 1'b0;
+    end
 
   //////////////////////////////////////////////
   // Outgoing Request
