@@ -84,7 +84,10 @@ class NBF:
 
             for word in stripped.split(): 
                 addr = curr_addr
-                data = int(word, 16)
+                data = ""
+                for i in range(0, len(word), 2):
+                    data = word[i:i+2] + data
+                data = int(data, 16)
                 x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1) + 1
                 y = self.select_bits(addr, lg_block_size + lg_x, lg_block_size + lg_x)
                 index = self.select_bits(addr, lg_block_size+lg_x+1, lg_block_size+lg_x+1+index_width-1)
