@@ -118,32 +118,32 @@ module bp_cce_to_mc_bridge
      );
   assign io_cmd_eva_li = io_cmd_li.header.addr;
 
-  logic                              in_v_lo;
-  logic [mc_data_width_p-1:0]        in_data_lo;
-  logic [(mc_data_width_p>>3)-1:0]   in_mask_lo;
-  logic [mc_addr_width_p-1:0]        in_addr_lo;
-  logic                              in_we_lo;
-  bsg_manycore_load_info_s           in_load_info_lo;
-  logic [mc_x_cord_width_p-1:0]      in_src_x_cord_lo;
-  logic [mc_y_cord_width_p-1:0]      in_src_y_cord_lo;
-  logic                              in_yumi_li;
+  logic                                    in_v_lo;
+  logic [mc_data_width_p-1:0]              in_data_lo;
+  logic [(mc_data_width_p>>3)-1:0]         in_mask_lo;
+  logic [mc_addr_width_p-1:0]              in_addr_lo;
+  logic                                    in_we_lo;
+  bsg_manycore_load_info_s                 in_load_info_lo;
+  logic [mc_x_cord_width_p-1:0]            in_src_x_cord_lo;
+  logic [mc_y_cord_width_p-1:0]            in_src_y_cord_lo;
+  logic                                    in_yumi_li;
 
-  logic [mc_data_width_p-1:0]        returning_data_li;
-  logic                              returning_v_li;
+  logic [mc_data_width_p-1:0]              returning_data_li;
+  logic                                    returning_v_li;
 
-  logic                              out_v_li;
-  bsg_manycore_packet_s              out_packet_li;
-  logic                              out_ready_lo;
+  logic                                    out_v_li;
+  bsg_manycore_packet_s                    out_packet_li;
+  logic                                    out_ready_lo;
 
-  logic [mc_data_width_p-1:0]        returned_data_r_lo;
-  logic [4:0]                        returned_reg_id_r_lo;
-  logic                              returned_v_r_lo, returned_yumi_li;
-  bsg_manycore_return_packet_type_e  returned_pkt_type_r_lo;
-  logic                              returned_fifo_full_lo;
-  logic                              returned_credit_v_r_lo;
-  logic [4:0]                        returned_credit_reg_id_r_lo;
+  logic [mc_data_width_p-1:0]              returned_data_r_lo;
+  logic [bsg_manycore_reg_id_width_gp-1:0] returned_reg_id_r_lo;
+  logic                                    returned_v_r_lo, returned_yumi_li;
+  bsg_manycore_return_packet_type_e        returned_pkt_type_r_lo;
+  logic                                    returned_fifo_full_lo;
+  logic                                    returned_credit_v_r_lo;
+  logic [bsg_manycore_reg_id_width_gp-1:0] returned_credit_reg_id_r_lo;
 
-  logic [3:0]                        out_credits_lo;
+  logic [3:0]                              out_credits_lo;
 
   bsg_manycore_endpoint_standard
    #(.x_cord_width_p(mc_x_cord_width_p)
@@ -243,16 +243,7 @@ module bp_cce_to_mc_bridge
   logic mmio_resp_v_lo, mmio_resp_yumi_li;
   logic mmio_returned_v_li;
 
-  wire [(mc_data_width_p>>3)-1:0] returned_id_li = returned_v_r_lo ? returned_reg_id_r_lo : returned_credit_reg_id_r_lo;
-  logic [bsg_manycore_reg_id_width_gp-1:0] mmio_returned_reg_id_li;
-  bsg_manycore_reg_id_decode
-   #(.data_width_p(mc_data_width_p))
-   reg_id_decode
-    (.data_i(returned_data_r_lo)
-     ,.mask_i(returned_id_li)
-     ,.reg_id_o(mmio_returned_reg_id_li)
-     );
-
+  wire [bsg_manycore_reg_id_width_gp-1:0] mmio_returned_reg_id_li = returned_reg_id_r_lo;
   wire [mc_data_width_p-1:0] mmio_returned_data_li = returned_data_r_lo;
   bsg_fifo_reorder
    #(.width_p(mc_data_width_p), .els_p(mc_max_outstanding_p))
