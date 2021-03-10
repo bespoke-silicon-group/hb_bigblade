@@ -1,8 +1,5 @@
+# Source common scripts
+source -echo -verbose $::env(BASEJUMP_STL_DIR)/hard/gf_14/bsg_link/tcl/bsg_link_sdr.constraints.tcl
 
-# set_dont_touch
-# inputs
-set_dont_touch_network -no_propagate [get_ports io_*_link_data_i[*]]
-set_dont_touch_network -no_propagate [get_ports io_*_link_v_i]
-# outputs
-set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_BUF_DONT_TOUCH/Z"]
-set_dont_touch_network -no_propagate [get_flat_pins -filter "full_name=~*BSG_OSDR_CKBUF_DONT_TOUCH/Z"]
+# set dont touch
+bsg_link_sdr_dont_touch_constraints [get_ports {io_*_link_data_i[*] io_*_link_v_i}]
