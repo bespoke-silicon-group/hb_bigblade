@@ -65,6 +65,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_scan.v
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
+  $basejump_stl_dir/bsg_misc/bsg_xor.v
 
   $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
