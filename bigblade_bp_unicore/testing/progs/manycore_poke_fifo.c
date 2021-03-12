@@ -52,6 +52,7 @@ void main(uint64_t argc, char * argv[]) {
     // Set up EPA mapping according to vanilla core map
     // For now, store to some manycore V$ EVA
     uint32_t some_mc_dram_eva = (uint32_t) 0x810000000;
+    uint32_t finish_eva = (uint32_t) 0x4000ead0;
 
     hb_mc_packet_t req_packet;
 
@@ -101,6 +102,22 @@ void main(uint64_t argc, char * argv[]) {
     resp_packet.words[2] = *mc_link_bp_resp_fifo_addr;
     resp_packet.words[3] = *mc_link_bp_resp_fifo_addr;
 
-    while(1);
+    // Write finish packet
+    req_packet.request.x_dst    = 0;
+    req_packet.request.y_dst    = 0;
+    // Unused
+    req_packet.request.x_src    = 0;
+    // Unused
+    req_packet.request.y_src    = 1;
+    req_packet.request.data     = 1;
+    // Store mask
+    req_packet.request.reg_id   = 0xf;
+    req_packet.request.op_v2    = 1; // Store
+    req_packet.request.addr     = finish_eva;
+
+    *mc_link_bp_req_fifo_addr = req_packet.words[0];
+    *mc_link_bp_req_fifo_addr = req_packet.words[1];
+    *mc_link_bp_req_fifo_addr = req_packet.words[2];
+    *mc_link_bp_req_fifo_addr = req_packet.words[3];
 }
 
