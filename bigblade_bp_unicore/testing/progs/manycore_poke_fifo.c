@@ -26,7 +26,7 @@ typedef struct request_packet {
 typedef union packet {
         hb_mc_request_packet_t request; /**/
         hb_mc_response_packet_t response; /* from the Hammerblade Manycore */
-        uint64_t words[2];
+        uint32_t words[4];
 } hb_mc_packet_t;
 
 void main(uint64_t argc, char * argv[]) {
@@ -40,23 +40,24 @@ void main(uint64_t argc, char * argv[]) {
     
     uint64_t  bp_coproc_offset             = 2UL << 36UL;
 
-    volatile uint64_t *mc_link_bp_req_fifo_addr     = (uint64_t *) (0x01000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_bp_req_credits_addr  = (uint64_t *) (0x02000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_bp_resp_fifo_addr    = (uint64_t *) (0x03000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_bp_resp_entries_addr = (uint64_t *) (0x04000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_mc_req_fifo_addr     = (uint64_t *) (0x05000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_mc_req_entries_addr  = (uint64_t *) (0x06000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_rom_start_addr       = (uint64_t *) (0x07000 + bp_coproc_offset);
-    volatile uint64_t *mc_link_rom_end_addr         = (uint64_t *) (0x07fff + bp_coproc_offset);
+    volatile uint32_t *mc_link_bp_req_fifo_addr     = (uint32_t *) (0x01000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_bp_req_credits_addr  = (uint32_t *) (0x02000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_bp_resp_fifo_addr    = (uint32_t *) (0x03000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_bp_resp_entries_addr = (uint32_t *) (0x04000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_mc_req_fifo_addr     = (uint32_t *) (0x05000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_mc_req_entries_addr  = (uint32_t *) (0x06000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_rom_start_addr       = (uint32_t *) (0x07000 + bp_coproc_offset);
+    volatile uint32_t *mc_link_rom_end_addr         = (uint32_t *) (0x07fff + bp_coproc_offset);
 
     // Set up EPA mapping according to vanilla core map
-    uint32_t some_mc_dram_eva = (uint32_t) 0x80000000c;
+    // For now, store to some manycore V$ EVA
+    uint32_t some_mc_dram_eva = (uint32_t) 0x810000000;
 
     hb_mc_packet_t req_packet;
 
-    // Store deadbeef to PC
-    req_packet.request.x_dst    = 0;
-    req_packet.request.y_dst    = 2;
+    // Store deadbeef to manycore V$ at the right coordinates (based on data striping)
+    req_packet.request.x_dst    = 1;
+    req_packet.request.y_dst    = 0;
     // Unused
     req_packet.request.x_src    = 0;
     // Unused
@@ -69,22 +70,26 @@ void main(uint64_t argc, char * argv[]) {
 
     *mc_link_bp_req_fifo_addr = req_packet.words[0];
     *mc_link_bp_req_fifo_addr = req_packet.words[1];
+    *mc_link_bp_req_fifo_addr = req_packet.words[2];
+    *mc_link_bp_req_fifo_addr = req_packet.words[3];
 
-    // Read deadbeef from PC
-    req_packet.request.x_dst    = 0;
-    req_packet.request.y_dst    = 2;
+    // Read deadbeef from manycore V$ at the right coordinates (based on data striping)
+    req_packet.request.x_dst    = 1;
+    req_packet.request.y_dst    = 0;
     // Unused
     req_packet.request.x_src    = 0;
     // Unused
     req_packet.request.y_src    = 1;
     req_packet.request.data     = 0;
     // Store mask
-    req_packet.request.reg_id   = 0x0;
+    req_packet.request.reg_id   = 0x10;
     req_packet.request.op_v2    = 0; // Load
     req_packet.request.addr     = some_mc_dram_eva;
 
     *mc_link_bp_req_fifo_addr = req_packet.words[0];
     *mc_link_bp_req_fifo_addr = req_packet.words[1];
+    *mc_link_bp_req_fifo_addr = req_packet.words[2];
+    *mc_link_bp_req_fifo_addr = req_packet.words[3];
 
     // Wait for response
     while (*mc_link_bp_resp_entries_addr == 0);
@@ -93,6 +98,8 @@ void main(uint64_t argc, char * argv[]) {
 
     resp_packet.words[0] = *mc_link_bp_resp_fifo_addr;
     resp_packet.words[1] = *mc_link_bp_resp_fifo_addr;
+    resp_packet.words[2] = *mc_link_bp_resp_fifo_addr;
+    resp_packet.words[3] = *mc_link_bp_resp_fifo_addr;
 
     while(1);
 }
