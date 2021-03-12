@@ -188,20 +188,20 @@ set_false_path -to   [get_ports async_*_reset_o]
 # Source-sync link constraints
 set link_clk_period_ps        1000
 set link_clk_uncertainty_ps   20
-set max_io_output_skew_ps     100
-set max_io_input_skew_ps      100
+set max_io_output_margin_ps   100
+set max_io_input_margin_ps    100
 
 bsg_link_sdr_constraints                           \
   $core_clk_name                                   \
   [get_ports core_clk_i]                           \
   "fwd_out_clk"                                    \
   $core_clk_period_ps                              \
-  $max_io_output_skew_ps                           \
+  $max_io_output_margin_ps                         \
   [get_ports io_fwd_link_clk_o]                    \
   [get_ports {io_fwd_link_data_o io_fwd_link_v_o}] \
   "fwd_in_clk"                                     \
   $link_clk_period_ps                              \
-  $max_io_input_skew_ps                            \
+  $max_io_input_margin_ps                          \
   [get_ports io_fwd_link_clk_i]                    \
   [get_ports {io_fwd_link_data_i io_fwd_link_v_i}] \
   "fwd_tkn_clk"                                    \
@@ -213,12 +213,12 @@ bsg_link_sdr_constraints                           \
   [get_ports core_clk_i]                           \
   "rev_out_clk"                                    \
   $core_clk_period_ps                              \
-  $max_io_output_skew_ps                           \
+  $max_io_output_margin_ps                         \
   [get_ports io_rev_link_clk_o]                    \
   [get_ports {io_rev_link_data_o io_rev_link_v_o}] \
   "rev_in_clk"                                     \
   $link_clk_period_ps                              \
-  $max_io_input_skew_ps                            \
+  $max_io_input_margin_ps                          \
   [get_ports io_rev_link_clk_i]                    \
   [get_ports {io_rev_link_data_i io_rev_link_v_i}] \
   "rev_tkn_clk"                                    \
