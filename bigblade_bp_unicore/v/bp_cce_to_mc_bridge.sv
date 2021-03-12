@@ -476,6 +476,7 @@ module bp_cce_to_mc_bridge
       bp_to_mc_v_li = '0;
       bp_to_mc_yumi_li = '0;
       mc_to_bp_request_yumi_li = '0;
+      mc_to_bp_response_yumi_li = '0;
 
       trans_id_yumi_li = '0;
 
