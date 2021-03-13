@@ -112,6 +112,9 @@ set TESTING_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
 
+  $bp_top_dir/test/common/dromajo_cosim.cpp
+  $bp_top_dir/test/common/bp_nonsynth_cosim.sv
+  
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
 "]

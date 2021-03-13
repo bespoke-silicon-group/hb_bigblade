@@ -35,6 +35,19 @@ module bsg_gateway_chip
 
   //////////////////////////////////////////////////
   //
+  // Testbench Parameters
+  //
+
+  parameter no_bind_p = 0;
+  
+  parameter commit_trace_p = 0;
+  parameter bridge_trace_p = 0;
+  
+  parameter cosim_p = 0;
+  parameter cosim_cfg_file_p = "prog.cfg";
+
+  //////////////////////////////////////////////////
+  //
   // Nonsynth Clock Generator(s)
   //
 
@@ -323,6 +336,49 @@ module bsg_gateway_chip
              );
         end
     end
+
+    // Dromajo cosimulation
+    if (no_bind_p == 0)
+      begin: do_bind
+        bind bp_be_top
+          bp_nonsynth_cosim
+            #(.bp_params_p(bp_params_p))
+            cosim
+            (.clk_i(clk_i)
+              ,.reset_i(reset_i)
+              ,.freeze_i(calculator.pipe_sys.csr.cfg_bus_cast_i.freeze)
+
+              // We want to pass these values as parameters, but cannot in Verilator 4.025
+              // Parameter-resolved constants must not use dotted references
+              ,.cosim_en_i($root.`BSG_TOP_SIM_MODULE.cosim_p == 1)
+              ,.trace_en_i($root.`BSG_TOP_SIM_MODULE.commit_trace_p == 1)
+              ,.checkpoint_i(1'b0)
+              ,.num_core_i($root.`BSG_TOP_SIM_MODULE.num_core_p)
+              ,.mhartid_i(calculator.pipe_sys.csr.cfg_bus_cast_i.core_id)
+              ,.config_file_i($root.`BSG_TOP_SIM_MODULE.cosim_cfg_file_p)
+              ,.instr_cap_i(0)
+              ,.memsize_i(128)
+              ,.amo_en_i(1'b0)
+
+              ,.decode_i(calculator.reservation_n.decode)
+
+              ,.is_debug_mode_i(calculator.pipe_sys.csr.is_debug_mode)
+              ,.commit_pkt_i(calculator.commit_pkt_cast_o)
+
+              ,.priv_mode_i(calculator.pipe_sys.csr.priv_mode_r)
+              ,.mstatus_i(calculator.pipe_sys.csr.mstatus_lo)
+              ,.mcause_i(calculator.pipe_sys.csr.mcause_lo)
+              ,.scause_i(calculator.pipe_sys.csr.scause_lo)
+
+              ,.ird_w_v_i(scheduler.iwb_pkt_cast_i.ird_w_v)
+              ,.ird_addr_i(scheduler.iwb_pkt_cast_i.rd_addr)
+              ,.ird_data_i(scheduler.iwb_pkt_cast_i.rd_data)
+
+              ,.frd_w_v_i(scheduler.fwb_pkt_cast_i.frd_w_v)
+              ,.frd_addr_i(scheduler.fwb_pkt_cast_i.rd_addr)
+              ,.frd_data_i(scheduler.fwb_pkt_cast_i.rd_data)
+              );
+      end
 
 endmodule
 
