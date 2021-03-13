@@ -53,6 +53,7 @@ module bp_cce_to_mc_bridge
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce);
+  `declare_bp_memory_map(paddr_width_p, caddr_width_p);
   `declare_bsg_manycore_packet_s(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p);
   `bp_cast_i(bp_bedrock_cce_mem_msg_s, io_cmd);
   `bp_cast_o(bp_bedrock_cce_mem_msg_s, io_resp);
@@ -116,7 +117,48 @@ module bp_cce_to_mc_bridge
      ,.v_o(io_cmd_v_li)
      ,.yumi_i(io_cmd_yumi_lo)
      );
-  assign io_cmd_eva_li = io_cmd_li.header.addr;
+
+  // Remapping BP host accesses to the manycore host addresses
+  bp_local_addr_s bp_host_addr_cast;
+  assign bp_host_addr_cast = io_cmd_li.header.addr;
+
+  localparam mc_finish_epa_gp       = 16'head0 >> 2;
+  localparam mc_time_epa_gp         = 16'head4 >> 2;
+  localparam mc_fail_epa_gp         = 16'head8 >> 2;
+  localparam mc_stdout_epa_gp       = 16'headc >> 2;
+  localparam mc_stderr_epa_gp       = 16'heee0 >> 2;
+  localparam mc_branch_trace_epa_gp = 16'heee4 >> 2;
+  localparam mc_print_stat_epa_gp   = 16'h0d0c >> 2;
+
+  localparam bp_getchar_addr_gp = 20'h0_0000;
+  localparam bp_putchar_addr_gp = 20'h0_1000;
+  localparam bp_finish_addr_gp  = 20'h0_2???;
+
+  always_comb
+    begin
+      if ((bp_host_addr_cast < dram_base_addr_gp) & host_enable_p)
+        begin
+          io_cmd_eva_li.remote = 2'b01;
+          io_cmd_eva_li.x_cord = '0;
+          io_cmd_eva_li.y_cord = '0;
+          io_cmd_eva_li.low_bits = '0;
+
+          unique casez (bp_host_addr_cast.addr)
+              bp_finish_addr_gp:
+                begin
+                  if (io_cmd_li.data == '0)
+                    io_cmd_eva_li.addr = mc_finish_epa_gp;
+                  else
+                    io_cmd_eva_li.addr = mc_fail_epa_gp;
+                end
+              bp_putchar_addr_gp: io_cmd_eva_li.addr = mc_stdout_epa_gp;
+              bp_getchar_addr_gp: io_cmd_eva_li.addr = mc_fail_epa_gp; // TODO: Find manycore mapping
+              default: io_cmd_eva_li = mc_fail_epa_gp; // must never come here
+          endcase
+        end
+      else
+        io_cmd_eva_li = io_cmd_li.header.addr;
+    end
 
   logic                                    in_v_lo;
   logic [mc_data_width_p-1:0]              in_data_lo;
@@ -154,7 +196,7 @@ module bp_cce_to_mc_bridge
 
     ,.max_out_credits_p(15)
     ,.warn_out_of_credits_p(0)
-    ,.debug_p(1)
+    ,.debug_p(0)
     )
    blackparrot_endpoint
    (.clk_i(clk_i)
@@ -309,12 +351,14 @@ module bp_cce_to_mc_bridge
       mmio_out_packet_li = '0;
       mmio_out_packet_li.src_y_cord = my_y_i;
       mmio_out_packet_li.src_x_cord = my_x_i;
-      if (io_cmd_eva_li.remote == '0)
+      // Local and global remote accesses
+      if (io_cmd_eva_li.remote == 2'b00 || io_cmd_eva_li.remote == 2'b01)
         begin
           mmio_out_packet_li.addr                             = io_cmd_eva_li.addr;
           mmio_out_packet_li.y_cord                           = io_cmd_eva_li.y_cord;
           mmio_out_packet_li.x_cord                           = io_cmd_eva_li.x_cord;
         end
+      // DRAM accesses
       else
         begin
           mmio_out_packet_li.addr = {
