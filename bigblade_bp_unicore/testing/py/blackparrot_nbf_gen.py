@@ -136,7 +136,7 @@ class NBF:
                 index = self.select_bits(addr, 2+vcache_word_offset_width+lg_banks, 2+vcache_word_offset_width+lg_banks+index_width-1)
                 x = self.select_bits(bank, 0, lg_x-1) + 1
                 y = self.select_bits(bank, lg_x, lg_x)
-                epa = (index << (2+vcache_word_offset_width)) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
+                epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
 
                 if y == 0:
