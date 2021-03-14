@@ -114,6 +114,7 @@ set TESTING_SOURCE_FILES [join "
 
   $bp_top_dir/test/common/dromajo_cosim.cpp
   $bp_top_dir/test/common/bp_nonsynth_cosim.sv
+  $bsg_designs_target_dir/testing/v/bp_cce_to_mc_bridge_tracer.sv
   
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v

@@ -337,7 +337,6 @@ module bsg_gateway_chip
         end
     end
 
-    // Dromajo cosimulation
     if (no_bind_p == 0)
       begin: do_bind
         bind bp_be_top
@@ -377,6 +376,162 @@ module bsg_gateway_chip
               ,.frd_w_v_i(scheduler.fwb_pkt_cast_i.frd_w_v)
               ,.frd_addr_i(scheduler.fwb_pkt_cast_i.rd_addr)
               ,.frd_data_i(scheduler.fwb_pkt_cast_i.rd_data)
+              );
+
+        bind DUT.host_link
+          bp_cce_to_mc_bridge_tracer
+          #(.bp_params_p(bp_params_p)
+            ,.trace_file_p("host"))
+          host_tracer
+            (.clk_i(clk_i)
+            ,.reset_i(reset_i)
+            ,.trace_en_i($root.`BSG_TOP_SIM_MODULE.bridge_trace_p == 1)
+
+            ,.io_cmd_i(io_cmd_i)
+            ,.io_cmd_v_i(io_cmd_v_i)
+            ,.io_cmd_ready_o(io_cmd_ready_o)
+
+            ,.io_resp_o(io_resp_cast_o)
+            ,.io_resp_v_o(io_resp_v_o)
+            ,.io_resp_yumi_i(io_resp_yumi_i)
+
+            ,.io_cmd_o(io_cmd_cast_o)
+            ,.io_cmd_v_o(io_cmd_v_o)
+            ,.io_cmd_yumi_i(io_cmd_yumi_i)
+
+            ,.io_resp_i(io_resp_i)
+            ,.io_resp_v_i(io_resp_v_i)
+            ,.io_resp_ready_o(io_resp_ready_o)
+
+            ,.out_v_li(out_v_li)
+            ,.out_packet_li(out_packet_li)
+            ,.out_ready_lo(out_ready_lo)
+
+            ,.returned_data_r_lo(returned_data_r_lo)
+            ,.returned_reg_id_r_lo(returned_reg_id_r_lo)
+            ,.returned_v_r_lo(returned_v_r_lo)
+            ,.returned_yumi_li(returned_yumi_li)
+            ,.returned_pkt_type_r_lo(returned_pkt_type_r_lo)
+            ,.returned_fifo_full_lo(returned_fifo_full_lo)
+            ,.returned_credit_v_r_lo(returned_credit_v_r_lo)
+            ,.returned_credit_reg_id_r_lo(returned_credit_reg_id_r_lo)
+            
+            ,.in_v_lo(in_v_lo)
+            ,.in_data_lo(in_data_lo)
+            ,.in_mask_lo(in_mask_lo)
+            ,.in_addr_lo(in_addr_lo)
+            ,.in_we_lo(in_we_lo)
+            ,.in_load_info_lo(in_load_info_lo)
+            ,.in_src_x_cord_lo(in_src_x_cord_lo)
+            ,.in_src_y_cord_lo(in_src_y_cord_lo)
+            ,.in_yumi_li(in_yumi_li)
+
+            ,.returning_data_li(returning_data_li)
+            ,.returning_v_li(returning_v_li)
+            );
+
+        bind DUT.d[0].dram_link
+          bp_cce_to_mc_bridge_tracer
+            #(.bp_params_p(bp_params_p)
+              ,.trace_file_p("dram_0"))
+            dram0_tracer
+              (.clk_i(clk_i)
+              ,.reset_i(reset_i)
+              ,.trace_en_i($root.`BSG_TOP_SIM_MODULE.bridge_trace_p == 1)
+
+              ,.io_cmd_i(io_cmd_i)
+              ,.io_cmd_v_i(io_cmd_v_i)
+              ,.io_cmd_ready_o(io_cmd_ready_o)
+
+              ,.io_resp_o(io_resp_cast_o)
+              ,.io_resp_v_o(io_resp_v_o)
+              ,.io_resp_yumi_i(io_resp_yumi_i)
+
+              ,.io_cmd_o(io_cmd_cast_o)
+              ,.io_cmd_v_o(io_cmd_v_o)
+              ,.io_cmd_yumi_i(io_cmd_yumi_i)
+
+              ,.io_resp_i(io_resp_i)
+              ,.io_resp_v_i(io_resp_v_i)
+              ,.io_resp_ready_o(io_resp_ready_o)
+
+              ,.out_v_li(out_v_li)
+              ,.out_packet_li(out_packet_li)
+              ,.out_ready_lo(out_ready_lo)
+
+              ,.returned_data_r_lo(returned_data_r_lo)
+              ,.returned_reg_id_r_lo(returned_reg_id_r_lo)
+              ,.returned_v_r_lo(returned_v_r_lo)
+              ,.returned_yumi_li(returned_yumi_li)
+              ,.returned_pkt_type_r_lo(returned_pkt_type_r_lo)
+              ,.returned_fifo_full_lo(returned_fifo_full_lo)
+              ,.returned_credit_v_r_lo(returned_credit_v_r_lo)
+              ,.returned_credit_reg_id_r_lo(returned_credit_reg_id_r_lo)
+              
+              ,.in_v_lo(in_v_lo)
+              ,.in_data_lo(in_data_lo)
+              ,.in_mask_lo(in_mask_lo)
+              ,.in_addr_lo(in_addr_lo)
+              ,.in_we_lo(in_we_lo)
+              ,.in_load_info_lo(in_load_info_lo)
+              ,.in_src_x_cord_lo(in_src_x_cord_lo)
+              ,.in_src_y_cord_lo(in_src_y_cord_lo)
+              ,.in_yumi_li(in_yumi_li)
+
+              ,.returning_data_li(returning_data_li)
+              ,.returning_v_li(returning_v_li)
+              );
+
+        bind DUT.d[1].dram_link
+          bp_cce_to_mc_bridge_tracer
+            #(.bp_params_p(bp_params_p)
+              ,.trace_file_p("dram_1"))
+            dram1_tracer
+              (.clk_i(clk_i)
+              ,.reset_i(reset_i)
+              ,.trace_en_i($root.`BSG_TOP_SIM_MODULE.bridge_trace_p == 1)
+
+              ,.io_cmd_i(io_cmd_i)
+              ,.io_cmd_v_i(io_cmd_v_i)
+              ,.io_cmd_ready_o(io_cmd_ready_o)
+
+              ,.io_resp_o(io_resp_cast_o)
+              ,.io_resp_v_o(io_resp_v_o)
+              ,.io_resp_yumi_i(io_resp_yumi_i)
+
+              ,.io_cmd_o(io_cmd_cast_o)
+              ,.io_cmd_v_o(io_cmd_v_o)
+              ,.io_cmd_yumi_i(io_cmd_yumi_i)
+
+              ,.io_resp_i(io_resp_i)
+              ,.io_resp_v_i(io_resp_v_i)
+              ,.io_resp_ready_o(io_resp_ready_o)
+
+              ,.out_v_li(out_v_li)
+              ,.out_packet_li(out_packet_li)
+              ,.out_ready_lo(out_ready_lo)
+
+              ,.returned_data_r_lo(returned_data_r_lo)
+              ,.returned_reg_id_r_lo(returned_reg_id_r_lo)
+              ,.returned_v_r_lo(returned_v_r_lo)
+              ,.returned_yumi_li(returned_yumi_li)
+              ,.returned_pkt_type_r_lo(returned_pkt_type_r_lo)
+              ,.returned_fifo_full_lo(returned_fifo_full_lo)
+              ,.returned_credit_v_r_lo(returned_credit_v_r_lo)
+              ,.returned_credit_reg_id_r_lo(returned_credit_reg_id_r_lo)
+              
+              ,.in_v_lo(in_v_lo)
+              ,.in_data_lo(in_data_lo)
+              ,.in_mask_lo(in_mask_lo)
+              ,.in_addr_lo(in_addr_lo)
+              ,.in_we_lo(in_we_lo)
+              ,.in_load_info_lo(in_load_info_lo)
+              ,.in_src_x_cord_lo(in_src_x_cord_lo)
+              ,.in_src_y_cord_lo(in_src_y_cord_lo)
+              ,.in_yumi_li(in_yumi_li)
+
+              ,.returning_data_li(returning_data_li)
+              ,.returning_v_li(returning_v_li)
               );
       end
 
