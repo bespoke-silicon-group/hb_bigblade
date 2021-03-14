@@ -129,7 +129,7 @@ NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
 %/prog.riscv:
 	mkdir -p $(@D)
-	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG) -o $@
+	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG) -o $@
 
 %/prog.elf: %/prog.riscv
 	cp $*/prog.riscv $@
