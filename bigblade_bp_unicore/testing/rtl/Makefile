@@ -93,6 +93,7 @@ NO_BIND_P ?= 0
 CMT_TRACE_P ?= 0
 BRIDGE_TRACE_P ?= 0
 COSIM_P ?= 0
+USE_BIN_P ?= 0
 
 TB_PARAMS = -pvalue+commit_trace_p=$(CMT_TRACE_P) \
 						-pvalue+bridge_trace_p=$(BRIDGE_TRACE_P) \
@@ -113,7 +114,8 @@ RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objc
 PROGS_DIR = $(abspath ../progs/)
 SRC_DIR = $(PROGS_DIR)/src
 INC_DIR = $(PROGS_DIR)/include
-PROG ?= manycore_poke_fifo.c
+BIN_DIR = $(PROGS_DIR)/bin
+PROG ?= manycore_poke_fifo
 CRT ?= $(SRC_DIR)/start.S
 BP_UTILS ?= $(SRC_DIR)/bp_utils.c
 LINKER ?= $(SRC_DIR)/riscv.ld
@@ -129,7 +131,11 @@ NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
 %/prog.riscv:
 	mkdir -p $(@D)
-	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG) -o $@
+ifneq ($(USE_BIN_P), 0)
+	cp $(BIN_DIR)/$(PROG).riscv $@
+else
+	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG).c -o $@
+endif
 
 %/prog.elf: %/prog.riscv
 	cp $*/prog.riscv $@

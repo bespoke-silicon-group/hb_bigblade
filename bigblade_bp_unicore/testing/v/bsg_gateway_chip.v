@@ -378,6 +378,24 @@ module bsg_gateway_chip
               ,.frd_data_i(scheduler.fwb_pkt_cast_i.rd_data)
               );
 
+        bind bp_be_top
+          bp_nonsynth_watchdog
+          #(.bp_params_p(bp_params_p)
+            ,.timeout_cycles_p(100000)
+            ,.heartbeat_instr_p(100000)
+            )
+          watchdog
+            (.clk_i(clk_i)
+            ,.reset_i(reset_i)
+            ,.freeze_i(calculator.pipe_sys.csr.cfg_bus_cast_i.freeze)
+            ,.wfi_i(director.is_wait)
+
+            ,.mhartid_i(calculator.pipe_sys.csr.cfg_bus_cast_i.core_id)
+
+            ,.npc_i(calculator.pipe_sys.csr.apc_r)
+            ,.instret_i(calculator.commit_pkt_cast_o.instret)
+            );
+
         bind DUT.host_link
           bp_cce_to_mc_bridge_tracer
           #(.bp_params_p(bp_params_p)
