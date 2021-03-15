@@ -54,6 +54,7 @@ module bp_unicore_lite
   `declare_bp_cache_engine_if(paddr_width_p, ctag_width_p, icache_sets_p, icache_assoc_p, dword_width_gp, icache_block_width_p, icache_fill_width_p, icache);
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
   `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, uce);
+  `declare_bp_memory_map(paddr_width_p, caddr_width_p);
 
   bp_icache_req_s icache_req_lo;
   logic icache_req_v_lo, icache_req_yumi_li, icache_req_busy_li;
@@ -441,9 +442,12 @@ module bp_unicore_lite
     end
 
   /* TODO: Extract local memory map to module */
+  bp_local_addr_s local_addr_cast;
+  assign local_addr_cast = cmd_fifo_selected_lo.header.addr;
+  wire [dev_id_width_gp-1:0] device_cmd_li = local_addr_cast.dev;
+
   wire local_cmd_li        = (cmd_fifo_selected_lo.header.addr < dram_base_addr_gp);
-  wire [3:0] device_cmd_li = cmd_fifo_selected_lo.header.addr[20+:4];
-  wire is_other_domain     = (cmd_fifo_selected_lo.header.addr[paddr_width_p-1-:io_noc_did_width_p] != 0);
+  wire is_other_domain     = (cmd_fifo_selected_lo.header.addr[paddr_width_p-1-:domain_width_p] != 0);
   wire is_cfg_cmd          = local_cmd_li & (device_cmd_li == cfg_dev_gp);
   wire is_clint_cmd        = local_cmd_li & (device_cmd_li == clint_dev_gp);
   wire is_io_cmd           = (local_cmd_li & (device_cmd_li inside {boot_dev_gp, host_dev_gp, mc_dev_gp})) | is_other_domain;

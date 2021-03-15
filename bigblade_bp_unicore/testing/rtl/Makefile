@@ -87,15 +87,40 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 	/usr/bin/tclsh bsg_config.tcl
 
 ########################################
+## Testbench options
+########################################
+NO_BIND_P ?= 0
+CMT_TRACE_P ?= 0
+BRIDGE_TRACE_P ?= 0
+COSIM_P ?= 0
+USE_BIN_P ?= 0
+
+TB_PARAMS = -pvalue+commit_trace_p=$(CMT_TRACE_P) \
+						-pvalue+bridge_trace_p=$(BRIDGE_TRACE_P) \
+						-pvalue+cosim_p=$(COSIM_P) \
+						-pvalue+no_bind_p=$(NO_BIND_P)
+
+VCS_OPTIONS += -CFLAGS "-I$(BLACKPARROT_DIR)/external/include -std=c++14"
+VCS_OPTIONS += $(BLACKPARROT_DIR)/external/lib/libdromajo_cosim.a
+
+########################################
 ## BlackParrot test junk
 ########################################
+## TODO: Port to blackparrot itself
 
-RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc
+RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc -mcmodel=medany
 RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
 RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
-PROG ?= ../progs/manycore_poke_fifo.c
-CRT ?= ../progs/start.S
-LINK ?= ../progs/riscv.ld
+
+PROGS_DIR = $(abspath ../progs/)
+SRC_DIR = $(PROGS_DIR)/src
+INC_DIR = $(PROGS_DIR)/include
+BIN_DIR = $(PROGS_DIR)/bin
+PROG ?= manycore_poke_fifo
+CRT ?= $(SRC_DIR)/start.S
+BP_UTILS ?= $(SRC_DIR)/bp_utils.c
+LINKER ?= $(SRC_DIR)/riscv.ld
+
 PYTHON ?= python
 PYTHONPATH +=:../../bsg_manycore/testbenches/py
 TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
@@ -107,7 +132,14 @@ NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
 %/prog.riscv:
 	mkdir -p $(@D)
-	$(RISCV_GCC) $(RISCV_LINK) -T$(LINK) -nostartfiles -nostdlib $(CRT) $(PROG) -o $@
+ifneq ($(USE_BIN_P), 0)
+	cp $(BIN_DIR)/$(PROG).riscv $@
+else
+	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG).c -o $@
+endif
+
+%/prog.elf: %/prog.riscv
+	cp $*/prog.riscv $@
 
 %/prog.dump: %/prog.riscv
 	mkdir -p $(@D)
@@ -117,7 +149,7 @@ NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 	mkdir -p $(@D)
 	$(RISCV_OBJCOPY) $< $@
 
-%/prog.nbf: %/prog.mem %/prog.dump
+%/prog.nbf: %/prog.mem %/prog.dump %/prog.elf
 	mkdir -p $(@D)
 	$(PYTHON) $(NBF_GEN) $< > $@
 
@@ -146,11 +178,12 @@ view:
 
 build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)
-	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
+	$(VCS) $(VCS_OPTIONS) $(TB_PARAMS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):
 	mkdir -p $@
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
+	rm -rf DVEFiles/
 
