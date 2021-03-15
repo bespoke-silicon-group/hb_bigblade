@@ -98,11 +98,18 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
+ifdef EAST_NOT_WEST
+VCS_OPTIONS += +define+EAST_NOT_WEST=1
+BSG_CHIP_DUT_TYPE = east
+else
+BSG_CHIP_DUT_TYPE = west
+endif
+
 ########################################
 ## SDF Annotation
 ########################################
 
-BSG_CHIP_TOP_MODULE_NAME = bsg_manycore_link_ruche_to_sdr_west
+BSG_CHIP_DUT_NAME = bsg_manycore_link_ruche_to_sdr_$(BSG_CHIP_DUT_TYPE)
 
 sdf_corner = max
 corner     = tt_0p80v_25c
@@ -111,13 +118,13 @@ rc_corner  = nominal
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
 #VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_TOP_MODULE_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_TOP_MODULE_NAME).sdf.gz
+VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_DUT_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_DUT_NAME).sdf.gz
 VCS_OPTIONS += -sdfretain
 
 EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
 BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
-BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_TOP_MODULE_NAME)_chip_finish.v
-BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_TOP_MODULE_NAME)/results/$(BSG_CHIP_TOP_MODULE_NAME)_chip_finish.v.gz
+BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_DUT_NAME)_chip_finish.v
+BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_DUT_NAME)/results/$(BSG_CHIP_DUT_NAME)_chip_finish.v.gz
 
 VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
 

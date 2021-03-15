@@ -11,7 +11,8 @@ set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
 
 
 # Grouping ports...
-set reset_port [get_ports reset_i]
+set reset_in_port  [get_ports reset_i]
+set reset_out_port [get_ports reset_o]
 
 set ruche_input_ports         [list]
 set ruche_output_ports        [list]
@@ -89,7 +90,6 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
-constraint_input_ports $clk_name $reset_port 500 0
 
 # FIFO input constraints
 for {set i 0} {$i < 6} {incr i} {
@@ -156,18 +156,24 @@ set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
 
 
+# reset ports
+constraint_input_ports $clk_name $reset_in_port  500 40
+constraint_output_ports $clk_name $reset_out_port 500 40
 
 
+set cord_in_ports [list]
+append_to_collection cord_in_ports [get_ports global_*_i*]
+constraint_input_ports $clk_name $cord_in_ports 500 40
+#set_multicycle_path 2 -from $cord_in_ports -setup
+#set_multicycle_path 1 -from $cord_in_ports -hold
+#set_false_path -from $cord_in_ports
 
-
-# false path
-set_false_path -from [get_ports my_*]
-set_false_path -from [get_ports pod_*]
-#set_multicycle_path 2 -from [get_ports my_*] -setup
-#set_multicycle_path 1 -from [get_ports my_*] -hold
-#set_multicycle_path 2 -from [get_ports pod_*] -setup
-#set_multicycle_path 1 -from [get_ports pod_*] -hold
-
+set cord_out_ports [list]
+append_to_collection cord_out_ports [get_ports global_*_o*]
+constraint_output_ports $clk_name $cord_out_ports 500 40
+#set_multicycle_path 2 -to $cord_out_ports -setup
+#set_multicycle_path 1 -to $cord_out_ports -hold
+#set_false_path -to $cord_out_ports
 
 
 
@@ -196,7 +202,6 @@ set_ungroup [get_designs -filter "hdl_template==network_tx"] true
 set_ungroup [get_designs -filter "hdl_template==network_rx"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
 set_ungroup [get_designs -filter "hdl_template==reverse"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"] true
 set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"] true
 set_ungroup [get_designs -filter "hdl_template==hash_function"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true

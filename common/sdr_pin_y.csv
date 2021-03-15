@@ -310,11 +310,3 @@ io_rev_link_data_i[1],96.128,K1
 io_rev_link_data_i[0],95.616,K1
 io_rev_link_v_i,129.408,K1
 io_rev_link_token_o,128.896,K1
-
-
-io_rev_link_v_i,129.408,K1
-io_fwd_link_token_o,184.704,K1
-io_fwd_link_v_i,184.832,K3
-io_fwd_link_token_i,91.904,K1
-io_fwd_link_v_o,92.032,K3
-

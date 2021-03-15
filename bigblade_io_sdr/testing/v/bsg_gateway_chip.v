@@ -1,5 +1,17 @@
 `timescale 1ps/1ps
 
+`define BSG_GATEWAY_CHIP_MODULE_NAME_TO_STR(name) "``name``"
+
+`ifndef EAST_NOT_WEST
+  `define DUT_MODULE_NAME bsg_manycore_link_ruche_to_sdr_west
+  `define UP_X_CORD_LP    9
+  `define DOWN_X_CORD_LP  8
+`else
+  `define DUT_MODULE_NAME bsg_manycore_link_ruche_to_sdr_east
+  `define UP_X_CORD_LP    7
+  `define DOWN_X_CORD_LP  8
+`endif
+
 module bsg_gateway_chip
 
  import bsg_noc_pkg::*;
@@ -58,9 +70,9 @@ module bsg_gateway_chip
   logic downnode_en, downnode_error;
   logic [31:0] downnode_sent, downnode_received;
 
-  localparam up_x_cord_lp = 9;
+  localparam up_x_cord_lp = `UP_X_CORD_LP;
   localparam up_y_cord_lp = 4;
-  localparam down_x_cord_lp = 8;
+  localparam down_x_cord_lp = `DOWN_X_CORD_LP;
   localparam down_y_cord_lp = 4;
 
 
@@ -116,7 +128,8 @@ module bsg_gateway_chip
   //
   // DUT
   //
-  bsg_manycore_link_ruche_to_sdr_west
+  `DUT_MODULE_NAME
+`ifndef NETLIST_LIBRARY_NAME
  #(.lg_fifo_depth_p                (lg_fifo_depth_p                )
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
   ,.addr_width_p                   (addr_width_p                   )
@@ -124,7 +137,9 @@ module bsg_gateway_chip
   ,.x_cord_width_p                 (x_cord_width_p                 )
   ,.y_cord_width_p                 (y_cord_width_p                 )
   ,.ruche_factor_X_p               (ruche_factor_X_p               )
-  ) DUT
+  )
+`endif
+  DUT
   (.core_clk_i              (upnode_clk) 
   ,.core_reset_i            (upnode_reset_dly)
 
@@ -339,6 +354,9 @@ module bsg_gateway_chip
     downnode_en = 0;
 
     #500000
+
+    $display("End Simulation\n");
+    $display("DUT Name: %0s\n", `BSG_GATEWAY_CHIP_MODULE_NAME_TO_STR(`DUT_MODULE_NAME));
 
     assert(upnode_error == 0)
     else 

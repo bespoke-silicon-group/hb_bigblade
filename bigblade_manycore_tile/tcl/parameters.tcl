@@ -1,6 +1,5 @@
 set TOPLEVEL_PARAMETERS [join "
   dmem_size_p=1024
-  vcache_size_p=2048
   icache_entries_p=1024
   icache_tag_width_p=12
   x_cord_width_p=7
@@ -11,6 +10,7 @@ set TOPLEVEL_PARAMETERS [join "
   num_tiles_y_p=8
   data_width_p=32
   addr_width_p=28
+  vcache_size_p=2048
   vcache_block_size_in_words_p=8
   vcache_sets_p=64
 "]
