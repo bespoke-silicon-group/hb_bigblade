@@ -184,4 +184,5 @@ $(BSG_OUT_DIR):
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
+	rm -rf DVEFiles/
 

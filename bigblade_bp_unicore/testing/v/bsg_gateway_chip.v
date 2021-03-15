@@ -15,6 +15,8 @@
   // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // [ 00 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   // [ 00 ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
 
 module bsg_gateway_chip
@@ -186,7 +188,7 @@ module bsg_gateway_chip
   // Fake network --> Giant crossbar to mimic where hammerblade will sit
   // Network parameters
   localparam cb_num_in_x_lp = mc_num_tiles_x_gp+1;
-  localparam cb_num_in_y_lp = mc_num_tiles_y_gp;
+  localparam cb_num_in_y_lp = mc_num_tiles_y_gp+2;
   localparam cb_num_in_lp = cb_num_in_x_lp*cb_num_in_y_lp;
   localparam cb_fwd_fifo_els_lp = 32;
   localparam cb_rev_fifo_els_lp = 32;
@@ -292,13 +294,13 @@ module bsg_gateway_chip
     end
 
   // Tie off all links below BP
-  for (genvar i = 4; i < 8; i++)
+  for (genvar i = 4; i <= mc_num_tiles_y_gp+1; i++)
     begin : bp_tieoff
       assign link_in[i][0] = '0;
     end
 
   // Tie off where the manycore would be
-  for (genvar i = 1; i < mc_num_tiles_y_gp-1; i++)
+  for (genvar i = 1; i <= mc_num_tiles_y_gp; i++)
     begin : tile_stubs_y
       for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
         begin : tile_stubs_x
@@ -312,7 +314,7 @@ module bsg_gateway_chip
       for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
         begin : mem_col
           localparam x_idx_lp = j;
-          localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp-1 : 0;
+          localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp+1 : 0;
           wire [mc_x_cord_width_gp-1:0] my_x_li = x_idx_lp;
           wire [mc_y_cord_width_gp-1:0] my_y_li = y_idx_lp;
 

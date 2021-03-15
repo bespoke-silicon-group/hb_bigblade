@@ -368,7 +368,7 @@ module bp_cce_to_mc_bridge
             io_cmd_eva_li[2+:vcache_word_offset_width_lp]
           };
           mmio_out_packet_li.y_cord = hash_bank_lo[mc_x_subcord_width_p]
-            ? (mc_y_cord_width_p)'(mc_num_tiles_y_p-1) // V$ ports are at the top and bottom of the manycore network
+            ? (mc_y_cord_width_p)'(mc_num_tiles_y_p+1) // V$ ports are at the top and bottom of the manycore network
             : {mc_y_cord_width_p{1'b0}};
           mmio_out_packet_li.x_cord = hash_bank_lo[0+:mc_x_subcord_width_p] + 1'b1;
         end

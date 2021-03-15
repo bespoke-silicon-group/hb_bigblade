@@ -101,7 +101,7 @@ class NBF:
                 if y == 0:
                     self.print_nbf(x, 0, epa, data)
                 else:
-                    self.print_nbf(x, self.num_tiles_y-1, epa, data)
+                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
 
     # Initialize V$ or infinite memories (Useful for no DRAM mode)
     # Emulates the hashing function in bsg_manycore/v/vanilla_bean/hash_function.v
@@ -142,7 +142,7 @@ class NBF:
                 if y == 0:
                     self.print_nbf(x, 0, epa, data)
                 else:
-                    self.print_nbf(x, self.num_tiles_y-1, epa, data)
+                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
