@@ -100,233 +100,108 @@ module bp_cce_to_mc_bridge_tracer
       $fwrite(file, "All sizes are in bytes\n");
     end
 
+  function string bp_msg_type (bp_bedrock_mem_type_e t);
+    case (t)
+      e_bedrock_mem_rd, e_bedrock_mem_uc_rd:
+        bp_msg_type = "[load      ]";
+      default:
+        bp_msg_type = "[store     ]";
+    endcase
+  endfunction
+
   // I/O Message type definitions
   string in_io_cmd_msg_type, in_io_resp_msg_type, out_io_cmd_msg_type, out_io_resp_msg_type;
   always_comb
     begin
-      if (io_cmd_v_i & io_cmd_ready_o)
-        if (io_cmd_cast_i.header.msg_type == e_bedrock_mem_rd)
-          in_io_cmd_msg_type = "[read]";
-        else if (io_cmd_cast_i.header.msg_type == e_bedrock_mem_uc_rd)
-          in_io_cmd_msg_type = "[uc_read]";
-        else if (io_cmd_cast_i.header.msg_type == e_bedrock_mem_wr)
-          in_io_cmd_msg_type = "[write]";
-        else if (io_cmd_cast_i.header.msg_type == e_bedrock_mem_uc_wr)
-          in_io_cmd_msg_type = "[uc_write]";
-        else
-          in_io_cmd_msg_type = "[unknown]";
-      else
-        in_io_cmd_msg_type = "[unknown]";
-
-      if (io_cmd_v_o & io_cmd_yumi_i)
-        if (io_cmd_cast_o.header.msg_type == e_bedrock_mem_rd)
-          out_io_cmd_msg_type = "[read]";
-        else if (io_cmd_cast_o.header.msg_type == e_bedrock_mem_uc_rd)
-          out_io_cmd_msg_type = "[uc_read]";
-        else if (io_cmd_cast_o.header.msg_type == e_bedrock_mem_wr)
-          out_io_cmd_msg_type = "[write]";
-        else if (io_cmd_cast_o.header.msg_type == e_bedrock_mem_uc_wr)
-          out_io_cmd_msg_type = "[uc_write]";
-        else
-          out_io_cmd_msg_type = "[unknown]";
-      else
-        out_io_cmd_msg_type = "[unknown]";
-
-      if (io_resp_v_i & io_resp_ready_o)
-        if (io_resp_cast_i.header.msg_type == e_bedrock_mem_rd)
-          in_io_resp_msg_type = "[read]";
-        else if (io_resp_cast_i.header.msg_type == e_bedrock_mem_uc_rd)
-          in_io_resp_msg_type = "[uc_read]";
-        else if (io_resp_cast_i.header.msg_type == e_bedrock_mem_wr)
-          in_io_resp_msg_type = "[write]";
-        else if (io_resp_cast_i.header.msg_type == e_bedrock_mem_uc_wr)
-          in_io_resp_msg_type = "[uc_write]";
-        else
-          in_io_resp_msg_type = "[unknown]";
-      else
-        in_io_resp_msg_type = "[unknown]";
-
-      if (io_resp_v_o & io_resp_yumi_i)
-        if (io_resp_cast_o.header.msg_type == e_bedrock_mem_rd)
-          out_io_resp_msg_type = "[read]";
-        else if (io_resp_cast_o.header.msg_type == e_bedrock_mem_uc_rd)
-          out_io_resp_msg_type = "[uc_read]";
-        else if (io_resp_cast_o.header.msg_type == e_bedrock_mem_wr)
-          out_io_resp_msg_type = "[write]";
-        else if (io_resp_cast_o.header.msg_type == e_bedrock_mem_uc_wr)
-          out_io_resp_msg_type = "[uc_write]";
-        else
-          out_io_resp_msg_type = "[unknown]";
-      else
-        out_io_resp_msg_type = "[unknown]";
+      in_io_cmd_msg_type   = bp_msg_type(io_cmd_cast_i.header.msg_type.mem);
+      in_io_resp_msg_type  = bp_msg_type(io_resp_cast_i.header.msg_type.mem);
+      out_io_cmd_msg_type  = bp_msg_type(io_cmd_cast_o.header.msg_type.mem);
+      out_io_resp_msg_type = bp_msg_type(io_resp_cast_o.header.msg_type.mem);
     end
 
-    // I/O Size definitions
-    string in_io_cmd_size, in_io_resp_size, out_io_cmd_size, out_io_resp_size;
+    //// I/O Size definitions
+    integer in_io_cmd_size, in_io_resp_size, out_io_cmd_size, out_io_resp_size;
     always_comb
     begin
-      if (io_cmd_v_i & io_cmd_ready_o)
-        if (io_cmd_cast_i.header.size == e_bedrock_msg_size_1)
-          in_io_cmd_size = "1";
-        else if (io_cmd_cast_i.header.size == e_bedrock_msg_size_2)
-          in_io_cmd_size = "2";
-        else if (io_cmd_cast_i.header.size == e_bedrock_msg_size_4)
-          in_io_cmd_size = "4";
-        else if (io_cmd_cast_i.header.size == e_bedrock_msg_size_8)
-          in_io_cmd_size = "8";
-        else
-          in_io_cmd_size = "0";
-      else
-        in_io_cmd_size = "0";
-
-      if (io_cmd_v_o & io_cmd_yumi_i)
-        if (io_cmd_cast_o.header.size == e_bedrock_msg_size_1)
-          out_io_cmd_size = "1";
-        else if (io_cmd_cast_o.header.size == e_bedrock_msg_size_2)
-          out_io_cmd_size = "2";
-        else if (io_cmd_cast_o.header.size == e_bedrock_msg_size_4)
-          out_io_cmd_size = "4";
-        else if (io_cmd_cast_o.header.size == e_bedrock_msg_size_8)
-          out_io_cmd_size = "8";
-        else
-          out_io_cmd_size = "0";
-      else  
-        out_io_cmd_size = "0";
-
-      if (io_resp_v_i & io_resp_ready_o)
-        if (io_resp_cast_i.header.size == e_bedrock_msg_size_1)
-          in_io_resp_size = "1";
-        else if (io_resp_cast_i.header.size == e_bedrock_msg_size_2)
-          in_io_resp_size = "2";
-        else if (io_resp_cast_i.header.size == e_bedrock_msg_size_4)
-          in_io_resp_size = "4";
-        else if (io_resp_cast_i.header.size == e_bedrock_msg_size_8)
-          in_io_resp_size = "8";
-        else
-          in_io_resp_size = "0";
-      else
-        in_io_resp_size = "0";
-
-      if (io_resp_v_o & io_resp_yumi_i)
-        if (io_resp_cast_o.header.size == e_bedrock_msg_size_1)
-          out_io_resp_size = "1";
-        else if (io_resp_cast_o.header.size == e_bedrock_msg_size_2)
-          out_io_resp_size = "2";
-        else if (io_resp_cast_o.header.size == e_bedrock_msg_size_4)
-          out_io_resp_size = "4";
-        else if (io_resp_cast_o.header.size == e_bedrock_msg_size_8)
-          out_io_resp_size = "8";
-        else
-          out_io_resp_size = "0";
-      else
-       out_io_resp_size = "0"; 
+      in_io_cmd_size   = 2**io_cmd_cast_i.header.size;
+      in_io_resp_size  = 2**io_resp_cast_i.header.size;
+      out_io_cmd_size  = 2**io_cmd_cast_o.header.size;
+      out_io_resp_size = 2**io_resp_cast_o.header.size;
     end
 
   // Outgoing request packet op
   string out_pkt_op;
   always_comb
-    begin
-      if (out_v_li & out_ready_lo)
-        if (out_packet_cast_i.op_v2 == e_remote_load)
-          out_pkt_op = "[load]";
-        else if (out_packet_cast_i.op_v2 == e_remote_store)
-          out_pkt_op = "[masked store]";
-        else if (out_packet_cast_i.op_v2 == e_remote_sw)
-          out_pkt_op = "[store word]";
-        else if (out_packet_cast_i.op_v2 == e_cache_op)
-          out_pkt_op = "[cache]";
-        else if (out_packet_cast_i.op_v2 inside {e_remote_amoswap, e_remote_amoadd, e_remote_amoor})
-          out_pkt_op = "[amo]";
-        else
-          out_pkt_op = "[unsupported/unknown]";
-      else
-        out_pkt_op = "[unsupported/unknown]";
-    end
+    case (out_packet_cast_i.op_v2)
+      e_remote_load   : out_pkt_op  = "[load      ]";
+      e_remote_store  : out_pkt_op  = "[store     ]";
+      e_remote_sw     : out_pkt_op  = "[store word]";
+      e_cache_op      : out_pkt_op  = "[cache     ]";
+      e_remote_amoswap
+      ,e_remote_amoadd
+      ,e_remote_amoor : out_pkt_op  = "[amo       ]";
+      default         : out_pkt_op  = "[unknown   ]";
+    endcase
 
   string rtn_pkt_op;
   always_comb
-    begin
-      if ((returned_v_r_lo & returned_yumi_li) | returned_credit_v_r_lo)
-        if (returned_pkt_type_r_lo == e_return_credit)
-          rtn_pkt_op = "[credit]";
-        else if (returned_pkt_type_r_lo == e_return_ifetch)
-          rtn_pkt_op = "[ifetch]";
-        else if (returned_pkt_type_r_lo == e_return_int_wb)
-          rtn_pkt_op = "[int wb]";
-        else if (returned_pkt_type_r_lo == e_return_float_wb)
-          rtn_pkt_op = "[float wb]";
-        else
-          rtn_pkt_op = "[unsupported/unknown]";
-      else
-        rtn_pkt_op = "[unsupported/unknown]";
-    end
+    case (returned_pkt_type_r_lo)
+      e_return_credit  : rtn_pkt_op = "[credit    ]";
+      e_return_ifetch  : rtn_pkt_op = "[ifetch    ]";
+      e_return_int_wb  : rtn_pkt_op = "[int wb    ]";
+      e_return_float_wb: rtn_pkt_op = "[float wb  ]";
+      default          : rtn_pkt_op = "[unknown   ]";
+    endcase
 
   string req_pkt_op;
-  string load_size, load_type;
   always_comb
-    begin
-      if (in_v_lo & in_yumi_li)
-        begin
-          if (in_we_lo)
-            req_pkt_op = "[store]";
-          else
-            req_pkt_op = "[load/amoswap]";
+    if (in_we_lo)
+      req_pkt_op = "[store     ]";
+    else if (in_load_info_lo.is_byte_op & in_load_info_lo.is_unsigned_op)
+      req_pkt_op = "[lbu       ]";
+    else if (in_load_info_lo.is_byte_op & ~in_load_info_lo.is_unsigned_op)
+      req_pkt_op = "[lb        ]";
+    else if (in_load_info_lo.is_hex_op & in_load_info_lo.is_unsigned_op)
+      req_pkt_op = "[lh        ]";
+    else if (in_load_info_lo.is_hex_op & ~in_load_info_lo.is_unsigned_op)
+      req_pkt_op = "[lhu       ]";
+    else
+      req_pkt_op = "[lw        ]";
 
-          if (in_load_info_lo.is_byte_op)
-            load_size = "byte";
-          else if (in_load_info_lo.is_hex_op)
-            load_size = "half";
-          else
-            load_size = "word";
+  always_ff @(negedge clk_i)
+    if (trace_en_i)
+      begin
+        // BP --> Manycore request
+        if (io_cmd_v_i & io_cmd_ready_o)
+          $fwrite(file, "%t [BP->Bridge req ] %s data: %x addr: %x size: %x \n", $time, in_io_cmd_msg_type, io_cmd_cast_i.data, io_cmd_cast_i.header.addr, in_io_cmd_size);
 
-          if (in_load_info_lo.is_unsigned_op)
-            load_type = {load_size, "u"};
-          else
-            load_type = load_size;
-        end
-      else
-        begin
-          req_pkt_op = "[load/amoswap]";
-          load_size = "word";
-          load_type = load_size;
-        end      
-    end
+        if (out_v_li & out_ready_lo)
+          $fwrite(file, "%t [Bridge->MC req ] %s data: %x addr: %x reg_id: %x dst x: %x dst y: %x \n", $time, out_pkt_op, out_packet_cast_i.payload, out_packet_cast_i.addr, out_packet_cast_i.reg_id, out_packet_cast_i.x_cord, out_packet_cast_i.y_cord);
 
-  always_ff @(posedge clk_i)
-    begin
-      if (trace_en_i)
-        begin
-          // BP --> Manycore request
-          if (io_cmd_v_i & io_cmd_ready_o)
-            $fwrite(file, "%t [BP->Bridge req] %s size: %s addr: %x data: %x \n", $time, in_io_cmd_msg_type, in_io_cmd_size, io_cmd_cast_i.header.addr, io_cmd_cast_i.data);
+        // Manycore --> BP response
+        if (returned_v_r_lo & returned_yumi_li)
+          $fwrite(file, "%t [MC->Bridge resp] %s data: %x reg_id: %x \n", $time, rtn_pkt_op, returned_data_r_lo, returned_reg_id_r_lo);
 
-          if (out_v_li & out_ready_lo)
-            $fwrite(file, "%t [Bridge->MC req] %s reg_id: %x addr: %x data: %x dst x: %x dst y: %x \n", $time, out_pkt_op, out_packet_cast_i.reg_id, out_packet_cast_i.addr, out_packet_cast_i.payload, out_packet_cast_i.x_cord, out_packet_cast_i.y_cord);
+        if (returned_credit_v_r_lo & ~returned_v_r_lo)
+          $fwrite(file, "%t [MC->Bridge resp] %s data: %x reg_id: %x \n", $time, rtn_pkt_op, 32'b0, returned_credit_reg_id_r_lo);
 
-          // Manycore --> BP response
-          if (returned_v_r_lo & returned_yumi_li)
-            $fwrite(file, "%t [MC->Bridge resp] %s reg_id: %x data: %x \n", $time, rtn_pkt_op, returned_reg_id_r_lo, returned_data_r_lo);
+        if (io_resp_v_o & io_resp_yumi_i)
+          $fwrite(file, "%t [Bridge->BP resp] %s data: %x addr: %x size: %x \n", $time, out_io_resp_msg_type, io_resp_cast_o.data, io_resp_cast_o.header.addr, out_io_resp_size);
 
-          if (returned_credit_v_r_lo & ~returned_v_r_lo)
-            $fwrite(file, "%t [MC->Bridge resp] %s reg_id: %x \n", $time, rtn_pkt_op, returned_credit_reg_id_r_lo);
+        // Manycore --> BP request
+        if (in_v_lo & in_yumi_li)
+          $fwrite(file, "%t [MC->Bridge req ] %s data: %x addr: %x mask: %b src x: %x src y: %x \n", $time, req_pkt_op, in_data_lo, in_addr_lo, in_mask_lo, in_src_x_cord_lo, in_src_y_cord_lo);
 
-          if (io_resp_v_o & io_resp_yumi_i)
-            $fwrite(file, "%t [Bridge->BP resp] %s size: %s addr: %x data: %x \n", $time, out_io_resp_msg_type, out_io_resp_size, io_resp_cast_o.header.addr, io_resp_cast_o.data);
+        if (io_cmd_v_o & io_cmd_yumi_i)
+          $fwrite(file, "%t [Bridge->BP req ] %s data: %x addr: %x size: %x \n", $time, out_io_cmd_msg_type, io_cmd_cast_o.data, io_cmd_cast_o.header.addr, out_io_cmd_size);
 
-          // Manycore --> BP request
-          if (in_v_lo & in_yumi_li)
-            $fwrite(file, "%t [MC->Bridge req] %s addr: %x data: %x mask: %x load type: src x: %x src y: %x \n", $time, req_pkt_op, in_addr_lo, in_data_lo, in_mask_lo, load_type, in_src_x_cord_lo, in_src_y_cord_lo);
+        // BP --> Manycore response
+        if (io_resp_v_i & io_resp_ready_o)
+          $fwrite(file, "%t [BP->Bridge resp] %s data: %x addr: %x size: %x \n", $time, in_io_resp_msg_type, io_resp_cast_i.data, io_resp_cast_i.header.addr, in_io_resp_size);
 
-          if (io_cmd_v_o & io_cmd_yumi_i)
-            $fwrite(file, "%t [Bridge->BP req] %s size: %s addr: %x data: %x \n", $time, out_io_cmd_msg_type, out_io_cmd_size, io_cmd_cast_o.header.addr, io_cmd_cast_o.data);
-
-          // BP --> Manycore response
-          if (io_resp_v_i & io_resp_ready_o)
-            $fwrite(file, "%t [BP->Bridge resp] %s size: %s addr: %x data: %x \n", $time, in_io_resp_msg_type, in_io_resp_size, io_resp_cast_i.header.addr, io_resp_cast_i.data);
-
-          if (returning_v_li)
-            $fwrite(file, "%t [Bridge->MC resp] data: %x \n", $time, returning_data_li);
-        end
-    end
+        if (returning_v_li)
+          $fwrite(file, "%t [Bridge->MC resp] [return    ] data: %x \n", $time, returning_data_li);
+      end
 
 endmodule
+
