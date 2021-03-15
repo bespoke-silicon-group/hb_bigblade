@@ -91,7 +91,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ########################################
 NO_BIND_P ?= 0
 CMT_TRACE_P ?= 0
-BRIDGE_TRACE_P ?= 0
+BRIDGE_TRACE_P ?= 1
 COSIM_P ?= 0
 USE_BIN_P ?= 0
 
@@ -107,7 +107,7 @@ VCS_OPTIONS += $(BLACKPARROT_DIR)/external/lib/libdromajo_cosim.a
 ## BlackParrot test junk
 ########################################
 
-RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc
+RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc -mcmodel=medany
 RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
 RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
 
@@ -115,7 +115,7 @@ PROGS_DIR = $(abspath ../progs/)
 SRC_DIR = $(PROGS_DIR)/src
 INC_DIR = $(PROGS_DIR)/include
 BIN_DIR = $(PROGS_DIR)/bin
-PROG ?= manycore_poke_fifo
+PROG ?= cache_hammer
 CRT ?= $(SRC_DIR)/start.S
 BP_UTILS ?= $(SRC_DIR)/bp_utils.c
 LINKER ?= $(SRC_DIR)/riscv.ld

@@ -101,7 +101,6 @@ module bp_cce_to_mc_bridge
   localparam mc_link_mc_req_entries_addr_gp  = 20'h0_6000;
 
   bp_bedrock_cce_mem_msg_s io_cmd_li;
-  bsg_manycore_global_addr_s io_cmd_eva_li;
   logic io_cmd_v_li, io_cmd_yumi_lo;
   bsg_fifo_1r1w_small
    #(.width_p($bits(bp_bedrock_cce_mem_msg_s)), .els_p(mc_max_outstanding_p))
@@ -117,48 +116,8 @@ module bp_cce_to_mc_bridge
      ,.v_o(io_cmd_v_li)
      ,.yumi_i(io_cmd_yumi_lo)
      );
-
-  // Remapping BP host accesses to the manycore host addresses
-  bp_local_addr_s bp_host_addr_cast;
-  assign bp_host_addr_cast = io_cmd_li.header.addr;
-
-  localparam mc_finish_epa_gp       = 16'head0 >> 2;
-  localparam mc_time_epa_gp         = 16'head4 >> 2;
-  localparam mc_fail_epa_gp         = 16'head8 >> 2;
-  localparam mc_stdout_epa_gp       = 16'headc >> 2;
-  localparam mc_stderr_epa_gp       = 16'heee0 >> 2;
-  localparam mc_branch_trace_epa_gp = 16'heee4 >> 2;
-  localparam mc_print_stat_epa_gp   = 16'h0d0c >> 2;
-
-  localparam bp_getchar_addr_gp = 20'h0_0000;
-  localparam bp_putchar_addr_gp = 20'h0_1000;
-  localparam bp_finish_addr_gp  = 20'h0_2???;
-
-  always_comb
-    begin
-      if ((bp_host_addr_cast < dram_base_addr_gp) & host_enable_p)
-        begin
-          io_cmd_eva_li.remote = 2'b01;
-          io_cmd_eva_li.x_cord = '0;
-          io_cmd_eva_li.y_cord = '0;
-          io_cmd_eva_li.low_bits = '0;
-
-          unique casez (bp_host_addr_cast.addr)
-              bp_finish_addr_gp:
-                begin
-                  if (io_cmd_li.data == '0)
-                    io_cmd_eva_li.addr = mc_finish_epa_gp;
-                  else
-                    io_cmd_eva_li.addr = mc_fail_epa_gp;
-                end
-              bp_putchar_addr_gp: io_cmd_eva_li.addr = mc_stdout_epa_gp;
-              bp_getchar_addr_gp: io_cmd_eva_li.addr = mc_fail_epa_gp; // TODO: Find manycore mapping
-              default: io_cmd_eva_li = mc_fail_epa_gp; // must never come here
-          endcase
-        end
-      else
-        io_cmd_eva_li = io_cmd_li.header.addr;
-    end
+  bsg_manycore_global_addr_s io_cmd_eva_li;
+  assign io_cmd_eva_li = io_cmd_li.header.addr;
 
   logic                                    in_v_lo;
   logic [mc_data_width_p-1:0]              in_data_lo;
@@ -351,14 +310,22 @@ module bp_cce_to_mc_bridge
       mmio_out_packet_li = '0;
       mmio_out_packet_li.src_y_cord = my_y_i;
       mmio_out_packet_li.src_x_cord = my_x_i;
-      // Local and global remote accesses
-      if (io_cmd_eva_li.remote == 2'b00 || io_cmd_eva_li.remote == 2'b01)
+      // Local access
+      if (io_cmd_eva_li.remote == 2'b00)
         begin
-          mmio_out_packet_li.addr                             = io_cmd_eva_li.addr;
-          mmio_out_packet_li.y_cord                           = io_cmd_eva_li.y_cord;
-          mmio_out_packet_li.x_cord                           = io_cmd_eva_li.x_cord;
+          // Hardcoded host at 0,0
+          mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
+          mmio_out_packet_li.y_cord = '0;
+          mmio_out_packet_li.x_cord = '0;
+        end
+      else if (io_cmd_eva_li.remote == 2'b01)
+        begin
+          mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
+          mmio_out_packet_li.y_cord = io_cmd_eva_li.y_cord;
+          mmio_out_packet_li.x_cord = io_cmd_eva_li.x_cord;
         end
       // DRAM accesses
+      // TODO: Pod support
       else
         begin
           mmio_out_packet_li.addr = {
