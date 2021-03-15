@@ -1,7 +1,11 @@
 `timescale 1ps/1ps
 
 `ifndef BLACKPARROT_CLK_PERIOD
-  `define BLACKPARROT_CLK_PERIOD 2100.0
+  `define BLACKPARROT_CLK_PERIOD 1200.0
+`endif
+
+`ifndef MANYCORE_CLK_PERIOD
+  `define MANYCORE_CLK_PERIOD 1000.0
 `endif
 
 
@@ -56,6 +60,9 @@ module bsg_gateway_chip
   logic blackparrot_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`BLACKPARROT_CLK_PERIOD)) blackparrot_clk_gen (.o(blackparrot_clk));
 
+  logic manycore_clk;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD)) manycore_clk_gen (.o(manycore_clk));
+
   //////////////////////////////////////////////////
   //
   // Nonsynth Reset Generator(s)
@@ -67,6 +74,14 @@ module bsg_gateway_chip
       (.clk_i(blackparrot_clk)
       ,.async_reset_o(blackparrot_reset)
       );
+
+  logic manycore_reset;
+  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
+    manycore_reset_gen
+      (.clk_i(manycore_clk)
+      ,.async_reset_o(manycore_reset)
+      );
+
 
   //////////////////////////////////////////////////
   //
@@ -108,63 +123,31 @@ module bsg_gateway_chip
 
   //////////////////////////////////////////////////
   //
-  // bsg_tag
-  localparam num_clients_lp = 3;
-  localparam payload_width_lp = 7;
-  localparam max_payload_width_lp = 10;
-  localparam lg_payload_width_lp = `BSG_WIDTH(max_payload_width_lp);
-  localparam rom_data_width_lp = 4+1+`BSG_SAFE_CLOG2(num_clients_lp)+1+lg_payload_width_lp+max_payload_width_lp;
-  localparam rom_addr_width_lp = 12;
-  
-  logic tr_valid_lo, tr_data_lo, tr_done_lo;
-  logic [rom_data_width_lp-1:0] rom_data;
-  logic [rom_addr_width_lp-1:0] rom_addr;
-  bsg_tag_trace_replay
-   #(.rom_addr_width_p(rom_addr_width_lp)
-     ,.rom_data_width_p(rom_data_width_lp)
-     ,.num_clients_p(num_clients_lp)
-     ,.max_payload_width_p(max_payload_width_lp)
-     )
-   tr
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset)
-     ,.en_i(1'b1)
+  // Reset trigger
+  //
+  logic async_uplink_reset, async_downlink_reset, async_downstream_reset, async_token_reset;
+  logic reset_done;
+  initial
+    begin
+      async_uplink_reset     = 1;
+      async_downlink_reset   = 1;
+      async_downstream_reset = 1;
+      async_token_reset      = 0;
+      reset_done             = 0;
 
-     ,.rom_addr_o(rom_addr)
-     ,.rom_data_i(rom_data)
-
-     ,.valid_i(1'b0)
-     ,.data_i('0)
-     ,.ready_o()
-
-     ,.valid_o(tr_valid_lo)
-     ,.en_r_o()
-     ,.tag_data_o(tr_data_lo)
-     ,.yumi_i(tr_valid_lo)
-     
-     ,.done_o(tr_done_lo)
-     ,.error_o()
-     );  
-
-  bsg_nonsynth_test_rom
-   #(.filename_p("trace.tr")
-     ,.data_width_p(rom_data_width_lp)
-     ,.addr_width_p(rom_addr_width_lp)
-     )
-   rom
-    (.addr_i(rom_addr)
-     ,.data_o(rom_data)
-     );
-
-  bsg_tag_s [2:0] bsg_tag_li;
-  bsg_tag_master
-   #(.els_p(num_clients_lp), .lg_width_p(lg_payload_width_lp))
-   btm
-    (.clk_i(blackparrot_clk)
-     ,.data_i(tr_valid_lo & tr_data_lo)
-     ,.en_i(1'b1)
-     ,.clients_r_o(bsg_tag_li)
-     );
+      #100000;
+      async_token_reset = 1;
+      #100000;
+      async_token_reset = 0;
+      #100000;
+      async_uplink_reset = 0;
+      #100000;
+      async_downlink_reset = 0;
+      #100000;
+      async_downstream_reset = 0;
+      #100000;
+      reset_done = 1;
+    end
 
   //////////////////////////////////////////////////
   //
@@ -174,16 +157,121 @@ module bsg_gateway_chip
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
   bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_li, mc_hor_links_lo;
 
-  bsg_blackparrot_unicore_tile
+  logic [2:0][mc_y_cord_width_gp-1:0] global_y_cord_li;
+  assign global_y_cord_li[0] = 1;
+  assign global_y_cord_li[1] = 2;
+  assign global_y_cord_li[2] = 3;
+
+  logic [2:0] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
+  logic [2:0][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
+  logic [2:0] io_rev_link_clk_lo, io_rev_link_v_lo, io_rev_link_token_li;
+  logic [2:0][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_lo;
+  logic [2:0] io_fwd_link_clk_li, io_fwd_link_v_li, io_fwd_link_token_lo;
+  logic [2:0][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_li;
+  logic [2:0] io_rev_link_clk_li, io_rev_link_v_li, io_rev_link_token_lo;
+  logic [2:0][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_li;
+  bsg_blackparrot_unicore_tile_sdr
    DUT
     (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset | ~tr_done_lo)
+     ,.reset_i(blackparrot_reset | ~reset_done)
 
-     ,.bsg_tag_i(bsg_tag_li)
+     ,.global_y_cord_i(global_y_cord_li)
 
-     ,.links_i(mc_hor_links_li)
-     ,.links_o(mc_hor_links_lo)
+     ,.async_uplink_reset_i(async_uplink_reset)
+     ,.async_downlink_reset_i(async_downlink_reset)
+     ,.async_downstream_reset_i(async_downstream_reset)
+     ,.async_token_reset_i(async_token_reset)
+
+     ,.async_uplink_reset_o()
+     ,.async_downlink_reset_o()
+     ,.async_downstream_reset_o()
+     ,.async_token_reset_o()
+
+     ,.io_fwd_link_clk_o(io_fwd_link_clk_lo)
+     ,.io_fwd_link_data_o(io_fwd_link_data_lo)
+     ,.io_fwd_link_v_o(io_fwd_link_v_lo)
+     ,.io_fwd_link_token_i(io_fwd_link_token_li)
+
+     ,.io_rev_link_clk_o(io_rev_link_clk_lo)
+     ,.io_rev_link_data_o(io_rev_link_data_lo)
+     ,.io_rev_link_v_o(io_rev_link_v_lo)
+     ,.io_rev_link_token_i(io_rev_link_token_li)
+
+     ,.io_fwd_link_clk_i(io_fwd_link_clk_li)
+     ,.io_fwd_link_data_i(io_fwd_link_data_li)
+     ,.io_fwd_link_v_i(io_fwd_link_v_li)
+     ,.io_fwd_link_token_o(io_fwd_link_token_lo)
+
+     ,.io_rev_link_clk_i(io_rev_link_clk_li)
+     ,.io_rev_link_data_i(io_rev_link_data_li)
+     ,.io_rev_link_v_i(io_rev_link_v_li)
+     ,.io_rev_link_token_o(io_rev_link_token_lo)
      );
+
+  for (genvar i = 0; i < 3; i++)
+    begin : sdr
+      bsg_link_sdr
+       #(.width_p($bits(bsg_manycore_fwd_link_sif_s)-2)
+         ,.lg_fifo_depth_p(3)
+         ,.lg_credit_to_token_decimation_p(0)
+         )
+       fwd_sdr
+        (.core_clk_i(manycore_clk)
+         ,.core_uplink_reset_i(async_uplink_reset)
+         ,.core_downstream_reset_i(async_downstream_reset)
+         ,.async_downlink_reset_i(async_downlink_reset)
+         ,.async_token_reset_i(async_token_reset)
+
+         ,.core_data_i(mc_hor_links_li[i][E].fwd.data)
+         ,.core_v_i(mc_hor_links_li[i][E].fwd.v)
+         ,.core_ready_o(mc_hor_links_lo[i][E].fwd.ready_and_rev)
+
+         ,.core_data_o(mc_hor_links_lo[i][E].fwd.data)
+         ,.core_v_o(mc_hor_links_lo[i][E].fwd.v)
+         ,.core_yumi_i(mc_hor_links_lo[i][E].fwd.v & mc_hor_links_li[i][E].fwd.ready_and_rev)
+
+         ,.link_clk_o(io_fwd_link_clk_li[i])
+         ,.link_data_o(io_fwd_link_data_li[i])
+         ,.link_v_o(io_fwd_link_v_li[i])
+         ,.link_token_i(io_fwd_link_token_lo[i])
+
+         ,.link_clk_i(io_fwd_link_clk_lo[i])
+         ,.link_data_i(io_fwd_link_data_lo[i])
+         ,.link_v_i(io_fwd_link_v_lo[i])
+         ,.link_token_o(io_fwd_link_token_li[i])
+         );
+
+      bsg_link_sdr
+       #(.width_p($bits(bsg_manycore_rev_link_sif_s)-2)
+         ,.lg_fifo_depth_p(3)
+         ,.lg_credit_to_token_decimation_p(0)
+         )
+       rev_sdr
+        (.core_clk_i(manycore_clk)
+         ,.core_uplink_reset_i(async_uplink_reset)
+         ,.core_downstream_reset_i(async_downstream_reset)
+         ,.async_downlink_reset_i(async_downlink_reset)
+         ,.async_token_reset_i(async_token_reset)
+
+         ,.core_data_i(mc_hor_links_li[i][E].rev.data)
+         ,.core_v_i(mc_hor_links_li[i][E].rev.v)
+         ,.core_ready_o(mc_hor_links_lo[i][E].rev.ready_and_rev)
+
+         ,.core_data_o(mc_hor_links_lo[i][E].rev.data)
+         ,.core_v_o(mc_hor_links_lo[i][E].rev.v)
+         ,.core_yumi_i(mc_hor_links_lo[i][E].rev.v & mc_hor_links_li[i][E].rev.ready_and_rev)
+
+         ,.link_clk_o(io_rev_link_clk_li[i])
+         ,.link_data_o(io_rev_link_data_li[i])
+         ,.link_v_o(io_rev_link_v_li[i])
+         ,.link_token_i(io_rev_link_token_lo[i])
+
+         ,.link_clk_i(io_rev_link_clk_lo[i])
+         ,.link_data_i(io_rev_link_data_lo[i])
+         ,.link_v_i(io_rev_link_v_lo[i])
+         ,.link_token_o(io_rev_link_token_li[i])
+         );
+    end
 
   // Fake network --> Giant crossbar to mimic where hammerblade will sit
   // Network parameters
@@ -256,8 +344,8 @@ module bsg_gateway_chip
      ,.rev_fifo_els_p(get_rev_fifo_els())
      )
    network
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset | ~tr_done_lo)
+    (.clk_i(manycore_clk)
+     ,.reset_i(manycore_reset | ~reset_done)
 
      ,.links_sif_i(link_in)
      ,.links_sif_o(link_out)
@@ -273,8 +361,8 @@ module bsg_gateway_chip
      ,.io_y_cord_p(0)
      )
    io
-    (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset | ~tr_done_lo)
+    (.clk_i(manycore_clk)
+     ,.reset_i(manycore_reset | ~reset_done)
 
      ,.io_link_sif_i(link_out[0][0])
      ,.io_link_sif_o(link_in[0][0])
@@ -327,8 +415,8 @@ module bsg_gateway_chip
              ,.mem_els_p(2**25)
              )
            mem_inf
-            (.clk_i(blackparrot_clk)
-             ,.reset_i(blackparrot_reset | ~tr_done_lo)
+            (.clk_i(manycore_clk)
+             ,.reset_i(manycore_reset | ~reset_done)
 
              ,.link_sif_i(link_out[y_idx_lp][x_idx_lp])
              ,.link_sif_o(link_in[y_idx_lp][x_idx_lp])
