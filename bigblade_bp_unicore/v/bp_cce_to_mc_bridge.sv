@@ -459,7 +459,6 @@ module bp_cce_to_mc_bridge
     end
   else
     begin: no_host
-      assign bp_to_mc_data_li = '0;
       assign bp_to_mc_ready_lo = 1'b0;
       assign bp_to_mc_v_lo = 1'b0;
       assign bp_to_mc_lo = '0;

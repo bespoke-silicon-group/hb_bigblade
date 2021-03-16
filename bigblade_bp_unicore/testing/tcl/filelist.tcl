@@ -28,7 +28,6 @@ set TESTING_SOURCE_FILES [join "
   
   $bp_common_dir/src/include/bp_common_pkg.sv
   $bp_me_dir/src/include/bp_me_pkg.sv
-  $bp_me_dir/test/common/bp_dramsim3_pkg.sv
   $bp_be_dir/src/include/bp_be_pkg.sv
 
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v

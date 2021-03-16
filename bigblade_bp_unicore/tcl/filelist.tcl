@@ -178,6 +178,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_aux.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_ptw.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_rec_to_fp.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_cmd_queue.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_detector.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_director.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_instr_decoder.sv
@@ -194,8 +195,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_fe_dir/src/v/bp_fe_instr_scan.sv
   $bp_fe_dir/src/v/bp_fe_pc_gen.sv
   $bp_fe_dir/src/v/bp_fe_top.sv
-  $bp_me_dir/src/v/cache/bp_me_cache_dma_to_cce.sv
-  $bp_me_dir/src/v/cache/bp_me_cache_slice.sv
   $bp_me_dir/src/v/cache/bp_me_cce_to_cache.sv
   $bp_me_dir/src/v/cce/bp_uce.sv
   $bp_me_dir/src/v/lce/bp_lce.sv
@@ -238,7 +237,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_mem_resp.sv
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
-  $bp_top_dir/src/v/bsg_async_noc_link.sv
   $bp_top_dir/src/v/bp_cacc_complex.sv
   $bp_top_dir/src/v/bp_cfg.sv
   $bp_top_dir/src/v/bp_clint_slice.sv

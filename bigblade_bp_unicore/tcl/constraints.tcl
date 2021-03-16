@@ -20,7 +20,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set bp_clk_name "bp_clk" ;# main clock running black parrot
-set bp_clk_period_ps       1100
+set bp_clk_period_ps       900
 set bp_clk_uncertainty_per 3.0
 set bp_clk_uncertainty_ps  [expr min([expr $bp_clk_period_ps*($bp_clk_uncertainty_per/100.0)], 20)]
 
@@ -63,7 +63,7 @@ set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports cl
 
 ########################################
 ## SDR constraints
-for set i 0 $i < 3 incr i 
+for {set i 0} {$i < 3} {incr i} {
 
   # upstream (fwd)
   set fwd_out_clk_name "fwd_out_clk_$i"
@@ -99,11 +99,12 @@ for set i 0 $i < 3 incr i
   constrain_input_sdr_ports $rev_in_clk_name [get_ports io_rev_link_data_i[$i][*]] $io_max_input_delay $io_min_input_delay
   constrain_input_sdr_ports $rev_in_clk_name [get_ports io_rev_link_v_i[$i]] $io_max_input_delay $io_min_input_delay
 
+}
 
 ########################################
 ## Disabled or false paths
-bsg_chip_disable_1r1w_paths "*regfile*rf*"
-bsg_chip_disable_1r1w_paths "*btb*tag_mem*"
+bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
+bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
 set_false_path -from [get_ports global_*_cord_i]
 set_false_path -from [get_ports async_*_reset_i]
