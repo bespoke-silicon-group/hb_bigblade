@@ -158,13 +158,6 @@ append_to_collection cdc_clocks [get_clocks $core_clk_name]
 bsg_async_icl $cdc_clocks
 
 
-# ungroup
-
-set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
-set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
-
 ## Derate
 bsg_chip_derate_cells
 #bsg_chip_derate_mems
