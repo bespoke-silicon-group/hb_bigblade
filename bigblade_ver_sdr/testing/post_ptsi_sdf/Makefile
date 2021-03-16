@@ -98,18 +98,18 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(EAST_NOT_WEST),1)
-VCS_OPTIONS += +define+EAST_NOT_WEST=1
-BSG_CHIP_DUT_TYPE = east
+ifeq ($(SOUTH_NOT_NORTH),1)
+VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+BSG_CHIP_DUT_TYPE = south
 else
-BSG_CHIP_DUT_TYPE = west
+BSG_CHIP_DUT_TYPE = north
 endif
 
 ########################################
 ## SDF Annotation
 ########################################
 
-BSG_CHIP_DUT_NAME = bsg_manycore_link_ruche_to_sdr_$(BSG_CHIP_DUT_TYPE)
+BSG_CHIP_DUT_NAME = bsg_manycore_link_to_sdr_$(BSG_CHIP_DUT_TYPE)
 
 sdf_corner = max
 corner     = tt_0p80v_25c

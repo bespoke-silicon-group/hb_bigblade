@@ -101,8 +101,8 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(EAST_NOT_WEST),1)
-VCS_OPTIONS += +define+EAST_NOT_WEST=1
+ifeq ($(SOUTH_NOT_NORTH),1)
+VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
 endif
 
 ########################################
