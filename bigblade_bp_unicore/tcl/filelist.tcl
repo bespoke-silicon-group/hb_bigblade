@@ -79,6 +79,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_mem/bsg_mem_2r1w_sync_synth.v
   $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync.v
   $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync_synth.v
+  $basejump_stl_dir/bsg_misc/bsg_xor.v
   $basejump_stl_dir/bsg_misc/bsg_adder_ripple_carry.v
   $basejump_stl_dir/bsg_misc/bsg_adder_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_fixed.v
@@ -237,6 +238,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_mem_resp.sv
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
+  $bp_common_dir/src/v/bsg_async_noc_link.sv
   $bp_top_dir/src/v/bp_cacc_complex.sv
   $bp_top_dir/src/v/bp_cfg.sv
   $bp_top_dir/src/v/bp_clint_slice.sv
