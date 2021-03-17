@@ -489,7 +489,12 @@ module bsg_gateway_chip
         bind DUT.host_link
           bp_cce_to_mc_bridge_tracer
           #(.bp_params_p(bp_params_p)
-            ,.trace_file_p("host"))
+            ,.trace_file_p("host")
+            ,.mc_x_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_x_cord_width_gp)
+            ,.mc_y_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_y_cord_width_gp)
+            ,.mc_data_width_p($root.`BSG_TOP_SIM_MODULE.mc_data_width_gp)
+            ,.mc_addr_width_p($root.`BSG_TOP_SIM_MODULE.mc_addr_width_gp)
+            )
           host_tracer
             (.clk_i(clk_i)
             ,.reset_i(reset_i)
@@ -541,7 +546,12 @@ module bsg_gateway_chip
         bind DUT.d[0].dram_link
           bp_cce_to_mc_bridge_tracer
             #(.bp_params_p(bp_params_p)
-              ,.trace_file_p("dram_0"))
+              ,.trace_file_p("dram_0")
+              ,.mc_x_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_x_cord_width_gp)
+              ,.mc_y_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_y_cord_width_gp)
+              ,.mc_data_width_p($root.`BSG_TOP_SIM_MODULE.mc_data_width_gp)
+              ,.mc_addr_width_p($root.`BSG_TOP_SIM_MODULE.mc_addr_width_gp)
+              )
             dram0_tracer
               (.clk_i(clk_i)
               ,.reset_i(reset_i)
@@ -593,7 +603,12 @@ module bsg_gateway_chip
         bind DUT.d[1].dram_link
           bp_cce_to_mc_bridge_tracer
             #(.bp_params_p(bp_params_p)
-              ,.trace_file_p("dram_1"))
+              ,.trace_file_p("dram_1")
+              ,.mc_x_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_x_cord_width_gp)
+              ,.mc_y_cord_width_p($root.`BSG_TOP_SIM_MODULE.mc_y_cord_width_gp)
+              ,.mc_data_width_p($root.`BSG_TOP_SIM_MODULE.mc_data_width_gp)
+              ,.mc_addr_width_p($root.`BSG_TOP_SIM_MODULE.mc_addr_width_gp)
+              )
             dram1_tracer
               (.clk_i(clk_i)
               ,.reset_i(reset_i)

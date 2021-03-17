@@ -31,6 +31,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/include/bp_be_pkg.sv
   $bp_me_dir/src/include/bp_me_pkg.sv
   $bp_top_dir/src/include/bp_top_pkg.sv
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $basejump_stl_dir/bsg_cache/bsg_cache.v
   $basejump_stl_dir/bsg_cache/bsg_cache_dma.v
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
@@ -293,14 +294,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
 
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_pkg.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_controller.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_phy.v
-  $basejump_stl_dir/bsg_dataflow/bsg_make_2D_array.v
-  $basejump_stl_dir/bsg_dataflow/bsg_flatten_2D_array.v
-
-  $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
@@ -312,15 +305,22 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/vanilla_bean/hash_function.v
 
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_pkg.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_controller.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_phy.v
+  $basejump_stl_dir/bsg_dataflow/bsg_make_2D_array.v
+  $basejump_stl_dir/bsg_dataflow/bsg_flatten_2D_array.v
+
   $bsg_designs_target_dir/v/bp_cce_to_mc_bridge.sv
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
   $bsg_designs_target_dir/v/bp_cce_serializer.sv
 
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
   $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
-  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
 

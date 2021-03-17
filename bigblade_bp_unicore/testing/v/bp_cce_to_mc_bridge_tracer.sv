@@ -5,7 +5,6 @@
 `include "bp_common_defines.svh"
 
 module bp_cce_to_mc_bridge_tracer
-  import bsg_chip_pkg::*;
   import bp_common_pkg::*;
   import bsg_manycore_pkg::*;
   #(parameter bp_params_e bp_params_p = e_bp_bigblade_unicore_cfg
@@ -14,10 +13,10 @@ module bp_cce_to_mc_bridge_tracer
   
   , parameter trace_file_p = "host"
   , parameter host_enable_p = 0
-  , parameter mc_x_cord_width_p = mc_x_cord_width_gp
-  , parameter mc_y_cord_width_p = mc_y_cord_width_gp
-  , parameter mc_data_width_p = mc_data_width_gp
-  , parameter mc_addr_width_p = mc_addr_width_gp
+  , parameter mc_x_cord_width_p = 0
+  , parameter mc_y_cord_width_p = 0
+  , parameter mc_data_width_p = 0
+  , parameter mc_addr_width_p = 0
   
   , localparam out_packet_width_lp = `bsg_manycore_packet_width(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p)
   , localparam return_packet_width_lp = `bsg_manycore_return_packet_width(mc_x_cord_width_p, mc_y_cord_width_p, mc_data_width_p)
