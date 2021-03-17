@@ -20,7 +20,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set bp_clk_name "bp_clk" ;# main clock running black parrot
-set bp_clk_period_ps       900
+set bp_clk_period_ps       1100
 set bp_clk_uncertainty_per 3.0
 set bp_clk_uncertainty_ps  [expr min([expr $bp_clk_period_ps*($bp_clk_uncertainty_per/100.0)], 20)]
 
