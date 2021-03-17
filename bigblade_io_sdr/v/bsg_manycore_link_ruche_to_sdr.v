@@ -196,7 +196,7 @@ module bsg_manycore_link_ruche_to_sdr
 
   ,.core_data_o (proc_link_sif_li.rev.data)
   ,.core_v_o    (proc_link_sif_li.rev.v)
-  ,.core_yumi_i (proc_link_sif_li.rev.v & proc_link_sif_lo.fwd.ready_and_rev)
+  ,.core_yumi_i (proc_link_sif_li.rev.v & proc_link_sif_lo.rev.ready_and_rev)
 
   ,.link_clk_o  (io_rev_link_clk_o)
   ,.link_data_o (io_rev_link_data_o)
