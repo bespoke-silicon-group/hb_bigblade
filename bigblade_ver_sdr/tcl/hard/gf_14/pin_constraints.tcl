@@ -31,22 +31,29 @@ proc place_pins_k2_k4 {pins start_x y} {
   }
 }
 
-proc place_pins_c5 {pins start_x y} {
-  set curr_x $start_x
+
+proc place_pins_k1_k3 {pins start_y x} {
   set i 0
+  set curr_y $start_y
+
 
   while {$i < [sizeof_collection $pins]} {
+
     set pin [index_collection $pins $i]
 
-    set layer "C5"
+    set layer ""
+    if {$i % 2 == 0} {
+      set layer "K1"
+    } else {
+      set layer "K3"
+    }
 
-    if { [bsg_pins_check_location $curr_x $y $layer] == 1 } {
-      #puts $curr_x
-      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$curr_x $y"
+    if { [bsg_pins_check_location $x $curr_y $layer] == 1} {
+      set_individual_pin_constraints -ports $pin -allowed_layers $layer -location "$x $curr_y"
       incr i
     }
 
-    set curr_x [expr $curr_x + 0.128]
+    set curr_y [expr $curr_y + 0.128]
   }
 }
 
@@ -56,56 +63,84 @@ set core_lly [get_attribute [get_core_area] bounding_box.ll_y]
 set core_urx [get_attribute [get_core_area] bounding_box.ur_x]
 set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 
-# ver link
-set north_input_pins [list]
-set south_input_pins [list]
-set north_output_pins [list]
-set south_output_pins [list]
+
+
+# async reset
+set reset_in_ports [list]
+append_to_collection reset_in_ports [get_ports "async_uplink_reset_i"]
+append_to_collection reset_in_ports [get_ports "async_downlink_reset_i"]
+append_to_collection reset_in_ports [get_ports "async_downstream_reset_i"]
+append_to_collection reset_in_ports [get_ports "async_token_reset_i"]
+set reset_out_ports [list]
+append_to_collection reset_out_ports [get_ports "async_uplink_reset_o"]
+append_to_collection reset_out_ports [get_ports "async_downlink_reset_o"]
+append_to_collection reset_out_ports [get_ports "async_downstream_reset_o"]
+append_to_collection reset_out_ports [get_ports "async_token_reset_o"]
+
+place_pins_k1_k3 $reset_in_ports [expr $core_ury/2] $core_llx
+place_pins_k1_k3 $reset_out_ports [expr $core_ury/2] $core_urx
+
+
+# manycore links
+set core_link_in_ports [list]
+set core_link_out_ports [list]
 for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
-  set idx [expr $i + ($HB_LINK_WIDTH_P*0)]
-  append_to_collection north_input_pins [get_ports "core_ver_link_sif_i[$idx]"]
-  set idx [expr $i + ($HB_LINK_WIDTH_P*1)]
-  append_to_collection south_output_pins [get_ports "core_ver_link_sif_o[$idx]"]
-  set idx [expr $i + ($HB_LINK_WIDTH_P*0)]
-  append_to_collection north_output_pins [get_ports "core_ver_link_sif_o[$idx]"]
-  set idx [expr $i + ($HB_LINK_WIDTH_P*1)]
-  append_to_collection south_input_pins [get_ports "core_ver_link_sif_i[$idx]"]
+  append_to_collection core_link_in_ports  [get_ports "core_link_sif_i[$i]"]
+  append_to_collection core_link_out_ports [get_ports "core_link_sif_o[$i]"]
 }
 
-place_pins_k2_k4 $north_input_pins  [expr 0.128*58] $core_ury 
-place_pins_k2_k4 $south_output_pins [expr 0.128*58] $core_lly
 
-place_pins_c5 $north_output_pins  [expr 0.08*66] $core_ury 
-place_pins_c5 $south_input_pins   [expr 0.08*66] $core_lly
+# sdr links
+set sdr_in_ports [list]
+set sdr_out_ports [list]
+append_to_collection sdr_in_ports [get_ports "io_rev_link_clk_i"]
+append_to_collection sdr_in_ports [get_ports "io_rev_link_v_i"]
+append_to_collection sdr_in_ports [get_ports "io_rev_link_token_o"]
+for {set i 0} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_in_ports [get_ports "io_rev_link_data_i[$i]"]
+}
+append_to_collection sdr_in_ports [get_ports "io_fwd_link_clk_i"]
+append_to_collection sdr_in_ports [get_ports "io_fwd_link_v_i"]
+append_to_collection sdr_in_ports [get_ports "io_fwd_link_token_o"]
+for {set i 0} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_in_ports [get_ports "io_fwd_link_data_i[$i]"]
+}
+
+append_to_collection sdr_out_ports [get_ports "io_rev_link_clk_o"]
+append_to_collection sdr_out_ports [get_ports "io_rev_link_v_o"]
+append_to_collection sdr_out_ports [get_ports "io_rev_link_token_i"]
+for {set i 0} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_out_ports [get_ports "io_rev_link_data_o[$i]"]
+}
+append_to_collection sdr_out_ports [get_ports "io_fwd_link_clk_o"]
+append_to_collection sdr_out_ports [get_ports "io_fwd_link_v_o"]
+append_to_collection sdr_out_ports [get_ports "io_fwd_link_token_i"]
+for {set i 0} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_out_ports [get_ports "io_fwd_link_data_o[$i]"]
+}
+
+# core clock
+set clk_ports [get_ports "core_clk_i"]
 
 
 
+if {$::env(SOUTH_NOT_NORTH) == 1} {
+  place_pins_k2_k4 $core_link_in_ports  $NORTH_INPUT_OFFSET $core_ury
+  place_pins_k2_k4 $core_link_out_ports $NORTH_OUTPUT_OFFSET $core_ury
+  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_ury"
 
-# hor link
-if {$::env(EAST_NOT_WEST) == 1} {
-  source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/hor_pin_constraints_east.tcl
+  place_pins_k2_k4 $sdr_out_ports       $NORTH_INPUT_OFFSET $core_lly
+  place_pins_k2_k4 $sdr_in_ports        $NORTH_OUTPUT_OFFSET $core_lly
 } else {
-  source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/hor_pin_constraints_west.tcl
+  place_pins_k2_k4 $core_link_in_ports  $NORTH_OUTPUT_OFFSET $core_lly
+  place_pins_k2_k4 $core_link_out_ports $NORTH_INPUT_OFFSET $core_lly
+  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_lly"
+
+  place_pins_k2_k4 $sdr_out_ports       $NORTH_OUTPUT_OFFSET $core_ury
+  place_pins_k2_k4 $sdr_in_ports        $NORTH_INPUT_OFFSET  $core_ury
 }
 
-# north misc pins
-set north_misc_pins [list]
-append_to_collection north_misc_pins [get_ports async_uplink_reset_i]
-append_to_collection north_misc_pins [get_ports async_downlink_reset_i]
-append_to_collection north_misc_pins [get_ports async_downstream_reset_i]
-append_to_collection north_misc_pins [get_ports async_token_reset_i]
-append_to_collection north_misc_pins [sort_collection [get_ports core_global_x_i] name]
-append_to_collection north_misc_pins [sort_collection [get_ports core_global_y_i] name]
-append_to_collection north_misc_pins [get_ports core_clk_i]
-append_to_collection north_misc_pins [get_ports core_reset_i]
-place_pins_k2_k4 $north_misc_pins [expr $core_urx-0.128*30] $core_ury
 
-set south_misc_pins [list]
-append_to_collection south_misc_pins [get_ports async_uplink_reset_o]
-append_to_collection south_misc_pins [get_ports async_downlink_reset_o]
-append_to_collection south_misc_pins [get_ports async_downstream_reset_o]
-append_to_collection south_misc_pins [get_ports async_token_reset_o]
-place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*30] $core_lly
 
 
 

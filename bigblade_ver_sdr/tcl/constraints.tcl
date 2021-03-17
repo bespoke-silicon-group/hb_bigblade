@@ -68,19 +68,19 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 # input constraints
 constraint_input_ports  $core_clk_name $core_link_rev_data_in_ports    930 0
 constraint_input_ports  $core_clk_name $core_link_rev_valid_in_ports   870 0
-constraint_output_ports $core_clk_name $core_link_rev_ready_out_ports  870 0
+constraint_output_ports $core_clk_name $core_link_rev_ready_out_ports  810 0
 
 constraint_input_ports  $core_clk_name $core_link_fwd_data_in_ports    930 0
 constraint_input_ports  $core_clk_name $core_link_fwd_valid_in_ports   850 0
-constraint_output_ports $core_clk_name $core_link_fwd_ready_out_ports  880 0
+constraint_output_ports $core_clk_name $core_link_fwd_ready_out_ports  790 0
 
 # output constraints
-constraint_output_ports $core_clk_name $core_link_rev_data_out_ports   550 0
-constraint_output_ports $core_clk_name $core_link_rev_valid_out_ports  690 0
-constraint_input_ports  $core_clk_name $core_link_rev_ready_in_ports   790 0
+constraint_output_ports $core_clk_name $core_link_rev_data_out_ports   270 0
+constraint_output_ports $core_clk_name $core_link_rev_valid_out_ports  790 0
+constraint_input_ports  $core_clk_name $core_link_rev_ready_in_ports   810 0
 
-constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   590 0
-constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  750 0
+constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   270 0
+constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  790 0
 constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   840 0
 
 
