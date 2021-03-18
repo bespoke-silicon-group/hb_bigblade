@@ -93,29 +93,43 @@ for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
 # sdr links
 set sdr_in_ports [list]
 set sdr_out_ports [list]
-append_to_collection sdr_in_ports [get_ports "io_rev_link_clk_i"]
 append_to_collection sdr_in_ports [get_ports "io_rev_link_v_i"]
 append_to_collection sdr_in_ports [get_ports "io_rev_link_token_o"]
-for {set i 0} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+for {set i 0} {$i < [expr $HB_REV_PACKET_WIDTH/2]} {incr i} {
   append_to_collection sdr_in_ports [get_ports "io_rev_link_data_i[$i]"]
 }
-append_to_collection sdr_in_ports [get_ports "io_fwd_link_clk_i"]
+append_to_collection sdr_in_ports [get_ports "io_rev_link_clk_i"]
+for {set i [expr $HB_REV_PACKET_WIDTH/2]} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_in_ports [get_ports "io_rev_link_data_i[$i]"]
+}
+
 append_to_collection sdr_in_ports [get_ports "io_fwd_link_v_i"]
 append_to_collection sdr_in_ports [get_ports "io_fwd_link_token_o"]
-for {set i 0} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
+for {set i 0} {$i < [expr $HB_FWD_PACKET_WIDTH/2]} {incr i} {
+  append_to_collection sdr_in_ports [get_ports "io_fwd_link_data_i[$i]"]
+}
+append_to_collection sdr_in_ports [get_ports "io_fwd_link_clk_i"]
+for {set i [expr $HB_FWD_PACKET_WIDTH/2]} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
   append_to_collection sdr_in_ports [get_ports "io_fwd_link_data_i[$i]"]
 }
 
-append_to_collection sdr_out_ports [get_ports "io_rev_link_clk_o"]
 append_to_collection sdr_out_ports [get_ports "io_rev_link_v_o"]
 append_to_collection sdr_out_ports [get_ports "io_rev_link_token_i"]
-for {set i 0} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+for {set i 0} {$i < [expr $HB_REV_PACKET_WIDTH/2]} {incr i} {
   append_to_collection sdr_out_ports [get_ports "io_rev_link_data_o[$i]"]
 }
-append_to_collection sdr_out_ports [get_ports "io_fwd_link_clk_o"]
+append_to_collection sdr_out_ports [get_ports "io_rev_link_clk_o"]
+for {set i [expr $HB_REV_PACKET_WIDTH/2]} {$i < $HB_REV_PACKET_WIDTH} {incr i} {
+  append_to_collection sdr_out_ports [get_ports "io_rev_link_data_o[$i]"]
+}
+
 append_to_collection sdr_out_ports [get_ports "io_fwd_link_v_o"]
 append_to_collection sdr_out_ports [get_ports "io_fwd_link_token_i"]
-for {set i 0} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
+for {set i 0} {$i < [expr $HB_FWD_PACKET_WIDTH/2]} {incr i} {
+  append_to_collection sdr_out_ports [get_ports "io_fwd_link_data_o[$i]"]
+}
+append_to_collection sdr_out_ports [get_ports "io_fwd_link_clk_o"]
+for {set i [expr $HB_FWD_PACKET_WIDTH/2]} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
   append_to_collection sdr_out_ports [get_ports "io_fwd_link_data_o[$i]"]
 }
 
