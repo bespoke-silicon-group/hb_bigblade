@@ -1,7 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
 set_app_options -name plan.place.auto_generate_blockages -value false
 
