@@ -26,8 +26,9 @@ for {set i 0} {$i < $HB_LINK_WIDTH_P} {incr i} {
 
 for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
   for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
-    append_to_collection wh_input_ports  [get_ports "core_wh_link_sif_i[$rf][$i]"]
-    append_to_collection wh_output_ports [get_ports "core_wh_link_sif_o[$rf][$i]"]
+    set idx [expr $i+($rf*$HB_WH_LINK_WIDTH_P)]
+    append_to_collection wh_input_ports  [get_ports "core_wh_link_sif_i[$idx]"]
+    append_to_collection wh_output_ports [get_ports "core_wh_link_sif_o[$idx]"]
   }
 }
 
