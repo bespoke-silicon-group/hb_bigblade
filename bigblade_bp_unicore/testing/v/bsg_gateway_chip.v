@@ -100,6 +100,7 @@ module bsg_gateway_chip
       $assertoff();
       @(posedge blackparrot_clk);
       @(negedge blackparrot_reset);
+      @(posedge blackparrot_clk);
       $asserton();
     end
 
@@ -156,6 +157,7 @@ module bsg_gateway_chip
   `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
   bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_li, mc_hor_links_lo;
+  bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_raw_lo;
 
   logic [2:0][mc_y_cord_width_gp-1:0] global_y_cord_li;
   assign global_y_cord_li[0] = 1;
@@ -224,11 +226,11 @@ module bsg_gateway_chip
 
          ,.core_data_i(mc_hor_links_li[i][E].fwd.data)
          ,.core_v_i(mc_hor_links_li[i][E].fwd.v)
-         ,.core_ready_o(mc_hor_links_lo[i][E].fwd.ready_and_rev)
+         ,.core_ready_o(mc_hor_links_raw_lo[i][E].fwd.ready_and_rev)
 
-         ,.core_data_o(mc_hor_links_lo[i][E].fwd.data)
-         ,.core_v_o(mc_hor_links_lo[i][E].fwd.v)
-         ,.core_yumi_i(mc_hor_links_lo[i][E].fwd.v & mc_hor_links_li[i][E].fwd.ready_and_rev)
+         ,.core_data_o(mc_hor_links_raw_lo[i][E].fwd.data)
+         ,.core_v_o(mc_hor_links_raw_lo[i][E].fwd.v)
+         ,.core_yumi_i(mc_hor_links_raw_lo[i][E].fwd.v & mc_hor_links_li[i][E].fwd.ready_and_rev)
 
          ,.link_clk_o(io_fwd_link_clk_li[i])
          ,.link_data_o(io_fwd_link_data_li[i])
@@ -255,11 +257,11 @@ module bsg_gateway_chip
 
          ,.core_data_i(mc_hor_links_li[i][E].rev.data)
          ,.core_v_i(mc_hor_links_li[i][E].rev.v)
-         ,.core_ready_o(mc_hor_links_lo[i][E].rev.ready_and_rev)
+         ,.core_ready_o(mc_hor_links_raw_lo[i][E].rev.ready_and_rev)
 
-         ,.core_data_o(mc_hor_links_lo[i][E].rev.data)
-         ,.core_v_o(mc_hor_links_lo[i][E].rev.v)
-         ,.core_yumi_i(mc_hor_links_lo[i][E].rev.v & mc_hor_links_li[i][E].rev.ready_and_rev)
+         ,.core_data_o(mc_hor_links_raw_lo[i][E].rev.data)
+         ,.core_v_o(mc_hor_links_raw_lo[i][E].rev.v)
+         ,.core_yumi_i(mc_hor_links_raw_lo[i][E].rev.v & mc_hor_links_li[i][E].rev.ready_and_rev)
 
          ,.link_clk_o(io_rev_link_clk_li[i])
          ,.link_data_o(io_rev_link_data_li[i])
@@ -370,6 +372,14 @@ module bsg_gateway_chip
      ,.print_stat_tag_o()
      ,.loader_done_o()
      );
+
+  always_comb
+    for (integer j = 0; j < 3; j++)
+      for (integer i = 0; i < $bits(bsg_manycore_link_sif_s); i++)
+        begin
+          if (mc_hor_links_raw_lo[i] == 1'bX) mc_hor_links_lo[i] = 1'b0;
+          else mc_hor_links_lo[i] = mc_hor_links_raw_lo[i];
+        end
 
   // BP <--> Fake network connections
   // mc_hor_link[0] = I/O

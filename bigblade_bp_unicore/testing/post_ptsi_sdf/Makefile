@@ -1,4 +1,4 @@
-.DEFAULT_GOAL=run_all
+.DEFAULT_GOAL=run
 .SECONDARY:
 
 # Note: most variables that are file/dir paths are ?= because they can be
@@ -18,6 +18,7 @@ include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
+export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
 export BSG_PACKAGE           ?=uw_bga
@@ -98,6 +99,8 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ## SDF Annotation
 ########################################
 
+BSG_CHIP_DUT_NAME = bsg_blackparrot_unicore_tile_sdr
+
 sdf_corner = max
 corner     = tt_0p80v_25c
 rc_corner  = nominal
@@ -105,49 +108,115 @@ rc_corner  = nominal
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
 #VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/bsg_chip/$(corner)_$(rc_corner)/results/bsg_chip.sdf.gz
+VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_DUT_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_DUT_NAME).sdf.gz
 VCS_OPTIONS += -sdfretain
+
+EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
+BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
+BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_DUT_NAME)_chip_finish.v
+BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_DUT_NAME)/results/$(BSG_CHIP_DUT_NAME)_chip_finish.v.gz
+
+VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
+
+# grab all of the sync flops
+$(BSG_CDC_PATH_FILE): $(BSG_CHIP_NETLIST_V_GZ)
+	cp $(BSG_CHIP_NETLIST_V_GZ) $(BSG_CHIP_NETLIST_V).gz
+	gzip -d $(BSG_CHIP_NETLIST_V).gz
+	python $(EXPAND_VERILOG) $(BSG_CHIP_NETLIST_V)| grep "_hard_sync_int" | awk '{ print "instance { $(BSG_CHIP_INSTANCE_PATH)." $$$$2 " } { noTiming };" }' | sort > $@
+
+########################################
+## Testbench options
+########################################
+NO_BIND_P ?= 1
+CMT_TRACE_P ?= 0
+BRIDGE_TRACE_P ?= 0
+COSIM_P ?= 0
+USE_BIN_P ?= 0
+
+TB_PARAMS = -pvalue+commit_trace_p=$(CMT_TRACE_P) \
+                        -pvalue+bridge_trace_p=$(BRIDGE_TRACE_P) \
+                        -pvalue+cosim_p=$(COSIM_P) \
+                        -pvalue+no_bind_p=$(NO_BIND_P)
+
+VCS_OPTIONS += -CFLAGS "-I$(BLACKPARROT_DIR)/external/include -std=c++14"
+VCS_OPTIONS += $(BLACKPARROT_DIR)/external/lib/libdromajo_cosim.a
 
 ########################################
 ## BlackParrot test junk
 ########################################
+## TODO: Port to blackparrot itself
 
-PROG_LIST :=hello_world cache_hammer aha-compress ns qsort towers
+RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc -mcmodel=medany
+RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
+RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
 
-%/prog.nbf:
+PROGS_DIR = $(abspath ../progs/)
+SRC_DIR = $(PROGS_DIR)/src
+INC_DIR = $(PROGS_DIR)/include
+BIN_DIR = $(PROGS_DIR)/bin
+PROG ?= manycore_poke_fifo
+CRT ?= $(SRC_DIR)/start.S
+BP_UTILS ?= $(SRC_DIR)/bp_utils.c
+LINKER ?= $(SRC_DIR)/riscv.ld
+
+PYTHON ?= python
+PYTHONPATH +=:../../bsg_manycore/testbenches/py
+TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
+NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
+
+%/trace.tr:
 	mkdir -p $(@D)
-	python $(BLACKPARROT_DIR)/bp_common/software/py/nbf.py --ncpus 1 --config > $@
+	$(PYTHON) $(TRACE_GEN) > $@
 
-%/prog.mem:
+%/prog.riscv:
 	mkdir -p $(@D)
-	@sed "s/@8/@0/g" $(BLACKPARROT_DIR)/bp_common/test/mem/$(lastword $(subst /, ,$(@D))).mem > $@
+ifneq ($(USE_BIN_P), 0)
+	cp $(BIN_DIR)/$(PROG).riscv $@
+else
+	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG).c -o $@
+endif
+
+%/prog.elf: %/prog.riscv
+	cp $*/prog.riscv $@
+
+%/prog.dump: %/prog.riscv
+	mkdir -p $(@D)
+	$(RISCV_OBJDUMP) $< > $@
+
+%/prog.mem: %/prog.riscv
+	mkdir -p $(@D)
+	$(RISCV_OBJCOPY) $< $@
+
+%/prog.nbf: %/prog.mem %/prog.dump %/prog.elf
+	mkdir -p $(@D)
+	$(PYTHON) $(NBF_GEN) $< > $@
+
+PLUSARGS ?= +nbf_file=prog.nbf
+PLUSARGS += +max_cycle=1000000
+PLUSARGS += +num_pods=1
 
 ########################################
 ## Run Targets
 ########################################
 
-BSG_RUN_DIRS := $(addsuffix /run, $(addprefix $(BSG_OUT_DIR)/, $(PROG_LIST)))
-run_all: $(BSG_OUT_SIM)
-	$(MAKE) $(BSG_RUN_DIRS)
+run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/run: $(BSG_OUT_SIM) %/prog.mem %/prog.nbf
-	cd $(@D); ../simv | tee -i run.log
+run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/run-no-tee: $(BSG_OUT_SIM) %/prog.mem %/prog.nbf
-	cd $(@D); ../simv
+rerun: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-%/rerun: $(BSG_OUT_SIM)
-	cd $(@D); ../simv | tee -i run.log
+rerun-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
-%/rerun-no-tee: $(BSG_OUT_SIM)
-	cd $(@D); ../simv
-
-%/view:
-	cd $(@D); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
+view:
+	$(VCS_BIN)/dve -full64 -vpd $(BSG_OUT_DIR)/vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)
-	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
+	$(VCS) $(VCS_OPTIONS) $(TB_PARAMS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):
 	mkdir -p $@
