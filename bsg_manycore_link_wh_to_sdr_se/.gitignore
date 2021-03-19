@@ -9,5 +9,10 @@ vc_hdrs.h
 simv*
 bsg_manycore/
 DVEfiles/
-.pdk_prep/
+.pdk_prep
 *.swp
+json
+tcl
+v
+testing
+mk/bsg_14.config.mk

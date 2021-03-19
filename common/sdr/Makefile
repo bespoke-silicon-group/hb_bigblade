@@ -1,5 +1,8 @@
+default: all
 
-THIS_DIR ?=$(realpath $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+THIS_DIR              ?= invalid
+COMMON_SDR_DIR        ?= invalid
+COMMON_SDR_DESIGN_DIR ?= invalid
 
 GIT_CLONE_STYLE :=ssh
 #GIT_CLONE_STYLE :=https
@@ -45,16 +48,27 @@ all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 $(prep_dir): $(bsg_14.repo)
 	ln -nsf $(bsg_14_dir)/.pdk_prep $@
 
-all: $(all_repos) $(prep_dir)
+all: prep $(all_repos) $(prep_dir)
 
 %.repo:
 	-git clone $($*_url) $($*_dir)
 	-cd $($*_dir) ; git checkout $($*_commit)
 
 clean: are_you_sure
+	make clean.prep
 	rm -rf $(subst .repo,,$(all_repos))
+	rm -f .pdk_prep
 
 DISABLE_SAFETY_PROMPT ?= false
 are_you_sure:
 	@$(DISABLE_SAFETY_PROMPT) || (echo -n "Are you sure [Y/n]? " && read ans && ([ "$$ans" == "Y" ] || [ "$$ans" == "y" ]))
 
+prep:
+	ln -s $(COMMON_SDR_DIR)/json/               $(THIS_DIR)
+	ln -s $(COMMON_SDR_DESIGN_DIR)/tcl/         $(THIS_DIR)
+	ln -s $(COMMON_SDR_DESIGN_DIR)/v/           $(THIS_DIR)
+	ln -s $(COMMON_SDR_DESIGN_DIR)/testing/     $(THIS_DIR)
+	ln -s $(COMMON_SDR_DIR)/mk/bsg_14.config.mk $(THIS_DIR)/mk/
+
+clean.prep:
+	rm -f json tcl v testing mk/bsg_14.config.mk

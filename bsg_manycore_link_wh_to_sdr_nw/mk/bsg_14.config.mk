@@ -1,1 +1,0 @@
-../../common/sdr/mk/bsg_14.config.mk
