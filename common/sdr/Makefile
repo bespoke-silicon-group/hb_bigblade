@@ -57,18 +57,29 @@ all: prep $(all_repos) $(prep_dir)
 clean: are_you_sure
 	make clean.prep
 	rm -rf $(subst .repo,,$(all_repos))
-	rm -f .pdk_prep
+	rm -rf .pdk_prep
 
 DISABLE_SAFETY_PROMPT ?= false
 are_you_sure:
 	@$(DISABLE_SAFETY_PROMPT) || (echo -n "Are you sure [Y/n]? " && read ans && ([ "$$ans" == "Y" ] || [ "$$ans" == "y" ]))
 
-prep:
+testing_dir := $(THIS_DIR)/testing
+test_names  := rtl rtl_hard post_synth_ff post_apr_ff post_ptsi_sdf
+all_tests   := $(test_names:%=%.test)
+
+$(testing_dir):
+	mkdir $@
+
+%.test: $(testing_dir)
+	cd $(testing_dir) && mkdir $*
+	ln -s $(COMMON_SDR_DIR)/testing/$*/* $(testing_dir)/$*/
+
+prep: $(testing_dir) $(all_tests)
 	ln -s $(COMMON_SDR_DIR)/json/               $(THIS_DIR)
 	ln -s $(COMMON_SDR_DESIGN_DIR)/tcl/         $(THIS_DIR)
 	ln -s $(COMMON_SDR_DESIGN_DIR)/v/           $(THIS_DIR)
-	ln -s $(COMMON_SDR_DESIGN_DIR)/testing/     $(THIS_DIR)
 	ln -s $(COMMON_SDR_DIR)/mk/bsg_14.config.mk $(THIS_DIR)/mk/
+	ln -s $(COMMON_SDR_DESIGN_DIR)/testing/*    $(testing_dir)/
 
 clean.prep:
-	rm -f json tcl v testing mk/bsg_14.config.mk
+	rm -rf json tcl v testing mk/bsg_14.config.mk
