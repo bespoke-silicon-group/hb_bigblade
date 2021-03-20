@@ -2,17 +2,8 @@
 
 `define BSG_GATEWAY_CHIP_MODULE_NAME_TO_STR(name) "``name``"
 
-`ifndef EAST_NOT_WEST
-  `define UP_X_CORD_LP    9
-  `define DOWN_X_CORD_LP  8
-`else
-  `define UP_X_CORD_LP    7
-  `define DOWN_X_CORD_LP  8
-`endif
-
 module bsg_gateway_chip
 
- import bsg_noc_pkg::*;
  import bsg_manycore_pkg::*;
 
  #(parameter toplevel_lg_fifo_depth_p                 = "inv"
@@ -21,7 +12,8 @@ module bsg_gateway_chip
   ,parameter toplevel_data_width_p                    = "inv"
   ,parameter toplevel_x_cord_width_p                  = "inv"
   ,parameter toplevel_y_cord_width_p                  = "inv"
-  ,parameter toplevel_ruche_factor_X_p                = "inv"
+  ,parameter toplevel_wh_ruche_factor_p               = "inv"
+  ,parameter toplevel_wh_flit_width_p                 = "inv"
 
   ,parameter lg_fifo_depth_p                 = toplevel_lg_fifo_depth_p
   ,parameter lg_credit_to_token_decimation_p = toplevel_lg_credit_to_token_decimation_p
@@ -29,16 +21,17 @@ module bsg_gateway_chip
   ,parameter data_width_p                    = toplevel_data_width_p
   ,parameter x_cord_width_p                  = toplevel_x_cord_width_p
   ,parameter y_cord_width_p                  = toplevel_y_cord_width_p
-  ,parameter ruche_factor_X_p                = toplevel_ruche_factor_X_p
+  ,parameter wh_ruche_factor_p               = toplevel_wh_ruche_factor_p
+  ,parameter wh_flit_width_p                 = toplevel_wh_flit_width_p
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
-  ,parameter ruche_x_link_sif_width_lp =
-    `bsg_manycore_ruche_x_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
   ,parameter fwd_width_lp =
     `bsg_manycore_packet_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
   ,parameter rev_width_lp =
     `bsg_manycore_return_packet_width(x_cord_width_p,y_cord_width_p,data_width_p)
+  ,parameter wh_link_sif_width_lp =
+    `bsg_ready_and_link_sif_width(wh_flit_width_p)
   )
 
  ();
@@ -68,12 +61,6 @@ module bsg_gateway_chip
   logic downnode_en, downnode_error;
   logic [31:0] downnode_sent, downnode_received;
 
-  localparam up_x_cord_lp = `UP_X_CORD_LP;
-  localparam up_y_cord_lp = 4;
-  localparam down_x_cord_lp = `DOWN_X_CORD_LP;
-  localparam down_y_cord_lp = 4;
-
-
   // Avoid X bits going into DUT
   bsg_manycore_link_sif_s upnode_link_sif_lo_raw, downnode_link_sif_lo_raw;
   always_comb
@@ -97,7 +84,43 @@ module bsg_gateway_chip
     (.i(upnode_link_sif_lo),.o(upnode_link_sif_lo_dly));
 
 
-  bsg_manycore_link_ruche_to_sdr_test_node
+  `declare_bsg_ready_and_link_sif_s(wh_flit_width_p, wh_link_sif_s);
+  wh_link_sif_s [wh_ruche_factor_p-1:0] upnode_wh_link_sif_li, upnode_wh_link_sif_lo;
+  wh_link_sif_s [wh_ruche_factor_p-1:0] downnode_wh_link_sif_li, downnode_wh_link_sif_lo;
+
+  logic [wh_ruche_factor_p-1:0] wh_error;
+  logic [wh_ruche_factor_p-1:0][31:0] wh_sent, wh_received;
+
+  logic [wh_ruche_factor_p-1:0] wh_link_clk_lo, wh_link_v_lo, wh_link_token_li;
+  logic [wh_ruche_factor_p-1:0] wh_link_clk_li, wh_link_v_li, wh_link_token_lo;
+  logic [wh_ruche_factor_p-1:0] [wh_flit_width_p-1:0] wh_link_data_li, wh_link_data_lo;
+
+  // Avoid X bits going into DUT
+  wh_link_sif_s [wh_ruche_factor_p-1:0] upnode_wh_link_sif_lo_raw, downnode_wh_link_sif_lo_raw;
+  always_comb
+    begin
+      for (integer i = 0; i < wh_ruche_factor_p; i++)
+        begin
+          for (integer j = 0; j < wh_link_sif_width_lp; j++)
+            begin
+              if (upnode_wh_link_sif_lo_raw[i][j] === 1'bX) upnode_wh_link_sif_lo[i][j] = 1'b0;
+              else upnode_wh_link_sif_lo[i][j] = upnode_wh_link_sif_lo_raw[i][j];
+              if (downnode_wh_link_sif_lo_raw[i][j] === 1'bX) downnode_wh_link_sif_lo[i][j] = 1'b0;
+              else downnode_wh_link_sif_lo[i][j] = downnode_wh_link_sif_lo_raw[i][j];
+            end
+        end
+    end
+
+  // Add delay to synchronous signals going into DUT
+  wh_link_sif_s [wh_ruche_factor_p-1:0] upnode_wh_link_sif_lo_dly;
+  for (genvar i = 0; i < wh_ruche_factor_p; i++)
+  begin: upnode_wh_link_bndl
+    bsg_nonsynth_delay_line #(.width_p(wh_link_sif_width_lp),.delay_p(500)) bndl
+      (.i(upnode_wh_link_sif_lo[i]),.o(upnode_wh_link_sif_lo_dly[i]));
+  end
+
+
+  bsg_manycore_link_to_sdr_test_node
  #(.addr_width_p   (addr_width_p)
   ,.data_width_p   (data_width_p)
   ,.x_cord_width_p (x_cord_width_p)
@@ -111,16 +134,28 @@ module bsg_gateway_chip
   ,.sent_o     (upnode_sent)
   ,.received_o (upnode_received)
 
-  ,.my_x_i     (x_cord_width_p'(up_x_cord_lp))
-  ,.my_y_i     (y_cord_width_p'(up_y_cord_lp))
-
-  ,.dest_x_i   (x_cord_width_p'(down_x_cord_lp))
-  ,.dest_y_i   (y_cord_width_p'(down_y_cord_lp))
-
   ,.links_sif_i(upnode_link_sif_li)
   ,.links_sif_o(upnode_link_sif_lo_raw)
   );
 
+  for (genvar i = 0; i < wh_ruche_factor_p; i++)
+  begin: wh_upnode
+    bsg_ral_link_to_sdr_test_node
+   #(.flit_width_p(wh_flit_width_p)
+    ,.master_p    (1)
+    ) node
+    (.clk_i      (upnode_clk)
+    ,.reset_i    (upnode_reset)
+    ,.en_i       (upnode_en)
+
+    ,.error_o    (wh_error   [i])
+    ,.sent_o     (wh_sent    [i])
+    ,.received_o (wh_received[i])
+
+    ,.links_sif_i(upnode_wh_link_sif_li    [i])
+    ,.links_sif_o(upnode_wh_link_sif_lo_raw[i])
+    );
+  end
 
   //////////////////////////////////////////////////
   //
@@ -134,24 +169,19 @@ module bsg_gateway_chip
   ,.data_width_p                   (data_width_p                   )
   ,.x_cord_width_p                 (x_cord_width_p                 )
   ,.y_cord_width_p                 (y_cord_width_p                 )
-  ,.ruche_factor_X_p               (ruche_factor_X_p               )
+  ,.wh_flit_width_p                (wh_flit_width_p                )
+  ,.wh_ruche_factor_p              (wh_ruche_factor_p              )
   )
 `endif
   DUT
   (.core_clk_i              (upnode_clk) 
-  ,.core_reset_i            (upnode_reset_dly)
+  ,.core_reset_i            (upnode_reset)
 
-  ,.core_ver_link_sif_i     ('0)
-  ,.core_ver_link_sif_o     ()
+  ,.core_ver_link_sif_i     (upnode_link_sif_lo_dly)
+  ,.core_ver_link_sif_o     (upnode_link_sif_li)
 
-  ,.core_hor_link_sif_i     (upnode_link_sif_lo_dly)
-  ,.core_hor_link_sif_o     (upnode_link_sif_li)
-
-  ,.core_ruche_link_i       ('0)
-  ,.core_ruche_link_o       ()
-
-  ,.core_global_x_i         (x_cord_width_p'(down_x_cord_lp))
-  ,.core_global_y_i         (y_cord_width_p'(down_y_cord_lp))
+  ,.core_wh_link_sif_i      (upnode_wh_link_sif_lo_dly)
+  ,.core_wh_link_sif_o      (upnode_wh_link_sif_li)
 
   ,.async_uplink_reset_i    (async_uplink_reset)
   ,.async_downlink_reset_i  (async_downlink_reset)
@@ -182,6 +212,16 @@ module bsg_gateway_chip
   ,.io_rev_link_data_i      (rev_link_data_li)
   ,.io_rev_link_v_i         (rev_link_v_li)
   ,.io_rev_link_token_o     (rev_link_token_lo)
+
+  ,.io_wh_link_clk_o        (wh_link_clk_lo)
+  ,.io_wh_link_data_o       (wh_link_data_lo)
+  ,.io_wh_link_v_o          (wh_link_v_lo)
+  ,.io_wh_link_token_i      (wh_link_token_li)
+
+  ,.io_wh_link_clk_i        (wh_link_clk_li)
+  ,.io_wh_link_data_i       (wh_link_data_li)
+  ,.io_wh_link_v_i          (wh_link_v_li)
+  ,.io_wh_link_token_o      (wh_link_token_lo)
   );
 
   logic uplink_reset_sync, downstream_reset_sync;
@@ -243,7 +283,7 @@ module bsg_gateway_chip
 
   ,.core_data_o (downnode_link_sif_li.rev.data)
   ,.core_v_o    (downnode_link_sif_li.rev.v)
-  ,.core_yumi_i (downnode_link_sif_li.rev.v & downnode_link_sif_lo.fwd.ready_and_rev)
+  ,.core_yumi_i (downnode_link_sif_li.rev.v & downnode_link_sif_lo.rev.ready_and_rev)
 
   ,.link_clk_o  (rev_link_clk_li)
   ,.link_data_o (rev_link_data_li)
@@ -256,7 +296,40 @@ module bsg_gateway_chip
   ,.link_token_o(rev_link_token_li)
   );
 
-  bsg_manycore_link_ruche_to_sdr_test_node
+  for (genvar i = 0; i < wh_ruche_factor_p; i++)
+  begin: wh_sdr
+    bsg_link_sdr
+   #(.width_p                        (wh_flit_width_p)
+    ,.lg_fifo_depth_p                (lg_fifo_depth_p)
+    ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+    ) sdr
+    (.core_clk_i             (downnode_clk)
+    ,.core_uplink_reset_i    (uplink_reset_sync)
+    ,.core_downstream_reset_i(downstream_reset_sync)
+    ,.async_downlink_reset_i (async_downlink_reset)
+    ,.async_token_reset_i    (async_token_reset)
+
+    ,.core_data_i (downnode_wh_link_sif_lo[i].data)
+    ,.core_v_i    (downnode_wh_link_sif_lo[i].v)
+    ,.core_ready_o(downnode_wh_link_sif_li[i].ready_and_rev)
+
+    ,.core_data_o (downnode_wh_link_sif_li[i].data)
+    ,.core_v_o    (downnode_wh_link_sif_li[i].v)
+    ,.core_yumi_i (downnode_wh_link_sif_li[i].v & downnode_wh_link_sif_lo[i].ready_and_rev)
+
+    ,.link_clk_o  (wh_link_clk_li  [i])
+    ,.link_data_o (wh_link_data_li [i])
+    ,.link_v_o    (wh_link_v_li    [i])
+    ,.link_token_i(wh_link_token_lo[i])
+
+    ,.link_clk_i  (wh_link_clk_lo  [i])
+    ,.link_data_i (wh_link_data_lo [i])
+    ,.link_v_i    (wh_link_v_lo    [i])
+    ,.link_token_o(wh_link_token_li[i])
+    );
+  end
+
+  bsg_manycore_link_to_sdr_test_node
  #(.addr_width_p   (addr_width_p)
   ,.data_width_p   (data_width_p)
   ,.x_cord_width_p (x_cord_width_p)
@@ -270,15 +343,28 @@ module bsg_gateway_chip
   ,.sent_o     (downnode_sent)
   ,.received_o (downnode_received)
 
-  ,.my_x_i     (x_cord_width_p'(down_x_cord_lp))
-  ,.my_y_i     (y_cord_width_p'(down_y_cord_lp))
-
-  ,.dest_x_i   (x_cord_width_p'(up_x_cord_lp))
-  ,.dest_y_i   (y_cord_width_p'(up_y_cord_lp))
-
   ,.links_sif_i(downnode_link_sif_li)
   ,.links_sif_o(downnode_link_sif_lo_raw)
   );
+
+  for (genvar i = 0; i < wh_ruche_factor_p; i++)
+  begin: wh_downnode
+    bsg_ral_link_to_sdr_test_node
+   #(.flit_width_p(wh_flit_width_p)
+    ,.master_p    (0)
+    ) node
+    (.clk_i      (downnode_clk)
+    ,.reset_i    (downnode_reset)
+    ,.en_i       (downnode_en)
+
+    ,.error_o    ()
+    ,.sent_o     ()
+    ,.received_o ()
+
+    ,.links_sif_i(downnode_wh_link_sif_li    [i])
+    ,.links_sif_o(downnode_wh_link_sif_lo_raw[i])
+    );
+  end
 
   // Simulation of Clock
   always #500 upnode_clk = ~upnode_clk;
@@ -370,6 +456,16 @@ module bsg_gateway_chip
         $finish;
       end
 
+    for (integer i = 0; i < wh_ruche_factor_p; i++)
+      begin
+        assert(wh_error[i] == 0)
+        else 
+          begin
+            $error("\nFAIL... Error in wh test node %d", i);
+            $finish;
+          end
+      end
+
     assert(upnode_sent == upnode_received)
     else 
       begin
@@ -384,9 +480,23 @@ module bsg_gateway_chip
         $finish;
       end
 
+    for (integer i = 0; i < wh_ruche_factor_p; i++)
+      begin
+        assert(wh_sent[i] == wh_received[i])
+        else 
+          begin
+            $error("\nFAIL... wh Test node %d sent %d packets but received only %d\n", i, wh_sent[i], wh_received[i]);
+            $finish;
+          end
+      end
+
     $display("\nPASS!\n");
     $display("Test upnode sent and received %d packets\n", upnode_sent);
     $display("Test downnode sent and received %d packets\n", downnode_sent);
+    for (integer i = 0; i < wh_ruche_factor_p; i++)
+      begin
+        $display("wh Test node %d sent and received %d packets\n", i, wh_sent[i]);
+      end
     $finish;
 
   end

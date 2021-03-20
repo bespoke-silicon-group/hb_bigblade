@@ -1,5 +1,5 @@
 
-module  bsg_manycore_link_ruche_to_sdr_test_node
+module  bsg_manycore_link_to_sdr_test_node
 
  import bsg_manycore_pkg::*;
 
@@ -10,15 +10,13 @@ module  bsg_manycore_link_ruche_to_sdr_test_node
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
-  ,parameter ruche_x_link_sif_width_lp =
-    `bsg_manycore_ruche_x_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
   ,parameter fwd_width_lp =
     `bsg_manycore_packet_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
   ,parameter rev_width_lp =
     `bsg_manycore_return_packet_width(x_cord_width_p,y_cord_width_p,data_width_p)
 
   ,localparam channel_width_p = 8
-  ,localparam num_channels_p = 4
+  ,localparam num_channels_p = rev_width_lp/channel_width_p
   ,localparam width_p = channel_width_p * num_channels_p
   )
 
@@ -29,12 +27,6 @@ module  bsg_manycore_link_ruche_to_sdr_test_node
   ,output logic  error_o
   ,output [31:0] sent_o
   ,output [31:0] received_o
-
-  ,input [x_cord_width_p] my_x_i
-  ,input [y_cord_width_p] my_y_i
-
-  ,input [x_cord_width_p] dest_x_i
-  ,input [y_cord_width_p] dest_y_i
 
   ,input  [link_sif_width_lp-1:0] links_sif_i
   ,output [link_sif_width_lp-1:0] links_sif_o
@@ -103,14 +95,7 @@ module  bsg_manycore_link_ruche_to_sdr_test_node
   ,.o      (data_gen)
   );
 
-  assign fwd_out_data.x_cord       = dest_x_i;
-  assign fwd_out_data.y_cord       = dest_y_i;
-  assign fwd_out_data.src_x_cord   = my_x_i;
-  assign fwd_out_data.src_y_cord   = my_y_i;
-  assign fwd_out_data.payload.data = data_gen;
-  assign fwd_out_data.reg_id       = '0;
-  assign fwd_out_data.op_v2        = e_remote_sw;
-  assign fwd_out_data.addr         = '0;
+  assign fwd_out_data = {'0, data_gen};
 
   test_bsg_data_gen
  #(.channel_width_p(channel_width_p)
@@ -125,15 +110,15 @@ module  bsg_manycore_link_ruche_to_sdr_test_node
   // synopsys translate_off
   always_ff @(negedge clk_i)
     if (rev_in_v & ~reset_r)
-      assert(data_check == rev_in_data.data)
-        else $error("check mismatch %x %x ", data_check,rev_in_data.data);
+      assert(data_check == rev_in_data[width_p-1:0])
+        else $error("check mismatch %x %x ", data_check,rev_in_data[width_p-1:0]);
   // synopsys translate_on
 
   always_ff @(posedge clk_i)
     if (reset_r) 
         error_o <= 0;
     else 
-        if (rev_in_v & data_check != rev_in_data.data)
+        if (rev_in_v & data_check != rev_in_data[width_p-1:0])
             error_o <= 1;
         else
             error_o <= error_o;
@@ -184,11 +169,7 @@ module  bsg_manycore_link_ruche_to_sdr_test_node
   assign rev_out_v = fwd_in_v;
   assign fwd_in_yumi = rev_out_v & rev_out_ready;
 
-  assign rev_out_data.x_cord   = fwd_in_data.src_x_cord;
-  assign rev_out_data.y_cord   = fwd_in_data.src_y_cord;
-  assign rev_out_data.reg_id   = fwd_in_data.reg_id;
-  assign rev_out_data.data     = fwd_in_data.payload.data;
-  assign rev_out_data.pkt_type = e_return_int_wb;
+  assign rev_out_data = fwd_in_data;
 
   bsg_two_fifo 
  #(.width_p(rev_width_lp)

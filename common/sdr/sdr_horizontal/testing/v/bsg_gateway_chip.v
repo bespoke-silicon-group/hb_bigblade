@@ -243,7 +243,7 @@ module bsg_gateway_chip
 
   ,.core_data_o (downnode_link_sif_li.rev.data)
   ,.core_v_o    (downnode_link_sif_li.rev.v)
-  ,.core_yumi_i (downnode_link_sif_li.rev.v & downnode_link_sif_lo.fwd.ready_and_rev)
+  ,.core_yumi_i (downnode_link_sif_li.rev.v & downnode_link_sif_lo.rev.ready_and_rev)
 
   ,.link_clk_o  (rev_link_clk_li)
   ,.link_data_o (rev_link_data_li)

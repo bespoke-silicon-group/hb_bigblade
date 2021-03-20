@@ -80,11 +80,13 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_test/test_bsg_data_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
+  $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
 
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
-  $bsg_designs_target_dir/testing/v/bsg_manycore_link_ruche_to_sdr_test_node.v
+  $bsg_designs_target_dir/testing/v/bsg_manycore_link_to_sdr_test_node.v
+  $bsg_designs_target_dir/testing/v/bsg_ral_link_to_sdr_test_node.v
 
 "]
 
