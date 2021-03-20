@@ -73,31 +73,31 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 
 # link constraints
 # ver link
-constraint_input_ports  $core_clk_name  $ver_rev_data_in_ports    830 200
-constraint_input_ports  $core_clk_name  $ver_rev_valid_in_ports   770 200
-constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports  770 200
+constraint_input_ports  $core_clk_name  $ver_rev_data_in_ports    780 200
+constraint_input_ports  $core_clk_name  $ver_rev_valid_in_ports   680 200
+constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports  720 200
 
-constraint_input_ports  $core_clk_name  $ver_fwd_data_in_ports    830 200
-constraint_input_ports  $core_clk_name  $ver_fwd_valid_in_ports   750 200
-constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports  780 200
+constraint_input_ports  $core_clk_name  $ver_fwd_data_in_ports    780 200
+constraint_input_ports  $core_clk_name  $ver_fwd_valid_in_ports   680 200
+constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports  720 200
 
 constraint_output_ports $core_clk_name  $ver_rev_data_out_ports   250 -75
-constraint_output_ports $core_clk_name  $ver_rev_valid_out_ports  590 -75
-constraint_input_ports  $core_clk_name  $ver_rev_ready_in_ports   690 -75
+constraint_output_ports $core_clk_name  $ver_rev_valid_out_ports  650 -75
+constraint_input_ports  $core_clk_name  $ver_rev_ready_in_ports   650 -75
 
 constraint_output_ports $core_clk_name  $ver_fwd_data_out_ports   250 -75
 constraint_output_ports $core_clk_name  $ver_fwd_valid_out_ports  650 -75
-constraint_input_ports  $core_clk_name  $ver_fwd_ready_in_ports   740 -75
+constraint_input_ports  $core_clk_name  $ver_fwd_ready_in_ports   650 -75
 
 for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
   # wh link
-  constraint_output_ports $core_clk_name $wh_data_out_ports($rf)  150 -75
-  constraint_output_ports $core_clk_name $wh_ready_out_ports($rf) 770 200
-  constraint_output_ports $core_clk_name $wh_valid_out_ports($rf) 425 -75
+  constraint_output_ports $core_clk_name $wh_data_out_ports($rf)  350 -75
+  constraint_output_ports $core_clk_name $wh_ready_out_ports($rf) 670 200
+  constraint_output_ports $core_clk_name $wh_valid_out_ports($rf) 670 -75
 
-  constraint_input_ports  $core_clk_name $wh_data_in_ports($rf)   825 200
-  constraint_input_ports  $core_clk_name $wh_ready_in_ports($rf)  535 -75
-  constraint_input_ports  $core_clk_name $wh_valid_in_ports($rf)  635 200
+  constraint_input_ports  $core_clk_name $wh_data_in_ports($rf)   730 200
+  constraint_input_ports  $core_clk_name $wh_ready_in_ports($rf)  640 -75
+  constraint_input_ports  $core_clk_name $wh_valid_in_ports($rf)  630 200
 }
 
 
