@@ -13,6 +13,7 @@ BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+include $(BSG_DESIGNS_TARGET_DIR)/mk/hier.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
@@ -28,7 +29,7 @@ export BSG_PADMAPPING        ?=default
 # Additional setup for RTL-Hard
 export BSG_CHIP_DIR             ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_14
 export PREP_MEMGEN_RUN_DIR      ?= $(BSG_CHIP_DIR)/.pdk_prep/memgen
-export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
+export BSG_TOPLEVEL_DESIGN_TYPE ?=block
 export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
@@ -54,7 +55,7 @@ VCS_OPTIONS += -diag timescale
 VCS_OPTIONS += -o $(BSG_OUT_SIM)
 VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
-VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC,noIWNF
+VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC
 VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 VCS_OPTIONS += +vcs+lic+wait
 
@@ -101,9 +102,13 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(SOUTH_NOT_NORTH),1)
-VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+ifeq ($(EAST_NOT_WEST),1)
+  VCS_OPTIONS += +define+EAST_NOT_WEST=1
 endif
+ifeq ($(SOUTH_NOT_NORTH),1)
+  VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+endif
+VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 
 ########################################
 ## Run Targets

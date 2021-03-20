@@ -3,11 +3,9 @@
 `define BSG_GATEWAY_CHIP_MODULE_NAME_TO_STR(name) "``name``"
 
 `ifndef EAST_NOT_WEST
-  `define DUT_MODULE_NAME bsg_manycore_link_ruche_to_sdr_west
   `define UP_X_CORD_LP    9
   `define DOWN_X_CORD_LP  8
 `else
-  `define DUT_MODULE_NAME bsg_manycore_link_ruche_to_sdr_east
   `define UP_X_CORD_LP    7
   `define DOWN_X_CORD_LP  8
 `endif

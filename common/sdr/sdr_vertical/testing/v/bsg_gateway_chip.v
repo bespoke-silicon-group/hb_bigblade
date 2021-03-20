@@ -2,12 +2,6 @@
 
 `define BSG_GATEWAY_CHIP_MODULE_NAME_TO_STR(name) "``name``"
 
-`ifndef SOUTH_NOT_NORTH
-  `define DUT_MODULE_NAME bsg_manycore_link_to_sdr_north
-`else
-  `define DUT_MODULE_NAME bsg_manycore_link_to_sdr_south
-`endif
-
 module bsg_gateway_chip
 
  import bsg_manycore_pkg::*;

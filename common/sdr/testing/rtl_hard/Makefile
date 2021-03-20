@@ -7,16 +7,19 @@
 
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(abspath ../../)
+export BSG_DESIGNS_TARGET_TCL_HARD_DIR ?= $(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14
 
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+include $(BSG_DESIGNS_TARGET_DIR)/mk/hier.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -28,7 +31,7 @@ export BSG_PADMAPPING        ?=default
 # Additional setup for RTL-Hard
 export BSG_CHIP_DIR             ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_14
 export PREP_MEMGEN_RUN_DIR      ?= $(BSG_CHIP_DIR)/.pdk_prep/memgen
-export BSG_TOPLEVEL_DESIGN_TYPE ?=block
+export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
 export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
@@ -54,11 +57,9 @@ VCS_OPTIONS += -diag timescale
 VCS_OPTIONS += -o $(BSG_OUT_SIM)
 VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
-VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC
-VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 VCS_OPTIONS += +vcs+lic+wait
 
-# Additional options for Post-Synth
+# Additional options for RTL-Hard
 VCS_OPTIONS += +notimingcheck
 VCS_OPTIONS += +nospecify
 
@@ -72,6 +73,14 @@ BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).DUT
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
 
+export BSG_CHIP_LIBRARY_NAME = bsg_chip
+export BSG_CHIP_FILELIST = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).filelist
+export BSG_CHIP_LIBRARY = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_CHIP_LIBRARY_NAME=$(BSG_CHIP_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_CHIP_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_CHIP_LIBRARY)
+
 export BSG_DESIGNS_TESTING_LIBRARY_NAME = bsg_design_testing
 export BSG_DESIGNS_TESTING_FILELIST = $(BSG_OUT_DIR)/$(BSG_DESIGNS_TESTING_LIBRARY_NAME).filelist
 export BSG_DESIGNS_TESTING_LIBRARY = $(BSG_OUT_DIR)/$(BSG_DESIGNS_TESTING_LIBRARY_NAME).library
@@ -79,15 +88,10 @@ export BSG_DESIGNS_TESTING_LIBRARY = $(BSG_OUT_DIR)/$(BSG_DESIGNS_TESTING_LIBRAR
 VCS_OPTIONS += +define+BSG_DESIGNS_TESTING_LIBRARY_NAME=$(BSG_DESIGNS_TESTING_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_DESIGNS_TESTING_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
+VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
-export NETLIST_LIBRARY_NAME = netlist
-export NETLIST_FILELIST = $(BSG_OUT_DIR)/$(NETLIST_LIBRARY_NAME).filelist
-export NETLIST_LIBRARY = $(BSG_OUT_DIR)/$(NETLIST_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+NETLIST_LIBRARY_NAME=$(NETLIST_LIBRARY_NAME)
-VCS_OPTIONS += -f $(NETLIST_FILELIST)
-VCS_OPTIONS += -libmap $(NETLIST_LIBRARY)
-
+$(BSG_CHIP_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
+$(BSG_CHIP_LIBRARY): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_DESIGNS_TESTING_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 	/usr/bin/tclsh bsg_config.tcl
@@ -101,9 +105,13 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(SOUTH_NOT_NORTH),1)
-VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+ifeq ($(EAST_NOT_WEST),1)
+  VCS_OPTIONS += +define+EAST_NOT_WEST=1
 endif
+ifeq ($(SOUTH_NOT_NORTH),1)
+  VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+endif
+VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 
 ########################################
 ## Run Targets
@@ -118,11 +126,11 @@ run-no-tee: $(BSG_OUT_SIM)
 rerun: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
-rerun-no-tee: $(BSG_OUT_SIM)
-	cd $$(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
+rerun-no-tee:
+	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
 
 view:
-	cd $(BSG_OUT_DIR); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
+	$(VCS_BIN)/dve -full64 -vpd $(BSG_OUT_DIR)/vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)

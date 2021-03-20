@@ -5,7 +5,7 @@
 # overriden by the chip repo if this makefile is called from the chip
 # infrastructure.
 
-export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
+export BSG_DESIGNS_DIR        ?= $(abspath ../../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(abspath ../../)
 
 BSG_WORK_DIR := $(abspath ./)
@@ -13,6 +13,7 @@ BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+include $(BSG_DESIGNS_TARGET_DIR)/mk/hier.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
@@ -48,23 +49,26 @@ VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
 VCS_OPTIONS += +noportcoerce
 VCS_OPTIONS += +vc
-#VCS_OPTIONS += +vcs+loopreport
+VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
 VCS_OPTIONS += -diag timescale 
 VCS_OPTIONS += -o $(BSG_OUT_SIM)
 VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
-VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC,noIWNF,noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
+VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC,noIWNF
+VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 VCS_OPTIONS += +vcs+lic+wait
 
-VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
+# Additional options for Post-Synth
+VCS_OPTIONS += +notimingcheck
+VCS_OPTIONS += +nospecify
 
 ########################################
 ## Chip and Testing Filelists and Liblists
 ########################################
 
 BSG_TOP_SIM_MODULE = bsg_gateway_chip
-BSG_CHIP_INSTANCE_PATH = bsg_gateway_chip.DUT
+BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).DUT
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
@@ -98,41 +102,13 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(SOUTH_NOT_NORTH),1)
-VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
-BSG_CHIP_DUT_TYPE = south
-else
-BSG_CHIP_DUT_TYPE = north
+ifeq ($(EAST_NOT_WEST),1)
+  VCS_OPTIONS += +define+EAST_NOT_WEST=1
 endif
-
-########################################
-## SDF Annotation
-########################################
-
-BSG_CHIP_DUT_NAME = bsg_manycore_link_to_sdr_$(BSG_CHIP_DUT_TYPE)
-
-sdf_corner = max
-corner     = tt_0p80v_25c
-rc_corner  = nominal
-
-VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
-VCS_OPTIONS += -negdelay
-#VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_DUT_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_DUT_NAME).sdf.gz
-VCS_OPTIONS += -sdfretain
-
-EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
-BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
-BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_DUT_NAME)_chip_finish.v
-BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_DUT_NAME)/results/$(BSG_CHIP_DUT_NAME)_chip_finish.v.gz
-
-VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
-
-# grab all of the sync flops
-$(BSG_CDC_PATH_FILE): $(BSG_CHIP_NETLIST_V_GZ)
-	cp $(BSG_CHIP_NETLIST_V_GZ) $(BSG_CHIP_NETLIST_V).gz
-	gzip -d $(BSG_CHIP_NETLIST_V).gz
-	python $(EXPAND_VERILOG) $(BSG_CHIP_NETLIST_V)| grep "_hard_sync_int" | awk '{ print "instance { $(BSG_CHIP_INSTANCE_PATH)." $$$$2 " } { noTiming };" }' | sort > $@
+ifeq ($(SOUTH_NOT_NORTH),1)
+  VCS_OPTIONS += +define+SOUTH_NOT_NORTH=1
+endif
+VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 
 ########################################
 ## Run Targets
@@ -154,7 +130,7 @@ view:
 	cd $(BSG_OUT_DIR); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_CDC_PATH_FILE)
+$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)
 	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):
@@ -168,6 +144,4 @@ clean:
 	rm -f  vcdplus.vpd
 	rm -f  inter.vpd
 	rm -f  ucli.key
-	rm -f  sdfAnnotateInfo
-
 
