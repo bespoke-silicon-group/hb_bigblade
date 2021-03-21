@@ -83,6 +83,13 @@ constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   270 0
 constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  790 0
 constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   840 0
 
+# core reset
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
+constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
+
+# global coordinates
+constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 0 40
+constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 0 40
 
 # false path
 set_false_path -from [get_ports async_*_reset_i]

@@ -136,6 +136,16 @@ for {set i [expr $HB_FWD_PACKET_WIDTH/2]} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
 # core clock
 set clk_ports [get_ports "core_clk_i"]
 
+# cord reset pins
+set cord_reset_in_pins [list]
+append_to_collection cord_reset_in_pins [get_ports "core_reset_i"]
+append_to_collection cord_reset_in_pins [sort_collection [get_ports "core_global_*_i*"] name]
+place_pins_k2_k4 $cord_reset_in_pins [expr $core_llx+(0.128*234)] $core_ury
+
+set cord_reset_out_pins [list]
+append_to_collection cord_reset_out_pins [get_ports "core_reset_o"]
+append_to_collection cord_reset_out_pins [sort_collection [get_ports "core_global_*_o*"] name]
+place_pins_k2_k4 $cord_reset_out_pins [expr $core_llx+(0.128*234)] $core_lly
 
 
 if {$::env(SOUTH_NOT_NORTH) == 1} {

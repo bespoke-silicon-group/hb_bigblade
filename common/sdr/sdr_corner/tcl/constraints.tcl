@@ -27,7 +27,6 @@ set_clock_uncertainty $core_clk_uncertainty_ps  [get_clocks $core_clk_name]
 
 
 # grouping ports...
-set core_reset_in_port  [get_ports core_reset_i]
 set ver_input_ports   [list]
 set ver_output_ports  [list]
 set wh_input_ports   [list]
@@ -115,7 +114,12 @@ for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
 
 
 # core reset
-constraint_input_ports $core_clk_name $core_reset_in_port 500 0
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
+constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
+
+# global coordinates
+constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 0 40
+constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 0 40
 
 
 # false path

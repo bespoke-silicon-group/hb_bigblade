@@ -181,15 +181,19 @@ if {$::env(EAST_NOT_WEST) == 1} {
 
 
 
-set north_misc_ports [list]
-append_to_collection north_misc_ports [get_ports "async_*_reset_i"]
-append_to_collection north_misc_ports [get_ports "core_clk_i"]
-append_to_collection north_misc_ports [get_ports "core_reset_i"]
-place_pins_k2_k4 $north_misc_ports [expr $core_urx-0.128*30] $core_ury
+# misc pins
+set north_misc_pins [list]
+append_to_collection north_misc_pins [sort_collection [get_ports async_*_reset_i*] name]
+append_to_collection north_misc_pins [get_ports core_reset_i]
+append_to_collection north_misc_pins [sort_collection [get_ports core_global_*_i*] name]
+append_to_collection north_misc_pins [get_ports core_clk_i]
+place_pins_k2_k4 $north_misc_pins [expr $core_urx-0.128*30] $core_ury
 
-set south_misc_ports [list]
-append_to_collection south_misc_ports [get_ports "async_*_reset_o"]
-place_pins_k2_k4 $south_misc_ports [expr $core_urx-0.128*30] $core_lly
+set south_misc_pins [list]
+append_to_collection south_misc_pins [sort_collection [get_ports async_*_reset_o*] name]
+append_to_collection south_misc_pins [get_ports core_reset_o]
+append_to_collection south_misc_pins [sort_collection [get_ports core_global_*_o*] name]
+place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*30] $core_lly
 
 
 

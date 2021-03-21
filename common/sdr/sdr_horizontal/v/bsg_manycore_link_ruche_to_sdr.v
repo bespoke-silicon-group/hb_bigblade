@@ -1,10 +1,5 @@
 
-module bsg_manycore_link_ruche_to_sdr
-
- import bsg_noc_pkg::*;
- import bsg_manycore_pkg::*;
-
- #(parameter lg_fifo_depth_p                 = "inv"
+  ,parameter lg_fifo_depth_p                 = "inv"
   ,parameter lg_credit_to_token_decimation_p = "inv"
 
   ,parameter addr_width_p     = "inv"
@@ -12,7 +7,6 @@ module bsg_manycore_link_ruche_to_sdr
   ,parameter x_cord_width_p   = "inv"
   ,parameter y_cord_width_p   = "inv"
   ,parameter ruche_factor_X_p = "inv"
-  ,parameter tieoff_west_not_east_p = "inv"
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -26,6 +20,7 @@ module bsg_manycore_link_ruche_to_sdr
 
   (input  core_clk_i
   ,input  core_reset_i
+  ,output core_reset_o
 
   ,input  [S:N][link_sif_width_lp-1:0] core_ver_link_sif_i
   ,output [S:N][link_sif_width_lp-1:0] core_ver_link_sif_o
@@ -38,6 +33,8 @@ module bsg_manycore_link_ruche_to_sdr
 
   ,input  [x_cord_width_p-1:0] core_global_x_i
   ,input  [y_cord_width_p-1:0] core_global_y_i
+  ,output [x_cord_width_p-1:0] core_global_x_o
+  ,output [y_cord_width_p-1:0] core_global_y_o
 
   ,input  async_uplink_reset_i
   ,input  async_downlink_reset_i
@@ -74,9 +71,22 @@ module bsg_manycore_link_ruche_to_sdr
   //As the manycore will distribute across large area, it will take long
   //time for the reset signal to propgate. We should register the reset
   //signal in each tile
+
   logic core_reset_r;
+  logic [x_cord_width_p-1:0] core_global_x_r;
+  logic [y_cord_width_p-1:0] core_global_y_r;
+
+  assign core_reset_o = core_reset_r;
+  assign core_global_x_o = core_global_x_r;
+  assign core_global_y_o = y_cord_width_p'(core_global_y_r+1'b1);
+
   bsg_dff #(.width_p(1)) dff_core_reset
   (.clk_i(core_clk_i),.data_i(core_reset_i),.data_o(core_reset_r));
+  bsg_dff #(.width_p(x_cord_width_p)) dff_global_x
+  (.clk_i(core_clk_i),.data_i(core_global_x_i),.data_o(core_global_x_r));
+  bsg_dff #(.width_p(y_cord_width_p)) dff_global_y
+  (.clk_i(core_clk_i),.data_i(core_global_y_i),.data_o(core_global_y_r));
+
 
   `declare_bsg_manycore_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
   bsg_manycore_link_sif_s proc_link_sif_li, proc_link_sif_lo;
@@ -88,7 +98,7 @@ module bsg_manycore_link_ruche_to_sdr
   assign core_link_sif_li[S:N] = core_ver_link_sif_i;
   assign core_ver_link_sif_o = core_link_sif_lo[S:N];
 
-  if (tieoff_west_not_east_p)
+  if (tieoff_east_not_west_p == 0)
   begin
     assign core_link_sif_li  [E] = core_hor_link_sif_i;
     assign core_ruche_link_li[E] = core_ruche_link_i;
@@ -113,8 +123,8 @@ module bsg_manycore_link_ruche_to_sdr
   ,.x_cord_width_p  (x_cord_width_p)
   ,.y_cord_width_p  (y_cord_width_p)
   ,.ruche_factor_X_p(ruche_factor_X_p)
-  ,.tieoff_west_p   (tieoff_west_not_east_p)
-  ,.tieoff_east_p   (tieoff_west_not_east_p == 0)
+  ,.tieoff_west_p   (tieoff_east_not_west_p == 0)
+  ,.tieoff_east_p   (tieoff_east_not_west_p)
   ) io_rtr
   (.clk_i           (core_clk_i)
   ,.reset_i         (core_reset_r)
@@ -128,8 +138,8 @@ module bsg_manycore_link_ruche_to_sdr
   ,.ruche_link_i    (core_ruche_link_li)
   ,.ruche_link_o    (core_ruche_link_lo)
 
-  ,.global_x_i      (core_global_x_i)
-  ,.global_y_i      (core_global_y_i)
+  ,.global_x_i      (core_global_x_r)
+  ,.global_y_i      (core_global_y_r)
   );
 
   assign async_uplink_reset_o     = async_uplink_reset_i;
@@ -208,5 +218,3 @@ module bsg_manycore_link_ruche_to_sdr
   ,.link_v_i    (io_rev_link_v_i)
   ,.link_token_o(io_rev_link_token_o)
   );
-
-endmodule

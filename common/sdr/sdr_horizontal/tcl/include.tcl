@@ -21,4 +21,5 @@ set SVERILOG_INCLUDE_PATHS [join "
   $basejump_stl_dir/bsg_test
   $basejump_stl_dir/bsg_noc
   $basejump_stl_dir/bsg_tag
+  $bsg_designs_target_dir/v
 "]

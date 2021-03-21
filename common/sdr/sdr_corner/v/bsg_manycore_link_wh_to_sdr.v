@@ -25,12 +25,18 @@
 
   (input  core_clk_i
   ,input  core_reset_i
+  ,input  core_reset_o
 
   ,input  [link_sif_width_lp-1:0] core_ver_link_sif_i
   ,output [link_sif_width_lp-1:0] core_ver_link_sif_o
 
   ,input  [wh_ruche_factor_p-1:0][wh_link_sif_width_lp-1:0] core_wh_link_sif_i
   ,output [wh_ruche_factor_p-1:0][wh_link_sif_width_lp-1:0] core_wh_link_sif_o
+
+  ,input  [x_cord_width_p-1:0] core_global_x_i
+  ,input  [y_cord_width_p-1:0] core_global_y_i
+  ,output [x_cord_width_p-1:0] core_global_x_o
+  ,output [y_cord_width_p-1:0] core_global_y_o
 
   ,input  async_uplink_reset_i
   ,input  async_downlink_reset_i
@@ -77,9 +83,21 @@
   //As the manycore will distribute across large area, it will take long
   //time for the reset signal to propgate. We should register the reset
   //signal in each tile
+
   logic core_reset_r;
+  logic [x_cord_width_p-1:0] core_global_x_r;
+  logic [y_cord_width_p-1:0] core_global_y_r;
+
+  assign core_reset_o = core_reset_r;
+  assign core_global_x_o = core_global_x_r;
+  assign core_global_y_o = y_cord_width_p'(core_global_y_r+1'b1);
+
   bsg_dff #(.width_p(1)) dff_core_reset
   (.clk_i(core_clk_i),.data_i(core_reset_i),.data_o(core_reset_r));
+  bsg_dff #(.width_p(x_cord_width_p)) dff_global_x
+  (.clk_i(core_clk_i),.data_i(core_global_x_i),.data_o(core_global_x_r));
+  bsg_dff #(.width_p(y_cord_width_p)) dff_global_y
+  (.clk_i(core_clk_i),.data_i(core_global_y_i),.data_o(core_global_y_r));
 
   `declare_bsg_manycore_link_sif_s(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p);
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_p, wh_link_sif_s);

@@ -99,7 +99,6 @@ set SVERILOG_SOURCE_FILES [join "
     $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
     $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
 
-    $bsg_designs_target_dir/v/bsg_manycore_link_ruche_to_sdr.v
     $bsg_designs_target_dir/v/bsg_manycore_link_ruche_to_sdr_west.v
     $bsg_designs_target_dir/v/bsg_manycore_link_ruche_to_sdr_east.v
 

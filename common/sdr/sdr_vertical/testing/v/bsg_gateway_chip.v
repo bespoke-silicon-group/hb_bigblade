@@ -113,9 +113,16 @@ module bsg_gateway_chip
 `endif
   DUT
   (.core_clk_i              (upnode_clk) 
+  ,.core_reset_i            (upnode_reset_dly)
+  ,.core_reset_o            ()
 
   ,.core_link_sif_i         (upnode_link_sif_lo_dly)
   ,.core_link_sif_o         (upnode_link_sif_li)
+
+  ,.core_global_x_i         ('0)
+  ,.core_global_y_i         ('0)
+  ,.core_global_x_o         ()
+  ,.core_global_y_o         ()
 
   ,.async_uplink_reset_i    (async_uplink_reset)
   ,.async_downlink_reset_i  (async_downlink_reset)
