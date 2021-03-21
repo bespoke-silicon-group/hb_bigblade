@@ -1,6 +1,6 @@
 puts "BSG-info: Running script [info script]\n"
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
 
 # core clk
 set clk_name           "manycore_clk"

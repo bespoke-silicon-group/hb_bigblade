@@ -2,7 +2,7 @@ puts "BSG-info: Running script [info script]\n"
 
 eval file delete [glob -nocomplain reports/*interface_timing.rpt]
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
 
 set min_scenario {"sspg_0p72v_125c_sigcmax" "ffpg_0p88v_125c_sigcmin" "ffpg_0p88v_m40c_sigcmin"}
 

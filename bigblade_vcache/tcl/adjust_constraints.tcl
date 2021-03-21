@@ -1,7 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 # constraints dir
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
 
 
 # core clk
@@ -129,7 +129,6 @@ constraint_output_ports $clk_name $reset_out_port 0 40
 
 
 constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
-constraint_input_ports $clk_name [get_ports wh_dest_east_not_west_i*]  0 40
 constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
 
 

@@ -3,7 +3,7 @@ puts "BSG-info: Running script [info script]\n"
 
 eval file delete [glob -nocomplain ${REPORTS_DIR}/*interface_timing.rpt]
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
 
 
 # ver link
