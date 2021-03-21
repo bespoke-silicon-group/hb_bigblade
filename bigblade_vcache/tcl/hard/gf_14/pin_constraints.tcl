@@ -1,7 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
 
 remove_individual_pin_constraints
@@ -164,7 +164,6 @@ set_individual_pin_constraints -ports $clk_pin   -allowed_layers "K3" -location 
 set cord_reset_in_pins [list]
 append_to_collection cord_reset_in_pins [get_ports "reset_i"]
 append_to_collection cord_reset_in_pins [sort_collection [get_ports "global_*_i*"] name]
-append_to_collection cord_reset_in_pins [get_ports "wh_dest_east_not_west_i"]
 place_pins_k2_k4 $cord_reset_in_pins [expr $vcache_llx+(0.128*234)] $vcache_ury
 
 set cord_reset_out_pins [list]

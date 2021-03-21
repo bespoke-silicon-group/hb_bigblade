@@ -9,7 +9,8 @@ proc get_y_cord {obj} {
 }
 
 
-source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_common_variables.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
+
 source $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/hb_draw_wires.tcl
 
 set core_llx [get_attribute [get_core_area] bounding_box.ll_x]

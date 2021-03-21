@@ -135,9 +135,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
   $basejump_stl_dir/bsg_cache/bsg_cache_sbuf.v
   $basejump_stl_dir/bsg_cache/bsg_cache_sbuf_queue.v
-  $basejump_stl_dir/bsg_cache/bsg_cache_to_dram_ctrl.v
-  $basejump_stl_dir/bsg_cache/bsg_cache_to_dram_ctrl_rx.v
-  $basejump_stl_dir/bsg_cache/bsg_cache_to_dram_ctrl_tx.v
 
   $bsg_manycore_dir/imports/HardFloat/source/compareRecFN.v
   $bsg_manycore_dir/imports/HardFloat/source/divSqrtRecFN_small.v
