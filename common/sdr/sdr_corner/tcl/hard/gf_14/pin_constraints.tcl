@@ -46,7 +46,7 @@ proc place_pins_c5 {pins start_x y} {
       incr i
     }
 
-    set curr_x [expr $curr_x + 0.128]
+    set curr_x [expr $curr_x + 0.16]
   }
 }
 
@@ -187,13 +187,13 @@ append_to_collection north_misc_pins [sort_collection [get_ports async_*_reset_i
 append_to_collection north_misc_pins [get_ports core_reset_i]
 append_to_collection north_misc_pins [sort_collection [get_ports core_global_*_i*] name]
 append_to_collection north_misc_pins [get_ports core_clk_i]
-place_pins_k2_k4 $north_misc_pins [expr $core_urx-0.128*30] $core_ury
+place_pins_k2_k4 $north_misc_pins [expr $core_urx-0.128*56] $core_ury
 
 set south_misc_pins [list]
 append_to_collection south_misc_pins [sort_collection [get_ports async_*_reset_o*] name]
 append_to_collection south_misc_pins [get_ports core_reset_o]
 append_to_collection south_misc_pins [sort_collection [get_ports core_global_*_o*] name]
-place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*30] $core_lly
+place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*56] $core_lly
 
 
 
