@@ -254,6 +254,8 @@ module bsg_gateway_chip
 
     $display("Start Simulation\n");
 
+    #100000;
+
     // Init
     upnode_clk   = 1;
     upnode_reset = 1;

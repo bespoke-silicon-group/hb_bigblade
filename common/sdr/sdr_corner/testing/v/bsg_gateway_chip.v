@@ -175,7 +175,7 @@ module bsg_gateway_chip
 `endif
   DUT
   (.core_clk_i              (upnode_clk) 
-  ,.core_reset_i            (upnode_reset)
+  ,.core_reset_i            (upnode_reset_dly)
   ,.core_reset_o            ()
 
   ,.core_ver_link_sif_i     (upnode_link_sif_lo_dly)
@@ -380,6 +380,8 @@ module bsg_gateway_chip
   begin
 
     $display("Start Simulation\n");
+
+    #100000;
 
     // Init
     upnode_clk   = 1;
