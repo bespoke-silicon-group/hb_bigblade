@@ -25,7 +25,7 @@
 
   (input  core_clk_i
   ,input  core_reset_i
-  ,input  core_reset_o
+  ,output core_reset_o
 
   ,input  [link_sif_width_lp-1:0] core_ver_link_sif_i
   ,output [link_sif_width_lp-1:0] core_ver_link_sif_o
