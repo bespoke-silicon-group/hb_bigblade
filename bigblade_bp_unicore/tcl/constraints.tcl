@@ -39,10 +39,6 @@ set token_clk_uncertainty_ps  [expr min([expr $token_clk_period_ps*($token_clk_u
 
 set max_io_output_margin_ps   200
 set max_io_input_margin_ps    200
-set io_setup_time_output      [expr ($core_clk_period_ps/2)-$max_io_output_margin_ps]
-set io_hold_time_output       [expr 0-$max_io_output_margin_ps]
-set io_max_input_delay        [expr ($link_clk_period_ps)-$max_io_input_margin_ps]
-set io_min_input_delay        [expr $max_io_input_margin_ps]
 
 ########################################
 ## Reg2Reg
