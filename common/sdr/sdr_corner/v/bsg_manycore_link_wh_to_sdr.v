@@ -109,8 +109,24 @@
 
   assign ver_link_sif_li = core_ver_link_sif_i;
   assign core_ver_link_sif_o = ver_link_sif_lo;
-  assign wh_link_sif_li = core_wh_link_sif_i;
-  assign core_wh_link_sif_o = wh_link_sif_lo;
+  // hard-coded from ruche factor = 2
+  assign wh_link_sif_li[0] = core_wh_link_sif_i[0];
+  assign core_wh_link_sif_o[0] = wh_link_sif_lo[0];
+  bsg_inv #(
+    .width_p($bits(wh_link_sif_s))
+    ,.harden_p(1)
+  ) hard_inv_in (
+    .i(core_wh_link_sif_i[1])
+    ,.o(wh_link_sif_li[1])
+  );
+  bsg_inv #(
+    .width_p($bits(wh_link_sif_s))
+    ,.harden_p(1)
+  ) hard_inv_out (
+    .i(wh_link_sif_lo[1])
+    ,.o(core_wh_link_sif_o[1])
+  );
+
 
   bsg_noc_repeater_node
  #(.width_p       (fwd_width_lp)

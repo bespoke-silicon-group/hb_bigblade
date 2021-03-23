@@ -7,3 +7,5 @@ bsg_link_sdr_dont_touch_constraints [get_ports { \
     io_rev_link_data_i[*]   io_rev_link_v_i      \
     io_wh_link_data_i[*][*] io_wh_link_v_i[*]    \
 }]
+
+set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true

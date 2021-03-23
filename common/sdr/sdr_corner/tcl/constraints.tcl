@@ -196,6 +196,8 @@ bsg_link_sdr_dont_touch_constraints [get_ports { \
     io_wh_link_data_i[*][*] io_wh_link_v_i[*]    \
 }]
 
+# dont touch ruche buffers
+set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
 
 # CDC
 set cdc_clocks [list]
