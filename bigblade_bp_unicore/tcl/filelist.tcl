@@ -31,6 +31,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/include/bp_be_pkg.sv
   $bp_me_dir/src/include/bp_me_pkg.sv
   $bp_top_dir/src/include/bp_top_pkg.sv
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $basejump_stl_dir/bsg_cache/bsg_cache.v
   $basejump_stl_dir/bsg_cache/bsg_cache_dma.v
   $basejump_stl_dir/bsg_cache/bsg_cache_miss.v
@@ -79,6 +80,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_mem/bsg_mem_2r1w_sync_synth.v
   $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync.v
   $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync_synth.v
+  $basejump_stl_dir/bsg_misc/bsg_xor.v
   $basejump_stl_dir/bsg_misc/bsg_adder_ripple_carry.v
   $basejump_stl_dir/bsg_misc/bsg_adder_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_fixed.v
@@ -178,6 +180,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_aux.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_ptw.sv
   $bp_be_dir/src/v/bp_be_calculator/bp_be_rec_to_fp.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_cmd_queue.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_detector.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_director.sv
   $bp_be_dir/src/v/bp_be_checker/bp_be_instr_decoder.sv
@@ -194,8 +197,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_fe_dir/src/v/bp_fe_instr_scan.sv
   $bp_fe_dir/src/v/bp_fe_pc_gen.sv
   $bp_fe_dir/src/v/bp_fe_top.sv
-  $bp_me_dir/src/v/cache/bp_me_cache_dma_to_cce.sv
-  $bp_me_dir/src/v/cache/bp_me_cache_slice.sv
   $bp_me_dir/src/v/cache/bp_me_cce_to_cache.sv
   $bp_me_dir/src/v/cce/bp_uce.sv
   $bp_me_dir/src/v/lce/bp_lce.sv
@@ -238,7 +239,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_mem_resp.sv
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
-  $bp_top_dir/src/v/bsg_async_noc_link.sv
+  $bp_common_dir/src/v/bsg_async_noc_link.sv
   $bp_top_dir/src/v/bp_cacc_complex.sv
   $bp_top_dir/src/v/bp_cfg.sv
   $bp_top_dir/src/v/bp_clint_slice.sv
@@ -262,6 +263,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
   $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
+  $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_dataflow/bsg_round_robin_1_to_n.v
   $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out.v
   $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_full.v
@@ -292,14 +294,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
 
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_pkg.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_controller.v
-  $basejump_stl_dir/bsg_dmc/bsg_dmc_phy.v
-  $basejump_stl_dir/bsg_dataflow/bsg_make_2D_array.v
-  $basejump_stl_dir/bsg_dataflow/bsg_flatten_2D_array.v
-
-  $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
@@ -311,14 +305,29 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/vanilla_bean/hash_function.v
 
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_pkg.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_controller.v
+  $basejump_stl_dir/bsg_dmc/bsg_dmc_phy.v
+  $basejump_stl_dir/bsg_dataflow/bsg_make_2D_array.v
+  $basejump_stl_dir/bsg_dataflow/bsg_flatten_2D_array.v
+
   $bsg_designs_target_dir/v/bp_cce_to_mc_bridge.sv
   $bsg_designs_target_dir/v/bp_cce_splitter.sv
   $bsg_designs_target_dir/v/bp_cce_serializer.sv
+
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
+  $basejump_stl_dir/bsg_link/bsg_link_sdr.v
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_small.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_sdr.sv
 "]
 
-  #$bsg_designs_target_dir/v/bsg_chip.v

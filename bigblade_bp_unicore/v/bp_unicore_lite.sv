@@ -54,6 +54,7 @@ module bp_unicore_lite
   `declare_bp_cache_engine_if(paddr_width_p, ctag_width_p, icache_sets_p, icache_assoc_p, dword_width_gp, icache_block_width_p, icache_fill_width_p, icache);
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
   `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, uce);
+  `declare_bp_memory_map(paddr_width_p, caddr_width_p);
 
   bp_icache_req_s icache_req_lo;
   logic icache_req_v_lo, icache_req_yumi_li, icache_req_busy_li;
@@ -350,9 +351,6 @@ module bp_unicore_lite
   bp_bedrock_uce_mem_msg_s [2:0] cmd_fifo_lo;
   logic [2:0] cmd_fifo_v_lo, cmd_fifo_yumi_li;
 
-  bp_bedrock_uce_mem_msg_s [2:0] resp_fifo_li;
-  logic [2:0] resp_fifo_v_li, resp_fifo_ready_lo;
-
   for (genvar i = 0; i < 3; i++)
     begin : fifo
       bsg_two_fifo
@@ -368,21 +366,6 @@ module bp_unicore_lite
          ,.data_o(cmd_fifo_lo[i])
          ,.v_o(cmd_fifo_v_lo[i])
          ,.yumi_i(cmd_fifo_yumi_li[i])
-         );
-
-      bsg_two_fifo
-       #(.width_p($bits(bp_bedrock_uce_mem_msg_s)))
-       resp_fifo
-        (.clk_i(clk_i)
-         ,.reset_i(reset_i)
-
-         ,.data_i(resp_fifo_li[i])
-         ,.v_i(resp_fifo_v_li[i])
-         ,.ready_o(resp_fifo_ready_lo[i])
-
-         ,.data_o(proc_resp_li[i])
-         ,.v_o(proc_resp_v_li[i])
-         ,.yumi_i(proc_resp_yumi_lo[i])
          );
     end
 
@@ -413,37 +396,44 @@ module bp_unicore_lite
   //   arbitrary orders, especially when considering CLINT or I/O responses
   // This is also suboptimal. Theoretically, we could dequeue into each fifo at once, but this
   //   would require more complex arbitration logic
-  wire resp_arb_ready_li = &resp_fifo_ready_lo;
+  logic loopback_resp_grant_li, dram_resp_grant_li, io_resp_grant_lo, clint_resp_grant_li, cfg_resp_grant_li;
   bsg_arb_fixed
    #(.inputs_p(5), .lo_to_hi_p(0))
    resp_arbiter
-    (.ready_i(resp_arb_ready_li)
+    (.ready_i(1'b1)
      ,.reqs_i({loopback_resp_v_lo, dram_resp_v_lo, io_resp_v_i, clint_resp_v_lo, cfg_resp_v_lo})
-     ,.grants_o({loopback_resp_yumi_li, dram_resp_yumi_li, io_resp_yumi_o, clint_resp_yumi_li, cfg_resp_yumi_li})
+     ,.grants_o({loopback_resp_grant_li, dram_resp_grant_li, io_resp_grant_lo, clint_resp_grant_li, cfg_resp_grant_li})
      );
 
   for (genvar i = 0; i < 3; i++)
     begin : resp_match
-      bp_bedrock_uce_mem_msg_s resp_fifo_selected_li;
-      bp_bedrock_uce_mem_payload_s resp_fifo_selected_payload_li;
-      assign resp_fifo_selected_payload_li = resp_fifo_selected_li.header.payload;
+      bp_bedrock_uce_mem_payload_s resp_selected_payload_li;
+      assign resp_selected_payload_li = proc_resp_li[i].header.payload;
       bsg_mux_one_hot
        #(.width_p($bits(bp_bedrock_uce_mem_msg_s)), .els_p(5))
        resp_select
         (.data_i({loopback_resp_lo, dram_resp_lo, io_resp_li, clint_resp_lo, cfg_resp_lo})
-         ,.sel_one_hot_i({loopback_resp_yumi_li, dram_resp_yumi_li, io_resp_yumi_o, clint_resp_yumi_li, cfg_resp_yumi_li})
-         ,.data_o(resp_fifo_selected_li)
+         ,.sel_one_hot_i({loopback_resp_grant_li, dram_resp_grant_li, io_resp_grant_lo, clint_resp_grant_li, cfg_resp_grant_li})
+         ,.data_o(proc_resp_li[i])
          );
-      wire resp_selected_v_li = |{loopback_resp_yumi_li, dram_resp_yumi_li, io_resp_yumi_o, clint_resp_yumi_li, cfg_resp_yumi_li};
+      wire any_resp_v_li = |{loopback_resp_v_lo, dram_resp_v_lo, io_resp_v_i, clint_resp_v_lo, cfg_resp_v_lo};
 
-      assign resp_fifo_v_li[i] = resp_selected_v_li & (resp_fifo_selected_payload_li.lce_id == i);
-      assign resp_fifo_li[i] = resp_fifo_selected_li;
+      assign proc_resp_v_li[i] = any_resp_v_li & (resp_selected_payload_li.lce_id == i);
     end
 
+  assign cfg_resp_yumi_li      = |proc_resp_yumi_lo & cfg_resp_grant_li;
+  assign clint_resp_yumi_li    = |proc_resp_yumi_lo & clint_resp_grant_li;
+  assign io_resp_yumi_o        = |proc_resp_yumi_lo & io_resp_grant_lo;
+  assign dram_resp_yumi_li     = |proc_resp_yumi_lo & dram_resp_grant_li;
+  assign loopback_resp_yumi_li = |proc_resp_yumi_lo & loopback_resp_grant_li;
+
   /* TODO: Extract local memory map to module */
+  bp_local_addr_s local_addr_cast;
+  assign local_addr_cast = cmd_fifo_selected_lo.header.addr;
+  wire [dev_id_width_gp-1:0] device_cmd_li = local_addr_cast.dev;
+
   wire local_cmd_li        = (cmd_fifo_selected_lo.header.addr < dram_base_addr_gp);
-  wire [3:0] device_cmd_li = cmd_fifo_selected_lo.header.addr[20+:4];
-  wire is_other_domain     = (cmd_fifo_selected_lo.header.addr[paddr_width_p-1-:io_noc_did_width_p] != 0);
+  wire is_other_domain     = (cmd_fifo_selected_lo.header.addr[paddr_width_p-1-:domain_width_p] != 0);
   wire is_cfg_cmd          = local_cmd_li & (device_cmd_li == cfg_dev_gp);
   wire is_clint_cmd        = local_cmd_li & (device_cmd_li == clint_dev_gp);
   wire is_io_cmd           = (local_cmd_li & (device_cmd_li inside {boot_dev_gp, host_dev_gp, mc_dev_gp})) | is_other_domain;
