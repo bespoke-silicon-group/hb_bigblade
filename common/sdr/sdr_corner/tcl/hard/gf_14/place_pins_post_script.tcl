@@ -14,7 +14,7 @@ for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   # get y coordinate based on port location
   set idx [expr $i + $HB_WH_LINK_WIDTH_P]
   set port [get_port "core_wh_link_sif_i[$idx]"]
-  set y [round_down_to_nearest [get_attribute $port bounding_box.ll_y] 0.128]
+  set y [round_down_to_nearest [get_attribute $port bounding_box.ll_y] 0.48]
 
 
   set cell [get_cell "hard_inv_in/hard_hard_${i}__hard_inv"]
@@ -34,7 +34,7 @@ for {set i 0} {$i < $HB_WH_LINK_WIDTH_P} {incr i} {
   # get y coordinate based on port location
   set idx [expr $i + $HB_WH_LINK_WIDTH_P]
   set port [get_port "core_wh_link_sif_o[$idx]"]
-  set y [round_down_to_nearest [get_attribute $port bounding_box.ll_y] 0.128]
+  set y [round_down_to_nearest [get_attribute $port bounding_box.ll_y] 0.48]
 
 
   set cell [get_cell "hard_inv_out/hard_hard_${i}__hard_inv"]
