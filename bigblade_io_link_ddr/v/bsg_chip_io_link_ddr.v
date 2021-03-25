@@ -18,13 +18,13 @@ module bsg_chip_io_link_ddr
   ,input                async_output_disable_i
 
   ,input                tag_clk_i
-  ,input  bsg_tag_s     tag_io_tag_lines_i
-  ,input  bsg_tag_s     tag_core_tag_lines_i
-  ,input  bsg_tag_s     tag_async_reset_tag_lines_i
-  ,input  bsg_tag_s     tag_osc_tag_lines_i
-  ,input  bsg_tag_s     tag_osc_trigger_tag_lines_i
-  ,input  bsg_tag_s     tag_ds_tag_lines_i
-  ,input  bsg_tag_s     tag_sel_tag_lines_i
+  ,input  [3:0]         tag_io_tag_lines_i
+  ,input  [3:0]         tag_core_tag_lines_i
+  ,input  [3:0]         tag_async_reset_tag_lines_i
+  ,input  [3:0]         tag_osc_tag_lines_i
+  ,input  [3:0]         tag_osc_trigger_tag_lines_i
+  ,input  [3:0]         tag_ds_tag_lines_i
+  ,input  [3:0]         tag_sel_tag_lines_i
 
   ,input                core_v_i
   ,input  [width_p-1:0] core_data_i
