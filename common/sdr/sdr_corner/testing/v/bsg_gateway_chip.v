@@ -119,6 +119,11 @@ module bsg_gateway_chip
       (.i(upnode_wh_link_sif_lo[i]),.o(upnode_wh_link_sif_lo_dly[i]));
   end
 
+  // invert wh link bits
+  // hardcoded for wh_ruche_factor_p == 2
+  wh_link_sif_s [wh_ruche_factor_p-1:0] upnode_wh_link_sif_li_inv, upnode_wh_link_sif_lo_dly_inv;
+  assign upnode_wh_link_sif_lo_dly_inv = {~upnode_wh_link_sif_lo_dly[1], upnode_wh_link_sif_lo_dly[0]};
+  assign upnode_wh_link_sif_li = {~upnode_wh_link_sif_li_inv[1], upnode_wh_link_sif_li_inv[0]};
 
   bsg_manycore_link_to_sdr_test_node
  #(.addr_width_p   (addr_width_p)
@@ -181,8 +186,8 @@ module bsg_gateway_chip
   ,.core_ver_link_sif_i     (upnode_link_sif_lo_dly)
   ,.core_ver_link_sif_o     (upnode_link_sif_li)
 
-  ,.core_wh_link_sif_i      (upnode_wh_link_sif_lo_dly)
-  ,.core_wh_link_sif_o      (upnode_wh_link_sif_li)
+  ,.core_wh_link_sif_i      (upnode_wh_link_sif_lo_dly_inv)
+  ,.core_wh_link_sif_o      (upnode_wh_link_sif_li_inv)
 
   ,.core_global_x_i         ('0)
   ,.core_global_y_i         ('0)
