@@ -16,9 +16,9 @@ proc bsg_dont_touch_regexp_type {arg1} {
 }
 
 
-bsg_dont_touch_regexp */adt/*
-bsg_dont_touch_regexp */cdt/*
-bsg_dont_touch_regexp */fdt/*
+bsg_dont_touch_regexp */adt_DONT_TOUCH/*
+bsg_dont_touch_regexp */cdt_DONT_TOUCH/*
+bsg_dont_touch_regexp */fdt_DONT_TOUCH/*
 bsg_dont_touch_regexp *BSG_BAL41MUX*
 
 bsg_dont_touch_regexp_type *SYNC*SDFF*
