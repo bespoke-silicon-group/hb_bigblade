@@ -100,6 +100,7 @@
 
   if (tieoff_east_not_west_p == 0)
   begin: tieoff_west
+    // hard-coded for odd ruche factor (= 3).
     assign core_link_sif_li  [E] = core_hor_link_sif_i;
     bsg_inv #(
       .width_p($bits(bsg_manycore_ruche_x_link_sif_s))
