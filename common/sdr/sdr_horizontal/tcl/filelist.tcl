@@ -43,6 +43,8 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_misc/bsg_dff_reset.v
     $basejump_stl_dir/bsg_misc/bsg_dff_reset_en.v
     $basejump_stl_dir/bsg_misc/bsg_xor.v
+    $basejump_stl_dir/bsg_misc/bsg_buf.v
+    $basejump_stl_dir/bsg_misc/bsg_inv.v
     $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_synth.v
     $basejump_stl_dir/bsg_mem/bsg_mem_1r1w.v
     $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_sync.v
