@@ -173,7 +173,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/vanilla_bean/network_tx.v
   $bsg_manycore_dir/v/vanilla_bean/vanilla_core.v
   $bsg_manycore_dir/v/vanilla_bean/load_packer.v
-  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
   $bsg_manycore_dir/v/vanilla_bean/icache.v
   $bsg_manycore_dir/v/vanilla_bean/cl_decode.v
   $bsg_manycore_dir/v/vanilla_bean/regfile.v
