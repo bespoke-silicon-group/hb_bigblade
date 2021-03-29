@@ -102,8 +102,12 @@ set_macro_relative_location \
   -target_object $dcache_data_ma_bot \
   -target_corner br \
   -target_orientation R0 \
-  -anchor_corner br \
-  -offset [list [expr -$io_link_gap_x-$keepout_margin_x] 0]
+  -anchor_corner tr \
+  -offset [list [expr -$keepout_margin_x-$io_link_gap_x] -$keepout_margin_y]
+
+#####################################
+### D CACHE TAG
+###
 
 set dcache_data_ma_top [create_macro_array \
   -num_rows 4 \
@@ -120,9 +124,8 @@ set_macro_relative_location \
   -target_object $dcache_data_ma_top \
   -target_corner br \
   -target_orientation R0 \
-  -anchor_corner tr \
-  -anchor_object $dcache_data_ma_bot \
-  -offset [list 0 $keepout_margin_y]
+  -anchor_corner br \
+  -offset [list [expr $keepout_margin_x-$io_link_gap_x] $keepout_margin_y]
 
 #####################################
 ### I CACHE TAG
