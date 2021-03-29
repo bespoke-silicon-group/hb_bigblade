@@ -74,7 +74,7 @@ constraint_output_ports $core_clk_name   $core_valid_out_ports       500 0
 constraint_output_ports $core_clk_name   $core_data_out_ports        500 0
 constraint_input_ports  $core_clk_name   $core_yumi_in_ports         500 0
 
-constraint_input_ports  $core_clk_name   $tag_in_ports               500 0
+constraint_input_ports  $tag_clk_name    $tag_in_ports               500 0
 
 # false path
 set_false_path -from [get_ports async_output_disable_i]
