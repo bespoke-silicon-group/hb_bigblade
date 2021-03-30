@@ -24,4 +24,4 @@ bsg_dont_touch_regexp *BSG_BAL41MUX*
 bsg_dont_touch_regexp_type *SYNC*SDFF*
 
 # set dont touch
-#bsg_link_sdr_dont_touch_constraints [get_ports {io_*_link_data_i[*] io_*_link_v_i}]
+bsg_link_sdr_dont_touch_constraints [get_ports {io_link_data_i[*] io_link_v_i}]
