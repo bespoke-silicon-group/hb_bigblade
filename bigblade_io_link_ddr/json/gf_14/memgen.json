@@ -1,5 +1,5 @@
 { "memories": [
-    {"name": "gf14_1r1w_d64_w34_m1",       "width":  34, "depth":   64, "mux": 1, "mask": 0, "banks": 1, "type": "2rf"  }
+    {"name": "gf14_1r1w_d64_w34_m1",       "width":  34, "depth":   64, "mux": 1, "mask": 0, "banks": 2, "type": "2rf"  }
   ],
   "dont_compile": [
   ]
