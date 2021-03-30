@@ -10,9 +10,9 @@ set_macro_relative_location \
   -target_corner tl \
   -target_orientation R0 \
   -anchor_corner tl \
-  -offset [list $keepout_margin_x [expr -$keepout_margin_y-13.00]]
+  -offset [list $keepout_margin_x -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem
 
-set clk_gen_bound [create_bound -name "clk_gen" -type soft -boundary {{0 83.00} {13 96.00}}]
+set clk_gen_bound [create_bound -name "clk_gen" -type soft -boundary {{28.32 64.80} {40.32 76.80}}]
 add_to_bound ${clk_gen_bound} [get_cells -hier -filter "full_name=~clk_gen/*"]
