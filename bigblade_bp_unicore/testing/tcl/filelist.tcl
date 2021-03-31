@@ -113,7 +113,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
-  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
+  $bsg_manycore_dir/v/bsg_manycore_dram_hash_function.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync_synth.v
 
