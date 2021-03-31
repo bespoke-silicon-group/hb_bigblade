@@ -113,6 +113,8 @@ module bsg_chip_io_link_ddr
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
   ,.use_extra_data_bit_p           (use_extra_data_bit_p)
   ,.use_encode_p                   (1)
+  ,.bypass_twofer_fifo_p           (1)
+  ,.bypass_gearbox_p               (1)
   ) uplink
   (.core_clk_i         (core_clk_i)
   ,.core_link_reset_i  (core_tag_data_lo.up_link_reset)
@@ -149,6 +151,8 @@ module bsg_chip_io_link_ddr
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
   ,.use_extra_data_bit_p           (use_extra_data_bit_p)
   ,.use_encode_p                   (0)
+  ,.bypass_twofer_fifo_p           (1)
+  ,.bypass_gearbox_p               (0)
   ,.use_hardened_fifo_p            (1)
   ) downlink
   (.core_clk_i       (core_clk_i)
