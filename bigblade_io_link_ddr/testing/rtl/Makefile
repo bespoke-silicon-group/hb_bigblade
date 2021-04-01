@@ -13,6 +13,7 @@ BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+include $(BSG_DESIGNS_TARGET_DIR)/mk/hier.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
@@ -80,6 +81,26 @@ $(BSG_DESIGNS_TESTING_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 	/usr/bin/tclsh bsg_config.tcl
 
+
+########################################
+## Trace Replay Roms
+########################################
+  
+BSG_TRACE_NAME  := bsg_tag_boot
+BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
+BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
+BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
+
+$(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
+	python $< > $@
+
+$(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
+	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
+
+
+VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
+
+
 ########################################
 ## Toplevel Parameters
 ########################################
@@ -89,9 +110,7 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(EAST_NOT_WEST),1)
-VCS_OPTIONS += +define+EAST_NOT_WEST=1
-endif
+VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 
 ########################################
 ## Run Targets
@@ -113,7 +132,7 @@ view:
 	$(VCS_BIN)/dve -full64 -vpd $(BSG_OUT_DIR)/vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY)
+$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS)
 	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):

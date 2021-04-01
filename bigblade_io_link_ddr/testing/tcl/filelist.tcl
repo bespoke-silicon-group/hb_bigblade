@@ -69,22 +69,24 @@ set TESTING_SOURCE_FILES [join "
 
   $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
-  $basejump_stl_dir/bsg_link/bsg_link_sdr.v
-  $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
-  $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
-  $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
-  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
-  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
+  $basejump_stl_dir/bsg_link/bsg_link_ddr_downstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_ddr_upstream.v
+  $basejump_stl_dir/bsg_link/bsg_link_iddr_phy.v
+  $basejump_stl_dir/bsg_link/bsg_link_oddr_phy.v
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_downstream.v
-  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
+  $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_test/test_bsg_data_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_delay_line.v
 
-  $bsg_manycore_dir/v/bsg_manycore_pkg.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
+  $basejump_stl_dir/bsg_fsb/bsg_fsb_node_trace_replay.v
 
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
-  $bsg_designs_target_dir/testing/v/bsg_manycore_link_ruche_to_sdr_test_node.v
-
+  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr_test_node.v
 "]
 
