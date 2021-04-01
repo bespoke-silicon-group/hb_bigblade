@@ -16,8 +16,6 @@ set HARD_SWAP_FILELIST [join "
   $basejump_stl_dir/hard/gf_14/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/hard/gf_14/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/hard/gf_14/bsg_clk_gen/bsg_clk_gen_osc.v
-  $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_oddr_phy.v
-  $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_iddr_phy.v
 "]
 
 set NETLIST_SOURCE_FILES [join "
