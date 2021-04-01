@@ -114,10 +114,13 @@ bsg_async_icl $cdc_clocks
 # ungroup
 
 
-## Derate
+# Derate
 bsg_chip_derate_cells
-#bsg_chip_derate_mems
+bsg_chip_derate_mems
 #report_timing_derate
+
+# Disabled or false paths
+bsg_chip_disable_1r1w_paths {"*downstream/harden*fifo/*"}
 
 puts "BSG-info: Completed script [info script]\n"
 
