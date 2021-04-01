@@ -50,7 +50,7 @@ set core_ready_and_out_ports   [get_ports core_ready_and_o]
 set core_valid_out_ports       [get_ports core_v_o]
 set core_data_out_ports        [get_ports core_data_o]
 set core_yumi_in_ports         [get_ports core_yumi_i]
-set tag_in_ports               [get_ports tag_*_tag_lines_i]
+set tag_in_ports               [get_ports {tag_*_tag_lines_i[1] tag_*_tag_lines_i[2]}]
 
 
 proc constraint_input_ports {clk_name ports max_delay min_delay} {
@@ -74,17 +74,18 @@ constraint_output_ports $core_clk_name   $core_valid_out_ports       500 0
 constraint_output_ports $core_clk_name   $core_data_out_ports        500 0
 constraint_input_ports  $core_clk_name   $core_yumi_in_ports         500 0
 
-constraint_input_ports  $tag_clk_name    $tag_in_ports               500 0
+constraint_input_ports  $tag_clk_name    $tag_in_ports              2500 0
 
 # false path
 set_false_path -from [get_ports async_output_disable_i]
+set_false_path -from [get_ports {tag_*_tag_lines_i[0] tag_*_tag_lines_i[3]}]
 
 
 # Source-sync link constraints
 set link_clk_period_ps        [expr $core_clk_period_ps*2.0]
 set link_clk_uncertainty_ps   20
-set max_io_output_margin_ps   100
-set max_io_input_margin_ps    100
+set max_io_output_margin_ps   80
+set max_io_input_margin_ps    80
 
 bsg_link_ddr_constraints                    \
   $core_clk_name                            \
@@ -101,9 +102,6 @@ bsg_link_ddr_constraints                    \
   "link_tkn_clk"                            \
   [get_ports io_link_token_i]               \
   $link_clk_uncertainty_ps
-
-# set dont touch
-bsg_link_ddr_dont_touch_constraints [get_ports {io_link_data_i[*] io_link_v_i}]
 
 
 # CDC
