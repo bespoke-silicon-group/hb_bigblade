@@ -353,7 +353,7 @@ module bsg_gateway_chip
   ,.use_encode_p                   (1)
   ,.bypass_twofer_fifo_p           (1)
   ,.bypass_gearbox_p               (0)
-  ,.use_hardened_fifo_p            (1)
+  ,.use_hardened_fifo_p            (0)
   ) s_downlink
   (.core_clk_i       (s_core_clk)
   ,.core_link_reset_i(s_core_tag_data_lo.down_link_reset)
