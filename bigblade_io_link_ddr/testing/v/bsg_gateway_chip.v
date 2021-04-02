@@ -198,6 +198,23 @@ module bsg_gateway_chip
       );
 
 
+  // Avoid X bits going into DUT
+  logic [width_p-1:0] m_core_data_li_raw;
+  for (genvar i = 0; i < width_p; i++)
+    assign m_core_data_li[i] = (m_core_data_li_raw[i] === 1'bX)? 1'b0 : m_core_data_li_raw[i];
+
+  // Add delay to synchronous signals going into DUT
+  logic m_core_v_li_dly, m_core_ready_li_dly;
+  logic [width_p-1:0] m_core_data_li_dly;
+  bsg_nonsynth_delay_line #(.width_p(width_p+2),.delay_p(100)) m_core_dly
+    (.i({m_core_v_li    , m_core_data_li    , m_core_ready_li    })
+    ,.o({m_core_v_li_dly, m_core_data_li_dly, m_core_ready_li_dly}));
+
+  bsg_tag_s [tag_num_clients_lp-1:0] tag_lines_dly;
+  bsg_nonsynth_delay_line #(.width_p(tag_num_clients_lp*4),.delay_p(100)) tag_dly
+    (.i(tag_lines),.o(tag_lines_dly));
+
+
   bsg_gateway_chip_io_link_ddr_test_node
  #(.width_p        (width_p)
   ,.channel_width_p(8)
@@ -216,7 +233,7 @@ module bsg_gateway_chip
   ,.data_i      (m_core_data_lo)
   ,.ready_o     (m_core_ready_li)
   ,.v_o         (m_core_v_li)
-  ,.data_o      (m_core_data_li)
+  ,.data_o      (m_core_data_li_raw)
   ,.yumi_i      (m_core_v_li & m_core_ready_lo)
   );
 
@@ -242,21 +259,21 @@ module bsg_gateway_chip
   ,.async_output_disable_i     (async_clk_gen_disable)
 
   ,.tag_clk_i                  (tag_clk)
-  ,.tag_io_tag_lines_i         (tag_lines[0])
-  ,.tag_core_tag_lines_i       (tag_lines[1])
-  ,.tag_async_reset_tag_lines_i(tag_lines[2])
-  ,.tag_osc_tag_lines_i        (tag_lines[3])
-  ,.tag_osc_trigger_tag_lines_i(tag_lines[4])
-  ,.tag_ds_tag_lines_i         (tag_lines[5])
-  ,.tag_sel_tag_lines_i        (tag_lines[6])
+  ,.tag_io_tag_lines_i         (tag_lines_dly[0])
+  ,.tag_core_tag_lines_i       (tag_lines_dly[1])
+  ,.tag_async_reset_tag_lines_i(tag_lines_dly[2])
+  ,.tag_osc_tag_lines_i        (tag_lines_dly[3])
+  ,.tag_osc_trigger_tag_lines_i(tag_lines_dly[4])
+  ,.tag_ds_tag_lines_i         (tag_lines_dly[5])
+  ,.tag_sel_tag_lines_i        (tag_lines_dly[6])
 
-  ,.core_v_i                   (m_core_v_li)
-  ,.core_data_i                (m_core_data_li)
+  ,.core_v_i                   (m_core_v_li_dly)
+  ,.core_data_i                (m_core_data_li_dly)
   ,.core_ready_and_o           (m_core_ready_lo)
 
   ,.core_v_o                   (m_core_v_lo)
   ,.core_data_o                (m_core_data_lo)
-  ,.core_yumi_i                (m_core_v_lo & m_core_ready_li)
+  ,.core_yumi_i                (m_core_v_lo & m_core_ready_li_dly)
 
   ,.io_link_clk_o              (m_link_clk)
   ,.io_link_data_o             (m_link_data)
