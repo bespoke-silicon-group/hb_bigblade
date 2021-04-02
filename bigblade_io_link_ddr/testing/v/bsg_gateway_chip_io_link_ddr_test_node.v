@@ -3,12 +3,14 @@
 //
 //
 
+`include "bsg_defines.v"
+
 module bsg_gateway_chip_io_link_ddr_test_node
 
  #(parameter width_p              = "inv"
   ,parameter channel_width_p      = "inv"
   ,parameter lg_fifo_depth_lp     = 3
-  ,parameter num_channels_lp      = (width_p/channel_width_p)
+  ,parameter num_channels_lp      = `BSG_CDIV(width_p, channel_width_p)
   ,parameter width_lp             = num_channels_lp*channel_width_p
   )
 
@@ -54,7 +56,7 @@ module bsg_gateway_chip_io_link_ddr_test_node
 
   // Send when node is enabled
   assign node_async_fifo_valid_li = node_en_i;
-  assign node_async_fifo_data_li  = data_gen;
+  assign node_async_fifo_data_li  = data_gen[width_p-1:0];
 
   // Count sent packets
   bsg_counter_clear_up
@@ -101,9 +103,9 @@ module bsg_gateway_chip_io_link_ddr_test_node
       if (node_reset_i)
           error_o <= 0;
       else
-          if (node_async_fifo_yumi_li && data_check != node_async_fifo_data_lo)
+          if (node_async_fifo_yumi_li && data_check[width_p-1:0] != node_async_fifo_data_lo)
             begin
-              $error("%m mismatched resp data %x %x",data_check, node_async_fifo_data_lo);
+              $error("%m mismatched resp data %x %x",data_check[width_p-1:0], node_async_fifo_data_lo);
               error_o <= 1;
             end
 

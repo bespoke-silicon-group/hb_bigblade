@@ -13,6 +13,7 @@ BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+include $(BSG_DESIGNS_TARGET_DIR)/mk/hier.mk
 
 # Repository setup
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
@@ -89,6 +90,26 @@ $(BSG_DESIGNS_TESTING_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 	/usr/bin/tclsh bsg_config.tcl
 
+
+########################################
+## Trace Replay Roms
+########################################
+  
+BSG_TRACE_NAME  := bsg_tag_boot
+BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
+BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
+BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
+
+$(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
+	python $< > $@
+
+$(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
+	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
+
+
+VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
+
+
 ########################################
 ## Toplevel Parameters
 ########################################
@@ -98,18 +119,11 @@ BSG_TOPLEVEL_PARAMS := $(shell grep "=" $(BSG_TOPLEVEL_PARAMS_DIR))
 
 VCS_OPTIONS += $(foreach PARAM, $(BSG_TOPLEVEL_PARAMS), -pvalue+toplevel_$(PARAM))
 
-ifeq ($(EAST_NOT_WEST),1)
-VCS_OPTIONS += +define+EAST_NOT_WEST=1
-BSG_CHIP_DUT_TYPE = east
-else
-BSG_CHIP_DUT_TYPE = west
-endif
+VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 
 ########################################
 ## SDF Annotation
 ########################################
-
-BSG_CHIP_DUT_NAME = bsg_manycore_link_ruche_to_sdr_$(BSG_CHIP_DUT_TYPE)
 
 sdf_corner = max
 corner     = tt_0p80v_25c
@@ -118,13 +132,13 @@ rc_corner  = nominal
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
 #VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(BSG_CHIP_DUT_NAME)/$(corner)_$(rc_corner)/results/$(BSG_CHIP_DUT_NAME).sdf.gz
+VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(TOP_HIER_BLOCK)/$(corner)_$(rc_corner)/results/$(TOP_HIER_BLOCK).sdf.gz
 VCS_OPTIONS += -sdfretain
 
 EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
 BSG_CDC_PATH_FILE = $(BSG_OUT_DIR)/cdc_instance_list.v
-BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(BSG_CHIP_DUT_NAME)_chip_finish.v
-BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(BSG_CHIP_DUT_NAME)/results/$(BSG_CHIP_DUT_NAME)_chip_finish.v.gz
+BSG_CHIP_NETLIST_V = $(BSG_OUT_DIR)/$(TOP_HIER_BLOCK)_chip_finish.v
+BSG_CHIP_NETLIST_V_GZ = $(BSG_CHIP_DIR)/current_build/pnr/$(TOP_HIER_BLOCK)/results/$(TOP_HIER_BLOCK)_chip_finish.v.gz
 
 VCS_OPTIONS += +optconfigfile+$(BSG_CDC_PATH_FILE)
 
@@ -154,7 +168,7 @@ view:
 	cd $(BSG_OUT_DIR); $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
 
 build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_CDC_PATH_FILE)
+$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_CDC_PATH_FILE)
 	$(VCS) $(VCS_OPTIONS) | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR):
@@ -169,5 +183,3 @@ clean:
 	rm -f  inter.vpd
 	rm -f  ucli.key
 	rm -f  sdfAnnotateInfo
-
-
