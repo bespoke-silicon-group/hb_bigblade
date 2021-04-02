@@ -151,7 +151,7 @@ set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"            
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"          ] true
-set_ungroup [get_designs -filter "hdl_template==hash_function"                   ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_dram_hash_function" ] true
 
 set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                    ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_dcache_decoder"            ] true
