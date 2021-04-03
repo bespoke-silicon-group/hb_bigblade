@@ -7,6 +7,7 @@ current_design ${DESIGN_NAME}
 # Start script fresh
 set_locked_objects -unlock [get_cells -hier]
 remove_edit_groups -all
+remove_bounds -all
 
 set tile_height [core_height]
 set tile_width  [core_width]
@@ -102,7 +103,7 @@ set_macro_relative_location \
   -target_corner tr \
   -target_orientation R0 \
   -anchor_corner tr \
-  -offset [list [expr -$keepout_margin_x-$io_link_gap_x] -$keepout_margin_y]
+  -offset [list [expr -$io_link_gap_x] -$keepout_margin_y]
 
 #####################################
 ### D CACHE TAG
@@ -124,7 +125,7 @@ set_macro_relative_location \
   -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
-  -offset [list [expr $keepout_margin_x-$io_link_gap_x] $keepout_margin_y]
+  -offset [list [expr -$io_link_gap_x] 0]
 
 #####################################
 ### D CACHE DATA
@@ -177,7 +178,7 @@ set_macro_relative_location \
   -target_orientation N \
   -anchor_corner br \
   -anchor_object $icache_data_ma_east \
-  -offset [list 0 -$keepout_margin_y]
+  -offset [list -$keepout_margin_x -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $btb_mem
 
@@ -217,9 +218,9 @@ set_macro_relative_location \
   -target_object $int_regfile_ma \
   -target_corner bl \
   -target_orientation R0 \
-  -anchor_corner br \
+  -anchor_corner tl \
   -anchor_object $fp_regfile_ma \
-  -offset [list $keepout_margin_x 0]
+  -offset [list 0 $keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
 
