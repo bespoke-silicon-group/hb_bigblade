@@ -96,7 +96,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ########################################
   
 BSG_TRACE_NAME  := bsg_tag_boot
-BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
+BSG_TRACE_PY    := $(BSG_DESIGNS_TARGET_DIR)/testing/py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
 
@@ -134,9 +134,9 @@ VCS_OPTIONS += +define+DUT_MODULE_NAME=$(TOP_HIER_BLOCK)
 ## SDF Annotation
 ########################################
 
-sdf_corner = max
-corner     = tt_0p80v_25c
-rc_corner  = nominal
+sdf_corner ?= max
+corner     ?= tt_0p80v_25c
+rc_corner  ?= nominal
 
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
@@ -169,8 +169,8 @@ ifeq ($(SWEEP_CLK_GEN),1)
 endif
 
 summarize:
-	grep -o -E ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | sort -n | more | uniq  | column -c 150 | more
-	grep -o -E ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | sort -n | more | uniq  | column -c 150 | more
+	grep -o -E ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 500
+	grep -o -E ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 500
 
 run-no-tee: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
