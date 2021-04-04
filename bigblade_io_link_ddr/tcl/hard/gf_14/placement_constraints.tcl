@@ -21,3 +21,6 @@ set iddr_bound [create_bound -name "iddr" -type soft -boundary {{0.00 10.50} {16
 set oddr_bound [create_bound -name "oddr" -type soft -boundary {{0.00 0.00} {8.00 10.50}}]
 add_to_bound ${iddr_bound} [get_cells -hier -filter "full_name=~*iddr_phy/*"]
 add_to_bound ${oddr_bound} [get_cells -hier -filter "full_name=~*oddr_phy/*"]
+
+set downstream_fifo_bound [create_bound -name "downstream_fifo" -type soft -boundary {{24.90 17.92} {40.32 26.88}}]
+add_to_bound ${downstream_fifo_bound} [get_cells -hier -filter "full_name=~*in_sipof/*"]
