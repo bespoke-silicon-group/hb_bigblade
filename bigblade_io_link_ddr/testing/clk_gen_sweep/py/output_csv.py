@@ -12,23 +12,44 @@ if __name__ == "__main__":
     filelist.sort()
     for file in filelist:
       corner = os.path.basename(file).replace('.log', '')
-      print(corner, end='')
+      print(corner+',', end='')
       f = open(file, "r")
       lines = f.readlines()
-      edge = 'NEG'
+      pos_list = []
+      neg_list = []
+      pos_line_num = 0
+      neg_line_num = 0
       for line in lines:
-        pattern = re.compile("[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s.*")
-        if pattern.match(line):
-          print(','+edge+',', end='')
-          array = line.split()
-          # remove first number if it is smaller than second one
-          # usually caused by glitch from clk_gen downsampler
-          if int(array[0]) < int(array[1]):
-            array.pop(0)
-          for num in array:
-            print(num+',',end='')
-          print('')
-          edge = 'POS'
+        pos_pattern = re.compile(".*POSEDGE.*[0-9]+\s+ps")
+        neg_pattern = re.compile(".*NEGEDGE.*[0-9]+\s+ps")
+        if neg_pattern.match(line):
+          line_num = int(line.split(':')[0])
+          # remove previous number if two lines are close to each other
+          # usually caused by smooth transition of osc
+          if line_num <= neg_line_num + 2:
+            neg_list.pop(-1)
+          neg_list.append(line.split()[-2])
+          neg_line_num = line_num
+        if pos_pattern.match(line):
+          line_num = int(line.split(':')[0])
+          if line_num <= pos_line_num + 2:
+            pos_list.pop(-1)
+          pos_list.append(line.split()[-2])
+          pos_line_num = line_num
+      # remove first number if it is smaller than second one
+      # usually caused by glitch from clk_gen downsampler
+      if int(neg_list[0]) < int(neg_list[1]):
+        neg_list.pop(0)
+      if int(pos_list[0]) < int(pos_list[1]):
+        pos_list.pop(0)
+      # Print results
+      print('NEG,', end='')
+      for num in neg_list:
+        print(num+',', end='')
+      print('\n,POS,', end='')
+      for num in pos_list:
+        print(num+',', end='')
+      print('')
   else:
     print("USAGE:")
     command = "python output_csv.py {logpath}"
