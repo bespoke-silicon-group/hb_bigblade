@@ -99,7 +99,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ########################################
   
 BSG_TRACE_NAME  := bsg_tag_boot
-BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
+BSG_TRACE_PY    := $(BSG_DESIGNS_TARGET_DIR)/testing/py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
 
