@@ -76,7 +76,6 @@ for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_p
 for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_core_tag_lines_i[$i]"]}
 
 # clock reset
-append_to_collection clk_reset_tag_ports [get_ports "core_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "ext_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "async_output_disable_i"]
 
@@ -87,8 +86,10 @@ set BSG_LINK_DDR_DATA_WIDTH    33
 set BSG_LINK_DDR_CHANNEL_WIDTH 16
 
 # manycore links
+set core_clock_ports [list]
 set core_upstream_ports [list]
 set core_downstream_ports [list]
+append_to_collection core_clock_ports        [get_ports "core_clk_i"]
 append_to_collection core_upstream_ports     [get_ports "core_v_i"]
 append_to_collection core_upstream_ports     [get_ports "core_ready_and_o"]
 append_to_collection core_downstream_ports   [get_ports "core_v_o"]
@@ -98,7 +99,8 @@ for {set i 0} {$i < $BSG_LINK_DDR_DATA_WIDTH} {incr i} {
   append_to_collection core_downstream_ports [get_ports "core_data_o[$i]"]
 }
 place_pins_k1_k3 $core_upstream_ports   [expr $core_lly+(0.128*50)] $core_urx
-place_pins_k1_k3 $core_downstream_ports [expr $core_lly+(0.128*300)] $core_urx
+place_pins_k1_k3 $core_clock_ports      [expr $core_lly+(0.128*125)] $core_urx
+place_pins_k1_k3 $core_downstream_ports [expr $core_lly+(0.128*150)] $core_urx
 
 
 # sdr links
@@ -125,8 +127,8 @@ for {set i [expr $BSG_LINK_DDR_CHANNEL_WIDTH/2]} {$i < $BSG_LINK_DDR_CHANNEL_WID
   append_to_collection sdr_out_ports [get_ports "io_link_data_o[$i]"]
 }
 
-place_pins_k1_k3 $sdr_out_ports [expr $core_lly+(0.128*50)] $core_llx
-place_pins_k1_k3 $sdr_in_ports [expr $core_lly+(0.128*100)] $core_llx
+place_pins_k1_k3 $sdr_out_ports [expr $core_lly+(0.128*40)] $core_llx
+place_pins_k1_k3 $sdr_in_ports [expr $core_lly+(0.128*90)] $core_llx
 
 
 
