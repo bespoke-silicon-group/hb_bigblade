@@ -9,3 +9,4 @@ simv*
 DVEfiles/
 .pdk_prep
 *.swp
+*.pyc
