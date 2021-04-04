@@ -39,7 +39,7 @@ run-%: $(SWEEP_RUNS_DIR) $(SWEEP_RESULTS_DIR)
 	            sdf_corner=$(subst sdf,,$(word 5, $(subst _, ,$*)))            \
 	            corner=$(subst $(subst ,, ),_,$(wordlist 1,3,$(subst _, ,$*))) \
 	            rc_corner=$(word 4, $(subst _, ,$*))                           \
-	&& make summarize > $(SWEEP_RESULTS_DIR)/$*.log
+	&& make summarize_details > $(SWEEP_RESULTS_DIR)/$*.log
 
 csv:
 	$(PYTHON) $(OUTPUT_CSV_PY) $(SWEEP_RESULTS_DIR) > $(RESULT_CSV)
