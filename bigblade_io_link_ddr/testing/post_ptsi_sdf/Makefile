@@ -169,8 +169,12 @@ ifeq ($(SWEEP_CLK_GEN),1)
 endif
 
 summarize:
-	grep -o -E ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 500
-	grep -o -E ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 500
+	grep -o -E ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 100
+	grep -o -E ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | column -c 100
+
+summarize_details:
+	grep -o -E -n ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log
+	grep -o -E -n ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log
 
 run-no-tee: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
