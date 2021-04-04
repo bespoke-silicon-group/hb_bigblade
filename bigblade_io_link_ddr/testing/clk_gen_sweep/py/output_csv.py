@@ -36,12 +36,6 @@ if __name__ == "__main__":
             pos_list.pop(-1)
           pos_list.append(line.split()[-2])
           pos_line_num = line_num
-      # remove first number if it is smaller than second one
-      # usually caused by glitch from clk_gen downsampler
-      if int(neg_list[0]) < int(neg_list[1]):
-        neg_list.pop(0)
-      if int(pos_list[0]) < int(pos_list[1]):
-        pos_list.pop(0)
       # Print results
       print('NEG,', end='')
       for num in neg_list:
