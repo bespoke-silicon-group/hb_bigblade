@@ -100,7 +100,10 @@ BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
 
-ifeq ($(USE_CLK_GEN),1)
+ifeq ($(SWEEP_CLK_GEN),1)
+  BSG_TRACE_PY_OPTION := sweep_clk_gen
+  VCS_OPTIONS += +define+SWEEP_CLK_GEN=1
+else ifeq ($(USE_CLK_GEN),1)
   BSG_TRACE_PY_OPTION := use_clk_gen
 else
   BSG_TRACE_PY_OPTION := use_ext_clk
@@ -160,6 +163,13 @@ $(BSG_CDC_PATH_FILE): $(BSG_CHIP_NETLIST_V_GZ)
 
 run: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
+ifeq ($(SWEEP_CLK_GEN),1)
+	make summarize
+endif
+
+summarize:
+	grep -o -E ".*NEGEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | sort -n | more | uniq  | column -c 150 | more
+	grep -o -E ".*POSEDGE.*[0-9]+\s+ps" $(BSG_OUT_DIR)/run.log | grep -o -E "[0-9]+\s+ps" | grep -o -E "[0-9]+" | sort -n | more | uniq  | column -c 150 | more
 
 run-no-tee: $(BSG_OUT_SIM)
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS)
