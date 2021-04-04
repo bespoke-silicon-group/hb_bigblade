@@ -86,6 +86,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
   $basejump_stl_dir/bsg_fsb/bsg_fsb_node_trace_replay.v
   $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
+  $basejump_stl_dir/bsg_clk_gen/bsg_nonsynth_clk_watcher.v
 
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr_test_node.v
