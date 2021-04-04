@@ -41,7 +41,7 @@ module bsg_gateway_chip
   logic [31:0] node_sent, node_received;
 
   logic m_core_clk, m_core_reset;
-  logic m_io_clk, m_io_clk_raw;
+  logic m_io_clk;
 
   logic s_core_clk, s_core_reset;
   logic s_io_clk;
@@ -72,7 +72,7 @@ module bsg_gateway_chip
   bsg_nonsynth_clock_gen #(.cycle_time_p(`NODE_CLK_PERIOD  )) node_clk_gen   (.o(node_clk  ));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`M_CORE_CLK_PERIOD)) m_core_clk_gen (.o(m_core_clk));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`S_CORE_CLK_PERIOD)) s_core_clk_gen (.o(s_core_clk));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`M_IO_CLK_PERIOD  )) m_io_clk_gen   (.o(m_io_clk_raw));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`M_IO_CLK_PERIOD  )) m_io_clk_gen   (.o(m_io_clk  ));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`S_IO_CLK_PERIOD  )) s_io_clk_gen   (.o(s_io_clk  ));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD   )) tag_clk_gen    (.o(tag_clk   ));
 
@@ -91,12 +91,16 @@ module bsg_gateway_chip
   //
   // Clock Generator Watcher
   //
-  wire clk_gen_watch_me = bsg_gateway_chip.DUT.clk_gen.clk_gen_inst.mux_inst.data_o;
+  logic clk_gen_watch_me, clk_gen_watch_me_raw, clk_gen_watch_me_state;
   bsg_nonsynth_clk_watcher #(.tolerance_p(1)) cw (.clk_i(clk_gen_watch_me));
 
-  // fix clock watcher behavior during tag programming
-  wire [1:0] clk_gen_sel = bsg_gateway_chip.DUT.clk_gen.clk_gen_inst.mux_inst.sel_i;
-  assign m_io_clk = (clk_gen_sel[0] === 1'bX || clk_gen_sel[1] === 1'bX)? 1'bX : m_io_clk_raw;
+  // filter out first cycle to eliminate glitch from ds
+  assign clk_gen_watch_me_raw = bsg_gateway_chip.DUT.clk_gen.clk_gen_inst.mux_inst.data_o;
+  assign clk_gen_watch_me = (clk_gen_watch_me_state === 1'b1)? clk_gen_watch_me_raw : 1'b0;
+  always_ff @(posedge clk_gen_watch_me_raw)
+    if (clk_gen_watch_me_raw !== 1'bX)
+        if      (clk_gen_watch_me_state === 1'bX) clk_gen_watch_me_state <= 1'b0;
+        else if (clk_gen_watch_me_state === 1'b0) clk_gen_watch_me_state <= 1'b1;
 
 
   //////////////////////////////////////////////////
