@@ -156,6 +156,7 @@ $(BSG_CDC_PATH_FILE): $(BSG_CHIP_NETLIST_V_GZ)
 	cp $(BSG_CHIP_NETLIST_V_GZ) $(BSG_CHIP_NETLIST_V).gz
 	gzip -d $(BSG_CHIP_NETLIST_V).gz
 	python $(EXPAND_VERILOG) $(BSG_CHIP_NETLIST_V)| grep "_hard_sync_int" | awk '{ print "instance { $(BSG_CHIP_INSTANCE_PATH)." $$$$2 " } { noTiming };" }' | sort > $@
+	python $(EXPAND_VERILOG) $(BSG_CHIP_NETLIST_V)| grep "bsg_SYNC_1_r" | awk '{ print "instance { $(BSG_CHIP_INSTANCE_PATH)." $$$$2 " } { noTiming };" }' | sort >> $@
 
 ########################################
 ## Run Targets
