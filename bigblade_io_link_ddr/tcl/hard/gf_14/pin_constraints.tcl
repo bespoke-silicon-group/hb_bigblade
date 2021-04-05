@@ -127,8 +127,8 @@ for {set i [expr $BSG_LINK_DDR_CHANNEL_WIDTH/2]} {$i < $BSG_LINK_DDR_CHANNEL_WID
   append_to_collection sdr_out_ports [get_ports "io_link_data_o[$i]"]
 }
 
-place_pins_k1_k3 $sdr_out_ports [expr $core_lly+(0.128*40)] $core_llx
-place_pins_k1_k3 $sdr_in_ports [expr $core_lly+(0.128*90)] $core_llx
+place_pins_k1_k3 $sdr_out_ports [expr $core_lly+(0.128*20)] $core_llx
+place_pins_k1_k3 $sdr_in_ports [expr $core_lly+(0.128*80)] $core_llx
 
 
 
