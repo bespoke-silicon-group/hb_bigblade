@@ -82,13 +82,13 @@ set_false_path -from [get_ports {tag_*_tag_lines_i[0] tag_*_tag_lines_i[3]}]
 
 
 # Source-sync link constraints
-set link_clk_period_ps        [expr $core_clk_period_ps*2.0]
+set link_clk_period_ps        [expr $io_clk_period_ps*2.0]
 set link_clk_uncertainty_ps   20
 set max_io_output_margin_ps   80
 set max_io_input_margin_ps    80
 
 bsg_link_ddr_constraints                    \
-  $core_clk_name                            \
+  $io_clk_name                              \
   "link_out_clk"                            \
   $link_clk_period_ps                       \
   $max_io_output_margin_ps                  \
