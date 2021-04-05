@@ -17,8 +17,8 @@ create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem
 set clk_gen_bound [create_bound -name "clk_gen" -type soft -boundary {{28.32 60.00} {40.32 72.00}}]
 add_to_bound ${clk_gen_bound} [get_cells -hier -filter "full_name=~clk_gen/*"]
 
-set iddr_bound [create_bound -name "iddr" -type soft -boundary {{0.00 10.50} {16.00 17.50}}]
-set oddr_bound [create_bound -name "oddr" -type soft -boundary {{0.00 0.00} {8.00 10.50}}]
+set iddr_bound [create_bound -name "iddr" -type soft -boundary {{0.00 7.50} {15.00 17.00}}]
+set oddr_bound [create_bound -name "oddr" -type soft -boundary {{0.00 0.00} {15.00 7.50}}]
 add_to_bound ${iddr_bound} [get_cells -hier -filter "full_name=~*iddr_phy/*"]
 add_to_bound ${oddr_bound} [get_cells -hier -filter "full_name=~*oddr_phy/*"]
 
