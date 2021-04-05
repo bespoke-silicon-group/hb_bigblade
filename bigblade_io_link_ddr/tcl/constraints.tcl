@@ -66,13 +66,13 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
-constraint_input_ports  $core_clk_name   $core_valid_in_ports        875   -5
-constraint_input_ports  $core_clk_name   $core_data_in_ports         880   25
-constraint_output_ports $core_clk_name   $core_ready_and_out_ports   850  -25
+constraint_input_ports  $core_clk_name   $core_valid_in_ports        [expr $core_clk_period_ps-125]   -5
+constraint_input_ports  $core_clk_name   $core_data_in_ports         [expr $core_clk_period_ps-120]   25
+constraint_output_ports $core_clk_name   $core_ready_and_out_ports   [expr $core_clk_period_ps-150]  -25
 
-constraint_output_ports $core_clk_name   $core_valid_out_ports       895  -10
-constraint_output_ports $core_clk_name   $core_data_out_ports        875  -10
-constraint_input_ports  $core_clk_name   $core_yumi_in_ports         900   25
+constraint_output_ports $core_clk_name   $core_valid_out_ports       [expr $core_clk_period_ps-105]  -10
+constraint_output_ports $core_clk_name   $core_data_out_ports        [expr $core_clk_period_ps-125]  -10
+constraint_input_ports  $core_clk_name   $core_yumi_in_ports         [expr $core_clk_period_ps-100]   25
 
 constraint_input_ports  $tag_clk_name    $tag_in_ports              4900   30
 
