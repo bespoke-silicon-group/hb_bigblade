@@ -1,0 +1,8 @@
+basejump_stl/
+board/
+bsg_manycore/
+bsg_packaging/
+bsg_cadenv/
+bsg_14/
+*.swp
+*.pyc
