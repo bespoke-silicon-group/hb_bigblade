@@ -55,26 +55,26 @@ set tag_in_ports               [get_ports {tag_*_tag_lines_i[1] tag_*_tag_lines_
 
 proc constraint_input_ports {clk_name ports max_delay min_delay} {
   set_input_delay -max $max_delay -clock $clk_name $ports
-  set_input_delay -min $min_delay -clock $clk_name -add_delay $ports
+  set_input_delay -min $min_delay -clock $clk_name $ports
   set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $ports
   set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $ports
 }
 proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_output_delay -max $max_delay -clock $clk_name $ports
-  set_output_delay -min $min_delay -clock $clk_name -add_delay $ports
+  set_output_delay -min $min_delay -clock $clk_name $ports
   set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $ports
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
-constraint_input_ports  $core_clk_name   $core_valid_in_ports        500 0
-constraint_input_ports  $core_clk_name   $core_data_in_ports         500 0
-constraint_output_ports $core_clk_name   $core_ready_and_out_ports   500 0
+constraint_input_ports  $core_clk_name   $core_valid_in_ports        875   -5
+constraint_input_ports  $core_clk_name   $core_data_in_ports         880   25
+constraint_output_ports $core_clk_name   $core_ready_and_out_ports   850  -25
 
-constraint_output_ports $core_clk_name   $core_valid_out_ports       500 0
-constraint_output_ports $core_clk_name   $core_data_out_ports        500 0
-constraint_input_ports  $core_clk_name   $core_yumi_in_ports         500 0
+constraint_output_ports $core_clk_name   $core_valid_out_ports       895  -10
+constraint_output_ports $core_clk_name   $core_data_out_ports        875  -10
+constraint_input_ports  $core_clk_name   $core_yumi_in_ports         900   25
 
-constraint_input_ports  $tag_clk_name    $tag_in_ports              2500 0
+constraint_input_ports  $tag_clk_name    $tag_in_ports              4900   30
 
 # false path
 set_false_path -from [get_ports async_output_disable_i]
