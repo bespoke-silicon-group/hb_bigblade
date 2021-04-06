@@ -1,7 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 set core_clk_name           "core_clk"
-set core_clk_period_ps      1000.0 ;# 1 GHz
+set core_clk_period_ps      625.0 ;# 1.6 GHz
 set tag_clk_name            "tag_clk"
 
 # grouping ports...
