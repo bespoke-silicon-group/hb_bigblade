@@ -97,7 +97,7 @@ module bsg_manycore_pod_row_sdr
     , output [E:W][S:N][wh_ruche_factor_gp-1:0]                           io_wh_link_token_o
   );
 
-  
+
   // link structs
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
   `declare_bsg_manycore_ruche_x_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
@@ -107,18 +107,21 @@ module bsg_manycore_pod_row_sdr
   // CLOCK GEN
   logic core_clk;
 
-  bsg_chip_clk_gen clkgen (
-    .async_reset_tag_lines_i    (async_reset_tag_lines_i)
-    ,.osc_tag_lines_i           (osc_tag_lines_i)
-    ,.osc_trigger_tag_lines_i   (osc_trigger_tag_lines_i)
-    ,.ds_tag_lines_i            (ds_tag_lines_i)
-    ,.sel_tag_lines_i           (sel_tag_lines_i)
+  assign core_clk = ext_clk_i;
 
-    ,.async_output_disable_i    (async_output_disable_i)
-    ,.ext_clk_i                 (ext_clk_i)
+  //bsg_chip_clk_gen clkgen (
+  //  .async_reset_tag_lines_i    (async_reset_tag_lines_i)
+  //  ,.osc_tag_lines_i           (osc_tag_lines_i)
+  //  ,.osc_trigger_tag_lines_i   (osc_trigger_tag_lines_i)
+  //  ,.ds_tag_lines_i            (ds_tag_lines_i)
+  //  ,.sel_tag_lines_i           (sel_tag_lines_i)
 
-    ,.clk_o                     (core_clk)
-  );
+  //  ,.async_output_disable_i    (async_output_disable_i)
+  //  ,.ext_clk_i                 (ext_clk_i)
+
+  //  ,.clk_o                     (core_clk)
+  //);
+
 
   // BSG_TAG CLIENT
   logic [hb_num_pods_x_gp-1:0] core_reset_lo;
@@ -167,10 +170,10 @@ module bsg_manycore_pod_row_sdr
     ,.addr_width_p        (hb_addr_width_gp)
     ,.data_width_p        (hb_data_width_gp)
     ,.ruche_factor_X_p    (hb_ruche_factor_X_gp)
-    
+
     ,.num_subarray_x_p    (hb_num_subarray_x_gp)
     ,.num_subarray_y_p    (hb_num_subarray_y_gp)
-    
+
     ,.dmem_size_p         (hb_dmem_size_gp)
     ,.icache_entries_p    (hb_icache_entries_gp)
     ,.icache_tag_width_p  (hb_icache_tag_width_gp)
@@ -200,10 +203,10 @@ module bsg_manycore_pod_row_sdr
 
     ,.wh_link_sif_i     (pod_wh_link_sif_li)
     ,.wh_link_sif_o     (pod_wh_link_sif_lo)
-  
+
     ,.hor_link_sif_i    (pod_hor_link_sif_li)
     ,.hor_link_sif_o    (pod_hor_link_sif_lo)
-  
+
     ,.ruche_link_i      (pod_ruche_link_li)
     ,.ruche_link_o      (pod_ruche_link_lo)
 
@@ -238,7 +241,7 @@ module bsg_manycore_pod_row_sdr
       ,.core_global_y_i(sdr_n_core_global_y_li[x])
       ,.core_global_x_o(sdr_n_core_global_x_lo[x])
       ,.core_global_y_o(sdr_n_core_global_y_lo[x])
-    
+
       ,.core_link_sif_i           (pod_ver_link_sif_lo[N][x])
       ,.core_link_sif_o           (pod_ver_link_sif_li[N][x])
 
@@ -306,7 +309,7 @@ module bsg_manycore_pod_row_sdr
 
   for (genvar x = 0; x < total_num_tiles_x_lp; x++) begin: sdr_s_x
     bsg_manycore_link_to_sdr_south #(
-      .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)      
+      .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)
       ,.lg_credit_to_token_decimation_p (sdr_lg_credit_to_token_decimation_gp)
 
       ,.x_cord_width_p      (hb_x_cord_width_gp)
@@ -317,12 +320,12 @@ module bsg_manycore_pod_row_sdr
       .core_clk_i(core_clk)
       ,.core_reset_i('0)
       ,.core_reset_o()
-      
+
       ,.core_global_x_i('0)
       ,.core_global_y_i('0)
       ,.core_global_x_o()
       ,.core_global_y_o()
-    
+
       ,.core_link_sif_i           (pod_ver_link_sif_lo[S][x])
       ,.core_link_sif_o           (pod_ver_link_sif_li[S][x])
 
@@ -380,7 +383,7 @@ module bsg_manycore_pod_row_sdr
   logic [hb_num_tiles_y_gp-1:0][hb_x_cord_width_gp-1:0] sdr_w_core_global_x_li, sdr_w_core_global_x_lo;
   logic [hb_num_tiles_y_gp-1:0][hb_y_cord_width_gp-1:0] sdr_w_core_global_y_li, sdr_w_core_global_y_lo;
 
-  
+
   bsg_manycore_link_sif_s [hb_num_tiles_y_gp-1:0][S:N] sdr_w_ver_link_sif_li, sdr_w_ver_link_sif_lo;
   logic [hb_num_tiles_y_gp-1:0] sdr_w_async_uplink_reset_li,     sdr_w_async_uplink_reset_lo;
   logic [hb_num_tiles_y_gp-1:0] sdr_w_async_downlink_reset_li,   sdr_w_async_downlink_reset_lo;
@@ -401,7 +404,7 @@ module bsg_manycore_pod_row_sdr
       .core_clk_i       (core_clk)
       ,.core_reset_i    (sdr_w_core_reset_li[y])
       ,.core_reset_o    (sdr_w_core_reset_lo[y])
-  
+
       ,.core_ver_link_sif_i   (sdr_w_ver_link_sif_li[y])
       ,.core_ver_link_sif_o   (sdr_w_ver_link_sif_lo[y])
 
@@ -464,7 +467,7 @@ module bsg_manycore_pod_row_sdr
       assign sdr_w_core_global_y_li[y+1] = sdr_w_core_global_y_lo[y];
     end
 
-  end 
+  end
 
   // EAST SDR
   logic [hb_num_tiles_y_gp-1:0] sdr_e_core_reset_li, sdr_e_core_reset_lo;
@@ -491,7 +494,7 @@ module bsg_manycore_pod_row_sdr
       .core_clk_i       (core_clk)
       ,.core_reset_i    (sdr_e_core_reset_li[y])
       ,.core_reset_o    (sdr_e_core_reset_lo[y])
-  
+
       ,.core_ver_link_sif_i   (sdr_e_ver_link_sif_li[y])
       ,.core_ver_link_sif_o   (sdr_e_ver_link_sif_lo[y])
 
@@ -555,7 +558,7 @@ module bsg_manycore_pod_row_sdr
     end
 
 
-  end 
+  end
 
   // CORNER SDR NW
   bsg_manycore_link_wh_to_sdr_nw #(
@@ -566,7 +569,7 @@ module bsg_manycore_pod_row_sdr
     ,.y_cord_width_p      (hb_y_cord_width_gp)
     ,.addr_width_p        (hb_addr_width_gp)
     ,.data_width_p        (hb_data_width_gp)
-    
+
     ,.wh_ruche_factor_p   (wh_ruche_factor_gp)
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_nw (
@@ -635,7 +638,7 @@ module bsg_manycore_pod_row_sdr
     ,.y_cord_width_p      (hb_y_cord_width_gp)
     ,.addr_width_p        (hb_addr_width_gp)
     ,.data_width_p        (hb_data_width_gp)
-    
+
     ,.wh_ruche_factor_p   (wh_ruche_factor_gp)
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_ne (
@@ -704,7 +707,7 @@ module bsg_manycore_pod_row_sdr
     ,.y_cord_width_p      (hb_y_cord_width_gp)
     ,.addr_width_p        (hb_addr_width_gp)
     ,.data_width_p        (hb_data_width_gp)
-    
+
     ,.wh_ruche_factor_p   (wh_ruche_factor_gp)
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_sw (
@@ -773,11 +776,11 @@ module bsg_manycore_pod_row_sdr
     ,.y_cord_width_p      (hb_y_cord_width_gp)
     ,.addr_width_p        (hb_addr_width_gp)
     ,.data_width_p        (hb_data_width_gp)
-    
+
     ,.wh_ruche_factor_p   (wh_ruche_factor_gp)
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_se (
-    .core_clk_i         (core_clk) 
+    .core_clk_i         (core_clk)
     ,.core_reset_i      (sdr_e_core_reset_lo[hb_num_tiles_y_gp-1])
     ,.core_reset_o      ()
 
