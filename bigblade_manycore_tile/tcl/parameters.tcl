@@ -13,4 +13,5 @@ set TOPLEVEL_PARAMETERS [join "
   vcache_size_p=2048
   vcache_block_size_in_words_p=8
   vcache_sets_p=64
+  num_vcache_rows_p=1
 "]

@@ -203,7 +203,8 @@ set_ungroup [get_designs -filter "hdl_template==network_rx"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
 set_ungroup [get_designs -filter "hdl_template==reverse"] true
 set_ungroup [get_designs -filter "hdl_template==recFNToRawFN"] true
-set_ungroup [get_designs -filter "hdl_template==hash_function"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_dram_hash_function"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_eva_to_npa"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
