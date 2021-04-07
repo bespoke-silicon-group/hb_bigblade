@@ -11,7 +11,7 @@ set manycore_clk_port             "clk_i"
 set manycore_clk_period_ps        1000.0
 set manycore_clk_uncertainty_ps   20
 
-set_input_transition 75 [get_port $manycore_clk_port]
+set_input_transition 50 [get_port $manycore_clk_port]
 create_clock -period $manycore_clk_period_ps -name $manycore_clk_name [get_ports $manycore_clk_port]
 set_clock_uncertainty $manycore_clk_uncertainty_ps [get_clocks $manycore_clk_name]
 
