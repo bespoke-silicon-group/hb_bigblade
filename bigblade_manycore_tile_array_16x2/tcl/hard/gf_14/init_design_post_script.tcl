@@ -16,8 +16,8 @@ proc bsg_dont_touch_regexp_type {arg1} {
   set_dont_touch $mycells
 }
 
-bsg_dont_touch_regexp *DONT_TOUCH*
-bsg_dont_touch_regexp_type *SYNC*SDFF*
+#bsg_dont_touch_regexp *DONT_TOUCH*
+#bsg_dont_touch_regexp_type *SYNC*SDFF*
 
 set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
 set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
