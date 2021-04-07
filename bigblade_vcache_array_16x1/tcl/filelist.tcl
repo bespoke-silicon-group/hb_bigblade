@@ -193,7 +193,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/vanilla_bean/fpu_fmin_fmax.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_int.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_int_fclass.v
-  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
   $bsg_manycore_dir/v/vanilla_bean/icache.v
   $bsg_manycore_dir/v/vanilla_bean/idiv.v
   $bsg_manycore_dir/v/vanilla_bean/load_packer.v

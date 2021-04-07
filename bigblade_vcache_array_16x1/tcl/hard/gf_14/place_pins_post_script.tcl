@@ -8,7 +8,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 
 for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
 
-  set tile_cell [get_cell "vc_x_${x}__vc"]
+  set tile_cell [get_cell "vc_y_0__vc_x_${x}__vc"]
   set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
   set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
   set tile_ury [get_attribute $tile_cell boundary_bounding_box.ur_y]

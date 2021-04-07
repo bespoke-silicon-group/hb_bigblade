@@ -7,7 +7,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 # ==========================================================
 
 for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
-  set tile_cell [get_cell "vc_x_${x}__vc"]
+  set tile_cell [get_cell "vc_y_0__vc_x_${x}__vc"]
   set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
   set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
   set tile_ury [get_attribute $tile_cell boundary_bounding_box.ur_y]
@@ -33,11 +33,11 @@ for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
 # ==========================================================
 
 for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
-  set lly [get_attribute [get_cells "vc_x_${x}__vc"] boundary_bounding_box.ll_y]
-  set ury [get_attribute [get_cells "vc_x_${x}__vc"] boundary_bounding_box.ur_y]
+  set lly [get_attribute [get_cells "vc_y_0__vc_x_${x}__vc"] boundary_bounding_box.ll_y]
+  set ury [get_attribute [get_cells "vc_y_0__vc_x_${x}__vc"] boundary_bounding_box.ur_y]
 
   # left side
-  set llx [get_attribute [get_cells "vc_x_${x}__vc"] boundary_bounding_box.ur_x]
+  set llx [get_attribute [get_cells "vc_y_0__vc_x_${x}__vc"] boundary_bounding_box.ur_x]
   set urx [expr $llx + $RB_RP_X_OFFSET]
   set boundary [list [list $llx $lly] [list $urx $ury]]
   create_placement_blockage -boundary $boundary -type hard -name "vc_rp_${x}_left"
