@@ -9,7 +9,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 # ==========================================================
 
 for {set x 0} {$x < $HB_SUBARRAY_NUM_TILES_X_P} {incr x} {
-  set vcache_cell [get_cells "vc_x_${x}__vc"]
+  set vcache_cell [get_cells "vc_y_0__vc_x_${x}__vc"]
   set llx [expr ($x*($vcache_width+$vcache_x_space))]
   set lly 0
   set urx [expr $llx + $vcache_width]
@@ -43,7 +43,7 @@ proc make_rp_array {rp_name cells row col orientation} {
 # ==========================================================
 
 for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
-  set vc_cell [get_cells "vc_x_${x}__vc"]
+  set vc_cell [get_cells "vc_y_0__vc_x_${x}__vc"]
   set vc_lly [get_attribute $vc_cell boundary_bounding_box.ll_y]
   set vc_urx [get_attribute $vc_cell boundary_bounding_box.ur_x]
 
@@ -54,8 +54,8 @@ for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
   # west side
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "rc_${x}__rl_0_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "rc_${x}__rl_1_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "rr_0__rc_${x}__rl_0_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "rr_0__rc_${x}__rl_1_*_rb_w_inv_inv0/hard_hard_${b}__hard_inv"]
 
       set rp_name "bsg_north_vc_rp_rb_w_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "MY"]
@@ -71,8 +71,8 @@ for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
   # east side
   for {set b 0} {$b < $HB_WH_LINK_WIDTH_P} {incr b} {
       set buffer_cells [list]
-      append_to_collection buffer_cells [get_cells "rc_${x}__rl_0_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
-      append_to_collection buffer_cells [get_cells "rc_${x}__rl_1_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "rr_0__rc_${x}__rl_0_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
+      append_to_collection buffer_cells [get_cells "rr_0__rc_${x}__rl_1_*_rb_e_inv_inv0/hard_hard_${b}__hard_inv"]
 
       set rp_name "bsg_north_vc_rp_rb_e_${x}_${b}"
       set my_rp [make_rp_array $rp_name $buffer_cells 1 2 "R0"]

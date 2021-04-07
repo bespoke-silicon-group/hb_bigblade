@@ -4,6 +4,7 @@ set TOPLEVEL_PARAMETERS [join "
   data_width_p=32
   x_cord_width_p=7
   y_cord_width_p=7
+  num_vcache_rows_p=1
   vcache_addr_width_p=29
   vcache_data_width_p=32
   vcache_ways_p=4

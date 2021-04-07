@@ -33,7 +33,7 @@ set_clock_uncertainty $manycore_clk_uncertainty_ps [get_clocks $manycore_clk_nam
 # Flatten and Dont Touch
 # ==========================================================
 
-set_ungroup [get_cells "rc*"] true
+set_ungroup [get_cells "rr*"] true
 
 set hard_inv_cells [get_cells -hier -filter "name=~*hard_inv*"]
 set_dont_touch $hard_inv_cells true
