@@ -8,5 +8,6 @@ for {set i [expr 2*$HB_WH_LINK_WIDTH_P]} {$i < [expr 2*$HB_WH_RUCHE_FACTOR_P*$HB
 }
 
 set_dont_touch [get_cells -hier "*hard_inv"] true
+set_dont_touch [get_nets -of [get_pins "vc_y_*__vc_x_*__vc/wh_link_sif_*"]] true
 
 puts "BSG-info: Completed script [info script]\n"

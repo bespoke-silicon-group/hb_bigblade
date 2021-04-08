@@ -81,10 +81,10 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 # constraint links
 for {set i 0} {$i < 2} {incr i} {
   # ver link
-  constraint_output_ports $clk_name $rev_data_out_ports($i)  150 -75
+  constraint_output_ports $clk_name $rev_data_out_ports($i)  300 -75
   constraint_output_ports $clk_name $rev_ready_out_ports($i) 785 200
   constraint_output_ports $clk_name $rev_valid_out_ports($i) 570 -75
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)  150 -75
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)  300 -75
   constraint_output_ports $clk_name $fwd_ready_out_ports($i) 780 200
   constraint_output_ports $clk_name $fwd_valid_out_ports($i) 615 -75
 
@@ -96,7 +96,7 @@ for {set i 0} {$i < 2} {incr i} {
   constraint_input_ports $clk_name $fwd_valid_in_ports($i) 635 200
 
   # wh link
-  constraint_output_ports $clk_name $wh_data_out_ports($i)  150 -75
+  constraint_output_ports $clk_name $wh_data_out_ports($i)  300 -75
   constraint_output_ports $clk_name $wh_ready_out_ports($i) 770 200
   constraint_output_ports $clk_name $wh_valid_out_ports($i) 425 -75
 
