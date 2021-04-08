@@ -103,9 +103,7 @@
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_p, wh_link_sif_s);
 
   bsg_manycore_link_sif_s ver_link_sif_li, ver_link_sif_lo;
-  bsg_manycore_link_sif_s ver_int_link_sif_li, ver_int_link_sif_lo;
   wh_link_sif_s [wh_ruche_factor_p-1:0] wh_link_sif_li, wh_link_sif_lo;
-  wh_link_sif_s [wh_ruche_factor_p-1:0] wh_link_int_sif_li, wh_link_int_sif_lo;
 
   assign ver_link_sif_li = core_ver_link_sif_i;
   assign core_ver_link_sif_o = ver_link_sif_lo;
@@ -126,43 +124,6 @@
     .i(wh_link_sif_lo[1])
     ,.o(core_wh_link_sif_o[1])
   );
-
-
-  bsg_noc_repeater_node
- #(.width_p       (fwd_width_lp)
-  ) fwd_node
-  (.clk_i         (core_clk_i)
-  ,.reset_i       (core_reset_r)
-  ,.side_A_links_i(ver_link_sif_li.fwd)
-  ,.side_A_links_o(ver_link_sif_lo.fwd)
-  ,.side_B_links_i(ver_int_link_sif_li.fwd)
-  ,.side_B_links_o(ver_int_link_sif_lo.fwd)
-  );
-
-  bsg_noc_repeater_node
- #(.width_p       (rev_width_lp)
-  ) rev_node
-  (.clk_i         (core_clk_i)
-  ,.reset_i       (core_reset_r)
-  ,.side_A_links_i(ver_link_sif_li.rev)
-  ,.side_A_links_o(ver_link_sif_lo.rev)
-  ,.side_B_links_i(ver_int_link_sif_li.rev)
-  ,.side_B_links_o(ver_int_link_sif_lo.rev)
-  );
-
-  for (genvar i = 0; i < wh_ruche_factor_p; i++)
-  begin: wh_node
-    bsg_noc_repeater_node
-   #(.width_p       (wh_flit_width_p)
-    ) node
-    (.clk_i         (core_clk_i)
-    ,.reset_i       (core_reset_r)
-    ,.side_A_links_i(wh_link_sif_li    [i])
-    ,.side_A_links_o(wh_link_sif_lo    [i])
-    ,.side_B_links_i(wh_link_int_sif_li[i])
-    ,.side_B_links_o(wh_link_int_sif_lo[i])
-    );
-  end
 
   assign async_uplink_reset_o     = async_uplink_reset_i;
   assign async_downlink_reset_o   = async_downlink_reset_i;
@@ -185,6 +146,8 @@
  #(.width_p                        (fwd_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (0)
+  ,.bypass_downstream_twofer_fifo_p(0)
   ) fwd_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
@@ -192,13 +155,13 @@
   ,.async_downlink_reset_i (async_downlink_reset_i)
   ,.async_token_reset_i    (async_token_reset_i)
 
-  ,.core_data_i (ver_int_link_sif_lo.fwd.data)
-  ,.core_v_i    (ver_int_link_sif_lo.fwd.v)
-  ,.core_ready_o(ver_int_link_sif_li.fwd.ready_and_rev)
+  ,.core_data_i (ver_link_sif_li.fwd.data)
+  ,.core_v_i    (ver_link_sif_li.fwd.v)
+  ,.core_ready_o(ver_link_sif_lo.fwd.ready_and_rev)
 
-  ,.core_data_o (ver_int_link_sif_li.fwd.data)
-  ,.core_v_o    (ver_int_link_sif_li.fwd.v)
-  ,.core_yumi_i (ver_int_link_sif_li.fwd.v & ver_int_link_sif_lo.fwd.ready_and_rev)
+  ,.core_data_o (ver_link_sif_lo.fwd.data)
+  ,.core_v_o    (ver_link_sif_lo.fwd.v)
+  ,.core_yumi_i (ver_link_sif_lo.fwd.v & ver_link_sif_li.fwd.ready_and_rev)
 
   ,.link_clk_o  (io_fwd_link_clk_o)
   ,.link_data_o (io_fwd_link_data_o)
@@ -215,6 +178,8 @@
  #(.width_p                        (rev_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (0)
+  ,.bypass_downstream_twofer_fifo_p(0)
   ) rev_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
@@ -222,13 +187,13 @@
   ,.async_downlink_reset_i (async_downlink_reset_i)
   ,.async_token_reset_i    (async_token_reset_i)
 
-  ,.core_data_i (ver_int_link_sif_lo.rev.data)
-  ,.core_v_i    (ver_int_link_sif_lo.rev.v)
-  ,.core_ready_o(ver_int_link_sif_li.rev.ready_and_rev)
+  ,.core_data_i (ver_link_sif_li.rev.data)
+  ,.core_v_i    (ver_link_sif_li.rev.v)
+  ,.core_ready_o(ver_link_sif_lo.rev.ready_and_rev)
 
-  ,.core_data_o (ver_int_link_sif_li.rev.data)
-  ,.core_v_o    (ver_int_link_sif_li.rev.v)
-  ,.core_yumi_i (ver_int_link_sif_li.rev.v & ver_int_link_sif_lo.rev.ready_and_rev)
+  ,.core_data_o (ver_link_sif_lo.rev.data)
+  ,.core_v_o    (ver_link_sif_lo.rev.v)
+  ,.core_yumi_i (ver_link_sif_lo.rev.v & ver_link_sif_li.rev.ready_and_rev)
 
   ,.link_clk_o  (io_rev_link_clk_o)
   ,.link_data_o (io_rev_link_data_o)
@@ -247,6 +212,8 @@
    #(.width_p                        (wh_flit_width_p)
     ,.lg_fifo_depth_p                (lg_fifo_depth_p)
     ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+    ,.bypass_upstream_twofer_fifo_p  (0)
+    ,.bypass_downstream_twofer_fifo_p(0)
     ) sdr
     (.core_clk_i             (core_clk_i)
     ,.core_uplink_reset_i    (core_uplink_reset_sync)
@@ -254,13 +221,13 @@
     ,.async_downlink_reset_i (async_downlink_reset_i)
     ,.async_token_reset_i    (async_token_reset_i)
 
-    ,.core_data_i (wh_link_int_sif_lo[i].data)
-    ,.core_v_i    (wh_link_int_sif_lo[i].v)
-    ,.core_ready_o(wh_link_int_sif_li[i].ready_and_rev)
+    ,.core_data_i (wh_link_sif_li[i].data)
+    ,.core_v_i    (wh_link_sif_li[i].v)
+    ,.core_ready_o(wh_link_sif_lo[i].ready_and_rev)
 
-    ,.core_data_o (wh_link_int_sif_li[i].data)
-    ,.core_v_o    (wh_link_int_sif_li[i].v)
-    ,.core_yumi_i (wh_link_int_sif_li[i].v & wh_link_int_sif_lo[i].ready_and_rev)
+    ,.core_data_o (wh_link_sif_lo[i].data)
+    ,.core_v_o    (wh_link_sif_lo[i].v)
+    ,.core_yumi_i (wh_link_sif_lo[i].v & wh_link_sif_li[i].ready_and_rev)
 
     ,.link_clk_o  (io_wh_link_clk_o  [i])
     ,.link_data_o (io_wh_link_data_o [i])
