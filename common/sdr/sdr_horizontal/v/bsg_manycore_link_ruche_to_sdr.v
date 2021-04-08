@@ -176,6 +176,8 @@
  #(.width_p                        (fwd_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (0)
+  ,.bypass_downstream_twofer_fifo_p(1)
   ) fwd_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
@@ -206,6 +208,8 @@
  #(.width_p                        (rev_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (0)
+  ,.bypass_downstream_twofer_fifo_p(1)
   ) rev_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
