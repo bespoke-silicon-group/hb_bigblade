@@ -129,30 +129,30 @@ constraint_output_ports $core_clk_name  $ruche_fwd_ready_out_ports      550 0
 # router output constraints
 # N/S ver link
 for {set i 0} {$i <= 1} {incr i} {
-  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   250 -75
+  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   350 -75
   constraint_output_ports $core_clk_name $ver_rev_valid_out_ports($i)  580 -75
   constraint_input_ports  $core_clk_name $ver_rev_ready_in_ports($i)   680 -75
 
-  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   250 -75
+  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   350 -75
   constraint_output_ports $core_clk_name $ver_fwd_valid_out_ports($i)  580 -75
   constraint_input_ports  $core_clk_name $ver_fwd_ready_in_ports($i)   660 -75
 }
 
 # hor link
-constraint_output_ports $core_clk_name $hor_rev_data_out_ports   250 -75
+constraint_output_ports $core_clk_name $hor_rev_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $hor_rev_valid_out_ports  590 -75
 constraint_input_ports  $core_clk_name $hor_rev_ready_in_ports   690 -75
 
-constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   250 -75
+constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $hor_fwd_valid_out_ports  650 -75
 constraint_input_ports  $core_clk_name $hor_fwd_ready_in_ports   740 -75
 
 # ruche link
-constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   250 -75
+constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $ruche_rev_valid_out_ports  800 -75
 constraint_input_ports  $core_clk_name $ruche_rev_ready_in_ports   410 -75
 
-constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   250 -75
+constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  660 -75
 constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   730 -75
 

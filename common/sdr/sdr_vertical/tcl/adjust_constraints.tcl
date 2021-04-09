@@ -62,11 +62,11 @@ constraint_output_ports $core_clk_name $core_link_fwd_ready_out_ports  690 200
 
 
 # output constraints
-constraint_output_ports $core_clk_name $core_link_rev_data_out_ports   150 -75
+constraint_output_ports $core_clk_name $core_link_rev_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $core_link_rev_valid_out_ports  590 -75
 constraint_input_ports  $core_clk_name $core_link_rev_ready_in_ports   690 -75
 
-constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   150 -75
+constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   350 -75
 constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  650 -75
 constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   740 -75
 
