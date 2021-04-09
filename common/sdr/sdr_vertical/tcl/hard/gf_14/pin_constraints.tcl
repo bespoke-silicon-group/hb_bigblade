@@ -158,7 +158,7 @@ if {$::env(SOUTH_NOT_NORTH) == 1} {
 } else {
   place_pins_k2_k4 $core_link_in_ports  $NORTH_OUTPUT_OFFSET $core_lly
   place_pins_k2_k4 $core_link_out_ports $NORTH_INPUT_OFFSET $core_lly
-  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_lly"
+  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_ury"
 
   place_pins_k2_k4 $sdr_out_ports       $NORTH_OUTPUT_OFFSET $core_ury
   place_pins_k2_k4 $sdr_in_ports        $NORTH_INPUT_OFFSET  $core_ury
