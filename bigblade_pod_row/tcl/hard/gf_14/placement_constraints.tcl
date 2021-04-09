@@ -89,4 +89,7 @@ set ury $pod_height
 create_bound -name "reset_dff_bound" -boundary [list [list $llx $lly] [list $urx $ury]] -type soft
 add_to_bound "reset_dff_bound" [get_flat_cells "tx_0__reset_dff/*"]
 
+#set clk_gen_bound [create_bound -name "clk_gen" -type soft -boundary {{? ?} {? ?}}]
+#add_to_bound ${clk_gen_bound} [get_cells -hier -filter "full_name=~clk_gen/*"]
+
 puts "BSG-info: Completed script [info script]\n"

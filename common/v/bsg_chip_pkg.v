@@ -1,7 +1,11 @@
 package bsg_chip_pkg;
   
   `include "bsg_defines.v"
-  
+
+  // clock generator parameters
+  localparam clk_gen_ds_width_gp = 6;
+  localparam clk_gen_num_adgs_gp = 1;
+
   // manycore parameters
   // x_cord_width_gp = pod_x_cord_width_gp + hb_x_subcord_width_gp
   parameter hb_x_cord_width_gp = 7; // (global X)

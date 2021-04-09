@@ -18,13 +18,14 @@ module bsg_manycore_pod_row_sdr
   )
   (
     // clk gen
-    input bsg_tag_s async_reset_tag_lines_i
-    , input bsg_tag_s osc_tag_lines_i
-    , input bsg_tag_s osc_trigger_tag_lines_i
-    , input bsg_tag_s ds_tag_lines_i
-    , input bsg_tag_s sel_tag_lines_i
+      input [3:0] async_reset_tag_lines_i
+    , input [3:0] osc_tag_lines_i
+    , input [3:0] osc_trigger_tag_lines_i
+    , input [3:0] ds_tag_lines_i
+    , input [3:0] sel_tag_lines_i
     , input async_output_disable_i
     , input ext_clk_i
+    , input tag_clk_i
 
     // pod tag
     , input bsg_tag_s [hb_num_pods_x_gp-1:0] pod_tags_i
@@ -105,23 +106,27 @@ module bsg_manycore_pod_row_sdr
 
 
   // CLOCK GEN
+  wire bsg_tag_s async_reset_tag_lines_li = {tag_clk_i, async_reset_tag_lines_i[2:0]};
+  wire bsg_tag_s osc_tag_lines_li         = {tag_clk_i, osc_tag_lines_i        [2:0]};
+  wire bsg_tag_s osc_trigger_tag_lines_li = {tag_clk_i, osc_trigger_tag_lines_i[2:0]};
+  wire bsg_tag_s ds_tag_lines_li          = {tag_clk_i, ds_tag_lines_i         [2:0]};
+  wire bsg_tag_s sel_tag_lines_li         = {tag_clk_i, sel_tag_lines_i        [2:0]};
+
   logic core_clk;
 
-  assign core_clk = ext_clk_i;
-
-  //bsg_chip_clk_gen clkgen (
-  //  .async_reset_tag_lines_i    (async_reset_tag_lines_i)
-  //  ,.osc_tag_lines_i           (osc_tag_lines_i)
-  //  ,.osc_trigger_tag_lines_i   (osc_trigger_tag_lines_i)
-  //  ,.ds_tag_lines_i            (ds_tag_lines_i)
-  //  ,.sel_tag_lines_i           (sel_tag_lines_i)
-
-  //  ,.async_output_disable_i    (async_output_disable_i)
-  //  ,.ext_clk_i                 (ext_clk_i)
-
-  //  ,.clk_o                     (core_clk)
-  //);
-
+  bsg_chip_clk_gen
+ #(.ds_width_p             (clk_gen_ds_width_gp     )
+  ,.num_adgs_p             (clk_gen_num_adgs_gp     )
+  ) clk_gen
+  (.async_reset_tag_lines_i(async_reset_tag_lines_li)
+  ,.osc_tag_lines_i        (osc_tag_lines_li        )
+  ,.osc_trigger_tag_lines_i(osc_trigger_tag_lines_li)
+  ,.ds_tag_lines_i         (ds_tag_lines_li         )
+  ,.sel_tag_lines_i        (sel_tag_lines_li        )
+  ,.async_output_disable_i (async_output_disable_i  )
+  ,.ext_clk_i              (ext_clk_i               )
+  ,.clk_o                  (core_clk                )
+  );
 
   // BSG_TAG CLIENT
   logic [hb_num_pods_x_gp-1:0] core_reset_lo;
