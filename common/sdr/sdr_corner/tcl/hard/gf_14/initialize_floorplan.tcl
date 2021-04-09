@@ -7,7 +7,7 @@ initialize_floorplan \
   -control_type core \
   -coincident_boundary true \
   -shape R \
-  -side_length [list [expr $grid_width*3.5] $vcache_height]
+  -side_length [list $sdr_corner_width $sdr_corner_height]
 
 
 
