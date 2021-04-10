@@ -51,7 +51,7 @@ for {set i 0} {$i < $HB_NUM_TILES_X_P} {incr i} {
 set sdr_sw_cell [get_cells "sdr_sw"]
 set sdr_se_cell [get_cells "sdr_se"]
 move_object $sdr_sw_cell -x 0 -y $pod_offset_y
-move_object $sdr_se_cell -x [expr $pod_width-$sdr_corner_width-(0.5*$grid_width)] -y $pod_offset_y
+move_object $sdr_se_cell -x [expr $pod_width-$sdr_corner_width] -y $pod_offset_y
 set_fixed_objects $sdr_sw_cell
 set_fixed_objects $sdr_se_cell
 
@@ -61,7 +61,7 @@ for {set i [expr $HB_NUM_TILES_Y_P-1]} {$i >= 0} {incr i -1} {
   set sdr_w_cell [get_cells sdr_w_y_${i}__sdr_w]
   set sdr_e_cell [get_cells sdr_e_y_${i}__sdr_e]
   move_object $sdr_w_cell -x 0 -y $y
-  move_object $sdr_e_cell -x [expr $pod_width - $sdr_east_west_width-(0.5*$grid_width)] -y $y
+  move_object $sdr_e_cell -x [expr $pod_width - $sdr_east_west_width] -y $y
   set_fixed_objects [get_cells sdr_w_y_${i}__sdr_w]
   set_fixed_objects [get_cells sdr_e_y_${i}__sdr_e]
   set y [expr $y + ($tile_height + $tile_y_space)]
@@ -71,7 +71,7 @@ for {set i [expr $HB_NUM_TILES_Y_P-1]} {$i >= 0} {incr i -1} {
 set sdr_nw_cell [get_cells "sdr_nw"]
 set sdr_ne_cell [get_cells "sdr_ne"]
 move_object $sdr_nw_cell -x 0 -y $y
-move_object $sdr_ne_cell -x [expr $pod_width-$sdr_corner_width-(0.5*$grid_width)] -y $y
+move_object $sdr_ne_cell -x [expr $pod_width-$sdr_corner_width] -y $y
 set_fixed_objects $sdr_nw_cell
 set_fixed_objects $sdr_ne_cell
 
