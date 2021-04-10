@@ -50,7 +50,7 @@ foreach_in_collection m [get_modes] {
   create_clock_skew_group -name sg1 -objects [get_pins "vc_y_*__vc_x_*__vc/clk_i"]
 }
 
-set_clock_balance_points -consider_for_balancing true -balance_points [get_pins "vc_y_*__vc_x_*__vc/clk_i"]
+#set_clock_balance_points -consider_for_balancing true -balance_points [get_pins "vc_y_*__vc_x_*__vc/clk_i"]
 
 
 puts "BSG-info: Completed script [info script]\n"

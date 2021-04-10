@@ -18,16 +18,33 @@ set_clock_uncertainty $manycore_clk_uncertainty_ps [get_clocks $manycore_clk_nam
 # ==========================================================
 # Input Constraints
 # ==========================================================
+set input_ports [list]
+append_to_collection input_ports [get_ports "reset_i*"]
+append_to_collection input_ports [get_ports "hor_link_sif_i*"]
+append_to_collection input_ports [get_ports "ver_link_sif_i*"]
+append_to_collection input_ports [get_ports "ruche_link_i*"]
+append_to_collection input_ports [get_ports "global_*_i*"]
+set_input_delay -max 0    -clock $manycore_clk_name $input_ports
+set_input_delay -min 200  -clock $manycore_clk_name $input_ports
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $input_ports
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $input_ports
 
-# set_driving_cell ...
-# set_input_delay ...
+
 
 # ==========================================================
 # Output Constraints
 # ==========================================================
+set output_ports [list]
+append_to_collection output_ports [get_ports "reset_o*"]
+append_to_collection output_ports [get_ports "hor_link_sif_o*"]
+append_to_collection output_ports [get_ports "ver_link_sif_o*"]
+append_to_collection output_ports [get_ports "ruche_link_o*"]
+append_to_collection output_ports [get_ports "global_*_o*"]
+set_output_delay -max 0   -clock $manycore_clk_name $output_ports
+set_output_delay -min 200 -clock $manycore_clk_name $output_ports
+set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $output_ports
+set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $output_ports
 
-# set_load ...
-# set_output_delay ...
 
 # ==========================================================
 # Flatten and Dont Touch
