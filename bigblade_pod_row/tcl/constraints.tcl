@@ -35,11 +35,11 @@ proc constraint_input_ports {clk_name ports max_delay min_delay} {
   set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $ports
 }
 
-set tag_in_ports [get_ports {*_tag_lines_i[1] *_tag_lines_i[2]}]
+set tag_in_ports [get_ports {*_tag_lines_i*op* *_tag_lines_i*param*}]
 constraint_input_ports $tag_clk_name $tag_in_ports     4800  50
 
 set_false_path -from [get_ports async_output_disable_i]
-set_false_path -from [get_ports {*_tag_lines_i[0] *_tag_lines_i[3]}]
+set_false_path -from [get_ports {*_tag_lines_i*clk* *_tag_lines_i*en*}]
 
 # pod tag
 create_clock -period 5000 -name "pod_tag_clk" [get_ports "pod_tags_i[0]\[clk\]"]

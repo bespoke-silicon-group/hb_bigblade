@@ -18,11 +18,11 @@ module bsg_manycore_pod_row_sdr
   )
   (
     // clk gen
-      input [3:0] async_reset_tag_lines_i
-    , input [3:0] osc_tag_lines_i
-    , input [3:0] osc_trigger_tag_lines_i
-    , input [3:0] ds_tag_lines_i
-    , input [3:0] sel_tag_lines_i
+      input bsg_tag_s async_reset_tag_lines_i
+    , input bsg_tag_s osc_tag_lines_i
+    , input bsg_tag_s osc_trigger_tag_lines_i
+    , input bsg_tag_s ds_tag_lines_i
+    , input bsg_tag_s sel_tag_lines_i
     , input async_output_disable_i
     , input ext_clk_i
     , input tag_clk_i
