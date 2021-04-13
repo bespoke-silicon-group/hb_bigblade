@@ -19,7 +19,7 @@ set_app_var case_analysis_propagate_through_icg true
 
 
 set core_clk_name           "core_clk"
-set core_clk_period_ps      625.0 ;# 1.6 GHz
+set core_clk_period_ps      800.0 ;# 1.25 GHz
 set core_clk_uncertainty_ps 20
 create_clock -period $core_clk_period_ps -name $core_clk_name [get_ports core_clk_i]
 set_clock_uncertainty $core_clk_uncertainty_ps  [get_clocks $core_clk_name]
@@ -31,7 +31,7 @@ create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports tag_clk_i
 set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
 set io_clk_name           "io_clk"
-set io_clk_period_ps      625.0 ;# 1.6 GHz
+set io_clk_period_ps      800.0 ;# 1.25 GHz
 set io_clk_uncertainty_ps 20
 set osc_period_ps         250.0 ;# Raw oscillator frequency
 set osc_uncertainty_ps    20
