@@ -25,6 +25,5 @@ export ETM_BLOCKS += bsg_manycore_link_ruche_to_sdr_west,$(BSG_DESIGNS_TARGET_DI
 export ETM_BLOCKS += bsg_manycore_link_ruche_to_sdr_east,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_ruche_to_sdr_east/bsg_14/current_build
 export ETM_BLOCKS += bsg_manycore_tile_compute_array_ruche,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_manycore_tile_array_16x2/bsg_14/current_build
 export ETM_BLOCKS += bsg_manycore_tile_vcache_array,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_vcache_array_16x1/bsg_14/current_build
-#export ETM_BLOCKS += bsg_manycore_tile_compute_ruche,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_manycore_tile/bsg_14/current_build
-#export ETM_BLOCKS += bsg_manycore_tile_vcache,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_vcache/bsg_14/current_build
-
+export ETM_BLOCKS += bsg_manycore_tile_compute_ruche,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_manycore_tile/bsg_14/current_build
+export ETM_BLOCKS += bsg_manycore_tile_vcache,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_vcache/bsg_14/current_build
