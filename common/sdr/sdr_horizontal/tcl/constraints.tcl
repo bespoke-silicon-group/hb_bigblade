@@ -174,12 +174,12 @@ constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  760 0
 constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   830 0
 
 # core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
-constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]     500 40
+constraint_output_ports $core_clk_name [get_ports core_reset_o]     500 40
 
 # global coordinates
-constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 0 40
-constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 0 40
+constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 850 40
+constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 850 40
 
 # false path
 set_false_path -from [get_ports async_*_reset_i]
