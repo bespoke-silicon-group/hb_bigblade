@@ -8,7 +8,7 @@ set harden_fifo_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*do
 set_macro_relative_location \
   -target_object $harden_fifo_mem \
   -target_corner tl \
-  -target_orientation R0 \
+  -target_orientation MY \
   -anchor_corner tl \
   -offset [list $keepout_margin_x -$keepout_margin_y]
 
