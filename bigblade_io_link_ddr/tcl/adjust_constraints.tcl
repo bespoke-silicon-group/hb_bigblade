@@ -1,7 +1,7 @@
 puts "BSG-info: Running script [info script]\n"
 
 set core_clk_name           "core_clk"
-set core_clk_period_ps      625.0 ;# 1.6 GHz
+set core_clk_period_ps      800.0 ;# 1.25 GHz
 set tag_clk_name            "tag_clk"
 
 # grouping ports...
@@ -26,12 +26,12 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
   set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $ports
 }
 
-constraint_input_ports  $core_clk_name   $core_valid_in_ports        [expr $core_clk_period_ps-250]   -5
+constraint_input_ports  $core_clk_name   $core_valid_in_ports        [expr $core_clk_period_ps-265]   -5
 constraint_input_ports  $core_clk_name   $core_data_in_ports         [expr $core_clk_period_ps-170]   75
 constraint_output_ports $core_clk_name   $core_ready_and_out_ports   [expr $core_clk_period_ps-200]  -20
 
 constraint_output_ports $core_clk_name   $core_valid_out_ports       [expr $core_clk_period_ps-155]   -5
-constraint_output_ports $core_clk_name   $core_data_out_ports        [expr $core_clk_period_ps-175]    0
+constraint_output_ports $core_clk_name   $core_data_out_ports        [expr $core_clk_period_ps-180]    0
 constraint_input_ports  $core_clk_name   $core_yumi_in_ports         [expr $core_clk_period_ps-165]   25
 
 constraint_input_ports  $tag_clk_name    $tag_in_ports              4800    0
