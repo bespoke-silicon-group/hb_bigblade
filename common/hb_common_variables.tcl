@@ -70,18 +70,18 @@ set  vcache_array_width       [expr $grid_width*176]
 set  vcache_array_height      [expr $grid_height*25.5]
 
 
-set  sdr_east_west_width      [expr $grid_width*3.5]
-set  sdr_east_west_height     [expr $grid_height*32.5]
-set  sdr_north_south_width    [expr $grid_width*10.5]
-set  sdr_north_south_height   [expr $grid_height*3.5]
+set  sdr_horiz_width      [expr $grid_width*3.5]
+set  sdr_horiz_height     [expr $grid_height*32.5]
+set  sdr_vert_width    [expr $grid_width*10.5]
+set  sdr_vert_height   [expr $grid_height*3.5]
 set  sdr_corner_width         [expr $grid_width*3.5]
 set  sdr_corner_height        [expr $grid_height*25.5]
 
-set  pod_width    [expr $tile_array_width + (2*$sdr_east_west_width)+(1.5*$grid_width)]
-set  pod_height   [expr $sdr_north_south_height + (0.5*$grid_height) + \
+set  pod_row_width    [expr ($tile_array_width*$HB_NUM_PODS_X_P) + ($grid_width*$HB_NUM_PODS_X_P) + (2*$sdr_horiz_width) + (0.5*$grid_width)]
+set  pod_row_height   [expr $sdr_vert_height + (0.5*$grid_height) + \
                         ($vcache_array_height+(0.5*$grid_height))*2 + \
                         ($tile_array_height+(0.5*$grid_height))*4 + \
-                        $sdr_north_south_height + (1*$grid_height)]
+                        $sdr_vert_height + (1*$grid_height)]
 
 
 puts "BSG-info: Completed script [info script]\n"

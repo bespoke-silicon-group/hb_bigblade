@@ -1,3 +1,5 @@
+set HB_NUM_PODS_X_P         1
+
 set HB_NUM_TILES_X_P        16
 set HB_NUM_TILES_Y_P        8
 

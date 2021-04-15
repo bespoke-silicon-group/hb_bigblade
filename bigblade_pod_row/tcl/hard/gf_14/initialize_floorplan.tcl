@@ -6,6 +6,6 @@ initialize_floorplan \
   -control_type core \
   -coincident_boundary true \
   -shape R \
-  -side_length "$pod_width $pod_height"
+  -side_length "$pod_row_width $pod_row_height"
 
 puts "BSG-info: Completed script [info script]\n"

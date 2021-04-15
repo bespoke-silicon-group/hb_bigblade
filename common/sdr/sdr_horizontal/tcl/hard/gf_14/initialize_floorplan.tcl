@@ -7,7 +7,7 @@ initialize_floorplan \
   -control_type core \
   -coincident_boundary true \
   -shape R \
-  -side_length [list $sdr_east_west_width $sdr_east_west_height]
+  -side_length [list $sdr_horiz_width $sdr_horiz_height]
 
 
 
