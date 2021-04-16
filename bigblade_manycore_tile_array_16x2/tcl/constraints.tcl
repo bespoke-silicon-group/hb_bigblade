@@ -7,7 +7,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constan
 # ==========================================================
 
 set manycore_clk_name             "manycore_clk"
-set manycore_clk_port             "clk_i"
+set manycore_clk_port             "clk_i*"
 set manycore_clk_period_ps        1000.0
 set manycore_clk_uncertainty_ps   20
 
