@@ -15,7 +15,7 @@ package bsg_chip_pkg;
   parameter hb_addr_width_gp   = 28; // word addr
   parameter hb_data_width_gp   = 32;
 
-  parameter hb_num_pods_x_gp   = 1;
+  parameter hb_num_pods_x_gp   = 4;
   parameter hb_num_pods_y_gp   = 4;
 
   parameter hb_num_subarray_x_gp = 1;
