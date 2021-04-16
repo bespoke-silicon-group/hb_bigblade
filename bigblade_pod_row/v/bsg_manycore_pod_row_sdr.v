@@ -194,6 +194,8 @@ module bsg_manycore_pod_row_sdr
     ,.wh_len_width_p      (wh_len_width_gp)
 
     ,.num_pods_x_p        (hb_num_pods_x_gp)
+
+    ,.num_clk_ports_p     (2)
   ) podrow (
     .clk_i              (core_clk)
     ,.reset_i           (pod_reset_li)
