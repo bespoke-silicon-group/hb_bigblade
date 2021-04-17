@@ -18,5 +18,6 @@ set TOPLEVEL_PARAMETERS [join "
   subarray_num_tiles_x_p=16
   subarray_num_tiles_y_p=2
   ruche_factor_X_p=3
+  num_clk_ports_p=2
 "]
 
