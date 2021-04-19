@@ -104,21 +104,21 @@ for {set i 0} {$i < 6} {incr i} {
 # FIFO output constraints
 for {set i 0} {$i < 2} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    405   -80
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -95
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     300   -50
   constraint_input_ports  $clk_name $rev_ready_in_ports($i)     535   -70
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    435   -80
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -95
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     300   -50
   constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     500   -70
 }
 
 for {set i 2} {$i < 4} {incr i} {
   constraint_output_ports $clk_name $rev_valid_out_ports($i)    490   -80
-  constraint_output_ports $clk_name $rev_data_out_ports($i)     150   -95
+  constraint_output_ports $clk_name $rev_data_out_ports($i)     250   -55
   constraint_input_ports  $clk_name $rev_ready_in_ports($i)     540   -70
 
   constraint_output_ports $clk_name $fwd_valid_out_ports($i)    460   -80
-  constraint_output_ports $clk_name $fwd_data_out_ports($i)     155   -95
+  constraint_output_ports $clk_name $fwd_data_out_ports($i)     255   -55
   constraint_input_ports  $clk_name $fwd_ready_in_ports($i)     510   -70
 }
 
