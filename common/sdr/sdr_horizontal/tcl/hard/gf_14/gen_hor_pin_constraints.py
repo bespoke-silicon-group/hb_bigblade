@@ -17,7 +17,7 @@ layermap = {}
 Y_OFFSET = 0
 curr_layer = "K1"
 
-with open("../../../../common/manycore_tile_pin_y.csv") as f:
+with open("../../../../../manycore_tile_pin_y.csv") as f:
   for line in f.readlines():
     stripped = line.strip()
     
@@ -25,11 +25,7 @@ with open("../../../../common/manycore_tile_pin_y.csv") as f:
     key = words[0]
     yval = float(words[1]) + Y_OFFSET
     ymap[key] = yval
-    layermap[key] = curr_layer
-    if curr_layer == "K1":
-      curr_layer = "K3"
-    else:
-      curr_layer = "K1"
+    layermap[key] = words[2]
 
 HB_LINK_WIDTH_P = 154
 HB_RUCHE_LINK_WIDTH_P = 140
@@ -49,7 +45,8 @@ for i in range(HB_RUCHE_LINK_WIDTH_P):
 
   # ruche link
   port = "core_ruche_link_{}[{}]".format(hb_port_o, i)
-  key = "ruche_link_o[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+i)
+  ruche_idx = i if east_not_west==1 else (2*HB_RUCHE_LINK_WIDTH_P)+i
+  key = "ruche_link_o[{}]".format(ruche_idx)
   place_pin(port, key, hb_link_x_loc)
 
 for i in range(HB_RUCHE_LINK_WIDTH_P, HB_LINK_WIDTH_P):
@@ -68,7 +65,8 @@ for i in range(HB_RUCHE_LINK_WIDTH_P):
 
   # ruche link
   port = "core_ruche_link_{}[{}]".format(hb_port_i, i)
-  key = "ruche_link_i[{}]".format((2*HB_RUCHE_LINK_WIDTH_P)+i)
+  ruche_idx = i if east_not_west==1 else (2*HB_RUCHE_LINK_WIDTH_P)+i
+  key = "ruche_link_i[{}]".format(ruche_idx)
   place_pin(port, key, hb_link_x_loc)
 
 

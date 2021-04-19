@@ -44,7 +44,7 @@ for {set x 0} {$x < [expr $HB_SUBARRAY_NUM_TILES_X_P]} {incr x} {
 
   # right side
   set urx [expr $llx+$vcache_x_space]
-  set llx [expr $urx - (0.084*46)]
+  set llx [expr $urx - (0.084*38)]
   set boundary [list [list $llx $lly] [list $urx $ury]]
   create_placement_blockage -boundary $boundary -type hard -name "vc_rp_${x}_right"
 }

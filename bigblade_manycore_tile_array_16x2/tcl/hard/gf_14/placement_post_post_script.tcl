@@ -21,11 +21,17 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
     set search_bbox [list [list $llx $lly] [list $urx $ury]]
     set search_bbox [bsg_expand_bbox $search_bbox 0.01]
 
+
+    if {$x == [expr $HB_SUBARRAY_NUM_TILES_X_P-1]} {
+      set tapx [expr $tile_array_width-1.176]
+    } else {
+      set tapx [expr $llx+$TAPCELL_X_OFFSET]
+    }
     set tap_cells [get_cells -filter "name=~tapfiller*" -within $search_bbox]
     foreach_in_collection tap_cell $tap_cells {
       set_attribute $tap_cell -name physical_status -value placed
       set tap_cell_y [get_attribute $tap_cell boundary_bounding_box.ll_y]
-      move_objects $tap_cell -x [expr $llx+$TAPCELL_X_OFFSET] -y $tap_cell_y
+      move_objects $tap_cell -x $tapx -y $tap_cell_y
       set_attribute $tap_cell -name physical_status -value fixed
     }
   }
@@ -48,8 +54,13 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
     create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_left"
 
     # right side of buffer
-    set urx [expr $llx+$tile_x_space]
-    set llx [expr $urx - (0.084*33)]
+    if {$x == [expr $HB_SUBARRAY_NUM_TILES_X_P-1]} {
+      set urx [expr $tile_array_width]
+      set llx [expr $urx - (0.084*25)]
+    } else {
+      set urx [expr $llx+$tile_x_space]
+      set llx [expr $urx - (0.084*25)]
+    }
     set boundary [list [list $llx $lly] [list $urx $ury]]
     create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_right"
   }
