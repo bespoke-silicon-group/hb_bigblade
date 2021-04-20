@@ -22,13 +22,20 @@ set_clock_uncertainty $manycore_clk_uncertainty_ps [get_clocks $manycore_clk_nam
 
 
 # pod tag
-create_clock -period 5000 -name "pod_tag_clk" [get_ports "pod_tags_i[0]\[clk\]"]
+set pod_tag_clk_ports [list]
+for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
+  append_to_collection pod_tag_clk_ports [get_ports "pod_tags_i[${i}]\[clk\]"]
+}
+create_clock -period 5000 -name "pod_tag_clk" $pod_tag_clk_ports
 set_clock_uncertainty 20 [get_clocks "pod_tag_clk"]
 set_input_transition 50 [get_ports "pod_tags_i[0]\[clk\]"]
+
 set tag_ports [list]
-append_to_collection tag_ports [get_ports "pod_tags_i[0]\[op\]"]
-append_to_collection tag_ports [get_ports "pod_tags_i[0]\[param\]"]
-append_to_collection tag_ports [get_ports "pod_tags_i[0]\[en\]"]
+for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
+  append_to_collection tag_ports [get_ports "pod_tags_i[${i}]\[op\]"]
+  append_to_collection tag_ports [get_ports "pod_tags_i[${i}]\[param\]"]
+  append_to_collection tag_ports [get_ports "pod_tags_i[${i}]\[en\]"]
+}
 set_input_delay -max 200 -clock "pod_tag_clk" $tag_ports
 set_input_delay -min 200 -clock "pod_tag_clk" $tag_ports
 set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $tag_ports

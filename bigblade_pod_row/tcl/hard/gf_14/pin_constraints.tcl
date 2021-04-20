@@ -18,15 +18,26 @@ append_to_collection matching_ports [get_ports "io_wh_*"]
 bsg_create_macro_matching_ports $matching_ports false
 
 ### place unmatch ports
+
+# pod tags
+for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
+  set pod_tag_ports [list]
+  for {set j 0} {$j < 4} {incr j} {
+    set idx [expr (4*$i)+$j]
+    append_to_collection pod_tag_ports [get_ports "pod_tags_i[$idx]"]
+  }
+  set x_offset [expr ($grid_width*4) + ($i*$grid_width*177) + ($tile_array_width/2)]
+  bsg_pins_line_constraint $pod_tag_ports {K2} top $x_offset self
+}
+
+
+# clk gen
 set unset_ports [list]
 append_to_collection unset_ports [get_ports "ext_clk_i"]
 append_to_collection unset_ports [get_ports "*_tag_lines_i*"]
 append_to_collection unset_ports [get_ports "async_output_disable_i"]
-append_to_collection unset_ports [get_ports "pod_tags_i"]
 
 bsg_pins_line_constraint $unset_ports {K2} top [expr ([die_width] / 2.0) - ($tile_x_space / 2.0) - 1] self
-
-
 
 
 

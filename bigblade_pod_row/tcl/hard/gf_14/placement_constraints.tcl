@@ -4,7 +4,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 set_app_options -name plan.place.auto_generate_blockages -value false
 
 # Uncomment if you are sourcing this file many times interactively.
-set_fixed_objects -unfix [get_flat_cells]
+#set_fixed_objects -unfix [get_flat_cells]
 
 
 # pod offset
@@ -92,17 +92,19 @@ move_object $sdr_ne_cell -x [expr $pod_row_width-$sdr_corner_east_width] -y $y
 set_fixed_objects $sdr_nw_cell
 set_fixed_objects $sdr_ne_cell
 
-return
+#return
 #remove_bounds -all
 
 # bsg tag client bound
-set llx [expr ($pod_row_width/2)]
-set lly [expr $pod_row_height - $grid_height]
-set urx [expr ($pod_row_width/2)+$grid_width]
-set ury $pod_row_height
-create_bound -name "tag_bound" -boundary [list [list $llx $lly] [list $urx $ury]] -type hard
-add_to_bound "tag_bound" [get_flat_cells "tx_0__btc/*"]
-
+for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
+  
+  set llx [expr ($grid_width*4) + ($i*$grid_width*177) + ($tile_array_width/2)]
+  set lly [expr $pod_row_height - $grid_height]
+  set urx [expr $llx+$grid_width]
+  set ury $pod_row_height
+  create_bound -name "tag_bound_${i}" -boundary [list [list $llx $lly] [list $urx $ury]] -type hard
+  add_to_bound "tag_bound_${i}" [get_flat_cells "tx_${i}__btc/*"]
+}
 
 # reset dff bound
 set llx 0
