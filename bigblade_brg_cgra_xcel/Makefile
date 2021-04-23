@@ -33,13 +33,13 @@ bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(BITBUCKET)taylor-bsg/bsg_packaging
 bsg_packaging_commit :=master
 
-brg_cgra_xcel_dir    :=$(THIS_DIR)/brg_cgra_xcel
-brg_cgra_xcel_url    :=$(GITHUB)cornell-brg/bsg_manycore
-brg_cgra_xcel_commit :=tapeout_bigblade
-
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
+
+hardfloat_dir        :=$(THIS_DIR)/HardFloat
+hardfloat_url        :=$(GITHUB)bsg-external/HardFloat
+hardfloat_commit     :=master
 
 prep_dir := .pdk_prep
 
