@@ -14,6 +14,15 @@ set bsg_padmapping    $::env(BSG_PADMAPPING)
 
 set brg_cgra_xcel_dir $bsg_designs_target_dir/brg_cgra_xcel
 set hardfloat_dir     $bsg_designs_target_dir/HardFloat
+set bigblade_dir      $bsg_designs_target_dir/..
+
+#set TOPLEVEL_PARAMETERS [join "
+#    addr_width_p=28
+#    data_width_p=32
+#    x_cord_width_p=7
+#    y_cord_width_p=7
+#    max_out_credits_p=32
+#"]
 
 set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
@@ -21,7 +30,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
-  $basejump_stl_dir/v/bsg_manycore_pkg.v
+  $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
   $basejump_stl_dir/bsg_misc/bsg_less_than.v
   $basejump_stl_dir/bsg_misc/bsg_reduce.v
@@ -161,8 +170,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
   
-  $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
-  $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
   $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
   $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
   
@@ -174,10 +181,10 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
 
-  $bsg_manycore_dir/v/brg_cgra_xcel/SramWrapper.v
-  $bsg_manycore_dir/v/brg_cgra_xcel/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
-  $bsg_manycore_dir/v/brg_cgra_xcel/brg_8x8_cgra_xcel.v
-  $bsg_manycore_dir/v/brg_cgra_xcel/brg_cgra_pod.v
+  $bsg_designs_target_dir/v/hard/gf_14/sram/SramWrapper.v
+  $bsg_designs_target_dir/v/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
+  $bsg_designs_target_dir/v/brg_8x8_cgra_xcel.v
+  $bsg_designs_target_dir/v/brg_cgra_pod.v
 
 "]
 
