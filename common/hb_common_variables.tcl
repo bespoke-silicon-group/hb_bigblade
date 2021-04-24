@@ -77,6 +77,9 @@ set  sdr_horiz_height          [expr $grid_height*32.5]
 set  sdr_vert_width    [expr $grid_width*10.5]
 set  sdr_vert_height   [expr $grid_height*3.5]
 
+set  sdr_vert_row_width   [expr $grid_width*176.5]
+set  sdr_vert_row_height  [expr $grid_height*3.75]
+
 set  sdr_corner_east_width          [expr $grid_width*3.5]
 set  sdr_corner_west_width          [expr $grid_width*3.75]
 set  sdr_corner_height              [expr $grid_height*25.5]

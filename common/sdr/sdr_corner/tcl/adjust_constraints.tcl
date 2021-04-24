@@ -106,8 +106,11 @@ constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
 constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
 
 # global coordinates
-constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 800 40
-constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 800 -75
+#constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 800 40
+#constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 800 -75
+set_false_path -from [get_ports "core_global_*_i*"]
+set_false_path -to   [get_ports "core_global_*_o*"]
+
 
 
 

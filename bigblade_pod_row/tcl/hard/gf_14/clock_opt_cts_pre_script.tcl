@@ -4,6 +4,9 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 
 set_app_options -name clock_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
+set_app_options -name clock_opt.flow.enable_ccd -value false
+set_app_options -name cts.common.enable_auto_skew_target_for_local_skew -value false
+
 
 create_routing_rule "bsg_cts_2w2s"  \
   -default_reference_rule       \
@@ -24,21 +27,22 @@ create_routing_rule "bsg_cts_2w2s"  \
 set_clock_routing_rules         \
   -net_type root                \
   -rule "bsg_cts_2w2s"          \
-  -min_routing_layer "M2"       \
+  -min_routing_layer "K1"       \
   -max_routing_layer "K4"
 
 set_clock_routing_rules         \
   -net_type internal            \
   -rule "bsg_cts_2w2s"          \
-  -min_routing_layer "M2"       \
+  -min_routing_layer "K1"       \
   -max_routing_layer "K4"
 
 set_clock_routing_rules         \
   -net_type sink                \
   -rule "bsg_cts_2w2s"          \
-  -min_routing_layer "M2"       \
+  -min_routing_layer "K1"       \
   -max_routing_layer "K4"
 
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree2.tcl
 
 # set balance points
 #set vcache_clk_pins [get_pins "podrow/px_*__pod/*_vc_x_*__*_vc_row/clk_i"]

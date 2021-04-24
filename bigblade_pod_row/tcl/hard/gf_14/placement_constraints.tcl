@@ -13,14 +13,10 @@ set pod_offset_y [expr $sdr_vert_height + ($grid_height*0.5)]
 
 # SOUTH SDRS
 for {set p 0} {$p < $HB_NUM_PODS_X_P} {incr p} {
-  set start_x [expr $pod_offset_x + ($tile_array_width+($grid_width*0.5))*$p]
-  for {set i 0} {$i < $HB_NUM_TILES_X_P} {incr i} {
-    set idx [expr $i + ($p*$HB_NUM_TILES_X_P)]
-    set sdr_cell [get_cells "sdr_s_x_${idx}__sdr_s"]
-    set x [expr $start_x + ($i*($sdr_vert_width+($grid_width*0.5)))]
-    move_object $sdr_cell -x $x -y 0
-    set_fixed_objects $sdr_cell
-  }
+  set x [expr $pod_offset_x + ($tile_array_width+($grid_width*0.5))*$p]
+  set sdr_cell [get_cells "sdr_s_x_${p}__sdr_s"]
+  move_object $sdr_cell -x $x -y 0
+  set_fixed_objects $sdr_cell
 }
 
 
@@ -51,14 +47,10 @@ for {set j 0} {$j < $HB_NUM_PODS_X_P} {incr j} {
 # NORTH SDRS
 set y [expr $y + $vcache_array_height + (0.5*$grid_height)]
 for {set p 0} {$p < $HB_NUM_PODS_X_P} {incr p} {
-  set start_x [expr $pod_offset_x + ($tile_array_width+($grid_width*0.5))*$p]
-  for {set i 0} {$i < $HB_NUM_TILES_X_P} {incr i} {
-    set idx [expr $i + ($p*$HB_NUM_TILES_X_P)]
-    set sdr_cell [get_cells "sdr_n_x_${idx}__sdr_n"]
-    set x [expr $start_x + ($i*($sdr_vert_width+($grid_width*0.5)))]
-    move_object $sdr_cell -x $x -y $y
-    set_fixed_objects $sdr_cell
-  }
+  set x [expr $pod_offset_x + ($tile_array_width+($grid_width*0.5))*$p]
+  set sdr_cell [get_cells "sdr_n_x_${p}__sdr_n"]
+  move_object $sdr_cell -x $x -y $y
+  set_fixed_objects $sdr_cell
 }
 
 
@@ -98,7 +90,7 @@ set_fixed_objects $sdr_ne_cell
 # bsg tag client bound
 for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
   
-  set llx [expr ($grid_width*4) + ($i*$grid_width*177) + ($tile_array_width/2)]
+  set llx [expr ($grid_width*4) + ($i*$grid_width*177)]
   set lly [expr $pod_row_height - $grid_height]
   set urx [expr $llx+$grid_width]
   set ury $pod_row_height
@@ -107,12 +99,15 @@ for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
 }
 
 # reset dff bound
-set llx 0
-set lly [expr $pod_row_height-($grid_height/4)]
-set urx $pod_row_width
-set ury $pod_row_height
-create_bound -name "reset_dff_bound" -boundary [list [list $llx $lly] [list $urx $ury]] -type soft
-add_to_bound "reset_dff_bound" [get_flat_cells "tx_0__reset_dff/*"]
+#for {set i 0} { $i < $HB_NUM_PODS_X_P} {incr i} {
+#  set llx [get_attribute [get_cells "podrow/px_${i}__pod/north_vc_x_0__north_vc_row"] boundary_bounding_box.ll_x]
+#  set urx [get_attribute [get_cells "podrow/px_${i}__pod/north_vc_x_0__north_vc_row"] boundary_bounding_box.ur_x]
+#  set ury $pod_row_height
+#  set lly [expr $ury - ($grid_height/2)]
+#  create_bound -name "reset_dff_bound_${i}" -boundary [list [list $llx $lly] [list $urx $ury]] -type hard
+#  add_to_bound "reset_dff_bound_${i}" [get_flat_cells "tx_*__reset_dff/*"]
+#}
+
 
 
 
