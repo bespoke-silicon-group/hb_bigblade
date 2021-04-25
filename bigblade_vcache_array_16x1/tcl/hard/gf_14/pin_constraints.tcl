@@ -17,9 +17,9 @@ for {set i 0} {$i < [expr $HB_WH_LINK_WIDTH_P*$HB_WH_RUCHE_FACTOR_P]} {incr i} {
 }
 
 bsg_create_macro_matching_ports $match_ports true
-#set_individual_pin_constraints -ports [get_ports clk_i] -allowed_layers K4 -location "[expr ([die_width] / 2.0) - ($tile_x_space / 2.0) + 1.750] [die_ury]"
-set_individual_pin_constraints -ports [get_ports clk_i[0]] -allowed_layers K4 -location "[expr 0.128*4584] [die_ury]"
-set_individual_pin_constraints -ports [get_ports clk_i[1]] -allowed_layers K4 -location "[expr 0.128*13824] [die_ury]"
+set_individual_pin_constraints -ports [get_ports clk_i] -allowed_layers K4 -location "[expr 0.128*9225] [die_ury]"
+#set_individual_pin_constraints -ports [get_ports clk_i[0]] -allowed_layers K4 -location "[expr 0.128*4584] [die_ury]"
+#set_individual_pin_constraints -ports [get_ports clk_i[1]] -allowed_layers K4 -location "[expr 0.128*13824] [die_ury]"
 
 
 

@@ -21,6 +21,6 @@ set TOPLEVEL_PARAMETERS [join "
   num_tiles_x_p=16
   num_tiles_y_p=8
   subarray_num_tiles_x_p=16
-  num_clk_ports_p=2
 "]
 
+  #num_clk_ports_p=2

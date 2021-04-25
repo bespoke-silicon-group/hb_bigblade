@@ -88,15 +88,6 @@ set_fixed_objects $sdr_ne_cell
 #remove_bounds -all
 
 # bsg tag client bound
-for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
-  
-  set llx [expr ($grid_width*4) + ($i*$grid_width*177)]
-  set lly [expr $pod_row_height - $grid_height]
-  set urx [expr $llx+$grid_width]
-  set ury $pod_row_height
-  create_bound -name "tag_bound_${i}" -boundary [list [list $llx $lly] [list $urx $ury]] -type hard
-  add_to_bound "tag_bound_${i}" [get_flat_cells "tx_${i}__btc/*"]
-}
 
 # reset dff bound
 #for {set i 0} { $i < $HB_NUM_PODS_X_P} {incr i} {

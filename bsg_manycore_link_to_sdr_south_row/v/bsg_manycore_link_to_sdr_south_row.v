@@ -17,13 +17,10 @@ module bsg_manycore_link_to_sdr_south_row
     , parameter lg_fifo_depth_p="inv"
     , parameter lg_credit_to_token_decimation_p="inv"
 
-    , parameter num_clk_ports_p=2
+    , parameter num_clk_ports_p=1
   )
   (
     input [num_clk_ports_p-1:0] core_clk_i
-    , input core_reset_i
-    , output [num_tiles_x_p-1:0] core_reset_ver_o
-    , output core_reset_o
 
     , input  [num_tiles_x_p-1:0][x_cord_width_p-1:0] core_global_x_i
     , input  [num_tiles_x_p-1:0][y_cord_width_p-1:0] core_global_y_i
@@ -65,8 +62,8 @@ module bsg_manycore_link_to_sdr_south_row
   );
 
 
-  logic [num_tiles_x_p-1:0]       core_reset_li;
-  logic [num_tiles_x_p-1:0][1:0]  core_reset_lo;
+  //logic [num_tiles_x_p-1:0]       core_reset_li;
+  //logic [num_tiles_x_p-1:0][1:0]  core_reset_lo;
 
   logic [num_tiles_x_p-1:0] async_uplink_reset_li;
   logic [num_tiles_x_p-1:0] async_downlink_reset_li;
@@ -90,8 +87,8 @@ module bsg_manycore_link_to_sdr_south_row
 
     ) sdr_n (
       .core_clk_i                 (core_clk_i[x/(num_tiles_x_p/num_clk_ports_p)])
-      ,.core_reset_i              (core_reset_li[x])
-      ,.core_reset_o              (core_reset_lo[x])
+      ,.core_reset_i              (1'b0)
+      ,.core_reset_o              ()
 
       ,.core_global_x_i           (core_global_x_i[x])
       ,.core_global_y_i           (core_global_y_i[x])
@@ -134,7 +131,6 @@ module bsg_manycore_link_to_sdr_south_row
     );
 
     if (x == 0) begin
-      assign core_reset_li[x] = core_reset_i;
       assign async_uplink_reset_li[x] = async_uplink_reset_i;
       assign async_downlink_reset_li[x] = async_downlink_reset_i;
       assign async_downstream_reset_li[x] = async_downstream_reset_i;
@@ -142,7 +138,6 @@ module bsg_manycore_link_to_sdr_south_row
     end
   
     if (x > 0) begin
-      assign core_reset_li[x] = core_reset_lo[x-1][1];
       assign async_uplink_reset_li[x] = async_uplink_reset_lo[x-1];
       assign async_downlink_reset_li[x] = async_downlink_reset_lo[x-1];
       assign async_downstream_reset_li[x] = async_downstream_reset_lo[x-1];
@@ -150,14 +145,11 @@ module bsg_manycore_link_to_sdr_south_row
     end
 
     if (x == num_tiles_x_p-1) begin
-      assign core_reset_o = core_reset_lo[x][1];
       assign async_uplink_reset_o = async_uplink_reset_lo[x];
       assign async_downlink_reset_o = async_downlink_reset_lo[x];
       assign async_downstream_reset_o = async_downstream_reset_lo[x];
       assign async_token_reset_o = async_token_reset_lo[x];
     end
-
-    assign core_reset_ver_o[x] = core_reset_lo[x][0];
 
   end
 

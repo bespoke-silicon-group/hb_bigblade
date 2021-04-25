@@ -130,13 +130,14 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset port
-constraint_input_ports  $clk_name $reset_in_port  0 40
-constraint_output_ports $clk_name $reset_out_port 0 40
+constraint_input_ports  $clk_name $reset_in_port  500 40
+constraint_output_ports $clk_name $reset_out_port 500 40
 
 
-constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
-constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
-
+#constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
+#constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
+set_false_path -from [get_ports global_*_i*]
+set_false_path -to   [get_ports global_*_o*]
 
 
 # ungrouping

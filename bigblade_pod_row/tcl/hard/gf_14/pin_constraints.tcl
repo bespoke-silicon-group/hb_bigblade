@@ -14,21 +14,11 @@ append_to_collection matching_ports [get_ports "ver_sdr_async_*_reset_i"]
 append_to_collection matching_ports [get_ports "ver_io_*"]
 append_to_collection matching_ports [get_ports "hor_io_*"]
 append_to_collection matching_ports [get_ports "io_wh_*"]
+append_to_collection matching_ports [get_ports "pod_tags*"]
 
 bsg_create_macro_matching_ports $matching_ports false
 
 ### place unmatch ports
-
-# pod tags
-for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
-  set pod_tag_ports [list]
-  for {set j 0} {$j < 4} {incr j} {
-    set idx [expr (4*$i)+$j]
-    append_to_collection pod_tag_ports [get_ports "pod_tags_i[$idx]"]
-  }
-  set x_offset [expr ($grid_width*4) + ($i*$grid_width*177)]
-  bsg_pins_line_constraint $pod_tag_ports {K2} top $x_offset self
-}
 
 
 # clk gen

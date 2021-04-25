@@ -23,7 +23,6 @@ append_to_collection input_ports [get_ports "reset_i*"]
 append_to_collection input_ports [get_ports "hor_link_sif_i*"]
 append_to_collection input_ports [get_ports "ver_link_sif_i*"]
 append_to_collection input_ports [get_ports "ruche_link_i*"]
-append_to_collection input_ports [get_ports "global_*_i*"]
 set_input_delay -max 0    -clock $manycore_clk_name $input_ports
 set_input_delay -min 200  -clock $manycore_clk_name $input_ports
 set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $input_ports
@@ -39,7 +38,6 @@ append_to_collection output_ports [get_ports "reset_o*"]
 append_to_collection output_ports [get_ports "hor_link_sif_o*"]
 append_to_collection output_ports [get_ports "ver_link_sif_o*"]
 append_to_collection output_ports [get_ports "ruche_link_o*"]
-append_to_collection output_ports [get_ports "global_*_o*"]
 set_output_delay -max 0   -clock $manycore_clk_name $output_ports
 set_output_delay -min 200 -clock $manycore_clk_name $output_ports
 set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $output_ports
@@ -65,5 +63,9 @@ set_dont_touch [get_nets -of [get_pins -of $hard_buf_cells -filter "name==Z"]] t
 
 set_dont_touch [get_nets -of [get_ports "ruche_link_*"]] true
 set_dont_touch [get_nets -of [get_pins "*tile/ruche_link_*"]] true
+
+set_false_path -from [get_ports "global_*_i*"]
+set_false_path -to [get_ports "global_*_o*"]
+
 
 puts "BSG-info: Completed script [info script]\n"

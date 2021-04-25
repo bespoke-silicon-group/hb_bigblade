@@ -1,6 +1,9 @@
 
 set_app_options -name clock_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
+set_app_options -name clock_opt.flow.enable_ccd -value false
+set_app_options -name cts.common.enable_auto_skew_target_for_local_skew -value false
+
 
 
 create_routing_rule "bsg_cts_2w2s"  \

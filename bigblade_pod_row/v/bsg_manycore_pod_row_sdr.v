@@ -15,6 +15,8 @@ module bsg_manycore_pod_row_sdr
       `bsg_manycore_return_packet_width(hb_x_cord_width_gp,hb_y_cord_width_gp,hb_data_width_gp)
 
     ,  parameter total_num_tiles_x_lp=(hb_num_pods_x_gp*hb_num_tiles_x_gp)
+
+    , parameter num_clk_ports_p=1
   )
   (
     // clk gen
@@ -123,24 +125,6 @@ module bsg_manycore_pod_row_sdr
   //);
 
 
-  // BSG_TAG CLIENT
-  logic [hb_num_pods_x_gp-1:0] core_reset_lo;
-
-  for (genvar x = 0; x < hb_num_pods_x_gp; x++) begin: tx
-    bsg_tag_client #(
-      .width_p(1)
-      ,.default_p(0)
-    ) btc (
-      .bsg_tag_i(pod_tags_i[x])
-      ,.recv_clk_i(core_clk)
-      ,.recv_reset_i(1'b0)
-      ,.recv_new_r_o()
-      ,.recv_data_r_o(core_reset_lo[x])
-    );
-
-  end
-
-
   // POD array
   logic [hb_num_pods_x_gp-1:0][hb_num_tiles_x_gp-1:0] pod_reset_li;
   logic [hb_num_pods_x_gp-1:0][hb_num_tiles_x_gp-1:0][hb_x_cord_width_gp-1:0] pod_global_x_li;
@@ -186,7 +170,7 @@ module bsg_manycore_pod_row_sdr
 
     ,.num_pods_x_p        (hb_num_pods_x_gp)
 
-    ,.num_clk_ports_p     (2)
+    ,.num_clk_ports_p     (num_clk_ports_p)
   ) podrow (
     .clk_i              (core_clk)
     ,.reset_i           (pod_reset_li)
@@ -226,9 +210,15 @@ module bsg_manycore_pod_row_sdr
       ,.y_cord_width_p                  (hb_y_cord_width_gp)
       ,.addr_width_p                    (hb_addr_width_gp)
       ,.data_width_p                    (hb_data_width_gp)
+      ,.num_clk_ports_p(num_clk_ports_p)
     ) sdr_n (
-      .core_clk_i                 ({2{core_clk}})
-      ,.core_reset_i              (core_reset_lo[x]) // from bsg_tag
+      .core_clk_i                 ({num_clk_ports_p{core_clk}})
+    
+      ,.pod_tags_i_clk_                (pod_tags_i[x].clk)
+      ,.pod_tags_i_op_                (pod_tags_i[x].op)
+      ,.pod_tags_i_param_                (pod_tags_i[x].param)
+      ,.pod_tags_i_en_                (pod_tags_i[x].en)
+    
       ,.core_reset_o              (sdr_n_core_reset_lo[x])
       ,.core_reset_ver_o          (sdr_n_core_reset_ver_lo[x])
 
@@ -309,11 +299,9 @@ module bsg_manycore_pod_row_sdr
       ,.y_cord_width_p      (hb_y_cord_width_gp)
       ,.addr_width_p        (hb_addr_width_gp)
       ,.data_width_p        (hb_data_width_gp)
+      ,.num_clk_ports_p(num_clk_ports_p)
     ) sdr_s (
-      .core_clk_i({2{core_clk}})
-      ,.core_reset_i('0)
-      ,.core_reset_o()
-      ,.core_reset_ver_o()
+      .core_clk_i({num_clk_ports_p{core_clk}})
 
       ,.core_global_x_i('0)
       ,.core_global_y_i('0)
@@ -568,7 +556,7 @@ module bsg_manycore_pod_row_sdr
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_nw (
     .core_clk_i         (core_clk)
-    ,.core_reset_i      (core_reset_lo[0])
+    ,.core_reset_i      (sdr_n_core_reset_lo[0])
     ,.core_reset_o      (sdr_w_core_reset_li[0])
 
     ,.core_global_x_i   (global_x_i[0])
@@ -637,7 +625,7 @@ module bsg_manycore_pod_row_sdr
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_ne (
     .core_clk_i         (core_clk)
-    ,.core_reset_i      (sdr_n_core_reset_lo[hb_num_pods_x_gp-1])
+    ,.core_reset_i      (sdr_n_core_reset_ver_lo[hb_num_pods_x_gp-1][hb_num_tiles_x_gp-1])
     ,.core_reset_o      (sdr_e_core_reset_li[0])
 
     ,.core_global_x_i   (global_x_i[2+total_num_tiles_x_lp-1])

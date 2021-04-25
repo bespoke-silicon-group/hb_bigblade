@@ -25,6 +25,18 @@ set SVERILOG_INCLUDE_PATHS [join "
 
 set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
+
+  $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
+  $basejump_stl_dir/bsg_async/bsg_sync_sync.v
+  $basejump_stl_dir/bsg_misc/bsg_buf.v
+  $basejump_stl_dir/bsg_misc/bsg_dff.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_chain.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_reset_en.v
+  $basejump_stl_dir/bsg_misc/bsg_inv.v
+  $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client.v
+
 
   $bsg_designs_target_dir/v/bsg_manycore_link_to_sdr_north_row.v
 "]

@@ -44,30 +44,5 @@ set_clock_routing_rules         \
 
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree2.tcl
 
-# set balance points
-#set vcache_clk_pins [get_pins "podrow/px_*__pod/*_vc_x_*__*_vc_row/clk_i"]
-#set_clock_balance_points -early -consider_for_balancing true -delay 166 -corners ffpg_0p88v_125c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 192 -corners ffpg_0p88v_125c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -early -consider_for_balancing true -delay 153 -corners ffpg_0p88v_m40c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 177 -corners ffpg_0p88v_m40c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -early -consider_for_balancing true -delay 300 -corners sspg_0p72v_125c_sigcmax -balance_points $vcache_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 337 -corners sspg_0p72v_125c_sigcmax -balance_points $vcache_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners ffpg_0p88v_125c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners ffpg_0p88v_m40c_sigcmin -balance_points $vcache_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners sspg_0p72v_125c_sigcmax -balance_points $vcache_clk_pins
-
-#set tile_clk_pins [get_pins "podrow/px_*__pod/mc_y_*__mc_x_*__mc/clk_i"]
-#set_clock_balance_points -early -consider_for_balancing true -delay 209 -corners ffpg_0p88v_125c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 234 -corners ffpg_0p88v_125c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -early -consider_for_balancing true -delay 188 -corners ffpg_0p88v_m40c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 208 -corners ffpg_0p88v_m40c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -early -consider_for_balancing true -delay 379 -corners sspg_0p72v_125c_sigcmax -balance_points $tile_clk_pins
-#set_clock_balance_points -late  -consider_for_balancing true -delay 417 -corners sspg_0p72v_125c_sigcmax -balance_points $tile_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners ffpg_0p88v_125c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners ffpg_0p88v_m40c_sigcmin -balance_points $tile_clk_pins
-#set_clock_balance_points -clock manycore_clk -consider_for_balancing true -corners sspg_0p72v_125c_sigcmax -balance_points $tile_clk_pins
-
-# report
-#report_clock_balance_points
 
 puts "BSG-info: Completed script [info script]\n"
