@@ -1,15 +1,15 @@
 set bsg_cts_i 0
 
-proc bsg_create_clock_buffer {src x y  {invert 1} {stren 20}} {
+proc bsg_create_clock_buffer {src x y  {invert 1} {stren 20} {vt "SL"}} {
   global bsg_cts_i
   set rd_x [round_down_to_nearest $x 0.084]
   set rd_y [round_down_to_nearest $y 0.48]
 
   # create buffer cell
   if {$invert == 1} {
-    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14SL/SC7P5T_CKINVX${stren}_SSC14SL"
+    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14${vt}/SC7P5T_CKINVX${stren}_SSC14${vt}"
   } else {
-    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14SL/SC7P5T_CKBUFX${stren}_SSC14SL"
+    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14${vt}/SC7P5T_CKBUFX${stren}_SSC14${vt}"
   }
 
   set cell_name "bsg_cts_${bsg_cts_i}"
@@ -59,8 +59,8 @@ proc bsg_connect_sinks {src sinks} {
 }
 
 
-remove_cells [get_cells bsg_cts*]
-remove_nets [get_nets bsg_cts*]
+#remove_cells [get_cells bsg_cts*]
+#remove_nets [get_nets bsg_cts*]
 disconnect_net [get_net "ext_clk_i"] -all
 
 
@@ -374,5 +374,13 @@ bsg_connect_sinks $RS3R3 [get_pins "sdr_s_x_3__sdr_s/core_clk_i"]
 
 
 
-
+# BSG TAG
+set TAG0 [bsg_create_clock_buffer [get_ports "pod_tags_i[3]"]  2417 1870 0]
+bsg_connect_sinks $TAG0 [get_pins "sdr_n_x_0__sdr_n/pod_tags_i_clk_"]
+set TAG1 [bsg_create_clock_buffer [get_ports "pod_tags_i[7]"]  4796 1870 0]
+bsg_connect_sinks $TAG1 [get_pins "sdr_n_x_1__sdr_n/pod_tags_i_clk_"]
+set TAG2 [bsg_create_clock_buffer [get_ports "pod_tags_i[11]"] 7174 1870 0]
+bsg_connect_sinks $TAG2 [get_pins "sdr_n_x_2__sdr_n/pod_tags_i_clk_"]
+set TAG3 [bsg_create_clock_buffer [get_ports "pod_tags_i[15]"] 9553 1870 0]
+bsg_connect_sinks $TAG3 [get_pins "sdr_n_x_3__sdr_n/pod_tags_i_clk_"]
 
