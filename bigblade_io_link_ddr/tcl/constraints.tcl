@@ -119,6 +119,8 @@ bsg_chip_derate_mems
 
 # Disabled or false paths
 bsg_chip_disable_1r1w_paths {"*downstream/harden*fifo/*"}
+set_min_delay [expr -$osc_uncertainty_ps] -from ${io_clk_name}_osc_ds -to ${io_clk_name}_osc -ignore_clock_latency
+set_min_delay [expr -$osc_uncertainty_ps] -from ${tag_clk_name} -to ${io_clk_name}_osc -ignore_clock_latency
 
 puts "BSG-info: Completed script [info script]\n"
 
