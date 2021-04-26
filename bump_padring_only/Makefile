@@ -3,8 +3,8 @@ all: | bsg_cadenv bsg_packaging basejump_stl bsg_14
 
 bsg_cadenv:    commit=master
 bsg_packaging: commit=basejump_fcbga_785
-basejump_stl:  commit=619fd4d65122fe97251544c8729d48d02a1791cf
-bsg_14:        commit=90aa2e637760e9491a32119fd55b7b591bfea758
+basejump_stl:  commit=master
+bsg_14:        commit=master
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@

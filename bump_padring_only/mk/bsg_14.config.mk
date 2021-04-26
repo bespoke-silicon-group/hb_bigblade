@@ -30,6 +30,13 @@ export BSG_FLOW_STYLE := flat
 
 export BSG_FLOW_USE_DP := true
 
+# Determines if the flow should generate an ETM (ndm + db files) for the toplevel block. The primary
+# difference is that during PTSI, model extraction will be performed to generate .db files that can
+# be used in higher level of the hierarchy. Other aspects of the flow might also change to allow for
+# higher-level integration.
+
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM := false
+
 # Select the target package. Inside of bsg_packaging there are multiple packages to choose from that
 # determine the intended package for the ASIC.
 
