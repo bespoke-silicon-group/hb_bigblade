@@ -24,39 +24,53 @@ if __name__ == "__main__":
   tg.send(masters=0b1, client_id=5, data_not_reset=0, length=7, data=0b1111111)
   tg.send(masters=0b1, client_id=6, data_not_reset=0, length=2, data=0b11)
 
-  if len(sys.argv) == 2 and (sys.argv[1] == 'use_clk_gen' or sys.argv[1] == 'sweep_clk_gen'):
+  tg.send(masters=0b1, client_id=9, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=10, data_not_reset=0, length=5, data=0b11111)
+  tg.send(masters=0b1, client_id=11, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=12, data_not_reset=0, length=7, data=0b1111111)
+  tg.send(masters=0b1, client_id=13, data_not_reset=0, length=2, data=0b11)
 
-    # select zero output clk
-    tg.send(masters=0b1, client_id=6, data_not_reset=1, length=2, data=0b11)
+  if len(sys.argv) == 2 and (sys.argv[1] == 'use_clk_gen' or sys.argv[1] == 'sweep_clk_gen_io' or sys.argv[1] == 'sweep_clk_gen_noc'):
 
-    # reset oscillator and trigger flops
-    tg.send(masters=0b1, client_id=2, data_not_reset=1, length=1, data=0b1)
+    for sel in range(2):
+      id_offset = 0
+      if sel == 1:
+        id_offset = 7
 
-    # init trigger to low, init oscillator to zero
-    # OSC INIT VALUE MUST BE ZERO TO AVOID X IN SIMULATION
-    tg.send(masters=0b1, client_id=4, data_not_reset=1, length=1, data=0b0)
-    tg.send(masters=0b1, client_id=3, data_not_reset=1, length=5, data=0b00000)
+      # select zero output clk
+      tg.send(masters=0b1, client_id=6+id_offset, data_not_reset=1, length=2, data=0b11)
 
-    # take oscillator and trigger flops out of reset
-    tg.send(masters=0b1, client_id=2, data_not_reset=1, length=1, data=0b0)
+      # reset oscillator and trigger flops
+      tg.send(masters=0b1, client_id=2+id_offset, data_not_reset=1, length=1, data=0b1)
 
-    # trigger oscillator value
-    tg.send(masters=0b1, client_id=4, data_not_reset=1, length=1, data=0b1)
-    tg.send(masters=0b1, client_id=4, data_not_reset=1, length=1, data=0b0)
+      # init trigger to low, init oscillator to zero
+      # OSC INIT VALUE MUST BE ZERO TO AVOID X IN SIMULATION
+      tg.send(masters=0b1, client_id=4+id_offset, data_not_reset=1, length=1, data=0b0)
+      tg.send(masters=0b1, client_id=3+id_offset, data_not_reset=1, length=5, data=0b00000)
 
-    # reset ds, then set ds value
-    tg.send(masters=0b1, client_id=5, data_not_reset=1, length=7, data=0b0000001)
-    tg.send(masters=0b1, client_id=5, data_not_reset=1, length=7, data=0b0000000)
+      # take oscillator and trigger flops out of reset
+      tg.send(masters=0b1, client_id=2+id_offset, data_not_reset=1, length=1, data=0b0)
 
-    # select ds output clk
-    tg.send(masters=0b1, client_id=6, data_not_reset=1, length=2, data=0b01)
+      # trigger oscillator value
+      tg.send(masters=0b1, client_id=4+id_offset, data_not_reset=1, length=1, data=0b1)
+      tg.send(masters=0b1, client_id=4+id_offset, data_not_reset=1, length=1, data=0b0)
 
-    if sys.argv[1] == 'sweep_clk_gen':
+      # reset ds, then set ds value
+      tg.send(masters=0b1, client_id=5+id_offset, data_not_reset=1, length=7, data=0b0000001)
+      tg.send(masters=0b1, client_id=5+id_offset, data_not_reset=1, length=7, data=0b0000000)
+
+      # select ds output clk
+      tg.send(masters=0b1, client_id=6+id_offset, data_not_reset=1, length=2, data=0b01)
+
+    if sys.argv[1] == 'sweep_clk_gen_io' or sys.argv[1] == 'sweep_clk_gen_noc':
+      id_offset = 0
+      if sys.argv[1] == 'sweep_clk_gen_noc':
+        id_offset = 7
       # sweep oscillator values
       for tap in range(32):
-        tg.send(masters=0b1, client_id=3, data_not_reset=1, length=5, data=tap)
-        tg.send(masters=0b1, client_id=4, data_not_reset=1, length=1, data=0b1)
-        tg.send(masters=0b1, client_id=4, data_not_reset=1, length=1, data=0b0)
+        tg.send(masters=0b1, client_id=3+id_offset, data_not_reset=1, length=5, data=tap)
+        tg.send(masters=0b1, client_id=4+id_offset, data_not_reset=1, length=1, data=0b1)
+        tg.send(masters=0b1, client_id=4+id_offset, data_not_reset=1, length=1, data=0b0)
       tg.wait(64)
       tg.done()
       quit()
@@ -73,6 +87,7 @@ if __name__ == "__main__":
 
     # select ext output clk
     tg.send(masters=0b1, client_id=6, data_not_reset=1, length=2, data=0b10)
+    tg.send(masters=0b1, client_id=13, data_not_reset=1, length=2, data=0b10)
 
 
 
