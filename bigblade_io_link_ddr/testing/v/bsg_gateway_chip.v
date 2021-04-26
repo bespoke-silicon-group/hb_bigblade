@@ -8,6 +8,7 @@
 `define M_IO_CLK_PERIOD   1000
 `define S_IO_CLK_PERIOD   1000
 `define TAG_CLK_PERIOD    5000
+`define M_NOC_CLK_PERIOD  1000
 
 module bsg_gateway_chip
 
@@ -36,6 +37,7 @@ module bsg_gateway_chip
 
   logic tag_clk, tag_reset;
   logic async_clk_gen_disable;
+  logic noc_clk, m_noc_clk;
 
   logic node_clk, node_reset, node_en, node_error;
   logic [31:0] node_sent, node_received;
@@ -75,6 +77,7 @@ module bsg_gateway_chip
   bsg_nonsynth_clock_gen #(.cycle_time_p(`M_IO_CLK_PERIOD  )) m_io_clk_gen   (.o(m_io_clk  ));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`S_IO_CLK_PERIOD  )) s_io_clk_gen   (.o(s_io_clk  ));
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD   )) tag_clk_gen    (.o(tag_clk   ));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`M_NOC_CLK_PERIOD )) m_noc_clk_gen  (.o(m_noc_clk ));
 
 
   //////////////////////////////////////////////////
@@ -95,7 +98,12 @@ module bsg_gateway_chip
   bsg_nonsynth_clk_watcher #(.tolerance_p(1)) cw (.clk_i(clk_gen_watch_me));
 
   // filter out first cycle to eliminate glitch from ds
-  assign clk_gen_watch_me_raw = bsg_gateway_chip.DUT.clk_gen.clk_gen_inst.mux_inst.data_o;
+`ifdef SWEEP_CLK_GEN_IO
+  assign clk_gen_watch_me_raw = bsg_gateway_chip.DUT.clk_gen_io.clk_gen_inst.mux_inst.data_o;
+`endif
+`ifdef SWEEP_CLK_GEN_NOC
+  assign clk_gen_watch_me_raw = noc_clk;
+`endif
   assign clk_gen_watch_me = (clk_gen_watch_me_state === 1'b1)? clk_gen_watch_me_raw : 1'b0;
   always_ff @(posedge clk_gen_watch_me_raw)
     if (clk_gen_watch_me_raw !== 1'bX)
@@ -109,7 +117,7 @@ module bsg_gateway_chip
   //
 
   localparam tag_num_masters_lp          = 1;
-  localparam tag_num_clients_lp          = 9;
+  localparam tag_num_clients_lp          = 14;
   localparam tag_max_payload_width_lp    = 7;
   localparam tag_lg_max_payload_width_lp = `BSG_SAFE_CLOG2(tag_max_payload_width_lp+1);
 
@@ -271,17 +279,24 @@ module bsg_gateway_chip
 `endif
   DUT
   (.core_clk_i                 (m_core_clk)
-  ,.ext_clk_i                  (m_io_clk)
+  ,.ext_io_clk_i               (m_io_clk)
+  ,.ext_noc_clk_i              (m_noc_clk)
   ,.async_output_disable_i     (async_clk_gen_disable)
+  ,.noc_clk_o                  (noc_clk)
 
   ,.tag_clk_i                  (tag_clk)
   ,.tag_io_tag_lines_i         (tag_lines_dly[0])
   ,.tag_core_tag_lines_i       (tag_lines_dly[1])
-  ,.tag_async_reset_tag_lines_i(tag_lines_dly[2])
-  ,.tag_osc_tag_lines_i        (tag_lines_dly[3])
-  ,.tag_osc_trigger_tag_lines_i(tag_lines_dly[4])
-  ,.tag_ds_tag_lines_i         (tag_lines_dly[5])
-  ,.tag_sel_tag_lines_i        (tag_lines_dly[6])
+  ,.tag_io_async_reset_tag_lines_i (tag_lines_dly[2])
+  ,.tag_io_osc_tag_lines_i         (tag_lines_dly[3])
+  ,.tag_io_osc_trigger_tag_lines_i (tag_lines_dly[4])
+  ,.tag_io_ds_tag_lines_i          (tag_lines_dly[5])
+  ,.tag_io_sel_tag_lines_i         (tag_lines_dly[6])
+  ,.tag_noc_async_reset_tag_lines_i(tag_lines_dly[9])
+  ,.tag_noc_osc_tag_lines_i        (tag_lines_dly[10])
+  ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_dly[11])
+  ,.tag_noc_ds_tag_lines_i         (tag_lines_dly[12])
+  ,.tag_noc_sel_tag_lines_i        (tag_lines_dly[13])
 
   ,.core_v_i                   (m_core_v_li_dly)
   ,.core_data_i                (m_core_data_li_dly)
@@ -429,8 +444,12 @@ module bsg_gateway_chip
     // Wait for programming
     while (tag_trace_done_lo == 1'b0) #5000;
 
-`ifdef SWEEP_CLK_GEN
-    $display("Clock Sweep Done!\n");
+`ifdef SWEEP_CLK_GEN_IO
+    $display("IO Clock Sweep Done!\n");
+    $finish;
+`endif
+`ifdef SWEEP_CLK_GEN_NOC
+    $display("NOC Clock Sweep Done!\n");
     $finish;
 `endif
 

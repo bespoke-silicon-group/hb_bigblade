@@ -36,11 +36,20 @@ set io_clk_uncertainty_ps 20
 set osc_period_ps         250.0 ;# Raw oscillator frequency
 set osc_uncertainty_ps    20
 set ds_uncertainty_ps     20
-bsg_clk_gen_clock_create clk_gen/clk_gen_inst/ ${io_clk_name} ${osc_period_ps} ${io_clk_period_ps} ${osc_uncertainty_ps} ${ds_uncertainty_ps} ${io_clk_uncertainty_ps}
+bsg_clk_gen_clock_create clk_gen_io/clk_gen_inst/ ${io_clk_name} ${osc_period_ps} ${io_clk_period_ps} ${osc_uncertainty_ps} ${ds_uncertainty_ps} ${io_clk_uncertainty_ps}
 
-set ext_clk_name           "ext_clk"
-create_clock -period $osc_period_ps -name $ext_clk_name [get_ports ext_clk_i]
-set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_clk_name]
+set ext_io_clk_name           "ext_io_clk"
+create_clock -period $osc_period_ps -name $ext_io_clk_name [get_ports ext_io_clk_i]
+set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_io_clk_name]
+
+set noc_clk_name           "noc_clk"
+set noc_clk_period_ps      800.0 ;# 1.25 GHz
+set noc_clk_uncertainty_ps 20
+bsg_clk_gen_clock_create clk_gen_noc/clk_gen_inst/ ${noc_clk_name} ${osc_period_ps} ${noc_clk_period_ps} ${osc_uncertainty_ps} ${ds_uncertainty_ps} ${noc_clk_uncertainty_ps}
+
+set ext_noc_clk_name           "ext_noc_clk"
+create_clock -period $osc_period_ps -name $ext_noc_clk_name [get_ports ext_noc_clk_i]
+set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_noc_clk_name]
 
 
 # grouping ports...
@@ -121,6 +130,8 @@ bsg_chip_derate_mems
 bsg_chip_disable_1r1w_paths {"*downstream/harden*fifo/*"}
 set_min_delay [expr -$osc_uncertainty_ps] -from ${io_clk_name}_osc_ds -to ${io_clk_name}_osc -ignore_clock_latency
 set_min_delay [expr -$osc_uncertainty_ps] -from ${tag_clk_name} -to ${io_clk_name}_osc -ignore_clock_latency
+set_min_delay [expr -$osc_uncertainty_ps] -from ${noc_clk_name}_osc_ds -to ${noc_clk_name}_osc -ignore_clock_latency
+set_min_delay [expr -$osc_uncertainty_ps] -from ${tag_clk_name} -to ${noc_clk_name}_osc -ignore_clock_latency
 
 puts "BSG-info: Completed script [info script]\n"
 

@@ -14,13 +14,15 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem
 
-set clk_gen_bound [create_bound -name "clk_gen" -type soft -boundary {{28.32 60.00} {40.32 72.00}}]
-add_to_bound ${clk_gen_bound} [get_cells -hier -filter "full_name=~clk_gen/*"]
+set clk_gen_noc_bound [create_bound -name "clk_gen_noc" -type soft -boundary {{26.32 64.88} {40.32 74.88}}]
+set clk_gen_io_bound  [create_bound -name "clk_gen_io"  -type soft -boundary {{26.32 54.88} {40.32 64.88}}]
+add_to_bound ${clk_gen_noc_bound} [get_cells -hier -filter "full_name=~clk_gen_noc/*"]
+add_to_bound ${clk_gen_io_bound}  [get_cells -hier -filter "full_name=~clk_gen_io/*"]
 
-set iddr_bound [create_bound -name "iddr" -type soft -boundary {{0.00 7.50} {15.00 17.00}}]
-set oddr_bound [create_bound -name "oddr" -type soft -boundary {{0.00 0.00} {15.00 7.50}}]
+set iddr_bound [create_bound -name "iddr" -type soft -boundary {{0.00 7.00} {20.00 20.00}}]
+set oddr_bound [create_bound -name "oddr" -type soft -boundary {{0.00 0.00} {20.00 13.00}}]
 add_to_bound ${iddr_bound} [get_cells -hier -filter "full_name=~*iddr_phy/*"]
 add_to_bound ${oddr_bound} [get_cells -hier -filter "full_name=~*oddr_phy/*"]
 
-set downstream_fifo_bound [create_bound -name "downstream_fifo" -type soft -boundary {{24.90 17.92} {40.32 26.88}}]
-add_to_bound ${downstream_fifo_bound} [get_cells -hier -filter "full_name=~*in_sipof/*"]
+#set downstream_fifo_bound [create_bound -name "downstream_fifo" -type soft -boundary {{26.32 17.92} {40.32 26.88}}]
+#add_to_bound ${downstream_fifo_bound} [get_cells -hier -filter "full_name=~*in_sipof/*"]
