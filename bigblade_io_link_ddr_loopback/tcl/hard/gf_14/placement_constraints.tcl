@@ -108,4 +108,9 @@ set_fixed_objects $DL6_cell
 
 
 
+set btm_bound [create_bound -name "btm" -type soft -boundary {{237 8563} {1037 8763}}]
+add_to_bound ${btm_bound} [get_cells -hier -filter "full_name=~btm/*"]
+
+
+
 puts "BSG-info: Completed script [info script]\n"
