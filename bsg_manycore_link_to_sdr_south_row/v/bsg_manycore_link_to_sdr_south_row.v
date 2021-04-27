@@ -22,11 +22,6 @@ module bsg_manycore_link_to_sdr_south_row
   (
     input [num_clk_ports_p-1:0] core_clk_i
 
-    , input  [num_tiles_x_p-1:0][x_cord_width_p-1:0] core_global_x_i
-    , input  [num_tiles_x_p-1:0][y_cord_width_p-1:0] core_global_y_i
-    , output [num_tiles_x_p-1:0][x_cord_width_p-1:0] core_global_x_o
-    , output [num_tiles_x_p-1:0][y_cord_width_p-1:0] core_global_y_o
-
     ,input  [num_tiles_x_p-1:0][link_sif_width_lp-1:0] core_link_sif_i
     ,output [num_tiles_x_p-1:0][link_sif_width_lp-1:0] core_link_sif_o
   
@@ -87,13 +82,6 @@ module bsg_manycore_link_to_sdr_south_row
 
     ) sdr_n (
       .core_clk_i                 (core_clk_i[x/(num_tiles_x_p/num_clk_ports_p)])
-      ,.core_reset_i              (1'b0)
-      ,.core_reset_o              ()
-
-      ,.core_global_x_i           (core_global_x_i[x])
-      ,.core_global_y_i           (core_global_y_i[x])
-      ,.core_global_x_o           (core_global_x_o[x])
-      ,.core_global_y_o           (core_global_y_o[x])
 
       ,.core_link_sif_i           (core_link_sif_i[x])
       ,.core_link_sif_o           (core_link_sif_o[x])

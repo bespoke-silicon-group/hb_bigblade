@@ -70,15 +70,6 @@ constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   610 -50
 constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  670 -50
 constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   740 -50
 
-# core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]     400 40
-constraint_output_ports $core_clk_name [get_ports core_reset_o]     400 40
-
-# global coordinates
-#constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 800 40
-#constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 800 -75
-set_false_path -from [get_ports "core_global_*_i*"]
-set_false_path -to   [get_ports "core_global_*_o*"]
 
 
 

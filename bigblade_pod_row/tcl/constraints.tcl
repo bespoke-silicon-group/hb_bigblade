@@ -28,7 +28,7 @@ for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {
 }
 create_clock -period 5000 -name "pod_tag_clk" $pod_tag_clk_ports
 set_clock_uncertainty 20 [get_clocks "pod_tag_clk"]
-set_input_transition 50 [get_ports "pod_tags_i[0]\[clk\]"]
+set_input_transition 50 $pod_tag_clk_ports
 
 set tag_ports [list]
 for {set i 0} {$i < $HB_NUM_PODS_X_P} {incr i} {

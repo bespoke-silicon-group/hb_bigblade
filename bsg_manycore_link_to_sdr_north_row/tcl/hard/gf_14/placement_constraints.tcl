@@ -16,7 +16,7 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 
 
 # bsg tag
-set llx [expr [die_urx] - 8]
+set llx [expr [die_urx] - 12]
 set lly [expr [die_ury] - 4.5]
 set urx [die_urx]
 set ury [die_ury]

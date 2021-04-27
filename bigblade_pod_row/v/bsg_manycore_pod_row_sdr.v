@@ -276,6 +276,8 @@ module bsg_manycore_pod_row_sdr
       assign sdr_n_async_downstream_reset_li[x] = sdr_n_async_downstream_reset_lo[x-1];
       assign sdr_n_async_token_reset_li[x]      = sdr_n_async_token_reset_lo[x-1];
     end
+  
+    assign pod_reset_li[x] = sdr_n_core_reset_ver_lo[x];
   end
 
   assign sdr_n_core_global_x_li = global_x_i[1+:total_num_tiles_x_lp];
@@ -302,11 +304,6 @@ module bsg_manycore_pod_row_sdr
       ,.num_clk_ports_p(num_clk_ports_p)
     ) sdr_s (
       .core_clk_i({num_clk_ports_p{core_clk}})
-
-      ,.core_global_x_i('0)
-      ,.core_global_y_i('0)
-      ,.core_global_x_o()
-      ,.core_global_y_o()
 
       ,.core_link_sif_i           (pod_ver_link_sif_lo[S][x])
       ,.core_link_sif_o           (pod_ver_link_sif_li[S][x])

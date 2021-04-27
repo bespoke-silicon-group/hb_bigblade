@@ -83,13 +83,14 @@ constraint_output_ports $core_clk_name $core_link_fwd_data_out_ports   700 0
 constraint_output_ports $core_clk_name $core_link_fwd_valid_out_ports  790 0
 constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   840 0
 
-# core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
-constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
-
-# global coordinates
-constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 850 40
-constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 850 40
+if {$::env(SOUTH_NOT_NORTH) == 0} {
+  # core reset
+  constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
+  constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
+  # global coordinates
+  set_false_path -from [core_global_*_i*]
+  set_false_path -to   [core_global_*_o*]
+}
 
 # false path
 set_false_path -from [get_ports async_*_reset_i]

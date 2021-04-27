@@ -4,6 +4,9 @@ set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name clock_opt.flow.enable_ccd -value false
 set_app_options -name cts.common.enable_auto_skew_target_for_local_skew -value false
 
+set_max_transition -scenarios [all_scenarios] -clock_path 25 [all_clocks]
+set_clock_tree_options -corners [get_corners *] -clocks [get_clocks -filter "!is_generated"] -target_latency 100
+
 
 
 create_routing_rule "bsg_cts_2w2s"  \
