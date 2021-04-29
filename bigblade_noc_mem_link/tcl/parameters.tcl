@@ -9,4 +9,11 @@ set TOPLEVEL_PARAMETERS [join "
   use_extra_data_bit_p=1
   tag_num_clients_p=512
   tag_lg_max_payload_width_p=3
+  sdr_lg_fifo_depth_p=3
+  sdr_lg_credit_to_token_decimation_p=0
+  wh_ruche_factor_p=2
+  wh_flit_width_p=32
+  wh_len_width_p=4
+  wh_cid_width_p=2
+  wh_cord_width_p=7
 "]

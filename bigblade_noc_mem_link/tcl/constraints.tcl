@@ -65,6 +65,42 @@ set_false_path -from [get_ports async_output_disable_i]
 set_false_path -from [get_ports tag_node_id_offset_i]
 
 
+# Source-sync link constraints
+set link_clk_period_ps        800
+set link_clk_uncertainty_ps   20
+set max_io_output_margin_ps   100
+set max_io_input_margin_ps    100
+
+for {set i 0} {$i < 2} {incr i} {
+  for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
+    bsg_link_sdr_constraints                                              \
+      $core_clk_name                                                      \
+      [get_attribute [get_clocks $core_clk_name] sources]                 \
+      "wh_${i}_${rf}_out_clk"                                             \
+      $core_clk_period_ps                                                 \
+      $max_io_output_margin_ps                                            \
+      [get_ports "io_wh_link_clk_o[$i][$rf]"]                             \
+      [get_ports "io_wh_link_data_o[$i][$rf][*] io_wh_link_v_o[$i][$rf]"] \
+      "wh_${i}_${rf}_in_clk"                                              \
+      $link_clk_period_ps                                                 \
+      $max_io_input_margin_ps                                             \
+      [get_ports "io_wh_link_clk_i[$i][$rf]"]                             \
+      [get_ports "io_wh_link_data_i[$i][$rf][*] io_wh_link_v_i[$i][$rf]"] \
+      "wh_${i}_${rf}_tkn_clk"                                             \
+      [get_ports "io_wh_link_token_i[$i][$rf]"]                           \
+      $link_clk_uncertainty_ps
+  }
+}
+
+# disable timing arcs
+bsg_link_sdr_disable_timing_constraints
+
+# set dont touch
+bsg_link_sdr_dont_touch_constraints [get_ports {    \
+    io_wh_link_data_i[*][*][*] io_wh_link_v_i[*][*] \
+}]
+
+
 # CDC
 set cdc_clocks [all_clocks]
 bsg_async_icl $cdc_clocks
