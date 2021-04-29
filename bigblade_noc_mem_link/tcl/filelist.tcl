@@ -77,6 +77,8 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v 
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v       
     $basejump_stl_dir/bsg_noc/bsg_wormhole_router.v
+    $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_in.v
+    $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator_out.v
     $basejump_stl_dir/bsg_noc/bsg_wormhole_concentrator.v
     $basejump_stl_dir/bsg_fsb/bsg_fsb_pkg.v
     $basejump_stl_dir/bsg_link/bsg_link_ddr_downstream.v
@@ -85,6 +87,13 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_link/bsg_link_oddr_phy.v
     $basejump_stl_dir/bsg_link/bsg_link_source_sync_downstream.v
     $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream.v
+    $basejump_stl_dir/bsg_link/bsg_link_sdr.v
+    $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
+    $basejump_stl_dir/bsg_link/bsg_link_sdr_upstream.v
+    $basejump_stl_dir/bsg_link/bsg_link_isdr_phy.v
+    $basejump_stl_dir/bsg_link/bsg_link_osdr_phy.v
+    $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
+    $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
     $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
     $basejump_stl_dir/bsg_misc/bsg_counter_clock_downsample.v
@@ -102,5 +111,6 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
 
     $bsg_designs_target_dir/v/bsg_chip_noc_mem_link.v
+    $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v
 
 "]
