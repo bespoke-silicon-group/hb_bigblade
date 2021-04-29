@@ -9,5 +9,6 @@ vc_hdrs.h
 simv*
 bsg_manycore/
 DVEfiles/
-.pdk_prep/
+.pdk_prep
 HardFloat/
+
