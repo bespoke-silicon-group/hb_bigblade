@@ -18,8 +18,8 @@ export BSG_TOPLEVEL_DESIGN_TYPE :=block
 # block. If there is only a single block in your design's hier.mk, this
 # variable has no affect and is effectively  forced to flat.
 
-export BSG_FLOW_STYLE :=hier
-#export BSG_FLOW_STYLE :=flat
+#export BSG_FLOW_STYLE :=hier
+export BSG_FLOW_STYLE :=flat
 
 # Select if the backend flor is going to perform Design Planning (DP). Design
 # planning is about 10 additional steps that occurs before any placement and
@@ -82,7 +82,7 @@ export BSG_POWER_INTENT :=sv_standard
 #     puts the CAD flow into the highest effort signoff quality mode we have.
 # - tt_only
 #     puts the CAD flow into a single scenario mode (typical corner).
-export BSG_CAD_SETUP :=tt_only
+export BSG_CAD_SETUP :=default
 #export BSG_CAD_SETUP :=default
 
 # Overrides the default memgen.json in bsg_14. Only these memories will be
@@ -150,3 +150,8 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=$(foreach _,$(PTSI_FLOW_ACTIVITY_FILE), 1.0)
 # Most often this is the path to the DUT starting from the testbench.
 export PTSI_FLOW_STRIP_PATH       :=bsg_gateway_chip/DUT
 
+synth_fakeout:
+	mkdir -p current_build/synth/brg_cgra_pod/results/
+	cp ../v/brg_cgra_pod.mapped.v current_build/synth/brg_cgra_pod/results/
+	cp ../sdc/brg_cgra_pod.mapped.sdc current_build/synth/brg_cgra_pod/results/
+	touch current_build/touchfiles/synth.brg_cgra_pod

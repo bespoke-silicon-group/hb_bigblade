@@ -10,7 +10,6 @@ ifeq ($(GIT_CLONE_STYLE),ssh)
 else ifeq ($(GIT_CLONE_STYLE),https)
   GITHUB    :=https://github.com/
   BITBUCKET :=https://bitbucket.com/
-
 endif
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl

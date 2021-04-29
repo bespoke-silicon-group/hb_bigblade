@@ -9,259 +9,111 @@ set_locked_objects -unlock [get_cells -hier]
 remove_edit_groups -all
 remove_bounds -all
 
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/adk.tcl
+
+#-------------------------------------------------------------------------
+# Floorplan variables
+#-------------------------------------------------------------------------
+
+# Power ring metal width and spacing
+
+#set M1_min_width   [get_attribute [get_layer M1] min_width]
+#set M1_min_spacing [get_attribute [get_layer M1] min_spacing]
+
+#set p_ring_width   [expr 48 * $M1_min_width];   # Arbitrary!
+#set p_ring_spacing [expr 24 * $M1_min_spacing]; # Arbitrary!
+
+# Core bounding box margins
+
+#set core_margin_t [expr ([llength $pwr_net_list] * ($p_ring_width + $p_ring_spacing)) + $p_ring_spacing]
+#set core_margin_b [expr ([llength $pwr_net_list] * ($p_ring_width + $p_ring_spacing)) + $p_ring_spacing]
+#set core_margin_r [expr ([llength $pwr_net_list] * ($p_ring_width + $p_ring_spacing)) + $p_ring_spacing]
+#set core_margin_l [expr ([llength $pwr_net_list] * ($p_ring_width + $p_ring_spacing)) + $p_ring_spacing]
+set core_margin_t 0
+set core_margin_b 0
+set core_margin_r 0
+set core_margin_l 0
+
 set tile_height [core_height]
 set tile_width  [core_width]
 
 set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
-set keepout_margins_2x [list [expr 2*$keepout_margin_x] [expr 2*$keepout_margin_y] [expr 2*$keepout_margin_x] [expr 2*$keepout_margin_y]]
-set io_link_gap_x [round_up_to_nearest 5 [unit_width]]
 
-set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
-set icache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 0 3]
-set icache_data_mems_east [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 4 7]
-set int_regfile_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/int_regfile/*"]
-set fp_regfile_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/fp_regfile/*"]
-set icache_stat_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*/icache*stat_mem*"]
-set dcache_data_mems_east [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem*"] 4 7]
-set dcache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*data_mem*"] 0 3]
-set data_mem_width    [lindex [get_attribute [get_cell -hier $dcache_data_mems_west] width ] 0]
-set data_mem_height   [lindex [get_attribute [get_cell -hier $dcache_data_mems_west] height] 0]
-set dcache_stat_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*stat_mem*"]
-set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*btb*tag_mem*"]
-set dcache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*tag_mem*"]
-set tag_mem_width     [lindex [get_attribute [get_cell -hier $dcache_tag_mems] width ] 0]
+set pe_num_x 8
+set pe_num_y 8
 
-set ireg_mem_height   [lindex [get_attribute [get_cell -hier $int_regfile_mems] height ] 0]
-set ireg_mem_width    [lindex [get_attribute [get_cell -hier $int_regfile_mems] width ] 0]
-set freg_mem_height   [lindex [get_attribute [get_cell -hier $fp_regfile_mems] height ] 0]
-set freg_mem_width    [lindex [get_attribute [get_cell -hier $fp_regfile_mems] width ] 0]
-set stat_mem_width    [lindex [get_attribute [get_cell -hier $dcache_stat_mem] width ] 0]
-set btb_mem_height    [lindex [get_attribute [get_cell -hier $btb_mem] height] 0]
-set btb_mem_width     [lindex [get_attribute [get_cell -hier $btb_mem] width] 0]
+set pe_width  50
+set pe_height 74.5
+set pe_margin_x 2
+set pe_margin_y 2
 
+set reserved_width 56
+# set reserved_height 20
 
-#####################################
-### I CACHE DATA
-###
+set array_margin 12
+set welltab_margin 3
 
-set icache_data_ma_top [create_macro_array \
-  -num_rows 2 \
-  -num_cols 2 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation FN \
-  $icache_data_mems_west]
+set array_width  [expr $pe_num_x*$pe_width + ($pe_num_x-1)*$pe_margin_x]
+set array_height [expr $pe_num_y*$pe_height+ ($pe_num_y-1)*$pe_margin_y]
 
-create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_west
+set pe_origin_x [expr $core_margin_l+$welltab_margin+$reserved_width+$array_margin]
+set pe_origin_y [expr $core_margin_b+$welltab_margin+$array_margin]
 
-set_macro_relative_location \
-  -target_object $icache_data_ma_top \
-  -target_corner tl \
-  -target_orientation R0 \
-  -anchor_corner tl \
-  -offset [list $keepout_margin_x 0]
+set sp_lx [expr $core_margin_l+$welltab_margin+1]
+set sp_ly [expr $core_margin_b+$welltab_margin+$array_margin]
+set sp_rx [expr $sp_lx+$reserved_width]
+set sp_ry [expr $sp_ly+$array_margin+$array_height]
 
-set icache_data_ma_bot [create_macro_array \
-  -num_rows 4 \
-  -num_cols 1 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation FN \
-  $icache_data_mems_east]
+set rf_width 54
+set rf_height 83
+set rf_margin [expr ($sp_ry-$sp_ly)/4-$rf_height]
 
-create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_east
+set total_width  [expr $core_margin_l+$core_margin_r+$welltab_margin*2+$reserved_width+$array_margin+$array_width]
+set total_height [expr $core_margin_b+$core_margin_t+$welltab_margin*2+$array_margin+$array_height+$array_margin]
 
-set_macro_relative_location \
-  -target_object $icache_data_ma_bot \
-  -target_corner tl \
-  -target_orientation R0 \
-  -anchor_corner bl \
-  -anchor_object $icache_data_ma_top \
-  -offset [list $keepout_margin_x 0]
+# Take all clock ports and place them center-left
 
-#####################################
-### D CACHE DATA
-###
+# PE array
 
-set dcache_data_ma_bot [create_macro_array \
-  -num_rows 2 \
-  -num_cols 2 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation N \
-  $dcache_data_mems_west]
+for {set idx_y 0} {$idx_y < $pe_num_y} {incr idx_y} {
+  for {set idx_x 0} {$idx_x < $pe_num_x} {incr idx_x} {
+    set cur_lx [expr $pe_origin_x+($pe_width +$pe_margin_x)*$idx_y]
+    set cur_ly [expr $pe_origin_y+($pe_height+$pe_margin_y)*($pe_num_x-1-$idx_x)]
+    set cur_rx [expr $cur_lx+$pe_width]
+    set cur_ry [expr $cur_ly+$pe_height]
 
-create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_west
+    set id [expr $idx_x+$idx_y*$pe_num_x]
+    # setObjFPlanBox Instance cgra_xcel/dpath/cgra/dpath/PE_rc__$id $cur_lx $cur_ly $cur_rx $cur_ry
+    create_bound pod/hb_cgra_xcel/cgra_xcel/dpath/cgra/dpath/PE_rc__$id \
+      -name PE_rc__$id \
+      -boundary [list [list $cur_lx $cur_ly] [list $cur_rx $cur_ry]] \
+      -type soft
+    #createFence pod/hb_cgra_xcel/cgra_xcel/dpath/cgra/dpath/PE_rc__$id $cur_lx $cur_ly $cur_rx $cur_ry
+  }
+}
 
-set_macro_relative_location \
-  -target_object $dcache_data_ma_bot \
-  -target_corner br \
-  -target_orientation R0 \
-  -anchor_corner br \
-  -offset [list [expr -$io_link_gap_x-$keepout_margin_x] 0]
+# createFence cgra_xcel/dpath/scratchpad $sp_lx $sp_ly $sp_rx $sp_ry
 
-set dcache_data_ma_top [create_macro_array \
-  -num_rows 4 \
-  -num_cols 1 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation N \
-  $dcache_data_mems_east]
+for {set idx 0} {$idx < 4} {incr idx} {
+  set cur_lx [expr $sp_lx]
+  set cur_ly [expr $sp_ly+($rf_height+$rf_margin)*$idx]
+  set cur_rx [expr $cur_lx+$rf_width]
+  set cur_ry [expr $cur_ly+$rf_height]
+  if {$idx > 0 && $idx < 3} {
+    rotate_objects \
+      [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
+      -orient FN
+  } else {
+    rotate_objects \
+      [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
+      -orient N
+  }
+  create_bound pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 \
+    -name BANK_rc__$idx \
+    -boundary [list [list $cur_lx $cur_ly] [list $cur_rx $cur_ry]] \
+    -type soft
+  #setObjFPlanBox Instance pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 $cur_lx $cur_ly $cur_rx $cur_ry
+}
 
-create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_east
-
-set_macro_relative_location \
-  -target_object $dcache_data_ma_top \
-  -target_corner br \
-  -target_orientation R0 \
-  -anchor_corner tr \
-  -anchor_object $dcache_data_ma_bot \
-  -offset [list 0 $keepout_margin_y]
-
-#####################################
-### I CACHE TAG
-###
-
-set icache_tag_ma [create_macro_array \
-  -num_rows 1 \
-  -num_cols 2 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation N \
-  $icache_tag_mems]
-
-create_keepout_margin -type hard -outer $keepout_margins $icache_tag_mems
-
-set_macro_relative_location \
-  -target_object $icache_tag_ma \
-  -target_corner br \
-  -target_orientation R0 \
-  -anchor_corner bl \
-  -anchor_object $dcache_data_ma_bot \
-  -offset [list -$keepout_margin_x 0]
-
-#####################################
-### D CACHE TAG
-###
-
-set dcache_tag_ma [create_macro_array \
-  -num_rows 1 \
-  -num_cols 2 \
-  -align bottom \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
-  -orientation FN \
-  $dcache_tag_mems]
-
-create_keepout_margin -type hard -outer $keepout_margins $dcache_tag_mems
-
-set_macro_relative_location \
-  -target_object $dcache_tag_ma \
-  -target_corner tl \
-  -target_orientation R0 \
-  -anchor_corner tr \
-  -anchor_object $icache_data_ma_top \
-  -offset [list $keepout_margin_x 0]
-
-#####################################
-### BTB Memory
-###
-
-set_macro_relative_location \
-  -target_object $btb_mem \
-  -target_corner tl \
-  -target_orientation FN \
-  -anchor_corner tr \
-  -anchor_object $icache_data_ma_bot \
-  -offset [list $keepout_margin_x 0]
-
-create_keepout_margin -type hard -outer $keepout_margins $btb_mem
-
-#####################################
-### INT + FP RF
-###
-
-set fp_regfile_ma [create_macro_array \
-  -num_rows 1 \
-  -num_cols 3 \
-  -align left \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation N \
-  $fp_regfile_mems]
-
-set_macro_relative_location \
-  -target_object $fp_regfile_ma \
-  -target_corner bl \
-  -target_orientation R0 \
-  -anchor_corner tl \
-  -anchor_object $dcache_data_ma_bot \
-  -offset [list 0 $keepout_margin_y]
-
-create_keepout_margin -type hard -outer $keepout_margins $fp_regfile_mems
-
-set int_regfile_ma [create_macro_array \
-  -num_rows 1 \
-  -num_cols 2 \
-  -align left \
-  -horizontal_channel_height [expr 4*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation N \
-  $int_regfile_mems]
-
-set_macro_relative_location \
-  -target_object $int_regfile_ma \
-  -target_corner br \
-  -target_orientation R0 \
-  -anchor_corner tr \
-  -anchor_object $fp_regfile_ma \
-  -offset [list 0 $keepout_margin_y]
-
-create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
-
-#####################################
-### I CACHE STAT
-###
-
-set_macro_relative_location \
-  -target_object $icache_stat_mem \
-  -target_corner tl \
-  -target_orientation FN \
-  -anchor_object $icache_data_ma_bot \
-  -anchor_corner bl \
-  -offset [list $keepout_margin_x -$keepout_margin_y]
-
-create_keepout_margin -type hard -outer $keepout_margins $icache_stat_mem
-
-#####################################
-### D CACHE STAT
-###
-
-set_macro_relative_location \
-  -target_object $dcache_stat_mem \
-  -target_corner br \
-  -target_orientation N \
-  -anchor_object $dcache_data_ma_top \
-  -anchor_corner tr \
-  -offset [list 0 $keepout_margin_y]
-
-create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
-
-#####################################
-### GUI setup
-###
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *bp_be_*]
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *bp_fe_*]
-#gui_explore_logic_hierarchy -create -cycle [get_cells -hier *io_router*]
-
-set isdr_bound [create_bound -name "isdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
-set osdr_bound [create_bound -name "osdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
-add_to_bound ${isdr_bound} [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
-add_to_bound ${osdr_bound} [get_cells -hier -filter "full_name=~*/osdr_phy/*"]

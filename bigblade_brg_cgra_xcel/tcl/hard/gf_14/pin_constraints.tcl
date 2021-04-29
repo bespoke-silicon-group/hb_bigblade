@@ -34,7 +34,7 @@ set contents [read $fh]
 
 set block_offset $core_lly
 set mc_tile_pitch [expr $tile_y_space + $tile_height]
-for {set i 0} {$i < 3} {incr i} {
+for {set i 0} {$i < 4} {incr i} {
     puts "Placing link $i, offset $block_offset, tile pitch $mc_tile_pitch"
     foreach line [split $contents] {
       if {$line  == ""} break
@@ -42,7 +42,7 @@ for {set i 0} {$i < 3} {incr i} {
       set pin_base [regsub -all {\[.*\]} $pin {}]
       if {$pin != $pin_base} {
         set pin_index [lindex [split $pin {\[.*\]}] 1]
-        set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 3]
+        set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 4]
         set true_pin_index [expr $i*$pin_len + $pin_index]
         set true_pin ${pin_base}[$true_pin_index]
       } else {
@@ -56,7 +56,7 @@ for {set i 0} {$i < 3} {incr i} {
       set_individual_pin_constraints \
           -ports [get_ports $true_pin] \
           -allowed_layers [get_layers $layer] \
-          -location "$core_urx $true_pos"
+          -location "$core_llx $true_pos"
     }
 }
 
