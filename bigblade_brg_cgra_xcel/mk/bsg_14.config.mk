@@ -18,8 +18,8 @@ export BSG_TOPLEVEL_DESIGN_TYPE :=block
 # block. If there is only a single block in your design's hier.mk, this
 # variable has no affect and is effectively  forced to flat.
 
-#export BSG_FLOW_STYLE :=hier
-export BSG_FLOW_STYLE :=flat
+export BSG_FLOW_STYLE :=hier
+#export BSG_FLOW_STYLE :=flat
 
 # Select if the backend flor is going to perform Design Planning (DP). Design
 # planning is about 10 additional steps that occurs before any placement and
@@ -154,4 +154,6 @@ synth_fakeout:
 	mkdir -p current_build/synth/brg_cgra_pod/results/
 	cp ../v/brg_cgra_pod.mapped.v current_build/synth/brg_cgra_pod/results/
 	cp ../sdc/brg_cgra_pod.mapped.sdc current_build/synth/brg_cgra_pod/results/
+	touch current_build/synth/ProcElement/results/ProcElement.mapped.v
+	touch current_build/touchfiles/synth.ProcElement
 	touch current_build/touchfiles/synth.brg_cgra_pod
