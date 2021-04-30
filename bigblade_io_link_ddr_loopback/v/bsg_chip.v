@@ -13,6 +13,7 @@
 module bsg_chip
 
  import bsg_chip_pkg::*;
+ import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
 
 `include "bsg_pinout.v"
@@ -47,19 +48,31 @@ module bsg_chip
   // BSG Tag Master Instance
   //
 
-  // All tag lines from the btm
-  wire bsg_chip_tag_lines_s tag_lines_lo;
+  wire tag_clk_lo  = bsg_tag_clk_i_int;
+  wire tag_data_lo = bsg_tag_en_i_int & bsg_tag_data_i_int;
 
-  // BSG tag master instance
-  bsg_tag_master #(.els_p( tag_num_clients_gp )
-                  ,.lg_width_p( tag_lg_max_payload_width_gp )
-                  )
-    btm
-      (.clk_i      ( bsg_tag_clk_i_int )
-      ,.data_i     ( bsg_tag_en_i_int ? bsg_tag_data_i_int : 1'b0 )
-      ,.en_i       ( 1'b1 )
-      ,.clients_r_o( tag_lines_lo )
-      );
+  //wire [mem_link_conc_num_gp-1:0] tag_data_r;
+  //localparam tag_stages_lp = 20;
+  //
+  //for (genvar i = 0; i < mem_link_conc_num_gp; i++)
+  //begin: tag_data_reg
+  //  bsg_dff_chain #(.width_p(1),.num_stages_p(tag_stages_lp)) chain
+  //  (.clk_i(tag_clk_lo),.data_i(tag_data_lo),.data_o(tag_data_r[i]));
+  //end
+
+  //// All tag lines from the btm
+  //wire bsg_chip_tag_lines_s tag_lines_lo;
+  //
+  //// BSG tag master instance
+  //bsg_tag_master #(.els_p( tag_num_clients_gp )
+  //                ,.lg_width_p( tag_lg_max_payload_width_gp )
+  //                )
+  //  btm
+  //    (.clk_i      ( bsg_tag_clk_i_int )
+  //    ,.data_i     ( bsg_tag_en_i_int ? bsg_tag_data_i_int : 1'b0 )
+  //    ,.en_i       ( 1'b1 )
+  //    ,.clients_r_o( tag_lines_lo )
+  //    );
 
   //////////////////////////////////////////////////
   //
@@ -207,115 +220,119 @@ module bsg_chip
   // BSG Chip IO
   //
 
-  bsg_chip_io_link_sif_s [io_link_num_gp-1:0] io_links_li, io_links_lo;
-  bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
-  wire [io_link_num_gp-1:0] io_noc_clk_lo;
-  wire [mem_link_num_gp-1:0] mem_noc_clk_lo;
+  //bsg_chip_io_link_sif_s [io_link_num_gp-1:0] io_links_li, io_links_lo;
+  //bsg_chip_mem_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
+  //wire [io_link_num_gp-1:0] io_noc_clk_lo;
+  //wire [mem_link_num_gp-1:0] mem_noc_clk_lo;
 
-  for (genvar i = 0; i < io_link_num_gp; i++)
-  begin: io_link
-  
-    bsg_chip_io_link_ddr
-   #(.ds_width_p                     (clk_gen_ds_width_gp                     )
-    ,.num_adgs_p                     (clk_gen_num_adgs_gp                     )
-    ,.width_p                        (io_link_width_gp                        )
-    ,.channel_width_p                (io_link_channel_width_gp                )
-    ,.num_channels_p                 (io_link_num_channels_gp                 )
-    ,.lg_fifo_depth_p                (io_link_lg_fifo_depth_gp                )
-    ,.lg_credit_to_token_decimation_p(io_link_lg_credit_to_token_decimation_gp)
-    ,.use_extra_data_bit_p           (io_link_use_extra_data_bit_gp           )
-    ) link
-    (.core_clk_i                     (io_noc_clk_lo[i]        ) // TODO: two links share one noc_clk
-    ,.ext_io_clk_i                   (ext_io_clk_i_int        )
-    ,.ext_noc_clk_i                  (ext_noc_clk_i_int       )
-    ,.async_output_disable_i         (async_output_disable_int)
-    ,.noc_clk_o                      (io_noc_clk_lo[i]        )
-  
-    ,.tag_clk_i                      (bsg_tag_clk_i_int                      )
-    ,.tag_io_tag_lines_i             (tag_lines_lo.io_link_io             [i])
-    ,.tag_core_tag_lines_i           (tag_lines_lo.io_link_core           [i])
-    ,.tag_io_async_reset_tag_lines_i (tag_lines_lo.io_link_io_async_reset [i])
-    ,.tag_io_osc_tag_lines_i         (tag_lines_lo.io_link_io_osc         [i])
-    ,.tag_io_osc_trigger_tag_lines_i (tag_lines_lo.io_link_io_osc_trigger [i])
-    ,.tag_io_ds_tag_lines_i          (tag_lines_lo.io_link_io_ds          [i])
-    ,.tag_io_sel_tag_lines_i         (tag_lines_lo.io_link_io_sel         [i])
-    ,.tag_noc_async_reset_tag_lines_i(tag_lines_lo.io_link_noc_async_reset[i])
-    ,.tag_noc_osc_tag_lines_i        (tag_lines_lo.io_link_noc_osc        [i])
-    ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_lo.io_link_noc_osc_trigger[i])
-    ,.tag_noc_ds_tag_lines_i         (tag_lines_lo.io_link_noc_ds         [i])
-    ,.tag_noc_sel_tag_lines_i        (tag_lines_lo.io_link_noc_sel        [i])
-  
-    ,.core_v_i                       (io_links_lo[i].v                               )
-    ,.core_data_i                    (io_links_lo[i].data                            )
-    ,.core_ready_and_o               (io_links_li[i].ready_and_rev                   )
-  
-    ,.core_v_o                       (io_links_li[i].v                               )
-    ,.core_data_o                    (io_links_li[i].data                            )
-    ,.core_yumi_i                    (io_links_li[i].v & io_links_lo[i].ready_and_rev)
-  
-    ,.io_link_clk_o                  (io_link_clk_lo [i])
-    ,.io_link_data_o                 (io_link_data_lo[i])
-    ,.io_link_v_o                    (io_link_v_lo   [i])
-    ,.io_link_token_i                (io_link_tkn_li [i])
-  
-    ,.io_link_clk_i                  (io_link_clk_li [i])
-    ,.io_link_data_i                 (io_link_data_li[i])
-    ,.io_link_v_i                    (io_link_v_li   [i])
-    ,.io_link_token_o                (io_link_tkn_lo [i])
-    );
-  
-  end
+  //for (genvar i = 0; i < io_link_num_gp; i++)
+  //begin: io_link
+  //
+  //  bsg_chip_io_link_ddr
+  // #(.ds_width_p                     (clk_gen_ds_width_gp                     )
+  //  ,.num_adgs_p                     (clk_gen_num_adgs_gp                     )
+  //  ,.width_p                        (io_link_width_gp                        )
+  //  ,.channel_width_p                (io_link_channel_width_gp                )
+  //  ,.num_channels_p                 (io_link_num_channels_gp                 )
+  //  ,.lg_fifo_depth_p                (io_link_lg_fifo_depth_gp                )
+  //  ,.lg_credit_to_token_decimation_p(io_link_lg_credit_to_token_decimation_gp)
+  //  ,.use_extra_data_bit_p           (io_link_use_extra_data_bit_gp           )
+  //  ) link
+  //  (.core_clk_i                     (io_noc_clk_lo[i]        ) // TODO: two links share one noc_clk
+  //  ,.ext_io_clk_i                   (ext_io_clk_i_int        )
+  //  ,.ext_noc_clk_i                  (ext_noc_clk_i_int       )
+  //  ,.async_output_disable_i         (async_output_disable_int)
+  //  ,.noc_clk_o                      (io_noc_clk_lo[i]        )
+  //
+  //  ,.tag_clk_i                      (bsg_tag_clk_i_int                      )
+  //  ,.tag_io_tag_lines_i             (tag_lines_lo.io_link_io             [i])
+  //  ,.tag_core_tag_lines_i           (tag_lines_lo.io_link_core           [i])
+  //  ,.tag_io_async_reset_tag_lines_i (tag_lines_lo.io_link_io_async_reset [i])
+  //  ,.tag_io_osc_tag_lines_i         (tag_lines_lo.io_link_io_osc         [i])
+  //  ,.tag_io_osc_trigger_tag_lines_i (tag_lines_lo.io_link_io_osc_trigger [i])
+  //  ,.tag_io_ds_tag_lines_i          (tag_lines_lo.io_link_io_ds          [i])
+  //  ,.tag_io_sel_tag_lines_i         (tag_lines_lo.io_link_io_sel         [i])
+  //  ,.tag_noc_async_reset_tag_lines_i(tag_lines_lo.io_link_noc_async_reset[i])
+  //  ,.tag_noc_osc_tag_lines_i        (tag_lines_lo.io_link_noc_osc        [i])
+  //  ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_lo.io_link_noc_osc_trigger[i])
+  //  ,.tag_noc_ds_tag_lines_i         (tag_lines_lo.io_link_noc_ds         [i])
+  //  ,.tag_noc_sel_tag_lines_i        (tag_lines_lo.io_link_noc_sel        [i])
+  //
+  //  ,.core_v_i                       (io_links_lo[i].v                               )
+  //  ,.core_data_i                    (io_links_lo[i].data                            )
+  //  ,.core_ready_and_o               (io_links_li[i].ready_and_rev                   )
+  //
+  //  ,.core_v_o                       (io_links_li[i].v                               )
+  //  ,.core_data_o                    (io_links_li[i].data                            )
+  //  ,.core_yumi_i                    (io_links_li[i].v & io_links_lo[i].ready_and_rev)
+  //
+  //  ,.io_link_clk_o                  (io_link_clk_lo [i])
+  //  ,.io_link_data_o                 (io_link_data_lo[i])
+  //  ,.io_link_v_o                    (io_link_v_lo   [i])
+  //  ,.io_link_token_i                (io_link_tkn_li [i])
+  //
+  //  ,.io_link_clk_i                  (io_link_clk_li [i])
+  //  ,.io_link_data_i                 (io_link_data_li[i])
+  //  ,.io_link_v_i                    (io_link_v_li   [i])
+  //  ,.io_link_token_o                (io_link_tkn_lo [i])
+  //  );
+  //
+  //end
 
-  for (genvar i = 0; i < mem_link_num_gp; i++)
+  logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0] wh_link_clk_li, wh_link_v_li, wh_link_tkn_lo;
+  logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] wh_link_data_li;
+  logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0] wh_link_clk_lo, wh_link_v_lo, wh_link_tkn_li;
+  logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] wh_link_data_lo;
+
+  for (genvar i = 0; i < mem_link_conc_num_gp; i++)
   begin: mem_link
 
-    bsg_chip_io_link_ddr
-   #(.ds_width_p                     (clk_gen_ds_width_gp                      )
-    ,.num_adgs_p                     (clk_gen_num_adgs_gp                      )
-    ,.width_p                        (mem_link_width_gp                        )
-    ,.channel_width_p                (mem_link_channel_width_gp                )
-    ,.num_channels_p                 (mem_link_num_channels_gp                 )
-    ,.lg_fifo_depth_p                (mem_link_lg_fifo_depth_gp                )
-    ,.lg_credit_to_token_decimation_p(mem_link_lg_credit_to_token_decimation_gp)
-    ,.use_extra_data_bit_p           (mem_link_use_extra_data_bit_gp           )
+    bsg_chip_noc_mem_link
+   #(.ds_width_p                         (clk_gen_ds_width_gp                      )
+    ,.num_adgs_p                         (clk_gen_num_adgs_gp                      )
+    ,.width_p                            (mem_link_width_gp                        )
+    ,.channel_width_p                    (mem_link_channel_width_gp                )
+    ,.num_channels_p                     (mem_link_num_channels_gp                 )
+    ,.lg_fifo_depth_p                    (mem_link_lg_fifo_depth_gp                )
+    ,.lg_credit_to_token_decimation_p    (mem_link_lg_credit_to_token_decimation_gp)
+    ,.use_extra_data_bit_p               (mem_link_use_extra_data_bit_gp           )
+    ,.tag_num_clients_p                  (tag_num_clients_gp                       )
+    ,.tag_lg_max_payload_width_p         (tag_lg_max_payload_width_gp              )
+    ,.sdr_lg_fifo_depth_p                (sdr_lg_fifo_depth_gp                     )
+    ,.sdr_lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp     )
+    ,.wh_ruche_factor_p                  (wh_ruche_factor_gp                       )
+    ,.wh_flit_width_p                    (wh_flit_width_gp                         )
+    ,.wh_len_width_p                     (wh_len_width_gp                          )
+    ,.wh_cid_width_p                     (wh_cid_width_gp                          )
+    ,.wh_cord_width_p                    (wh_cord_width_gp                         )
     ) link
-    (.core_clk_i                     (mem_noc_clk_lo[i]       ) // TODO: two links share one noc_clk
-    ,.ext_io_clk_i                   (ext_io_clk_i_int        )
+    (.ext_io_clk_i                   (ext_io_clk_i_int        )
     ,.ext_noc_clk_i                  (ext_noc_clk_i_int       )
     ,.async_output_disable_i         (async_output_disable_int)
-    ,.noc_clk_o                      (mem_noc_clk_lo[i]       )
 
-    ,.tag_clk_i                      (bsg_tag_clk_i_int                       )
-    ,.tag_io_tag_lines_i             (tag_lines_lo.mem_link_io             [i])
-    ,.tag_core_tag_lines_i           (tag_lines_lo.mem_link_core           [i])
-    ,.tag_io_async_reset_tag_lines_i (tag_lines_lo.mem_link_io_async_reset [i])
-    ,.tag_io_osc_tag_lines_i         (tag_lines_lo.mem_link_io_osc         [i])
-    ,.tag_io_osc_trigger_tag_lines_i (tag_lines_lo.mem_link_io_osc_trigger [i])
-    ,.tag_io_ds_tag_lines_i          (tag_lines_lo.mem_link_io_ds          [i])
-    ,.tag_io_sel_tag_lines_i         (tag_lines_lo.mem_link_io_sel         [i])
-    ,.tag_noc_async_reset_tag_lines_i(tag_lines_lo.mem_link_noc_async_reset[i])
-    ,.tag_noc_osc_tag_lines_i        (tag_lines_lo.mem_link_noc_osc        [i])
-    ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_lo.mem_link_noc_osc_trigger[i])
-    ,.tag_noc_ds_tag_lines_i         (tag_lines_lo.mem_link_noc_ds         [i])
-    ,.tag_noc_sel_tag_lines_i        (tag_lines_lo.mem_link_noc_sel        [i])
+    ,.tag_clk_i                      (tag_clk_lo              )
+    ,.tag_data_i                     (tag_data_lo             )
+    ,.tag_node_id_offset_i           ((`BSG_SAFE_CLOG2(tag_num_clients_gp))'(i*26))
 
-    ,.core_v_i                       (mem_links_lo[i].v                                )
-    ,.core_data_i                    (mem_links_lo[i].data                             )
-    ,.core_ready_and_o               (mem_links_li[i].ready_and_rev                    )
+    ,.io_link_clk_o                  (mem_link_clk_lo [i*2+:2])
+    ,.io_link_data_o                 (mem_link_data_lo[i*2+:2])
+    ,.io_link_v_o                    (mem_link_v_lo   [i*2+:2])
+    ,.io_link_token_i                (mem_link_tkn_li [i*2+:2])
 
-    ,.core_v_o                       (mem_links_li[i].v                                )
-    ,.core_data_o                    (mem_links_li[i].data                             )
-    ,.core_yumi_i                    (mem_links_li[i].v & mem_links_lo[i].ready_and_rev)
+    ,.io_link_clk_i                  (mem_link_clk_li [i*2+:2])
+    ,.io_link_data_i                 (mem_link_data_li[i*2+:2])
+    ,.io_link_v_i                    (mem_link_v_li   [i*2+:2])
+    ,.io_link_token_o                (mem_link_tkn_lo [i*2+:2])
 
-    ,.io_link_clk_o                  (mem_link_clk_lo [i])
-    ,.io_link_data_o                 (mem_link_data_lo[i])
-    ,.io_link_v_o                    (mem_link_v_lo   [i])
-    ,.io_link_token_i                (mem_link_tkn_li [i])
+    ,.io_wh_link_clk_o               (wh_link_clk_lo [i]      )
+    ,.io_wh_link_data_o              (wh_link_data_lo[i]      )
+    ,.io_wh_link_v_o                 (wh_link_v_lo   [i]      )
+    ,.io_wh_link_token_i             (wh_link_tkn_li [i]      )
 
-    ,.io_link_clk_i                  (mem_link_clk_li [i])
-    ,.io_link_data_i                 (mem_link_data_li[i])
-    ,.io_link_v_i                    (mem_link_v_li   [i])
-    ,.io_link_token_o                (mem_link_tkn_lo [i])
+    ,.io_wh_link_clk_i               (wh_link_clk_li [i]      )
+    ,.io_wh_link_data_i              (wh_link_data_li[i]      )
+    ,.io_wh_link_v_i                 (wh_link_v_li   [i]      )
+    ,.io_wh_link_token_o             (wh_link_tkn_lo [i]      )
     );
 
   end
@@ -325,11 +342,17 @@ module bsg_chip
   // HB Complex
   //
 
-  bsg_chip_core_complex core_complex
-  (.io_links_i    ( io_links_li        )
-  ,.io_links_o    ( io_links_lo        )
-  ,.mem_links_i   ( mem_links_li       )
-  ,.mem_links_o   ( mem_links_lo       )
-  );
+  // Loopback
+  assign wh_link_clk_li  = wh_link_clk_lo;
+  assign wh_link_v_li    = wh_link_v_lo;
+  assign wh_link_tkn_li  = wh_link_tkn_lo;
+  assign wh_link_data_li = wh_link_data_lo;
+
+  //bsg_chip_core_complex core_complex
+  //(.io_links_i    ( io_links_li        )
+  //,.io_links_o    ( io_links_lo        )
+  //,.mem_links_i   ( mem_links_li       )
+  //,.mem_links_o   ( mem_links_lo       )
+  //);
 
 `include "bsg_pinout_end.v"
