@@ -28,18 +28,16 @@ remove_block_pin_constraints
   set array_margin 12
   set welltab_margin 3
 
-  set reserved_width 56
+  set reserved_width 76
   # set reserved_height 20
 
   # PE array
-  set pe_width  [round_up_to_nearest 50 [unit_width]]
+  set pe_width  [round_up_to_nearest 47 [unit_width]]
   set pe_height [round_up_to_nearest 85 [unit_height]]
 
   set pe_num_x 8
   set pe_num_y 8
 
-  set pe_width  50
-  set pe_height 74.5
   set pe_margin_x 2
   set pe_margin_y 2
 

@@ -38,7 +38,8 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
 
   set array_margin 12
   set welltab_margin 3
-  set reserved_width 52  
+  set reserved_width 76  
+  # set reserved_height 20
 
   set tile_height [core_height]
   set tile_width  [core_width]
@@ -46,9 +47,6 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set keepout_margin_x [expr 6*[unit_width]]
   set keepout_margin_y [expr 1*[unit_height]]
   set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
-  
-  set reserved_width 56
-  # set reserved_height 20
 
   # PE array
   set pe_width  [round_up_to_nearest 47 [unit_width]]
@@ -92,7 +90,7 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
     -align left \
     -horizontal_channel_height [expr ($rf_height+$rf_margin)/2+$keepout_margin_y] \
     -vertical_channel_width [expr $keepout_margin_x] \
-    -orientation [list FN N FN N] \
+    -orientation FN \
     $sram_mems
   ]
 
