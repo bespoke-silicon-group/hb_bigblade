@@ -16,7 +16,7 @@ set core_margin_l 0
 
 set array_margin 12
 set welltab_margin 3
-set reserved_width 52
+set reserved_width 76
 
 # PE array
 set pe_width  [round_up_to_nearest 47 [unit_width]]
@@ -31,8 +31,8 @@ set pe_margin_y 2
 set pe_origin_x [expr $core_margin_l+$welltab_margin+$reserved_width+$array_margin]
 set pe_origin_y [expr $core_margin_b+$welltab_margin+$array_margin]
 
-foreach {idx_y} {0 1 2 3 4 5 6 7} {
-  foreach {idx_x} {0 1 2 3 4 5 6 7} {
+foreach {idx_x} {0 1 2 3 4 5 6 7} {
+  foreach {idx_y} {7 6 5 4 3 2 1 0} {
     set id [expr $idx_x+$idx_y*$pe_num_x]
     append_to_collection pe_cells [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/cgra/dpath/PE_rc__$id]
   }
