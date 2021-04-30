@@ -37,21 +37,17 @@ set_false_path -to   [get_ports "core_global_*_o*"]
 
 
 # pod tag client
-create_clock -period 5000 -name "pod_tag_clk" [get_ports "pod_tags_i\[clk\]"]
+create_clock -period 5000 -name "pod_tag_clk" [get_ports "tag_clk_i"]
 set_clock_uncertainty 20 [get_clocks "pod_tag_clk"]
-set_input_transition 50 [get_ports "pod_tags_i\[clk\]"]
+set_input_transition 50 [get_ports "tag_clk_i"]
 
+set tag_data_ports [get_ports "tag_data_i"]
+set_input_delay -max 200 -clock "pod_tag_clk" $tag_data_ports
+set_input_delay -min 200 -clock "pod_tag_clk" $tag_data_ports
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $tag_data_ports
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $tag_data_ports
 
-set tag_ports [list] 
-append_to_collection tag_ports [get_ports "pod_tags_i\[op\]"]
-append_to_collection tag_ports [get_ports "pod_tags_i\[param\]"]
-append_to_collection tag_ports [get_ports "pod_tags_i\[en\]"]
-set_input_delay -max 200 -clock "pod_tag_clk" $tag_ports
-set_input_delay -min 200 -clock "pod_tag_clk" $tag_ports
-set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $tag_ports
-set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" $tag_ports
-
+set_false_path -from [get_ports "node_id_offset_i*"]
 
 # async path 
 bsg_async_icl [all_clocks]
-

@@ -17,33 +17,28 @@ module bsg_manycore_pod_row_sdr
     ,  parameter total_num_tiles_x_lp=(hb_num_pods_x_gp*hb_num_tiles_x_gp)
 
     , parameter num_clk_ports_p=1
+
+    // TODO put actual parameter
+    , parameter tag_els_p=64
+    , parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
   )
   (
     // clk gen
-    input bsg_tag_s async_reset_tag_lines_i
-    , input bsg_tag_s osc_tag_lines_i
-    , input bsg_tag_s osc_trigger_tag_lines_i
-    , input bsg_tag_s ds_tag_lines_i
-    , input bsg_tag_s sel_tag_lines_i
-    , input async_output_disable_i
-    , input ext_clk_i
+    input ext_clk_i
 
     // pod tag
-    , input bsg_tag_s [hb_num_pods_x_gp-1:0] pod_tags_i
+    , input [hb_num_pods_x_gp-1:0] pod_tag_clk_i
+    , input [hb_num_pods_x_gp-1:0] pod_tag_data_i
+    , input [hb_num_pods_x_gp-1:0][tag_lg_els_lp-1:0] pod_tag_node_id_offset_i
+
+
+    , input [S:N][E:W] async_reset_tag_clk_i
+    , input [S:N][E:W] async_reset_tag_data_i
+    , input [S:N][E:W][tag_lg_els_lp-1:0] async_reset_tag_node_id_offset_i
+
+    // global coordinates
     , input [2+total_num_tiles_x_lp-1:0][hb_x_cord_width_gp-1:0] global_x_i
     , input [2+total_num_tiles_x_lp-1:0][hb_y_cord_width_gp-1:0] global_y_i
-
-    // sdr async reset (going horizontally through ver sdr)
-    , input [S:N] hor_sdr_async_uplink_reset_i
-    , input [S:N] hor_sdr_async_downlink_reset_i
-    , input [S:N] hor_sdr_async_downstream_reset_i
-    , input [S:N] hor_sdr_async_token_reset_i
-
-    // sdr async reset (going vertically through corner and hor sdr)
-    , input [E:W] ver_sdr_async_uplink_reset_i
-    , input [E:W] ver_sdr_async_downlink_reset_i
-    , input [E:W] ver_sdr_async_downstream_reset_i
-    , input [E:W] ver_sdr_async_token_reset_i
 
     // ver IO
     , output [S:N][2+total_num_tiles_x_lp-1:0]                    ver_io_fwd_link_clk_o
@@ -108,21 +103,7 @@ module bsg_manycore_pod_row_sdr
 
   // CLOCK GEN
   logic core_clk;
-
   assign core_clk = ext_clk_i;
-
-  //bsg_chip_clk_gen clkgen (
-  //  .async_reset_tag_lines_i    (async_reset_tag_lines_i)
-  //  ,.osc_tag_lines_i           (osc_tag_lines_i)
-  //  ,.osc_trigger_tag_lines_i   (osc_trigger_tag_lines_i)
-  //  ,.ds_tag_lines_i            (ds_tag_lines_i)
-  //  ,.sel_tag_lines_i           (sel_tag_lines_i)
-
-  //  ,.async_output_disable_i    (async_output_disable_i)
-  //  ,.ext_clk_i                 (ext_clk_i)
-
-  //  ,.clk_o                     (core_clk)
-  //);
 
 
   // POD array
@@ -194,7 +175,7 @@ module bsg_manycore_pod_row_sdr
 
   // NORTH SDR
   logic [hb_num_pods_x_gp-1:0][hb_num_tiles_x_gp-1:0] sdr_n_core_reset_ver_lo;
-  logic [hb_num_pods_x_gp-1:0] sdr_n_core_reset_lo;
+  logic [hb_num_pods_x_gp-1:0][E:W] sdr_n_core_reset_lo;
   logic [hb_num_pods_x_gp-1:0][hb_num_tiles_x_gp-1:0][hb_x_cord_width_gp-1:0] sdr_n_core_global_x_li, sdr_n_core_global_x_lo;
   logic [hb_num_pods_x_gp-1:0][hb_num_tiles_x_gp-1:0][hb_y_cord_width_gp-1:0] sdr_n_core_global_y_li, sdr_n_core_global_y_lo;
   logic [hb_num_pods_x_gp-1:0] sdr_n_async_uplink_reset_li,     sdr_n_async_uplink_reset_lo;
@@ -213,12 +194,6 @@ module bsg_manycore_pod_row_sdr
       ,.num_clk_ports_p(num_clk_ports_p)
     ) sdr_n (
       .core_clk_i                 ({num_clk_ports_p{core_clk}})
-    
-      ,.pod_tags_i_clk_                (pod_tags_i[x].clk)
-      ,.pod_tags_i_op_                (pod_tags_i[x].op)
-      ,.pod_tags_i_param_                (pod_tags_i[x].param)
-      ,.pod_tags_i_en_                (pod_tags_i[x].en)
-    
       ,.core_reset_o              (sdr_n_core_reset_lo[x])
       ,.core_reset_ver_o          (sdr_n_core_reset_ver_lo[x])
 
@@ -259,15 +234,12 @@ module bsg_manycore_pod_row_sdr
       ,.io_rev_link_data_i        (ver_io_rev_link_data_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
       ,.io_rev_link_v_i           (ver_io_rev_link_v_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
       ,.io_rev_link_token_o       (ver_io_rev_link_token_o[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+
+      ,.tag_clk_i         (pod_tag_clk_i[x])
+      ,.tag_data_i        (pod_tag_data_i[x])
+      ,.node_id_offset_i  (pod_tag_node_id_offset_i[x])
     );
 
-    // connect async reset port
-    if (x == 0) begin
-      assign sdr_n_async_uplink_reset_li[x]     = hor_sdr_async_uplink_reset_i[N];
-      assign sdr_n_async_downlink_reset_li[x]   = hor_sdr_async_downlink_reset_i[N];
-      assign sdr_n_async_downstream_reset_li[x] = hor_sdr_async_downstream_reset_i[N];
-      assign sdr_n_async_token_reset_li[x]      = hor_sdr_async_token_reset_i[N];
-    end
 
     // connect async_reset between sdr
     if (x > 0) begin
@@ -277,13 +249,13 @@ module bsg_manycore_pod_row_sdr
       assign sdr_n_async_token_reset_li[x]      = sdr_n_async_token_reset_lo[x-1];
     end
   
-    assign pod_reset_li[x] = sdr_n_core_reset_ver_lo[x];
   end
 
   assign sdr_n_core_global_x_li = global_x_i[1+:total_num_tiles_x_lp];
   assign sdr_n_core_global_y_li = global_y_i[1+:total_num_tiles_x_lp];
   assign pod_global_x_li = sdr_n_core_global_x_lo;
   assign pod_global_y_li = sdr_n_core_global_y_lo;
+  assign pod_reset_li = sdr_n_core_reset_ver_lo;
 
 
   // SOUTH SDR
@@ -339,20 +311,12 @@ module bsg_manycore_pod_row_sdr
       ,.io_rev_link_token_o       (ver_io_rev_link_token_o[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
     );
 
-    // connect async_reset port on west
-    if (x == 0) begin
-      assign sdr_s_async_uplink_reset_li[x]     = hor_sdr_async_uplink_reset_i[S];
-      assign sdr_s_async_downlink_reset_li[x]   = hor_sdr_async_downlink_reset_i[S];
-      assign sdr_s_async_downstream_reset_li[x] = hor_sdr_async_downstream_reset_i[S];
-      assign sdr_s_async_token_reset_li[x]      = hor_sdr_async_token_reset_i[S];
-    end
-
     // connect async_reset between sdr
     if (x > 0) begin
-      assign sdr_s_async_uplink_reset_li[x]     = sdr_s_async_uplink_reset_lo[x-1];
-      assign sdr_s_async_downlink_reset_li[x]   = sdr_s_async_downlink_reset_lo[x-1];
-      assign sdr_s_async_downstream_reset_li[x] = sdr_s_async_downstream_reset_lo[x-1];
-      assign sdr_s_async_token_reset_li[x]      = sdr_s_async_token_reset_lo[x-1];
+      assign sdr_s_async_uplink_reset_li[x-1]     = sdr_s_async_uplink_reset_lo[x];
+      assign sdr_s_async_downlink_reset_li[x-1]   = sdr_s_async_downlink_reset_lo[x];
+      assign sdr_s_async_downstream_reset_li[x-1] = sdr_s_async_downstream_reset_lo[x];
+      assign sdr_s_async_token_reset_li[x-1]      = sdr_s_async_token_reset_lo[x];
     end
   end
 
@@ -435,10 +399,10 @@ module bsg_manycore_pod_row_sdr
       assign sdr_w_ver_link_sif_li[y][S] = sdr_w_ver_link_sif_lo[y+1][N];
       assign sdr_w_ver_link_sif_li[y+1][N] = sdr_w_ver_link_sif_lo[y][S];
       // async reset
-      assign sdr_w_async_uplink_reset_li[y+1] = sdr_w_async_uplink_reset_lo[y];
-      assign sdr_w_async_downlink_reset_li[y+1] = sdr_w_async_downlink_reset_lo[y];
-      assign sdr_w_async_downstream_reset_li[y+1] = sdr_w_async_downstream_reset_lo[y];
-      assign sdr_w_async_token_reset_li[y+1] = sdr_w_async_token_reset_lo[y];
+      assign sdr_w_async_uplink_reset_li[y] = sdr_w_async_uplink_reset_lo[y+1];
+      assign sdr_w_async_downlink_reset_li[y] = sdr_w_async_downlink_reset_lo[y+1];
+      assign sdr_w_async_downstream_reset_li[y] = sdr_w_async_downstream_reset_lo[y+1];
+      assign sdr_w_async_token_reset_li[y] = sdr_w_async_token_reset_lo[y+1];
       // core reset
       assign sdr_w_core_reset_li[y+1] = sdr_w_core_reset_lo[y];
       // core global cord
@@ -553,7 +517,7 @@ module bsg_manycore_pod_row_sdr
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_nw (
     .core_clk_i         (core_clk)
-    ,.core_reset_i      (sdr_n_core_reset_lo[0])
+    ,.core_reset_i      (sdr_n_core_reset_lo[0][W])
     ,.core_reset_o      (sdr_w_core_reset_li[0])
 
     ,.core_global_x_i   (global_x_i[0])
@@ -567,15 +531,14 @@ module bsg_manycore_pod_row_sdr
     ,.core_wh_link_sif_i          (pod_wh_link_sif_lo[W][N])
     ,.core_wh_link_sif_o          (pod_wh_link_sif_li[W][N])
 
-    ,.async_uplink_reset_i        (ver_sdr_async_uplink_reset_i[W])
-    ,.async_downlink_reset_i      (ver_sdr_async_downlink_reset_i[W])
-    ,.async_downstream_reset_i    (ver_sdr_async_downstream_reset_i[W])
-    ,.async_token_reset_i         (ver_sdr_async_token_reset_i[W])
 
-    ,.async_uplink_reset_o        (sdr_w_async_uplink_reset_li[0])
-    ,.async_downlink_reset_o      (sdr_w_async_downlink_reset_li[0])
-    ,.async_downstream_reset_o    (sdr_w_async_downstream_reset_li[0])
-    ,.async_token_reset_o         (sdr_w_async_token_reset_li[0])
+    ,.tag_clk_i               (async_reset_tag_clk_i[N][W])
+    ,.tag_data_i              (async_reset_tag_data_i[N][W])
+    ,.tag_node_id_offset_i    (async_reset_tag_node_id_offset_i[N][W])
+    ,.async_uplink_reset_o        (sdr_n_async_uplink_reset_li[0])
+    ,.async_downlink_reset_o      (sdr_n_async_downlink_reset_li[0])
+    ,.async_downstream_reset_o    (sdr_n_async_downstream_reset_li[0])
+    ,.async_token_reset_o         (sdr_n_async_token_reset_li[0])
 
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[N][0])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[N][0])
@@ -622,7 +585,7 @@ module bsg_manycore_pod_row_sdr
     ,.wh_flit_width_p     (wh_flit_width_gp)
   ) sdr_ne (
     .core_clk_i         (core_clk)
-    ,.core_reset_i      (sdr_n_core_reset_ver_lo[hb_num_pods_x_gp-1][hb_num_tiles_x_gp-1])
+    ,.core_reset_i      (sdr_n_core_reset_lo[hb_num_pods_x_gp-1][E])
     ,.core_reset_o      (sdr_e_core_reset_li[0])
 
     ,.core_global_x_i   (global_x_i[2+total_num_tiles_x_lp-1])
@@ -636,11 +599,10 @@ module bsg_manycore_pod_row_sdr
     ,.core_wh_link_sif_i          (pod_wh_link_sif_lo[E][N])
     ,.core_wh_link_sif_o          (pod_wh_link_sif_li[E][N])
 
-    ,.async_uplink_reset_i        (ver_sdr_async_uplink_reset_i[E])
-    ,.async_downlink_reset_i      (ver_sdr_async_downlink_reset_i[E])
-    ,.async_downstream_reset_i    (ver_sdr_async_downstream_reset_i[E])
-    ,.async_token_reset_i         (ver_sdr_async_token_reset_i[E])
 
+    ,.tag_clk_i               (async_reset_tag_clk_i[N][E])
+    ,.tag_data_i              (async_reset_tag_data_i[N][E])
+    ,.tag_node_id_offset_i    (async_reset_tag_node_id_offset_i[N][E])
     ,.async_uplink_reset_o        (sdr_e_async_uplink_reset_li[0])
     ,.async_downlink_reset_o      (sdr_e_async_downlink_reset_li[0])
     ,.async_downstream_reset_o    (sdr_e_async_downstream_reset_li[0])
@@ -705,15 +667,13 @@ module bsg_manycore_pod_row_sdr
     ,.core_wh_link_sif_i          (pod_wh_link_sif_lo[W][S])
     ,.core_wh_link_sif_o          (pod_wh_link_sif_li[W][S])
 
-    ,.async_uplink_reset_i        (sdr_w_async_uplink_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_downlink_reset_i      (sdr_w_async_downlink_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_downstream_reset_i    (sdr_w_async_downstream_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_token_reset_i         (sdr_w_async_token_reset_lo[hb_num_tiles_y_gp-1])
-
-    ,.async_uplink_reset_o        ()
-    ,.async_downlink_reset_o      ()
-    ,.async_downstream_reset_o    ()
-    ,.async_token_reset_o         ()
+    ,.tag_clk_i               (async_reset_tag_clk_i[S][W])
+    ,.tag_data_i              (async_reset_tag_data_i[S][W])
+    ,.tag_node_id_offset_i    (async_reset_tag_node_id_offset_i[S][W])
+    ,.async_uplink_reset_o        (sdr_w_async_uplink_reset_li[hb_num_tiles_y_gp-1])
+    ,.async_downlink_reset_o      (sdr_w_async_downlink_reset_li[hb_num_tiles_y_gp-1])
+    ,.async_downstream_reset_o    (sdr_w_async_downstream_reset_li[hb_num_tiles_y_gp-1])
+    ,.async_token_reset_o         (sdr_w_async_token_reset_li[hb_num_tiles_y_gp-1])
 
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[S][0])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[S][0])
@@ -744,6 +704,7 @@ module bsg_manycore_pod_row_sdr
     ,.io_wh_link_data_i           (io_wh_link_data_i[W][S])
     ,.io_wh_link_v_i              (io_wh_link_v_i[W][S])
     ,.io_wh_link_token_o          (io_wh_link_token_o[W][S])
+
   );
 
   // CORNER SDR SE
@@ -775,15 +736,13 @@ module bsg_manycore_pod_row_sdr
     ,.core_wh_link_sif_o          (pod_wh_link_sif_li[E][S])
 
 
-    ,.async_uplink_reset_i        (sdr_e_async_uplink_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_downlink_reset_i      (sdr_e_async_downlink_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_downstream_reset_i    (sdr_e_async_downstream_reset_lo[hb_num_tiles_y_gp-1])
-    ,.async_token_reset_i         (sdr_e_async_token_reset_lo[hb_num_tiles_y_gp-1])
-
-    ,.async_uplink_reset_o()
-    ,.async_downlink_reset_o()
-    ,.async_downstream_reset_o()
-    ,.async_token_reset_o()
+    ,.tag_clk_i               (async_reset_tag_clk_i[S][E])
+    ,.tag_data_i              (async_reset_tag_data_i[S][E])
+    ,.tag_node_id_offset_i    (async_reset_tag_node_id_offset_i[S][E])
+    ,.async_uplink_reset_o      (sdr_s_async_uplink_reset_li[hb_num_pods_x_gp-1])
+    ,.async_downlink_reset_o    (sdr_s_async_downlink_reset_li[hb_num_pods_x_gp-1])
+    ,.async_downstream_reset_o  (sdr_s_async_downstream_reset_li[hb_num_pods_x_gp-1])
+    ,.async_token_reset_o       (sdr_s_async_token_reset_li[hb_num_pods_x_gp-1])
 
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[S][2+total_num_tiles_x_lp-1])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[S][2+total_num_tiles_x_lp-1])
@@ -814,6 +773,9 @@ module bsg_manycore_pod_row_sdr
     ,.io_wh_link_data_i           (io_wh_link_data_i[E][S])
     ,.io_wh_link_v_i              (io_wh_link_v_i[E][S])
     ,.io_wh_link_token_o          (io_wh_link_token_o[E][S])
+
+
+
   );
 
 

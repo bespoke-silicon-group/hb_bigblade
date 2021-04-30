@@ -17,8 +17,9 @@ for {set x 0} {$x < $HB_NUM_TILES_X_P} {incr x} {
 
 # bsg tag
 set llx [expr [die_urx] - 12]
-set lly [expr [die_ury] - 4.5]
+set lly [die_lly]
 set urx [die_urx]
 set ury [die_ury]
 create_bound -name "btc_bound" -boundary [list [list $llx $lly] [list $urx $ury]] -type hard
 add_to_bound "btc_bound" [get_flat_cells "btc*"]
+add_to_bound "btc_bound" [get_flat_cells "btm*"]

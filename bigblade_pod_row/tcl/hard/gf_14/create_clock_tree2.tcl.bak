@@ -1,12 +1,69 @@
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_create_clock_tree.tcl
+set bsg_cts_i 0
+
+proc bsg_create_clock_buffer {src x y  {invert 1} {stren 20} {vt "SL"}} {
+  global bsg_cts_i
+  set rd_x [round_down_to_nearest $x 0.084]
+  set rd_y [round_down_to_nearest $y 0.48]
+
+  # create buffer cell
+  if {$invert == 1} {
+    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14${vt}/SC7P5T_CKINVX${stren}_SSC14${vt}"
+  } else {
+    set lib_name "IN14LPP_SC7P5T_84CPP_BASE_SSC14${vt}/SC7P5T_CKBUFX${stren}_SSC14${vt}"
+  }
+
+  set cell_name "bsg_cts_${bsg_cts_i}"
+  set buffer_cell [create_cell $cell_name $lib_name]
+  move_objects -x $rd_x -y $rd_y $buffer_cell
+  set_fixed_object $buffer_cell
+  set_size_only [get_cells $buffer_cell] true
+
+  set buffer_input_pin [get_pin -of $buffer_cell -filter "name==CLK"]
+  set buffer_output_pin [get_pin -of $buffer_cell -filter "name==Z"]
+
+  # create new net
+  set src_net [get_net -of $src -quiet]
+  if {[sizeof_collection $src_net] == 0} {
+    set new_net_name "bsg_cts_net_${bsg_cts_i}"
+    create_net $new_net_name
+    set src_net [get_net $new_net_name]
+    connect_net -net $src_net [list $src $buffer_input_pin]
+    set_dont_touch $src_net true
+  } else {
+    connect_net -net $src_net [list $buffer_input_pin]
+    set_dont_touch $src_net true
+  }
+
+  incr bsg_cts_i
+  return $buffer_output_pin
+}
+
+proc bsg_connect_sinks {src sinks} {
+  global bsg_cts_i
+
+  set sink_net [get_net -of $sinks -quiet]
+  if {[sizeof_collection $sink_net] != 0} {
+    remove_net $sink_net
+  }
+
+  set src_net [get_net -of $src -quiet]
+  if {[sizeof_collection $src_net] == 0} {
+    set new_net_name "bsg_cts_net_${bsg_cts_i}"
+    create_net $new_net_name
+    set src_net [get_net $new_net_name]
+    connect_net -net $src_net [list $src $sinks]
+    set_dont_touch $src_net
+    incr bsg_cts_i
+  } else {
+    connect_net -net $src_net $sinks
+  }
+}
+
 
 #remove_cells [get_cells bsg_cts*]
 #remove_nets [get_nets bsg_cts*]
 disconnect_net [get_net "ext_clk_i"] -all
-disconnect_net [get_net "pod_tag_clk_i[0]"] -all
-disconnect_net [get_net "pod_tag_clk_i[1]"] -all
-disconnect_net [get_net "pod_tag_clk_i[2]"] -all
-disconnect_net [get_net "pod_tag_clk_i[3]"] -all
+disconnect_net [get_net "pod_tag_clk_i"] -all
 
 
 # center spine
@@ -87,26 +144,26 @@ set LVN7 [bsg_create_clock_buffer $LVN5 2429 1693]
 set LVN9 [bsg_create_clock_buffer $LVN7 2429 1844 0]
 
 
-set LCL0 [bsg_create_clock_buffer $LH7  2267  933]
-set LCL1 [bsg_create_clock_buffer $LCL0 1971  933]
-set LCL2 [bsg_create_clock_buffer $LCL1 1673  933]
-set LCL3 [bsg_create_clock_buffer $LCL2 1369  933]
+set LCL0 [bsg_create_clock_buffer $LH7  2267  933 1 8]
+set LCL1 [bsg_create_clock_buffer $LCL0 1971  933 1 8]
+set LCL2 [bsg_create_clock_buffer $LCL1 1673  933 1 8]
+set LCL3 [bsg_create_clock_buffer $LCL2 1369  933 1 16]
 bsg_connect_sinks $LCL3 [get_pins "podrow/px_0__pod/mc_y_2__mc_x_0__mc/clk_i"]
-set LCR0 [bsg_create_clock_buffer $LH7  2572  933]
-set LCR1 [bsg_create_clock_buffer $LCR0 2873  933]
-set LCR2 [bsg_create_clock_buffer $LCR1 3164  933]
-set LCR3 [bsg_create_clock_buffer $LCR2 3465  933]
+set LCR0 [bsg_create_clock_buffer $LH7  2572  933 1 8]
+set LCR1 [bsg_create_clock_buffer $LCR0 2873  933 1 8]
+set LCR2 [bsg_create_clock_buffer $LCR1 3164  933 1 8]
+set LCR3 [bsg_create_clock_buffer $LCR2 3465  933 1 16]
 bsg_connect_sinks $LCR3 [get_pins "podrow/px_1__pod/mc_y_2__mc_x_0__mc/clk_i"]
 
-set LN1L0 [bsg_create_clock_buffer $LVN3  2267  1312]
-set LN1L1 [bsg_create_clock_buffer $LN1L0 1971  1312]
-set LN1L2 [bsg_create_clock_buffer $LN1L1 1673  1312]
-set LN1L3 [bsg_create_clock_buffer $LN1L2 1369  1312]
+set LN1L0 [bsg_create_clock_buffer $LVN3  2267  1312 1 8]
+set LN1L1 [bsg_create_clock_buffer $LN1L0 1971  1312 1 8]
+set LN1L2 [bsg_create_clock_buffer $LN1L1 1673  1312 1 8]
+set LN1L3 [bsg_create_clock_buffer $LN1L2 1369  1312 1 16]
 bsg_connect_sinks $LN1L3 [get_pins "podrow/px_0__pod/mc_y_1__mc_x_0__mc/clk_i"]
-set LN1R0 [bsg_create_clock_buffer $LVN3  2572  1312]
-set LN1R1 [bsg_create_clock_buffer $LN1R0 2873  1312]
-set LN1R2 [bsg_create_clock_buffer $LN1R1 3164  1312]
-set LN1R3 [bsg_create_clock_buffer $LN1R2 3465  1312]
+set LN1R0 [bsg_create_clock_buffer $LVN3  2572  1312 1 8]
+set LN1R1 [bsg_create_clock_buffer $LN1R0 2873  1312 1 8]
+set LN1R2 [bsg_create_clock_buffer $LN1R1 3164  1312 1 8]
+set LN1R3 [bsg_create_clock_buffer $LN1R2 3465  1312 1 16]
 bsg_connect_sinks $LN1R3 [get_pins "podrow/px_1__pod/mc_y_1__mc_x_0__mc/clk_i"]
 
 set LN2L0 [bsg_create_clock_buffer $LVN7  2267  1693]
@@ -131,37 +188,37 @@ set LN3R2 [bsg_create_clock_buffer $LN3R1 3164  1844]
 set LN3R3 [bsg_create_clock_buffer $LN3R2 3465  1844]
 bsg_connect_sinks $LN3R3 [get_pins {sdr_n_x_1__sdr_n/core_clk_i podrow/px_1__pod/north_vc_x_0__north_vc_row/clk_i}]
 
-set LS1L0 [bsg_create_clock_buffer $LVS3  2267  552]
-set LS1L1 [bsg_create_clock_buffer $LS1L0 1971  552]
-set LS1L2 [bsg_create_clock_buffer $LS1L1 1673  552]
-set LS1L3 [bsg_create_clock_buffer $LS1L2 1369  552]
+set LS1L0 [bsg_create_clock_buffer $LVS3  2267  552 1 8]
+set LS1L1 [bsg_create_clock_buffer $LS1L0 1971  552 1 8]
+set LS1L2 [bsg_create_clock_buffer $LS1L1 1673  552 1 8]
+set LS1L3 [bsg_create_clock_buffer $LS1L2 1369  552 1 16]
 bsg_connect_sinks $LS1L3 [get_pins "podrow/px_0__pod/mc_y_3__mc_x_0__mc/clk_i"]
-set LS1R0 [bsg_create_clock_buffer $LVS3  2572  552]
-set LS1R1 [bsg_create_clock_buffer $LS1R0 2873  552]
-set LS1R2 [bsg_create_clock_buffer $LS1R1 3164  552]
-set LS1R3 [bsg_create_clock_buffer $LS1R2 3465  552]
+set LS1R0 [bsg_create_clock_buffer $LVS3  2572  552 1 8]
+set LS1R1 [bsg_create_clock_buffer $LS1R0 2873  552 1 8]
+set LS1R2 [bsg_create_clock_buffer $LS1R1 3164  552 1 8]
+set LS1R3 [bsg_create_clock_buffer $LS1R2 3465  552 1 16]
 bsg_connect_sinks $LS1R3 [get_pins "podrow/px_1__pod/mc_y_3__mc_x_0__mc/clk_i"]
 
-set LS2L0 [bsg_create_clock_buffer $LVS7  2267  172] 
-set LS2L1 [bsg_create_clock_buffer $LS2L0 1971  172]
-set LS2L2 [bsg_create_clock_buffer $LS2L1 1673  172]
-set LS2L3 [bsg_create_clock_buffer $LS2L2 1369  172]
+set LS2L0 [bsg_create_clock_buffer $LVS7  2267  172 1 8] 
+set LS2L1 [bsg_create_clock_buffer $LS2L0 1971  172 1 8]
+set LS2L2 [bsg_create_clock_buffer $LS2L1 1673  172 1 8]
+set LS2L3 [bsg_create_clock_buffer $LS2L2 1369  172 1 16]
 bsg_connect_sinks $LS2L3 [get_pins "podrow/px_0__pod/south_vc_x_0__south_vc_row/clk_i"]
-set LS2R0 [bsg_create_clock_buffer $LVS7  2572  172]
-set LS2R1 [bsg_create_clock_buffer $LS2R0 2873  172]
-set LS2R2 [bsg_create_clock_buffer $LS2R1 3164  172]
-set LS2R3 [bsg_create_clock_buffer $LS2R2 3465  172]
+set LS2R0 [bsg_create_clock_buffer $LVS7  2572  172 1 8]
+set LS2R1 [bsg_create_clock_buffer $LS2R0 2873  172 1 8]
+set LS2R2 [bsg_create_clock_buffer $LS2R1 3164  172 1 8]
+set LS2R3 [bsg_create_clock_buffer $LS2R2 3465  172 1 16]
 bsg_connect_sinks $LS2R3 [get_pins "podrow/px_1__pod/south_vc_x_0__south_vc_row/clk_i"]
 
-set LS3L0 [bsg_create_clock_buffer $LVS9  2267  22.5]
-set LS3L1 [bsg_create_clock_buffer $LS3L0 1971  22.5]
-set LS3L2 [bsg_create_clock_buffer $LS3L1 1673  22.5]
-set LS3L3 [bsg_create_clock_buffer $LS3L2 1369  22.5]
+set LS3L0 [bsg_create_clock_buffer $LVS9  2267  22.5 1 8]
+set LS3L1 [bsg_create_clock_buffer $LS3L0 1971  22.5 1 8]
+set LS3L2 [bsg_create_clock_buffer $LS3L1 1673  22.5 1 8]
+set LS3L3 [bsg_create_clock_buffer $LS3L2 1369  22.5 1 8]
 bsg_connect_sinks $LS3L3 [get_pins "sdr_s_x_0__sdr_s/core_clk_i"]
-set LS3R0 [bsg_create_clock_buffer $LVS9  2572  22.5]
-set LS3R1 [bsg_create_clock_buffer $LS3R0 2873  22.5]
-set LS3R2 [bsg_create_clock_buffer $LS3R1 3164  22.5]
-set LS3R3 [bsg_create_clock_buffer $LS3R2 3465  22.5]
+set LS3R0 [bsg_create_clock_buffer $LVS9  2572  22.5 1 8]
+set LS3R1 [bsg_create_clock_buffer $LS3R0 2873  22.5 1 8]
+set LS3R2 [bsg_create_clock_buffer $LS3R1 3164  22.5 1 8]
+set LS3R3 [bsg_create_clock_buffer $LS3R2 3465  22.5 1 16]
 bsg_connect_sinks $LS3R3 [get_pins "sdr_s_x_1__sdr_s/core_clk_i"]
 
 
@@ -235,26 +292,26 @@ set RVN7 [bsg_create_clock_buffer $RVN5 7186 1693]
 set RVN9 [bsg_create_clock_buffer $RVN7 7186 1844 0]
 
 
-set RCL0 [bsg_create_clock_buffer $RH7  7028  933]
-set RCL1 [bsg_create_clock_buffer $RCL0 6732  933]
-set RCL2 [bsg_create_clock_buffer $RCL1 6433  933]
-set RCL3 [bsg_create_clock_buffer $RCL2 6134  933]
+set RCL0 [bsg_create_clock_buffer $RH7  7028  933 1 8]
+set RCL1 [bsg_create_clock_buffer $RCL0 6732  933 1 8]
+set RCL2 [bsg_create_clock_buffer $RCL1 6433  933 1 8]
+set RCL3 [bsg_create_clock_buffer $RCL2 6134  933 1 16]
 bsg_connect_sinks $RCL3 [get_pins "podrow/px_2__pod/mc_y_2__mc_x_0__mc/clk_i"]
-set RCR0 [bsg_create_clock_buffer $RH7  7335  933]
-set RCR1 [bsg_create_clock_buffer $RCR0 7629  933]
-set RCR2 [bsg_create_clock_buffer $RCR1 7925  933]
-set RCR3 [bsg_create_clock_buffer $RCR2 8220  933]
+set RCR0 [bsg_create_clock_buffer $RH7  7335  933 1 8]
+set RCR1 [bsg_create_clock_buffer $RCR0 7629  933 1 8]
+set RCR2 [bsg_create_clock_buffer $RCR1 7925  933 1 8]
+set RCR3 [bsg_create_clock_buffer $RCR2 8220  933 1 16]
 bsg_connect_sinks $RCR3 [get_pins "podrow/px_3__pod/mc_y_2__mc_x_0__mc/clk_i"]
 
-set RN1L0 [bsg_create_clock_buffer $RVN3   7028  1312]
-set RN1L1 [bsg_create_clock_buffer $RN1L0  6732  1312]
-set RN1L2 [bsg_create_clock_buffer $RN1L1  6433  1312]
-set RN1L3 [bsg_create_clock_buffer $RN1L2  6134  1312]
+set RN1L0 [bsg_create_clock_buffer $RVN3   7028  1312 1 8]
+set RN1L1 [bsg_create_clock_buffer $RN1L0  6732  1312 1 8]
+set RN1L2 [bsg_create_clock_buffer $RN1L1  6433  1312 1 8]
+set RN1L3 [bsg_create_clock_buffer $RN1L2  6134  1312 1 16]
 bsg_connect_sinks $RN1L3 [get_pins "podrow/px_2__pod/mc_y_1__mc_x_0__mc/clk_i"]
-set RN1R0 [bsg_create_clock_buffer $RVN3   7335  1312]
-set RN1R1 [bsg_create_clock_buffer $RN1R0  7629  1312]
-set RN1R2 [bsg_create_clock_buffer $RN1R1  7925  1312]
-set RN1R3 [bsg_create_clock_buffer $RN1R2  8220  1312]
+set RN1R0 [bsg_create_clock_buffer $RVN3   7335  1312 1 8]
+set RN1R1 [bsg_create_clock_buffer $RN1R0  7629  1312 1 8]
+set RN1R2 [bsg_create_clock_buffer $RN1R1  7925  1312 1 8]
+set RN1R3 [bsg_create_clock_buffer $RN1R2  8220  1312 1 16]
 bsg_connect_sinks $RN1R3 [get_pins "podrow/px_3__pod/mc_y_1__mc_x_0__mc/clk_i"]
 
 set RN2L0 [bsg_create_clock_buffer $RVN7   7028  1693]
@@ -280,38 +337,38 @@ set RN3R3 [bsg_create_clock_buffer $RN3R2  8220  1844]
 bsg_connect_sinks $RN3R3 [get_pins {podrow/px_3__pod/north_vc_x_0__north_vc_row/clk_i sdr_n_x_3__sdr_n/core_clk_i}]
 
 
-set RS1L0 [bsg_create_clock_buffer $RVS3   7028  552]
-set RS1L1 [bsg_create_clock_buffer $RS1L0  6732  552]
-set RS1L2 [bsg_create_clock_buffer $RS1L1  6433  552]
-set RS1L3 [bsg_create_clock_buffer $RS1L2  6134  552]
+set RS1L0 [bsg_create_clock_buffer $RVS3   7028  552 1 8]
+set RS1L1 [bsg_create_clock_buffer $RS1L0  6732  552 1 8]
+set RS1L2 [bsg_create_clock_buffer $RS1L1  6433  552 1 8]
+set RS1L3 [bsg_create_clock_buffer $RS1L2  6134  552 1 16]
 bsg_connect_sinks $RS1L3 [get_pins "podrow/px_2__pod/mc_y_3__mc_x_0__mc/clk_i"]
-set RS1R0 [bsg_create_clock_buffer $RVS3   7335  552]
-set RS1R1 [bsg_create_clock_buffer $RS1R0  7629  552]
-set RS1R2 [bsg_create_clock_buffer $RS1R1  7925  552]
-set RS1R3 [bsg_create_clock_buffer $RS1R2  8220  552]
+set RS1R0 [bsg_create_clock_buffer $RVS3   7335  552 1 8]
+set RS1R1 [bsg_create_clock_buffer $RS1R0  7629  552 1 8]
+set RS1R2 [bsg_create_clock_buffer $RS1R1  7925  552 1 8]
+set RS1R3 [bsg_create_clock_buffer $RS1R2  8220  552 1 16]
 bsg_connect_sinks $RS1R3 [get_pins "podrow/px_3__pod/mc_y_3__mc_x_0__mc/clk_i"]
 
-set RS2L0 [bsg_create_clock_buffer $RVS7   7028  172]
-set RS2L1 [bsg_create_clock_buffer $RS2L0  6732  172]
-set RS2L2 [bsg_create_clock_buffer $RS2L1  6433  172]
-set RS2L3 [bsg_create_clock_buffer $RS2L2  6134  172]
+set RS2L0 [bsg_create_clock_buffer $RVS7   7028  172 1 8]
+set RS2L1 [bsg_create_clock_buffer $RS2L0  6732  172 1 8]
+set RS2L2 [bsg_create_clock_buffer $RS2L1  6433  172 1 8]
+set RS2L3 [bsg_create_clock_buffer $RS2L2  6134  172 1 16]
 bsg_connect_sinks $RS2L3 [get_pins "podrow/px_2__pod/south_vc_x_0__south_vc_row/clk_i"]
-set RS2R0 [bsg_create_clock_buffer $RVS7   7335  172]
-set RS2R1 [bsg_create_clock_buffer $RS2R0  7629  172]
-set RS2R2 [bsg_create_clock_buffer $RS2R1  7925  172]
-set RS2R3 [bsg_create_clock_buffer $RS2R2  8220  172]
+set RS2R0 [bsg_create_clock_buffer $RVS7   7335  172 1 8]
+set RS2R1 [bsg_create_clock_buffer $RS2R0  7629  172 1 8]
+set RS2R2 [bsg_create_clock_buffer $RS2R1  7925  172 1 8]
+set RS2R3 [bsg_create_clock_buffer $RS2R2  8220  172 1 16]
 bsg_connect_sinks $RS2R3 [get_pins "podrow/px_3__pod/south_vc_x_0__south_vc_row/clk_i"]
 
 
-set RS3L0 [bsg_create_clock_buffer $RVS9   7028  22.5]
-set RS3L1 [bsg_create_clock_buffer $RS3L0  6732  22.5]
-set RS3L2 [bsg_create_clock_buffer $RS3L1  6433  22.5]
-set RS3L3 [bsg_create_clock_buffer $RS3L2  6134  22.5]
+set RS3L0 [bsg_create_clock_buffer $RVS9   7028  22.5 1 8]
+set RS3L1 [bsg_create_clock_buffer $RS3L0  6732  22.5 1 8]
+set RS3L2 [bsg_create_clock_buffer $RS3L1  6433  22.5 1 8]
+set RS3L3 [bsg_create_clock_buffer $RS3L2  6134  22.5 1 16]
 bsg_connect_sinks $RS3L3 [get_pins "sdr_s_x_2__sdr_s/core_clk_i"]
-set RS3R0 [bsg_create_clock_buffer $RVS9   7335  22.5]
-set RS3R1 [bsg_create_clock_buffer $RS3R0  7629  22.5]
-set RS3R2 [bsg_create_clock_buffer $RS3R1  7925  22.5]
-set RS3R3 [bsg_create_clock_buffer $RS3R2  8220  22.5]
+set RS3R0 [bsg_create_clock_buffer $RVS9   7335  22.5 1 8]
+set RS3R1 [bsg_create_clock_buffer $RS3R0  7629  22.5 1 8]
+set RS3R2 [bsg_create_clock_buffer $RS3R1  7925  22.5 1 8]
+set RS3R3 [bsg_create_clock_buffer $RS3R2  8220  22.5 1 16]
 bsg_connect_sinks $RS3R3 [get_pins "sdr_s_x_3__sdr_s/core_clk_i"]
 
 

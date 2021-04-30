@@ -15,6 +15,7 @@ set bsg_padmapping    $::env(BSG_PADMAPPING)
 set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_misc/bsg_defines.v
     $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
+    $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
     $basejump_stl_dir/bsg_async/bsg_async_fifo.v
     $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
     $basejump_stl_dir/bsg_async/bsg_sync_sync.v
@@ -23,6 +24,7 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_misc/bsg_array_reverse.v
     $basejump_stl_dir/bsg_misc/bsg_scan.v
     $basejump_stl_dir/bsg_misc/bsg_mux.v
+    $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
     $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
     $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
     $basejump_stl_dir/bsg_misc/bsg_binary_plus_one_to_gray.v
@@ -92,11 +94,17 @@ set SVERILOG_SOURCE_FILES [join "
 
     $basejump_stl_dir/bsg_noc/bsg_noc_repeater_node.v
 
+    $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
+    $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
+    
     $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
     $bsg_designs_target_dir/v/bsg_manycore_link_wh_to_sdr_nw.v
     $bsg_designs_target_dir/v/bsg_manycore_link_wh_to_sdr_ne.v
     $bsg_designs_target_dir/v/bsg_manycore_link_wh_to_sdr_sw.v
     $bsg_designs_target_dir/v/bsg_manycore_link_wh_to_sdr_se.v
+
+
+
 
 "]

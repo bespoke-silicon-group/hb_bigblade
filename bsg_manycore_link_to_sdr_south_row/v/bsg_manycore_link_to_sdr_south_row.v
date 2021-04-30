@@ -119,24 +119,24 @@ module bsg_manycore_link_to_sdr_south_row
     );
 
     if (x == 0) begin
-      assign async_uplink_reset_li[x] = async_uplink_reset_i;
-      assign async_downlink_reset_li[x] = async_downlink_reset_i;
-      assign async_downstream_reset_li[x] = async_downstream_reset_i;
-      assign async_token_reset_li[x] = async_token_reset_i;
-    end
-  
-    if (x > 0) begin
-      assign async_uplink_reset_li[x] = async_uplink_reset_lo[x-1];
-      assign async_downlink_reset_li[x] = async_downlink_reset_lo[x-1];
-      assign async_downstream_reset_li[x] = async_downstream_reset_lo[x-1];
-      assign async_token_reset_li[x] = async_token_reset_lo[x-1];
-    end
-
-    if (x == num_tiles_x_p-1) begin
       assign async_uplink_reset_o = async_uplink_reset_lo[x];
       assign async_downlink_reset_o = async_downlink_reset_lo[x];
       assign async_downstream_reset_o = async_downstream_reset_lo[x];
       assign async_token_reset_o = async_token_reset_lo[x];
+    end
+  
+    if (x < num_tiles_x_p-1) begin
+      assign async_uplink_reset_li[x] = async_uplink_reset_lo[x+1];
+      assign async_downlink_reset_li[x] = async_downlink_reset_lo[x+1];
+      assign async_downstream_reset_li[x] = async_downstream_reset_lo[x+1];
+      assign async_token_reset_li[x] = async_token_reset_lo[x+1];
+    end
+
+    if (x == num_tiles_x_p-1) begin
+      assign async_uplink_reset_li[x] = async_uplink_reset_i;
+      assign async_downlink_reset_li[x] = async_downlink_reset_i;
+      assign async_downstream_reset_li[x] = async_downstream_reset_i;
+      assign async_token_reset_li[x] = async_token_reset_i;
     end
 
   end

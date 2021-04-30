@@ -74,8 +74,9 @@ set  sdr_horiz_east_width      [expr $grid_width*3.5]
 set  sdr_horiz_west_width      [expr $grid_width*3.75]
 set  sdr_horiz_height          [expr $grid_height*32.5]
 
-set  sdr_vert_width    [expr $grid_width*10.5]
-set  sdr_vert_height   [expr $grid_height*3.5]
+set  sdr_vert_width      [expr ($grid_width*10.5)+0.672]
+set  sdr_vert_height     [expr $grid_height*3.5]
+set  sdr_vert_x_pitch    [expr ($grid_width*11)]
 
 set  sdr_vert_row_width   [expr $grid_width*176.5]
 set  sdr_vert_row_height  [expr $grid_height*3.75]
@@ -94,7 +95,7 @@ set pod_row_width   [expr $sdr_horiz_west_width + \
 set  pod_row_height   [expr $sdr_vert_height + (0.5*$grid_height) + \
                         ($vcache_array_height+(0.5*$grid_height))*2 + \
                         ($tile_array_height+(0.5*$grid_height))*4 + \
-                        $sdr_vert_height + (1*$grid_height)]
+                        $sdr_vert_height + (0.5*$grid_height)]
 
 
 puts "BSG-info: Completed script [info script]\n"

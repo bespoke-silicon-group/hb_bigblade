@@ -1,5 +1,6 @@
 
  import bsg_noc_pkg::*;
+ import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
 
  #(parameter lg_fifo_depth_p                 = "inv"
@@ -12,6 +13,13 @@
 
   ,parameter wh_ruche_factor_p = "inv"
   ,parameter wh_flit_width_p   = "inv"
+
+  // TODO: set the real parameter
+  ,parameter tag_els_p=64
+  ,parameter tag_local_els_p=1
+  ,parameter tag_lg_width_p=1
+  ,parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
+    
 
   ,parameter link_sif_width_lp =
     `bsg_manycore_link_sif_width(addr_width_p,data_width_p,x_cord_width_p,y_cord_width_p)
@@ -38,10 +46,11 @@
   ,output [x_cord_width_p-1:0] core_global_x_o
   ,output [y_cord_width_p-1:0] core_global_y_o
 
-  ,input  async_uplink_reset_i
-  ,input  async_downlink_reset_i
-  ,input  async_downstream_reset_i
-  ,input  async_token_reset_i
+
+  // tag master
+  ,input tag_clk_i
+  ,input tag_data_i
+  ,input [tag_lg_els_lp-1:0] tag_node_id_offset_i
 
   ,output async_uplink_reset_o
   ,output async_downlink_reset_o
@@ -78,6 +87,35 @@
   ,input  [wh_ruche_factor_p-1:0]                      io_wh_link_v_i
   ,output [wh_ruche_factor_p-1:0]                      io_wh_link_token_o
   );
+
+
+  
+  // BTM
+  bsg_tag_s [tag_local_els_p-1:0] clients_lo;
+  bsg_tag_master_decentralized #(
+    .els_p(tag_els_p)
+    ,.local_els_p(tag_local_els_p)
+    ,.lg_width_p(tag_lg_width_p)
+  ) btm0 (
+    .clk_i(tag_clk_i)
+    ,.data_i(tag_data_i)
+    ,.node_id_offset_i(tag_node_id_offset_i)
+    ,.clients_o(clients_lo)
+  );
+
+  // BTC
+  logic async_uplink_reset_lo;
+  logic async_downlink_reset_lo;
+  logic async_downstream_reset_lo;
+  logic async_token_reset_lo;
+  bsg_tag_client_unsync #(
+    .width_p(4)
+  ) btc0 (
+    .bsg_tag_i(clients_lo)
+    ,.data_async_r_o({async_uplink_reset_lo, async_downlink_reset_lo, async_downstream_reset_lo, async_token_reset_lo})
+  );
+
+
 
   //-------------------------------------------
   //As the manycore will distribute across large area, it will take long
@@ -125,20 +163,20 @@
     ,.o(core_wh_link_sif_o[1])
   );
 
-  assign async_uplink_reset_o     = async_uplink_reset_i;
-  assign async_downlink_reset_o   = async_downlink_reset_i;
-  assign async_downstream_reset_o = async_downstream_reset_i;
-  assign async_token_reset_o      = async_token_reset_i;
+  assign async_uplink_reset_o     = async_uplink_reset_lo;
+  assign async_downlink_reset_o   = async_downlink_reset_lo;
+  assign async_downstream_reset_o = async_downstream_reset_lo;
+  assign async_token_reset_o      = async_token_reset_lo;
 
   logic core_uplink_reset_sync, core_downstream_reset_sync;
   bsg_sync_sync #(.width_p(1)) up_bss
   (.oclk_i     (core_clk_i            )
-  ,.iclk_data_i(async_uplink_reset_i  )
+  ,.iclk_data_i(async_uplink_reset_lo  )
   ,.oclk_data_o(core_uplink_reset_sync)
   );
   bsg_sync_sync #(.width_p(1)) down_bss
   (.oclk_i     (core_clk_i                )
-  ,.iclk_data_i(async_downstream_reset_i  )
+  ,.iclk_data_i(async_downstream_reset_lo  )
   ,.oclk_data_o(core_downstream_reset_sync)
   );
 
@@ -152,8 +190,8 @@
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
   ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_i)
-  ,.async_token_reset_i    (async_token_reset_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo)
+  ,.async_token_reset_i    (async_token_reset_lo)
 
   ,.core_data_i (ver_link_sif_li.fwd.data)
   ,.core_v_i    (ver_link_sif_li.fwd.v)
@@ -184,8 +222,8 @@
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
   ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_i)
-  ,.async_token_reset_i    (async_token_reset_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo)
+  ,.async_token_reset_i    (async_token_reset_lo)
 
   ,.core_data_i (ver_link_sif_li.rev.data)
   ,.core_v_i    (ver_link_sif_li.rev.v)
@@ -218,8 +256,8 @@
     (.core_clk_i             (core_clk_i)
     ,.core_uplink_reset_i    (core_uplink_reset_sync)
     ,.core_downstream_reset_i(core_downstream_reset_sync)
-    ,.async_downlink_reset_i (async_downlink_reset_i)
-    ,.async_token_reset_i    (async_token_reset_i)
+    ,.async_downlink_reset_i (async_downlink_reset_lo)
+    ,.async_token_reset_i    (async_token_reset_lo)
 
     ,.core_data_i (wh_link_sif_li[i].data)
     ,.core_v_i    (wh_link_sif_li[i].v)

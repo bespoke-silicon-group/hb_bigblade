@@ -35,9 +35,13 @@ proc place_pins_k2_k4 {pins start_x y} {
   }
 }
 
+set tag_ports [list]
+append_to_collection tag_ports [get_ports "tag_clk_i"]
+append_to_collection tag_ports [get_ports "tag_data_i"]
+append_to_collection tag_ports [get_ports "node_id_offset_i*"]
+place_pins_k2_k4 $tag_ports [expr 0.128*18468]  [die_ury]
 
-place_pins_k2_k4 [get_ports "pod_tags*"] [expr 0.128*18468]  [die_ury]
 
 
-
+set_individual_pin_constraints -ports [get_ports "core_reset_o[2]"] -allowed_layers "K3" -location "[die_urx] [expr 0.128*50]"
 

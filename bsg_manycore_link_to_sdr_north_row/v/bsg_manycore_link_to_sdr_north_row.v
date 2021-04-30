@@ -1,6 +1,7 @@
 module bsg_manycore_link_to_sdr_north_row
   import bsg_manycore_pkg::*;
   import bsg_tag_pkg::*;
+  import bsg_noc_pkg::*;
   #(parameter num_tiles_x_p="inv"
     , parameter addr_width_p="inv"
     , parameter data_width_p="inv"
@@ -14,16 +15,21 @@ module bsg_manycore_link_to_sdr_north_row
     , parameter rev_width_lp =
       `bsg_manycore_return_packet_width(x_cord_width_p,y_cord_width_p,data_width_p)
 
-
     , parameter lg_fifo_depth_p="inv"
     , parameter lg_credit_to_token_decimation_p="inv"
 
     , parameter num_clk_ports_p=1
+
+    // TODO: put actual parameter
+    , parameter tag_els_p=64
+    , parameter tag_local_els_p=1
+    , parameter tag_lg_width_p=1
+    , parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
   )
   (
     input [num_clk_ports_p-1:0] core_clk_i
     , output [num_tiles_x_p-1:0] core_reset_ver_o
-    , output core_reset_o
+    , output [E:W]  core_reset_o
 
     , input  [num_tiles_x_p-1:0][x_cord_width_p-1:0] core_global_x_i
     , input  [num_tiles_x_p-1:0][y_cord_width_p-1:0] core_global_y_i
@@ -63,8 +69,25 @@ module bsg_manycore_link_to_sdr_north_row
     ,input  [num_tiles_x_p-1:0]                   io_rev_link_v_i
     ,output [num_tiles_x_p-1:0]                   io_rev_link_token_o
 
-    , input bsg_tag_s pod_tags_i
+    // bsg_tag_master
+    ,input tag_clk_i
+    ,input tag_data_i
+    ,input [tag_lg_els_lp-1:0] node_id_offset_i
   );
+
+  // BTM
+  bsg_tag_s clients_lo;
+  bsg_tag_master_decentralized #(
+    .els_p(tag_els_p)
+    ,.local_els_p(tag_local_els_p)
+    ,.lg_width_p(tag_lg_width_p)
+  ) btm0 (
+    .clk_i(tag_clk_i)
+    ,.data_i(tag_data_i)
+    ,.node_id_offset_i(node_id_offset_i)
+    ,.clients_o(clients_lo)
+  );
+
 
   // BTC for core reset
   logic btc_core_reset_lo;
@@ -72,7 +95,7 @@ module bsg_manycore_link_to_sdr_north_row
     .width_p(1)
     ,.default_p(0)
   ) btc (
-    .bsg_tag_i(pod_tags_i)
+    .bsg_tag_i(clients_lo)
     ,.recv_clk_i(core_clk_i)
     ,.recv_reset_i(1'b0)
     ,.recv_new_r_o()
@@ -149,7 +172,7 @@ module bsg_manycore_link_to_sdr_north_row
     );
 
     if (x == 0) begin
-      assign core_reset_o = core_reset_lo[x][1];
+      assign core_reset_o[W] = core_reset_lo[x][1];
       assign async_uplink_reset_li[x] = async_uplink_reset_i;
       assign async_downlink_reset_li[x] = async_downlink_reset_i;
       assign async_downstream_reset_li[x] = async_downstream_reset_i;
@@ -173,6 +196,7 @@ module bsg_manycore_link_to_sdr_north_row
       assign async_downlink_reset_o = async_downlink_reset_lo[x];
       assign async_downstream_reset_o = async_downstream_reset_lo[x];
       assign async_token_reset_o = async_token_reset_lo[x];
+      assign core_reset_o[E] = btc_core_reset_lo;
     end
 
     assign core_reset_ver_o[x] = core_reset_lo[x][0];
