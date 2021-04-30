@@ -51,14 +51,12 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   # set reserved_height 20
 
   # PE array
-  set pe_width  [round_up_to_nearest 50 [unit_width]]
+  set pe_width  [round_up_to_nearest 47 [unit_width]]
   set pe_height [round_up_to_nearest 85 [unit_height]]
   
   set pe_num_x 8
   set pe_num_y 8
   
-  set pe_width  50
-  set pe_height 74.5
   set pe_margin_x 2
   set pe_margin_y 2
   
@@ -86,25 +84,45 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   # Take all clock ports and place them center-left
   
   # createFence cgra_xcel/dpath/scratchpad $sp_lx $sp_ly $sp_rx $sp_ry
-  
-  for {set idx 0} {$idx < 4} {incr idx} {
-    set cur_lx [expr $sp_lx]
-    set cur_ly [expr $sp_ly+($rf_height+$rf_margin)*$idx]
-    set cur_rx [expr $cur_lx+$rf_width]
-    set cur_ry [expr $cur_ly+$rf_height]
-    if {$idx > 0 && $idx < 3} {
-      rotate_objects \
-        [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
-        -orient FN
-    } else {
-      rotate_objects \
-        [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
-        -orient N
-    }
-    create_bound pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 \
-      -name BANK_rc__$idx \
-      -boundary [list [list $cur_lx $cur_ly] [list $cur_rx $cur_ry]] \
-      -type soft
-    #setObjFPlanBox Instance pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 $cur_lx $cur_ly $cur_rx $cur_ry
-  }
+ 
+  set sram_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*brg_rf_1024_32"]
+  set sram_ma [create_macro_array \
+    -num_rows 4 \
+    -num_cols 1 \
+    -align left \
+    -horizontal_channel_height [expr ($rf_height+$rf_margin)/2+$keepout_margin_y] \
+    -vertical_channel_width [expr $keepout_margin_x] \
+    -orientation [list FN N FN N] \
+    $sram_mems
+  ]
+
+  create_keepout_margin -type hard -outer $keepout_margins $sram_mems
+
+  set_macro_relative_location \
+    -target_object $sram_ma \
+    -target_corner bl \
+    -target_orientation R0 \
+    -anchor_corner bl \
+    -offset [list $sp_lx $sp_ly]
+   
+  #for {set idx 0} {$idx < 4} {incr idx} {
+  #  set cur_lx [expr $sp_lx]
+  #  set cur_ly [expr $sp_ly+($rf_height+$rf_margin)*$idx]
+  #  set cur_rx [expr $cur_lx+$rf_width]
+  #  set cur_ry [expr $cur_ly+$rf_height]
+  #  if {$idx > 0 && $idx < 3} {
+  #    rotate_objects \
+  #      [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
+  #      -orient FN
+  #  } else {
+  #    rotate_objects \
+  #      [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32] \
+  #      -orient N
+  #  }
+  #  create_bound pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 \
+  #    -name BANK_rc__$idx \
+  #    -boundary [list [list $cur_lx $cur_ly] [list $cur_rx $cur_ry]] \
+  #    -type soft
+  #  #setObjFPlanBox Instance pod/hb_cgra_xcel/cgra_xcel/dpath/scratchpad/banks__$idx/sram/sram/brg_rf_1024_32 $cur_lx $cur_ly $cur_rx $cur_ry
+  #}
 }

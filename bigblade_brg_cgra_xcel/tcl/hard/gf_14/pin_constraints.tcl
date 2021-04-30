@@ -125,9 +125,9 @@ remove_block_pin_constraints
   append_to_collection misc_pins [get_pins -hier $master_pe/* -filter "name=~y_cord*"]
 
   set num_misc_pins [expr [llength $misc_pins]]
-  set misc_spacing  [expr 4*0.16]
+  set misc_spacing  [expr 0.16]
   set start_y [expr $pe_height/2 - $misc_spacing*$num_misc_pins/2]
-  set last_loc [bsg_pins_line_constraint $misc_pins "C4" left $start_y $master_pe "" 2 0]
+  set last_loc [bsg_pins_line_constraint $misc_pins "C4" left $start_y $master_pe "" 1 1]
 
   #-------------------------------------------------------------------------
   # Cfg pins
@@ -136,34 +136,50 @@ remove_block_pin_constraints
   set pins_cfg_out [get_pins -hier $master_pe/* -filter "name=~cfg_out*"]
   set cfg_pins_len [expr [llength $pins_cfg_in]]
 
-  set cfg_spacing [expr 4*0.16]
+  set cfg_spacing [expr 2*0.16]
   set start_x [expr $pe_width/2 - $cfg_pins_len*$cfg_spacing/2]
-  set last_loc [bsg_pins_line_constraint $pins_cfg_in "C5" top $start_x $master_pe $pins_cfg_out 2 2]
+  set last_loc [bsg_pins_line_constraint $pins_cfg_in "C5" top $start_x $master_pe $pins_cfg_out 1 1]
 
   #-------------------------------------------------------------------------
   # Msg  pins
   #-------------------------------------------------------------------------
-  set msg_pins_i [get_pins -hier $master_pe/* -filter "name=~in__*"]
-  set msg_pins_o [get_pins -hier $master_pe/* -filter "name=~out__*"]
+  set msg_pins_i [get_pins -hier $master_pe/* -filter "name=~in___msg*"]
+  set msg_pins_o [get_pins -hier $master_pe/* -filter "name=~out__msg*"]
   set msg_pin_len [expr [sizeof_collection $msg_pins_o] / 4]
 
   set msg_pins_o_N [index_collection $msg_pins_o [expr 0*$msg_pin_len] [expr 1*$msg_pin_len-1]]
+  append_to_collection msg_pins_o_N [get_pins -hier $master_pe/* -filter "name=~out__val[0]"]
+  append_to_collection msg_pins_o_N [get_pins -hier $master_pe/* -filter "name=~out__rdy[0]"]
   set msg_pins_i_N [index_collection $msg_pins_i [expr 0*$msg_pin_len] [expr 1*$msg_pin_len-1]]
+  append_to_collection msg_pins_i_N [get_pins -hier $master_pe/* -filter "name=~in___val[0]"]
+  append_to_collection msg_pins_i_N [get_pins -hier $master_pe/* -filter "name=~in___rdy[0]"]
   set msg_pins_o_S [index_collection $msg_pins_o [expr 1*$msg_pin_len] [expr 2*$msg_pin_len-1]]
+  append_to_collection msg_pins_o_S [get_pins -hier $master_pe/* -filter "name=~out__val[1]"]
+  append_to_collection msg_pins_o_S [get_pins -hier $master_pe/* -filter "name=~out__rdy[1]"]
   set msg_pins_i_S [index_collection $msg_pins_i [expr 1*$msg_pin_len] [expr 2*$msg_pin_len-1]]
+  append_to_collection msg_pins_i_S [get_pins -hier $master_pe/* -filter "name=~in___val[1]"]
+  append_to_collection msg_pins_i_S [get_pins -hier $master_pe/* -filter "name=~in___rdy[1]"]
   set msg_pins_o_W [index_collection $msg_pins_o [expr 2*$msg_pin_len] [expr 3*$msg_pin_len-1]]
+  append_to_collection msg_pins_o_W [get_pins -hier $master_pe/* -filter "name=~out__val[2]"]
+  append_to_collection msg_pins_o_W [get_pins -hier $master_pe/* -filter "name=~out__rdy[2]"]
   set msg_pins_i_W [index_collection $msg_pins_i [expr 2*$msg_pin_len] [expr 3*$msg_pin_len-1]]
+  append_to_collection msg_pins_i_W [get_pins -hier $master_pe/* -filter "name=~in___val[2]"]
+  append_to_collection msg_pins_i_W [get_pins -hier $master_pe/* -filter "name=~in___rdy[2]"]
   set msg_pins_o_E [index_collection $msg_pins_o [expr 3*$msg_pin_len] [expr 4*$msg_pin_len-1]]
+  append_to_collection msg_pins_o_E [get_pins -hier $master_pe/* -filter "name=~out__val[3]"]
+  append_to_collection msg_pins_o_E [get_pins -hier $master_pe/* -filter "name=~out__rdy[3]"]
   set msg_pins_i_E [index_collection $msg_pins_i [expr 3*$msg_pin_len] [expr 4*$msg_pin_len-1]]
+  append_to_collection msg_pins_i_E [get_pins -hier $master_pe/* -filter "name=~in___val[3]"]
+  append_to_collection msg_pins_i_E [get_pins -hier $master_pe/* -filter "name=~in___rdy[3]"]
 
-  set msg_spacing [expr 0.128*4]
+  set msg_spacing [expr 2*0.128]
   set start_y [expr $pe_height/2 - $msg_spacing*$msg_pin_len/2]
   set start_x [expr $pe_width/2 - $msg_spacing*$msg_pin_len/2]
 
-  set last_loc [bsg_pins_line_constraint $msg_pins_o_N "K2 K4" top $start_x $master_pe $msg_pins_i_S 2 2]
-  set last_loc [bsg_pins_line_constraint $msg_pins_i_N "K2 K4" top $last_loc $master_pe $msg_pins_o_S 2 2]
-  set last_loc [bsg_pins_line_constraint $msg_pins_o_E "K1 K3" right $start_y $master_pe $msg_pins_i_W 2 2]
-  set last_loc [bsg_pins_line_constraint $msg_pins_i_E "K1 K3" right $last_loc $master_pe $msg_pins_o_W 2 2]
+  set last_loc [bsg_pins_line_constraint $msg_pins_o_N "K2 K4" top $start_x $master_pe $msg_pins_i_S 1 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_i_N "K2 K4" top $last_loc $master_pe $msg_pins_o_S 1 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_o_E "K1 K3" right $start_y $master_pe $msg_pins_i_W 1 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_i_E "K1 K3" right $last_loc $master_pe $msg_pins_o_W 1 1]
 
 puts "BSG-info: Completed script [info script]\n"
 

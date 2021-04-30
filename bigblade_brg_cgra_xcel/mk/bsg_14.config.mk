@@ -64,7 +64,7 @@ export BSG_PADMAPPING :=default
 
 # Select the target power grid. We have multiple power grid implementations
 # that can be used. Currently available power grids include none, default_wb
-export BSG_POWER_GRID :=none
+export BSG_POWER_GRID :=default_wb
 
 # Select the target power intent. The power intent contains the power ports
 # and nets that will be available as well as maps cells to power domains.
@@ -103,8 +103,8 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 # - rtm_exp
 #     Runtime exploration is designed to be quick and used for early experiments
 #export DC_FLOW_RMPLUS_FLOW :=hplp
-export DC_FLOW_RMPLUS_FLOW :=rtm_exp
-#export DC_FLOW_RMPLUS_FLOW :=
+#export DC_FLOW_RMPLUS_FLOW :=rtm_exp
+export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are
