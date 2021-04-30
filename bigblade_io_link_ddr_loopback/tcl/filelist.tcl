@@ -22,8 +22,8 @@ set SVERILOG_PACKAGE_FILES [join "
 # in _pkg). The rest of the files should allowed in any order.
 set SVERILOG_SOURCE_FILES [join "
   $SVERILOG_PACKAGE_FILES
-  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
-  $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_misc/bsg_dff.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_chain.v
   $bsg_designs_target_dir/v/bsg_chip_core_complex.v
   $bsg_designs_target_dir/v/bsg_chip.v
 "]
