@@ -16,11 +16,12 @@ set_app_var timing_enable_multiple_clocks_per_reg true
 set_app_var case_analysis_propagate_through_icg true
 ########################################
 
-set tag_clk_name           "tag_clk"
-set tag_clk_period_ps      10000.0 ;# 100 MHz
-set tag_clk_uncertainty_ps 20
-create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_pins pad_ML0_0_i/Y]
-set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
+#set tag_clk_name           "tag_clk"
+#set tag_clk_period_ps      10000.0 ;# 100 MHz
+#set tag_clk_uncertainty_ps 20
+#create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_pins pad_ML0_0_i/Y]
+#create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports p_pad_ML0_0_i]
+#set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
 set osc_period_ps         250.0 ;# Raw oscillator frequency
 set osc_uncertainty_ps    20
@@ -36,8 +37,21 @@ set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_noc_clk_name]
 
 
 # tag constraints
-set tag_in_pins [get_pins {pad_ML0_1_i/Y pad_ML0_2_i/Y}]
-set_input_delay [expr $tag_clk_period_ps/2] -clock $tag_clk_name $tag_in_pins
+#set tag_in_pins [get_pins {pad_ML0_1_i/Y pad_ML0_2_i/Y}]
+#set tag_in_ports [get_ports {p_pad_ML0_1_i p_pad_ML0_2_i}]
+#set_input_delay [expr $tag_clk_period_ps/2] -clock $tag_clk_name -source_latency_included -network_latency_included $tag_in_ports
+
+# regard tag_clk_i as data pin
+set_attribute [get_lib_pins */bsg_chip_noc_mem_link/tag_clk_i] clock false
+
+set_data_check -from [get_pins mem_link*0*link/tag_clk_i] -to [get_pins mem_link*0*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*1*link/tag_clk_i] -to [get_pins mem_link*1*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*2*link/tag_clk_i] -to [get_pins mem_link*2*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*3*link/tag_clk_i] -to [get_pins mem_link*3*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*4*link/tag_clk_i] -to [get_pins mem_link*4*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*5*link/tag_clk_i] -to [get_pins mem_link*5*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*6*link/tag_clk_i] -to [get_pins mem_link*6*link/tag_data_i] 5000
+set_data_check -from [get_pins mem_link*7*link/tag_clk_i] -to [get_pins mem_link*7*link/tag_data_i] 5000
 
 
 # false path
