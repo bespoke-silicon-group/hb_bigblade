@@ -122,9 +122,8 @@ package bsg_chip_pkg;
   localparam tag_num_masters_gp = 2;
   localparam tag_num_clients_gp = 512; //$bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
 
-  // Set mininum payload width to 10-bits (fixed to 10 most of the time)
-  localparam tag_max_payload_width_in_clk_gen_pd_gp = `BSG_MAX(clk_gen_ds_width_gp+1, clk_gen_num_adgs_gp+4);
-  localparam tag_max_payload_width_gp = tag_max_payload_width_in_clk_gen_pd_gp;
+  // Set mininum payload width to 9-bits
+  localparam tag_max_payload_width_gp = 9;
 
   // The number of bits required to represent the max payload width
   localparam tag_lg_max_payload_width_gp = `BSG_SAFE_CLOG2(tag_max_payload_width_gp + 1);
