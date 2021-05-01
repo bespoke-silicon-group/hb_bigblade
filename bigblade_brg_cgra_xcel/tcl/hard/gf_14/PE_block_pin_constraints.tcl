@@ -1,10 +1,15 @@
 #=========================================================================
 # floorplan.tcl
 #=========================================================================
-# This script is called from the Innovus init flow step.
+# This script is called from the Innovus init flow step. The constraitns
+# below places cfg_out on the north edge, cfg_in on the south,
+# val/rdy0 + msg[32:0] on the south, val/rdy1 + msg[65:33] on the north,
+# val/rdy2 + msg[98:66] on the west, and val/rdy3 + msg[131:99] on the
+# east. Applying constraints in this script effectively rotates the
+# logical PE block by 90 degrees clockwise.
 #
-# Author : Yanghui Ou
-# Date   : Jan 20, 2021
+# Author : Yanghui Ou, Peitian Pan
+# Date   : May 1, 2021
 
 set pe_width  50.00
 set pe_height 85.00
@@ -74,11 +79,11 @@ for {set i 0} {$i < 38} {incr i} {
 set cfg_spacing [expr 4*0.16]
 set start_x [expr $pe_width/2 - 39/2*$cfg_spacing]
 
-for {set i 0} {$i < [expr [llength $pins_cfg_in]]} {incr i} {
-  editPin -pin [lindex $pins_cfg_in $i] -layer C5 -snap TRACK -assign [expr $start_x+$i*$cfg_spacing] $pe_height
-}
 for {set i 0} {$i < [expr [llength $pins_cfg_out]]} {incr i} {
-  editPin -pin [lindex $pins_cfg_out $i] -layer C5 -snap TRACK -assign [expr $start_x+$i*$cfg_spacing] 0
+  editPin -pin [lindex $pins_cfg_out $i] -layer C5 -snap TRACK -assign [expr $start_x+$i*$cfg_spacing] $pe_height
+}
+for {set i 0} {$i < [expr [llength $pins_cfg_in]]} {incr i} {
+  editPin -pin [lindex $pins_cfg_in $i] -layer C5 -snap TRACK -assign [expr $start_x+$i*$cfg_spacing] 0
 }
 
 
@@ -90,28 +95,28 @@ set spacing [expr 0.128*4]
 set start_x [expr $pe_width/2  - 35*$spacing]
 set start_y [expr $pe_height/2 - 35*$spacing]
 
-lappend pins_north in___val[0] in___rdy[0]
+lappend pins_south in___val[0] in___rdy[0]
 for {set i 0} {$i < 33} {incr i} {
   set idx [expr $i + 33*0]
-  lappend pins_north in___msg[$idx]
+  lappend pins_south in___msg[$idx]
 }
 
-lappend pins_north out__val[0] out__rdy[0]
+lappend pins_south out__val[0] out__rdy[0]
 for {set i 0} {$i < 33} {incr i} {
   set idx [expr $i + 33*0]
-  lappend pins_north out__msg[$idx]
-}
-
-lappend pins_south out__val[1] out__rdy[1]
-for {set i 0} {$i < 33} {incr i} {
-  set idx [expr $i + 33*1]
   lappend pins_south out__msg[$idx]
 }
 
-lappend pins_south in___val[1] in___rdy[1]
+lappend pins_north out__val[1] out__rdy[1]
 for {set i 0} {$i < 33} {incr i} {
   set idx [expr $i + 33*1]
-  lappend pins_south in___msg[$idx]
+  lappend pins_north out__msg[$idx]
+}
+
+lappend pins_north in___val[1] in___rdy[1]
+for {set i 0} {$i < 33} {incr i} {
+  set idx [expr $i + 33*1]
+  lappend pins_north in___msg[$idx]
 }
 
 lappend pins_west in___val[2] in___rdy[2]
