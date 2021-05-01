@@ -86,7 +86,7 @@ append_to_collection clk_reset_tag_ports [get_ports "ext_noc_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "async_output_disable_i"]
 append_to_collection clk_reset_tag_ports [get_ports "noc_clk_o"]
 
-place_pins_k2_k4 $clk_reset_tag_ports [expr $core_urx/2+(0.128*65)] $core_ury
+place_pins_k1_k3 $clk_reset_tag_ports [expr $core_ury-(0.128*100)] $core_urx
 
 
 set BSG_LINK_DDR_DATA_WIDTH    33
