@@ -6,6 +6,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_misc.tcl
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_async.constraints.tcl
 source -echo -verbose $::env(BASEJUMP_STL_DIR)/hard/gf_14/bsg_link/tcl/bsg_link_sdr.constraints.tcl
+source -echo -verbose $::env(BASEJUMP_STL_DIR)/hard/gf_14/bsg_link/tcl/bsg_link_ddr.constraints.tcl
 
 
 ########################################
@@ -99,6 +100,37 @@ bsg_link_sdr_disable_timing_constraints
 bsg_link_sdr_dont_touch_constraints [get_ports {    \
     io_wh_link_data_i[*][*][*] io_wh_link_v_i[*][*] \
 }]
+
+
+# Source-sync link constraints
+set io_clk_period_ps              800.0 ;# 1.25 GHz
+set io_clk_uncertainty_ps         20
+set ddr_link_clk_period_ps        [expr $io_clk_period_ps*2.0]
+set ddr_link_clk_uncertainty_ps   20
+set ddr_max_io_output_margin_ps   80
+set ddr_max_io_input_margin_ps    80
+
+for {set i 0} {$i < 2} {incr i} {
+  set io_clk_name   "io_link_${i}_io_clk"
+  create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "ddr_link*${i}*link/io_clk"]
+  set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
+
+  bsg_link_ddr_constraints                              \
+    $io_clk_name                                        \
+    "io_link_${i}_out_clk"                              \
+    $ddr_link_clk_period_ps                             \
+    $ddr_max_io_output_margin_ps                        \
+    [get_ports "io_link_clk_o[$i]"]                     \
+    [get_ports "io_link_data_o[$i][*] io_link_v_o[$i]"] \
+    "io_link_${i}_in_clk"                               \
+    $ddr_link_clk_period_ps                             \
+    $ddr_max_io_input_margin_ps                         \
+    [get_ports "io_link_clk_i[$i]"]                     \
+    [get_ports "io_link_data_i[$i][*] io_link_v_i[$i]"] \
+    "io_link_${i}_tkn_clk"                              \
+    [get_ports "io_link_token_i[$i]"]                   \
+    $ddr_link_clk_uncertainty_ps
+}
 
 
 # CDC
