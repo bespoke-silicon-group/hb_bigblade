@@ -48,39 +48,36 @@ set_false_path -from [get_ports async_output_disable_i]
 
 
 # Source-sync link constraints
-#set io_clk_name               "io_clk"
-#set io_clk_period_ps          800 ;# 1.25 GHz
-#set link_clk_period_ps        [expr $io_clk_period_ps*2.0]
-#set link_clk_uncertainty_ps   20
-#set max_io_output_margin_ps   200
-#set max_io_input_margin_ps    200
+set io_clk_period_ps          800.0 ;# 1.25 GHz
+set io_clk_uncertainty_ps     20
+set link_clk_period_ps        [expr $io_clk_period_ps*2.0]
+set link_clk_uncertainty_ps   20
+set max_io_output_margin_ps   380
+set max_io_input_margin_ps    380
 
-#for {set i 0} {$i < 1} {incr i} {
-#
-#  set link_clk_i_pin                          [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_clk_i"]] -filter "name==Y"]
-#  set link_tkn_i_pin                          [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_tkn_i"]] -filter "name==Y"]
-#  set link_dv_i_pin   [remove_from_collection [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_*_i"]] -filter "name==Y"] {$link_clk_i_pin link_tkn_i_pin}]
-#  set link_clk_o_pin                          [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_clk_o"]] -filter "name==DATA"]
-#  set link_tkn_o_pin                          [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_tkn_o"]] -filter "name==DATA"]
-#  set link_dv_o_pin   [remove_from_collection [get_pins -of_objects [get_cells -of_objects [get_ports "p_pad_DL${i}_*_o"]] -filter "name==DATA"] {$link_clk_o_pin link_tkn_o_pin}]
-#
-#  bsg_link_ddr_constraints                    \
-#    $io_clk_name                              \
-#    "link_out_clk_DL${i}"                     \
-#    $link_clk_period_ps                       \
-#    $max_io_output_margin_ps                  \
-#    [get_ports io_link_clk_o]                 \
-#    [get_ports {io_link_data_o io_link_v_o}]  \
-#    "link_in_clk_DL${i}"                      \
-#    $link_clk_period_ps                       \
-#    $max_io_input_margin_ps                   \
-#    [get_ports io_link_clk_i]                 \
-#    [get_ports {io_link_data_i io_link_v_i}]  \
-#    "link_tkn_clk_DL${i}"                     \
-#    [get_ports io_link_token_i]               \
-#    $link_clk_uncertainty_ps
-#}
+for {set i 0} {$i < 8} {incr i} {
+  for {set j 0} {$j < 2} {incr j} {
+    set io_clk_name   "io_link_${i}_${j}_io_clk"
+    create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "mem_link*${i}*link/io_link_${j}_io_clk"]
+    set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
 
+    bsg_link_ddr_constraints                                      \
+      $io_clk_name                                                \
+      "io_link_${i}_${j}_out_clk"                                 \
+      $link_clk_period_ps                                         \
+      $max_io_output_margin_ps                                    \
+      [get_ports "io_link_clk_o[$i][$j]"]                         \
+      [get_ports "io_link_data_o[$i][$j][*] io_link_v_o[$i][$j]"] \
+      "io_link_${i}_${j}_in_clk"                                  \
+      $link_clk_period_ps                                         \
+      $max_io_input_margin_ps                                     \
+      [get_ports "io_link_clk_i[$i][$j]"]                         \
+      [get_ports "io_link_data_i[$i][$j][*] io_link_v_i[$i][$j]"] \
+      "io_link_${i}_${j}_tkn_clk"                                 \
+      [get_ports "io_link_token_i[$i][$j]"]                       \
+      $link_clk_uncertainty_ps
+  }
+}
 
 # CDC
 set cdc_clocks [all_clocks]
