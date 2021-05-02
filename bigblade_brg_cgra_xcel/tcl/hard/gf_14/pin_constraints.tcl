@@ -133,10 +133,10 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
   set start_y [expr $pe_height/2 - (2*$k_pitch*$msg_pin_len/2)]
   set start_x [expr $pe_width/2 - (1*$k_pitch*$msg_pin_len/2)]
 
-  set last_loc [bsg_pins_line_constraint $msg_pins_o_N "K1 K3" right  $start_y  $master_pe $msg_pins_i_S 1 1 1]
-  set last_loc [bsg_pins_line_constraint $msg_pins_i_N "K1 K3" right  $last_loc $master_pe $msg_pins_o_S 1 1 1]
-  set last_loc [bsg_pins_line_constraint $msg_pins_o_E "K2 K4" bottom $start_x  $master_pe $msg_pins_i_W 1 1 1]
-  set last_loc [bsg_pins_line_constraint $msg_pins_i_E "K2 K4" bottom $last_loc $master_pe $msg_pins_o_W 1 1 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_o_N "K1 K3" right  $start_y  $master_pe $msg_pins_i_S 1 0 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_i_N "K1 K3" right  $last_loc $master_pe $msg_pins_o_S 1 0 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_o_E "K2 K4" bottom $start_x  $master_pe $msg_pins_i_W 1 0 1]
+  set last_loc [bsg_pins_line_constraint $msg_pins_i_E "K2 K4" bottom $last_loc $master_pe $msg_pins_o_W 1 0 1]
 
   remove_routing_blockages -all
 
