@@ -14,18 +14,20 @@ set tile_height [core_height]
 
 # PE array
 set pe_width  [round_up_to_nearest 37 [unit_width]]
-set pe_height [round_up_to_nearest 82 [unit_height]]
+set pe_height [round_up_to_nearest 83 [unit_height]]
 
 set pe_num_x 8
 set pe_num_y 8
 
 # This is variable depending on PE size MIB alignment
 set pe_margin_x 3.276
-set pe_margin_y 4.32
+#set pe_margin_y 4.32
+set pe_margin_y 9.12
 
 set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
 set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
-set pe_origin_y [expr ($tile_height - $array_height) / 2]
+#set pe_origin_y [expr ($tile_height - $array_height) / 2]
+set pe_origin_y 14.4
 set pe_origin_x [expr $tile_width - $array_width - $keepout_margin_x]
 
 foreach {idx_x} {7 6 5 4 3 2 1 0} {
