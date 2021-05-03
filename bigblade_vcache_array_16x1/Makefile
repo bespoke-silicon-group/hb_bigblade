@@ -1,9 +1,9 @@
 all: | bsg_cadenv basejump_stl bsg_14 bsg_manycore
 
 bsg_cadenv:    commit=master
-basejump_stl:  commit=7556378810412be47e118b08910c02883936a64c
-bsg_14:        commit=etm_mid_level_dev
-bsg_manycore:  commit=500c948606799ebb1ee774538aae3ed7ea1d3cdf
+basejump_stl:  commit=master
+bsg_14:        commit=master
+bsg_manycore:  commit=ci_bigblade
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@
