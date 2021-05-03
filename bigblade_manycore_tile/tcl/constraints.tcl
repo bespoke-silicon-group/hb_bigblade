@@ -161,19 +161,15 @@ constraint_input_ports $clk_name $reset_in_port  500 40
 constraint_output_ports $clk_name $reset_out_port 500 40
 
 
-set cord_in_ports [list]
-append_to_collection cord_in_ports [get_ports global_*_i*]
-constraint_input_ports $clk_name $cord_in_ports 500 40
-#set_multicycle_path 2 -from $cord_in_ports -setup
-#set_multicycle_path 1 -from $cord_in_ports -hold
-#set_false_path -from $cord_in_ports
+#set cord_in_ports [list]
+#append_to_collection cord_in_ports [get_ports global_*_i*]
+#constraint_input_ports $clk_name $cord_in_ports 500 40
 
-set cord_out_ports [list]
-append_to_collection cord_out_ports [get_ports global_*_o*]
-constraint_output_ports $clk_name $cord_out_ports 500 40
-#set_multicycle_path 2 -to $cord_out_ports -setup
-#set_multicycle_path 1 -to $cord_out_ports -hold
-#set_false_path -to $cord_out_ports
+#set cord_out_ports [list]
+#append_to_collection cord_out_ports [get_ports global_*_o*]
+#constraint_output_ports $clk_name $cord_out_ports 500 40
+set_false_path -from [get_ports global_*_i*]
+set_false_path -to   [get_ports global_*_o*]
 
 
 

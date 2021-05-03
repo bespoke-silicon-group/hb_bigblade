@@ -118,12 +118,11 @@ constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
 constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
 
 # global coordinates
-constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 0 40
-constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 0 40
-
+set_false_path -from [get_ports core_global_*_i*]
+set_false_path -to   [get_ports core_global_*_o*]
 
 # false path
-set_false_path -from [get_ports async_*_reset_i]
+#set_false_path -from [get_ports async_*_reset_i]
 set_false_path -to   [get_ports async_*_reset_o]
 
 
@@ -231,6 +230,22 @@ for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
 bsg_chip_derate_cells
 #bsg_chip_derate_mems
 #report_timing_derate
+
+
+
+### BSG_TAG
+create_clock -period 5000 -name "tag_clk" [get_ports "tag_clk_i"]
+set_clock_uncertainty 20  [get_clocks "tag_clk"]
+set_false_path -from [get_ports "tag_node_id_offset_i*"]
+constraint_input_ports "tag_clk" [get_ports "tag_data_i"] 500 0
+
+set cdc_clocks [list]
+append_to_collection cdc_clocks [get_clocks "tag_clk"]
+append_to_collection cdc_clocks [get_clocks "manycore_clk"]
+# TODO fix this
+bsg_async_icl [all_clocks]
+
+
 
 puts "BSG-info: Completed script [info script]\n"
 

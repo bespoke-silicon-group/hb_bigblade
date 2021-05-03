@@ -25,6 +25,11 @@ for {set i [expr 2*$HB_WH_LINK_WIDTH_P]} {$i < [expr 2*$HB_WH_RUCHE_FACTOR_P*$HB
 }
 
 
-
+# isolate SRAM clk pins
+set clk_buf_cells [list]
+append_to_collection clk_buf_cells [create_clock_buffer -clock manycore_clk -sinks [get_pins "cache/tag_mem/macro_mem/CLK"]]
+append_to_collection clk_buf_cells [create_clock_buffer -clock manycore_clk -sinks [get_pins "cache/data_mem/macro_mem/CLK"]]
+append_to_collection clk_buf_cells [create_clock_buffer -clock manycore_clk -sinks [get_pins "cache/stat_mem/macro_mem/CLK"]]
+set_dont_touch $clk_buf_cells true
 
 puts "BSG-info: Completed script [info script]\n"

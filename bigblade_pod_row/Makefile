@@ -3,7 +3,7 @@ all: | bsg_cadenv bsg_manycore basejump_stl bsg_14
 bsg_cadenv:    commit=master
 basejump_stl:  commit=dev-bsg_link_sdr
 bsg_14:        commit=master
-bsg_manycore:        commit=io_rtr_refactor2
+bsg_manycore:  commit=ci_bigblade
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@
@@ -16,6 +16,7 @@ basejump_stl:
 bsg_14:
 	git clone git@github.com:bespoke-silicon-group/bsg_14.git $@
 	cd $@ ; git checkout $(commit) ;
+
 bsg_manycore:
 	git clone git@github.com:bespoke-silicon-group/bsg_manycore.git $@
 	cd $@ ; git checkout $(commit) ;

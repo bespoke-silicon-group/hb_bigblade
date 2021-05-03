@@ -19,7 +19,7 @@
 
   (input  core_clk_i
   ,input  core_reset_i
-  ,output core_reset_o
+  ,output [1:0] core_reset_o
 
   ,input  [link_sif_width_lp-1:0] core_link_sif_i
   ,output [link_sif_width_lp-1:0] core_link_sif_o
@@ -69,7 +69,7 @@
   logic [x_cord_width_p-1:0] core_global_x_r;
   logic [y_cord_width_p-1:0] core_global_y_r;
 
-  assign core_reset_o = core_reset_r;
+  assign core_reset_o = {2{core_reset_r}};
   assign core_global_x_o = core_global_x_r;
   assign core_global_y_o = y_cord_width_p'(core_global_y_r+1'b1);
 
@@ -107,6 +107,8 @@
  #(.width_p                        (fwd_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (1)
+  ,.bypass_downstream_twofer_fifo_p(0)
   ) fwd_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)
@@ -137,6 +139,8 @@
  #(.width_p                        (rev_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
   ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
+  ,.bypass_upstream_twofer_fifo_p  (1)
+  ,.bypass_downstream_twofer_fifo_p(0)
   ) rev_sdr
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync)

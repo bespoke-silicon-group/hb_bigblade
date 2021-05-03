@@ -65,20 +65,6 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 
 
 
-# async reset
-set reset_in_ports [list]
-append_to_collection reset_in_ports [get_ports "async_uplink_reset_i"]
-append_to_collection reset_in_ports [get_ports "async_downlink_reset_i"]
-append_to_collection reset_in_ports [get_ports "async_downstream_reset_i"]
-append_to_collection reset_in_ports [get_ports "async_token_reset_i"]
-set reset_out_ports [list]
-append_to_collection reset_out_ports [get_ports "async_uplink_reset_o"]
-append_to_collection reset_out_ports [get_ports "async_downlink_reset_o"]
-append_to_collection reset_out_ports [get_ports "async_downstream_reset_o"]
-append_to_collection reset_out_ports [get_ports "async_token_reset_o"]
-
-place_pins_k1_k3 $reset_in_ports [expr $core_ury/2] $core_llx
-place_pins_k1_k3 $reset_out_ports [expr $core_ury/2] $core_urx
 
 
 # manycore links
@@ -137,15 +123,6 @@ for {set i [expr $HB_FWD_PACKET_WIDTH/2]} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
 set clk_ports [get_ports "core_clk_i"]
 
 # cord reset pins
-set cord_reset_in_pins [list]
-append_to_collection cord_reset_in_pins [get_ports "core_reset_i"]
-append_to_collection cord_reset_in_pins [sort_collection [get_ports "core_global_*_i*"] name]
-place_pins_k2_k4 $cord_reset_in_pins [expr $core_llx+(0.128*234)] $core_ury
-
-set cord_reset_out_pins [list]
-append_to_collection cord_reset_out_pins [get_ports "core_reset_o"]
-append_to_collection cord_reset_out_pins [sort_collection [get_ports "core_global_*_o*"] name]
-place_pins_k2_k4 $cord_reset_out_pins [expr $core_llx+(0.128*234)] $core_lly
 
 
 if {$::env(SOUTH_NOT_NORTH) == 1} {
@@ -158,13 +135,56 @@ if {$::env(SOUTH_NOT_NORTH) == 1} {
 } else {
   place_pins_k2_k4 $core_link_in_ports  $NORTH_OUTPUT_OFFSET $core_lly
   place_pins_k2_k4 $core_link_out_ports $NORTH_INPUT_OFFSET $core_lly
-  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_lly"
+  set_individual_pin_constraints -ports $clk_ports -allowed_layers "K4" -location "[expr 0.128*552] $core_ury"
 
   place_pins_k2_k4 $sdr_out_ports       $NORTH_OUTPUT_OFFSET $core_ury
   place_pins_k2_k4 $sdr_in_ports        $NORTH_INPUT_OFFSET  $core_ury
+
+
+  set cord_reset_in_pins [list]
+  append_to_collection cord_reset_in_pins [sort_collection [get_ports "core_global_*_i*"] name]
+  place_pins_k2_k4 $cord_reset_in_pins [expr $core_llx+(0.128*234)] $core_ury
+  set cord_reset_out_pins [list]
+  append_to_collection cord_reset_out_pins [get_ports "core_reset_o[0]"]
+  append_to_collection cord_reset_out_pins [sort_collection [get_ports "core_global_*_o*"] name]
+  place_pins_k2_k4 $cord_reset_out_pins [expr $core_llx+(0.128*234)] $core_lly
 }
 
 
+# async reset
+if {$::env(SOUTH_NOT_NORTH) == 0} {
+  # north SDR
+  set reset_east_ports [list]
+  append_to_collection reset_east_ports [get_ports "async_uplink_reset_o"]
+  append_to_collection reset_east_ports [get_ports "async_downlink_reset_o"]
+  append_to_collection reset_east_ports [get_ports "async_downstream_reset_o"]
+  append_to_collection reset_east_ports [get_ports "async_token_reset_o"]
+  append_to_collection reset_east_ports [get_ports "core_reset_i"]
+  set reset_west_ports [list]
+  append_to_collection reset_west_ports [get_ports "async_uplink_reset_i"]
+  append_to_collection reset_west_ports [get_ports "async_downlink_reset_i"]
+  append_to_collection reset_west_ports [get_ports "async_downstream_reset_i"]
+  append_to_collection reset_west_ports [get_ports "async_token_reset_i"]
+  append_to_collection reset_west_ports [get_ports "core_reset_o[1]"]
+
+  place_pins_k1_k3 $reset_west_ports [expr 0.128*82] $core_llx
+  place_pins_k1_k3 $reset_east_ports [expr 0.128*82] $core_urx
+} else {
+  # south SDR
+  set reset_east_ports [list]
+  append_to_collection reset_east_ports [get_ports "async_uplink_reset_i"]
+  append_to_collection reset_east_ports [get_ports "async_downlink_reset_i"]
+  append_to_collection reset_east_ports [get_ports "async_downstream_reset_i"]
+  append_to_collection reset_east_ports [get_ports "async_token_reset_i"]
+  set reset_west_ports [list]
+  append_to_collection reset_west_ports [get_ports "async_uplink_reset_o"]
+  append_to_collection reset_west_ports [get_ports "async_downlink_reset_o"]
+  append_to_collection reset_west_ports [get_ports "async_downstream_reset_o"]
+  append_to_collection reset_west_ports [get_ports "async_token_reset_o"]
+
+  place_pins_k1_k3 $reset_west_ports [expr 0.128*82] $core_llx
+  place_pins_k1_k3 $reset_east_ports [expr 0.128*82] $core_urx
+}
 
 
 

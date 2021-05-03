@@ -89,20 +89,41 @@ if {$::env(EAST_NOT_WEST) == 1} {
 }
 
 # misc pins
-set north_misc_pins [list]
-append_to_collection north_misc_pins [sort_collection [get_ports async_*_reset_i*] name]
-append_to_collection north_misc_pins [get_ports core_reset_i]
-append_to_collection north_misc_pins [sort_collection [get_ports core_global_*_i*] name]
-append_to_collection north_misc_pins [get_ports core_clk_i]
-place_pins_k2_k4 $north_misc_pins [expr $core_urx-0.128*56] $core_ury
+if {$::env(EAST_NOT_WEST) == 1} {
+  # east SDR
+  set north_misc_pins [list]
+  append_to_collection north_misc_pins [sort_collection [get_ports async_*_reset_i*] name]
+  append_to_collection north_misc_pins [get_ports core_reset_i]
+  append_to_collection north_misc_pins [sort_collection [get_ports core_global_*_i*] name]
+  place_pins_k2_k4 $north_misc_pins [expr 0.128*311] $core_ury
 
-set south_misc_pins [list]
-append_to_collection south_misc_pins [sort_collection [get_ports async_*_reset_o*] name]
-append_to_collection south_misc_pins [get_ports core_reset_o]
-append_to_collection south_misc_pins [sort_collection [get_ports core_global_*_o*] name]
-place_pins_k2_k4 $south_misc_pins [expr $core_urx-0.128*56] $core_lly
+  set south_misc_pins [list]
+  append_to_collection south_misc_pins [sort_collection [get_ports async_*_reset_o*] name]
+  append_to_collection south_misc_pins [get_ports core_reset_o]
+  append_to_collection south_misc_pins [sort_collection [get_ports core_global_*_o*] name]
+  place_pins_k2_k4 $south_misc_pins [expr 0.128*311] $core_lly
+} else {
+  # west SDR
+  set north_misc_pins [list]
+  append_to_collection north_misc_pins [sort_collection [get_ports async_*_reset_o*] name]
+  append_to_collection north_misc_pins [get_ports core_reset_i]
+  append_to_collection north_misc_pins [sort_collection [get_ports core_global_*_i*] name]
+  place_pins_k2_k4 $north_misc_pins [expr 0.128*16] $core_ury
+  set south_misc_pins [list]
+  append_to_collection south_misc_pins [sort_collection [get_ports async_*_reset_i*] name]
+  append_to_collection south_misc_pins [get_ports core_reset_o]
+  append_to_collection south_misc_pins [sort_collection [get_ports core_global_*_o*] name]
+  place_pins_k2_k4 $south_misc_pins [expr 0.128*16] $core_lly
+}
 
 
+# core_clk pin
+set core_clk_pin [get_ports "core_clk_i"]
+if {$::env(EAST_NOT_WEST) == 1} {
+  set_individual_pin_constraints -ports $core_clk_pin -allowed_layers "K1" -location "$core_llx [expr 0.128*740]"
+} else {
+  set_individual_pin_constraints -ports $core_clk_pin -allowed_layers "K1" -location "$core_urx [expr 0.128*740]"
+}
 
 
 puts "BSG-info: Completed script [info script]\n"

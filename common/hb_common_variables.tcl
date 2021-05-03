@@ -16,16 +16,16 @@ set pod_y_offset      [expr $grid_height*1]
 
 
 # shape of tiles
-set tile_width        [expr $grid_width*10.5]
+set tile_width        [expr ($grid_width*10.5)+0.672]
 set tile_height       [expr $grid_height*32.50]
-set vcache_width      [expr $grid_width*10.5]
-set vcache_height     [expr $grid_height*25.25]
+set vcache_width      [expr ($grid_width*10.5)+0.672]
+set vcache_height     [expr $grid_height*25.50]
 
 
 # spacing between tiles
-set tile_x_space        [expr $grid_width*0.5]
+set tile_x_space        [expr $grid_width*0.5-0.672]
 set tile_y_space        [expr $grid_height*0.5]
-set vcache_x_space      [expr $grid_width*0.5]
+set vcache_x_space      [expr $grid_width*0.5-0.672]
 set vcache_top_y_space  [expr $grid_height*0.50]
 set vcache_bot_y_space  [expr $grid_height*0.75]
 
@@ -60,6 +60,42 @@ set TILE_WEST_INPUT_OFFSET      [expr (0.128*747)]
 set VCACHE_WEST_OUTPUT_OFFSET   [expr (302*0.128)]
 set VCACHE_WEST_INPUT_OFFSET    [expr (702*0.128)]
 
+
+
+
+# POD DIMENSION
+set  tile_array_width         [expr $grid_width*176.5]
+set  tile_array_height        [expr $grid_height*65.5]
+set  vcache_array_width       [expr $grid_width*176.5]
+set  vcache_array_height      [expr $grid_height*25.75]
+
+
+set  sdr_horiz_east_width      [expr $grid_width*3.5]
+set  sdr_horiz_west_width      [expr $grid_width*3.75]
+set  sdr_horiz_height          [expr $grid_height*32.5]
+
+set  sdr_vert_width      [expr ($grid_width*10.5)+0.672]
+set  sdr_vert_height     [expr $grid_height*3.5]
+set  sdr_vert_x_pitch    [expr ($grid_width*11)]
+
+set  sdr_vert_row_width   [expr $grid_width*176.5]
+set  sdr_vert_row_height  [expr $grid_height*3.75]
+
+set  sdr_corner_east_width          [expr $grid_width*3.5]
+set  sdr_corner_west_width          [expr $grid_width*3.75]
+set  sdr_corner_height              [expr $grid_height*25.5]
+
+set pod_row_width   [expr $sdr_horiz_west_width + \
+                          (0.25*$grid_width) + \
+                          ((($grid_width*0.5)+$tile_array_width)*$HB_NUM_PODS_X_P) + \
+                          $sdr_horiz_east_width]
+                          
+
+
+set  pod_row_height   [expr $sdr_vert_height + (0.5*$grid_height) + \
+                        ($vcache_array_height+(0.5*$grid_height))*2 + \
+                        ($tile_array_height+(0.5*$grid_height))*4 + \
+                        $sdr_vert_height + (0.5*$grid_height)]
 
 
 puts "BSG-info: Completed script [info script]\n"
