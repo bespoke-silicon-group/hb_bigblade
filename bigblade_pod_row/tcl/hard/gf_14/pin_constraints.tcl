@@ -21,7 +21,7 @@ bsg_create_macro_matching_ports $matching_ports false
 
 
 # clk gen
-set_individual_pin_constraints -ports [get_ports "ext_clk_i"] -allowed_layers "K4" -location "[expr 37574*0.128] [die_ury]"
+set_individual_pin_constraints -ports [get_ports "ext_clk_i"] -allowed_layers "K4" -location "[expr 37555*0.128] [die_ury]"
 
 
 

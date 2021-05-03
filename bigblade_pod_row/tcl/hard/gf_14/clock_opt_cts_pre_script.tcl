@@ -42,7 +42,7 @@ set_clock_routing_rules         \
   -min_routing_layer "K1"       \
   -max_routing_layer "K4"
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree2.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree3.tcl
 
 
 puts "BSG-info: Completed script [info script]\n"

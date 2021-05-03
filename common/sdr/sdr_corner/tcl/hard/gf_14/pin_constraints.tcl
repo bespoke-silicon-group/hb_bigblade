@@ -237,8 +237,8 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection south_misc_ports [sort_collection [get_ports "core_global_*_o*"] name]
     append_to_collection south_misc_ports $tag_ports
     
-    place_pins_k2_k4 $north_misc_ports [expr 0.128*16] $core_ury
-    place_pins_k2_k4 $south_misc_ports [expr 0.128*16] $core_lly
+    place_pins_k2_k4 $north_misc_ports [expr 0.128*8] $core_ury
+    place_pins_k2_k4 $south_misc_ports [expr 0.128*8] $core_lly
   } else {
     # NW
     set north_misc_ports [list]
@@ -250,8 +250,8 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection south_misc_ports [get_ports "core_reset_o"]
     append_to_collection south_misc_ports [sort_collection [get_ports "core_global_*_o*"] name]
     
-    place_pins_k2_k4 $north_misc_ports [expr 0.128*16] $core_ury
-    place_pins_k2_k4 $south_misc_ports [expr 0.128*20] $core_lly
+    place_pins_k2_k4 $north_misc_ports [expr 0.128*8] $core_ury
+    place_pins_k2_k4 $south_misc_ports [expr 0.128*8] $core_lly
   }
 }
 

@@ -4,7 +4,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 set_app_options -name plan.place.auto_generate_blockages -value false
 
 # Uncomment if you are sourcing this file many times interactively.
-#set_fixed_objects -unfix [get_flat_cells]
+set_fixed_objects -unfix [get_flat_cells]
 
 
 # pod offset
@@ -65,7 +65,7 @@ set_fixed_objects $sdr_se_cell
 
 
 # SDR W/E
-set y [expr $pod_offset_y + $vcache_array_height + ($grid_height*0.5)]
+set y [expr $pod_offset_y + $vcache_array_height + ($grid_height*0.25)]
 for {set i [expr $HB_NUM_TILES_Y_P-1]} {$i >= 0} {incr i -1} {
   set sdr_w_cell [get_cells sdr_w_y_${i}__sdr_w]
   set sdr_e_cell [get_cells sdr_e_y_${i}__sdr_e]

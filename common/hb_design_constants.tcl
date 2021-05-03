@@ -12,6 +12,7 @@ set HB_RUCHE_FACTOR_P       3
 
 set HB_WH_LINK_WIDTH_P      34
 set HB_WH_RUCHE_FACTOR_P    2
+set HB_WH_FLIT_WIDTH_P      32
 
 # LOCAL LINK indexing
 set HB_REV_PACKET_WIDTH     53

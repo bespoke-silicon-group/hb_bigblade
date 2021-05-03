@@ -42,7 +42,8 @@ set_false_path -from $tag_id_ports
 
 # global x/y
 set_false_path -from [get_ports global_*_i*]
-
+set_false_path -through [get_pins -filter "name=~*global_*_*"]
+set_false_path -through [get_pins -filter "name=~async*reset*"]
 
 # async path
 bsg_async_icl [all_clocks]
