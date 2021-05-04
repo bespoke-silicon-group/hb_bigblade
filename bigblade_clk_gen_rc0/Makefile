@@ -2,8 +2,8 @@
 all: | bsg_cadenv basejump_stl bsg_14
 
 bsg_cadenv:    commit=master
-basejump_stl:  commit=dev_tag_lines_join_disjoin
-bsg_14:        commit=master
+basejump_stl:  commit=dev-bsg_link_ddr_encode
+bsg_14:        commit=dev-clk_gen_block
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@
