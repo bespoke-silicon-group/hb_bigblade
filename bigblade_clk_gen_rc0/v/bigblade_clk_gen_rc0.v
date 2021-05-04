@@ -1,47 +1,36 @@
 module bigblade_clk_gen_rc0
   import bsg_tag_pkg::bsg_tag_s;
 
- #( ds_width_p = 8, num_adgs_p = 1 )
+#( ds_width_p = 6, num_adgs_p = 1, tag_els_p = 512, tag_lg_width_p = 4 )
 
-( input         ext_clk_i
-, input         async_output_disable_i
+( input                                  tag_clk_i
+, input                                  tag_data_i
+, input [`BSG_SAFE_CLOG2(tag_els_p)-1:0] tag_node_id_offset_i
 
-, input         tag_clk_i
-, input         tag_en_i
-, input  [1:0]  async_reset_tag_op_param_i
-, input  [1:0]  sel_tag_op_param_i
-, input  [1:0]  osc_tag_op_param_i
-, input  [1:0]  osc_trigger_tag_op_param_i
-, input  [1:0]  ds_tag_op_param_i
+, input                                  ext_clk_i
+, input                                  async_output_disable_i
 
-, output logic  clk_o
+, output logic                           clk_o
 );
 
-  bsg_tag_s  async_reset_tag_lines_li;
-  bsg_tag_s  sel_tag_lines_li;
-  bsg_tag_s  osc_tag_lines_li;
-  bsg_tag_s  osc_trigger_tag_lines_li;
-  bsg_tag_s  ds_tag_lines_li;
+  bsg_tag_s [4:0] tag_lines_lo;
 
-  bsg_tag_lines_join #(.els_p(5))
-    tag_lines_join_BSG_UNGROUP
-      (.bsg_tag_clk_i(tag_clk_i)
-      ,.bsg_tag_en_i(tag_en_i)
-      ,.bsg_tag_op_param_i({
-          async_reset_tag_op_param_i,
-          sel_tag_op_param_i,
-          osc_tag_op_param_i,
-          osc_trigger_tag_op_param_i,
-          ds_tag_op_param_i
-      })
-      ,.bsg_tag_o({
-          async_reset_tag_lines_li,
-          sel_tag_lines_li,
-          osc_tag_lines_li,
-          osc_trigger_tag_lines_li,
-          ds_tag_lines_li
-      })
+  bsg_tag_master_decentralized #(.els_p(tag_els_p)
+                                ,.local_els_p(5)
+                                ,.lg_width_p(tag_lg_width_p)
+                                )
+    btm
+      (.clk_i(tag_clk_i)
+      ,.data_i(tag_data_i)
+      ,.node_id_offset_i(tag_node_id_offset_i)
+      ,.clients_o(tag_lines_lo)
       );
+
+  wire bsg_tag_s async_reset_tag_lines_li = tag_lines_lo[0];
+  wire bsg_tag_s sel_tag_lines_li         = tag_lines_lo[1];
+  wire bsg_tag_s osc_tag_lines_li         = tag_lines_lo[2];
+  wire bsg_tag_s osc_trigger_tag_lines_li = tag_lines_lo[3];
+  wire bsg_tag_s ds_tag_lines_li          = tag_lines_lo[4];
 
   logic [1:0] clk_select_lo;
   logic       async_reset_lo;

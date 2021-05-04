@@ -36,9 +36,11 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_reduce.v
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_misc/bsg_xnor.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
   $basejump_stl_dir/bsg_tag/bsg_tag_lines_join.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
-  $bsg_designs_target_dir/v/bigblade_clk_gen_rc0.v
+  $bsg_designs_target_dir/v/bigblade_clk_gen_rc1.v
 "]
 

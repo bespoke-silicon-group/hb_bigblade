@@ -29,4 +29,3 @@ set NEW_SVERILOG_SOURCE_FILES [join "
 
 set HARD_INCLUDE_PATHS [join "
 "]
-

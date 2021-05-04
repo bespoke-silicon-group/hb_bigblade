@@ -21,6 +21,8 @@ create_boundary_cells \
 # ADT RP Groups
 # ==============================================================================
 
+remove_rp_groups -all
+
 create_rp_group  -name  adt_inv_group_1       -row  1  -col  3
 create_rp_group  -name  adt_inv_group_2       -row  1  -col  3
 create_rp_group  -name  adt_inv_group_3       -row  1  -col  3
@@ -152,8 +154,10 @@ add_to_rp_group cdt_fdt_over_adt -rp_group adt     -row 0 -column 0
 add_to_rp_group cdt_fdt_over_adt -rp_group cdt_fdt -row 1 -column 0
 
 # ==============================================================================
-# Create Bounds
+# Create Placement Bounds
 # ==============================================================================
+
+remove_bounds -all
 
 # Note: The placement bounds are all relative to 0,0. To move all the bounds as
 # a group, we add all the bounds to the my_bounds list and then use the
@@ -161,32 +165,26 @@ add_to_rp_group cdt_fdt_over_adt -rp_group cdt_fdt -row 1 -column 0
 
 set my_bounds [list]
 
-append_to_collection my_bounds [create_bound -name adt_cdt_fdt_bounds -type hard -boundary {{2.7720 4.3200} {2.7720 7.6800} {12.6840 7.6800} {12.6840 4.3200}}]
-add_to_bound adt_cdt_fdt_bounds [get_flat_cells "*adt* *cdt* *fdt*"]
+append_to_collection my_bounds [create_bound -name adt_cdt_fdt_bound -type hard -boundary {{6.5520 0.0000} {6.5520 3.3600} {16.4640 3.3600} {16.4640 0.0000}}]
+append_to_collection my_bounds [create_bound -name mux_out_bound -type hard -boundary {{16.4640 0.0000} {16.4640 0.9600} {21.5040 0.9600} {21.5040 0.0000}}]
+append_to_collection my_bounds [create_bound -name other_bound -type hard -boundary {{6.5520 0.0000} {6.5520 3.3600} {16.4640 3.3600} {16.4640 0.9600} {21.5040 0.9600} {21.5040 9.6000} {0.0000 9.6000} {0.0000 0.0000}}]
 
-append_to_collection my_bounds [create_bound -name btc_async_reset_bounds -type hard -boundary {{0.0000 0.0000} {0.0000 1.9200} {2.7720 1.9200} {2.7720 0.0000}}]
-add_to_bound btc_async_reset_bounds [get_flat_cells "*btc_async_reset*"]
-add_to_bound btc_async_reset_bounds [get_cells "clk_gen_inst/clk_gen_osc_inst/*" -filter "!is_hierarchical"]
+move_objects -delta "$decap_w [unit_height]" $my_bounds
 
-append_to_collection my_bounds [create_bound -name btc_clk_select_bounds -type hard -boundary {{8.8200 0.0000} {8.8200 1.4400} {12.6840 1.4400} {12.6840 0.0000}}]
-add_to_bound btc_clk_select_bounds [get_flat_cells "*btc_clk_select*"]
-
-append_to_collection my_bounds [create_bound -name clk_gen_ds_bounds -type hard -boundary {{12.6840 0.9600} {12.6840 7.6800} {17.7240 7.6800} {17.7240 0.9600}}]
-add_to_bound clk_gen_ds_bounds [get_flat_cells "*clk_gen_ds_inst*"]
-
-append_to_collection my_bounds [create_bound -name clk_gen_btc_bounds -type hard -boundary {{0.0000 3.3600} {0.0000 7.6800} {2.7720 7.6800} {2.7720 3.3600}}]
-add_to_bound clk_gen_btc_bounds [get_flat_cells "clk_gen_inst/clk_gen_osc_inst/btc/*"]
-
-append_to_collection my_bounds [create_bound -name clk_gen_btc_trigger_bounds -type hard -boundary {{0.0000 1.9200} {0.0000 3.3600} {2.7720 3.3600} {2.7720 1.9200}}]
-add_to_bound clk_gen_btc_trigger_bounds [get_flat_cells "clk_gen_inst/clk_gen_osc_inst/btc_trigger/*"]
-
-append_to_collection my_bounds [create_bound -name clk_gen_btc_ds_bounds -type hard -boundary {{8.8200 1.4400} {8.8200 0.0000} {2.7720 0.0000} {2.7720 4.3200} {12.6840 4.3200} {12.6840 1.4400}}]
-add_to_bound clk_gen_btc_ds_bounds [get_flat_cells "clk_gen_inst/btc_ds/*"]
-
-append_to_collection my_bounds [create_bound -name mux_out_bound -type hard -boundary {{12.6710 0.0000} {12.6710 0.9600} {17.7110 0.9600} {17.7110 0.0000}}]
+add_to_bound adt_cdt_fdt_bound [get_flat_cells "*adt* *cdt* *fdt*"]
 add_to_bound mux_out_bound [get_flat_cells "clk_gen_inst/mux_inst/fi_rof_0__BSG_BAL41MUX_BSG_DONT_TOUCH"]
-add_to_bound mux_out_bound [get_cells "*" -filter "!is_hierarchical && !is_physical_only"]
+add_to_bound other_bound \
+  [remove_from_collection \
+    [remove_from_collection \
+      [get_flat_cells] \
+      [get_flat_cells "*adt* *cdt* *fdt*"]] \
+      [get_flat_cells "clk_gen_inst/mux_inst/fi_rof_0__BSG_BAL41MUX_BSG_DONT_TOUCH"]]
 
-move_objects -delta "$bounds_offset_x $bounds_offset_y" $my_bounds
+# ==============================================================================
+# Create Routing Bounds
+# ==============================================================================
+
+create_routing_blockage -zero_spacing -layers {J3 A4} -boundary "{[core_llx] [core_lly]} {[expr [core_llx]+(4*[unit_width])] [core_ury]}"
+create_routing_blockage -zero_spacing -layers {J3 A4} -boundary "{[core_urx] [core_lly]} {[expr [core_urx]-(4*[unit_width])] [core_ury]}"
 
 puts "BSG-info: Completed script [info script]\n"

@@ -26,7 +26,7 @@ bsg_clk_gen_clock_create \
 set_load [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] [get_ports "clk_o"]
 
 # ==============================================================================
-# Async Disable
+# Async Output Disable
 # ==============================================================================
 
 # TODO: is this correct?
@@ -38,20 +38,17 @@ set_false_path -from [get_port "async_output_disable_i"]
 
 set tag_period_ps       6666.0  ;# 150 MHz
 set tag_uncertainty_ps  20.0
-set tag_input_delay_ps  6000.0  ;# ~90% of the tag clock tag delay
 
-set tag_clk_port      [get_ports "tag_clk_i"]
-set tag_data_en_ports [get_ports "tag_en_i *_tag_op_param_i"]
+create_clock -period $tag_period_ps -name "tag_clk" [get_ports "tag_clk_i"]
+set_clock_uncertainty $tag_uncertainty_ps [get_ports "tag_clk_i"]
+set_input_transition 75.0 [get_ports "tag_clk_i"]
 
-create_clock -period $tag_period_ps -name "tag_clk" $tag_clk_port
-set_clock_uncertainty $tag_uncertainty_ps $tag_clk_port
-set_input_transition 75.0 $tag_clk_port
+set_input_delay [expr $tag_period_ps / 2.0] -clock "tag_clk" [get_ports "tag_data_i"]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" [get_ports "tag_data_i"]
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [get_ports "tag_data_i"]
 
-set_input_delay -max $tag_input_delay_ps -clock "tag_clk" $tag_data_en_ports
-set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX1_SSC14R" $tag_data_en_ports
-
-set_input_delay  -min 0 -clock "tag_clk" $tag_data_en_ports
-set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" $tag_data_en_ports
+# TODO: is this correct?
+set_false_path -from [get_port "tag_node_id_offset_i*"]
 
 # ==============================================================================
 # CDC Between Clocks

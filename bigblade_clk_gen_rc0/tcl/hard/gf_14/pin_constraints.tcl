@@ -32,22 +32,24 @@ proc bsg_create_terminal { name side y } {
 
   # create the terminal on C4 and fix it so place_pins doesn't move it.
   set_fixed_object [create_shape -port [get_port $name] -layer C4 -shape_type rect -boundary "{$term_llx $term_lly} {$term_urx $term_ury}"]
+
 }
 
-bsg_create_terminal  "tag_en_i"                       "left"   7.241
-bsg_create_terminal  "tag_clk_i"                      "left"   6.841
-bsg_create_terminal  "osc_tag_op_param_i[1]"          "left"   4.921
-bsg_create_terminal  "osc_tag_op_param_i[0]"          "left"   4.761
-bsg_create_terminal  "ds_tag_op_param_i[1]"           "left"   4.601
-bsg_create_terminal  "ds_tag_op_param_i[0]"           "left"   4.441
-bsg_create_terminal  "osc_trigger_tag_op_param_i[1]"  "left"   4.281
-bsg_create_terminal  "osc_trigger_tag_op_param_i[0]"  "left"   4.121
-bsg_create_terminal  "async_reset_tag_op_param_i[1]"  "left"   3.961
-bsg_create_terminal  "async_reset_tag_op_param_i[0]"  "left"   3.801
-bsg_create_terminal  "sel_tag_op_param_i[0]"          "left"   2.361
-bsg_create_terminal  "sel_tag_op_param_i[1]"          "left"   2.201
-bsg_create_terminal  "async_output_disable_i"         "left"   1.721
-bsg_create_terminal  "ext_clk_i"                      "left"   1.241
-bsg_create_terminal  "clk_o"                          "right"  1.321
+bsg_create_terminal  "tag_clk_i"                "left"   6.08
+bsg_create_terminal  "tag_data_i"               "left"   5.92
+
+bsg_create_terminal  "tag_node_id_offset_i[8]"  "left"   5.76
+bsg_create_terminal  "tag_node_id_offset_i[7]"  "left"   5.6
+bsg_create_terminal  "tag_node_id_offset_i[6]"  "left"   5.44
+bsg_create_terminal  "tag_node_id_offset_i[5]"  "left"   5.28
+bsg_create_terminal  "tag_node_id_offset_i[4]"  "left"   5.12
+bsg_create_terminal  "tag_node_id_offset_i[3]"  "left"   4.96
+bsg_create_terminal  "tag_node_id_offset_i[2]"  "left"   4.8
+bsg_create_terminal  "tag_node_id_offset_i[1]"  "left"   4.64
+bsg_create_terminal  "tag_node_id_offset_i[0]"  "left"   4.48
+
+bsg_create_terminal  "ext_clk_i"                "right"  2.08
+bsg_create_terminal  "async_output_disable_i"   "right"  2.88
+bsg_create_terminal  "clk_o"                    "right"  1.28
 
 puts "BSG-info: Completed script [info script]\n"
