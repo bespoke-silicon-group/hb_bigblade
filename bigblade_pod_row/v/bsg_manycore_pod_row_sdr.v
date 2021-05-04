@@ -186,6 +186,7 @@ module bsg_manycore_pod_row_sdr
     bsg_manycore_link_to_sdr_north_row #(
       .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)
       ,.lg_credit_to_token_decimation_p (sdr_lg_credit_to_token_decimation_gp)
+      ,.num_tiles_x_p                   (hb_num_tiles_x_gp)
       ,.x_cord_width_p                  (hb_x_cord_width_gp)
       ,.y_cord_width_p                  (hb_y_cord_width_gp)
       ,.addr_width_p                    (hb_addr_width_gp)
@@ -267,7 +268,7 @@ module bsg_manycore_pod_row_sdr
     bsg_manycore_link_to_sdr_south_row #(
       .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)
       ,.lg_credit_to_token_decimation_p (sdr_lg_credit_to_token_decimation_gp)
-
+      ,.num_tiles_x_p       (hb_num_tiles_x_gp)
       ,.x_cord_width_p      (hb_x_cord_width_gp)
       ,.y_cord_width_p      (hb_y_cord_width_gp)
       ,.addr_width_p        (hb_addr_width_gp)
