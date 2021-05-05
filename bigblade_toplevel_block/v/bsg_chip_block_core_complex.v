@@ -50,7 +50,7 @@ module bsg_chip_block_core_complex
 
 
   wire [hb_num_pods_y_gp-1:0][hb_num_pods_x_gp-1:0][tag_lg_els_gp-1:0] pod_tag_node_id_offset_li;
-  wire [hb_num_pods_y_gp-1:0][S:N][E:W][tag_lg_els_gp-1:0] async_reset_tag_node_id_offset_li;
+  wire [hb_num_pods_y_gp-1:0][3:0][tag_lg_els_gp-1:0] async_reset_tag_node_id_offset_li;
 
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_x_cord_width_gp-1:0] global_x_li;
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_y_cord_width_gp-1:0] global_y_li;
@@ -146,25 +146,29 @@ module bsg_chip_block_core_complex
 
   end
 
-
+  // hard-wire constants
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
   begin
+    // assign async reset tag offset, 4 corners in total
+    for (genvar j = 0; j < 4; j++)
+        assign async_reset_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_sdr_offset_gp+(i*4+j)*tag_sdr_local_els_gp);
+
     // assign pod tag offset
     for (genvar j = 0; j < hb_num_pods_x_gp; j++)
-        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(9*29+(i*hb_num_pods_x_gp+j));
+        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_reset_offset_gp+(i*hb_num_pods_x_gp+j)*1);
 
-    // assign async reset tag offset
-    for (genvar j = N; j < S; j++)
-        for (genvar k = W; k < E; k++)
-            assign async_reset_tag_node_id_offset_li[i][j][k] = (tag_lg_els_gp)'(9*29+4*4+((i*2+(j-N))*2+(k-W))*4);
+    // assign global x coordinates
+    localparam hb_local_x_cord_width_lp = hb_x_cord_width_gp-hb_pod_x_cord_width_gp;
 
-    // assign global coordinates
-    assign global_x_li[i][0] = {3'(0), 4'b1111};
-    assign global_x_li[i][2+total_num_tiles_x_lp-1] = {3'(hb_num_pods_x_gp+1), 4'b0000};
+    assign global_x_li[i][0] = {(hb_pod_x_cord_width_gp)'(0), (hb_local_x_cord_width_lp)'(1<<hb_local_x_cord_width_lp-1)};
     for (genvar j = 0; j < total_num_tiles_x_lp; j++)
-        assign global_x_li[i][j+1] = {3'((j/hb_num_tiles_x_gp)+1), 4'(j%hb_num_tiles_x_gp)};
+        assign global_x_li[i][j+1] = {(hb_pod_x_cord_width_gp)'((j/hb_num_tiles_x_gp)+1), (hb_local_x_cord_width_lp)'(j%hb_num_tiles_x_gp)};
+    assign global_x_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_x_cord_width_gp)'(hb_num_pods_x_gp+1), (hb_local_x_cord_width_lp)'(0)};
+    
+    // assign global y coordinates
+    localparam hb_local_y_cord_width_lp = hb_y_cord_width_gp-hb_pod_y_cord_width_gp;
     for (genvar j = 0; j < 2+total_num_tiles_x_lp; j++)
-        assign global_y_li[i][j] = {4'(i*2), 3'b110};
+        assign global_y_li[i][j] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'(1<<hb_local_y_cord_width_lp-2)};
   end
 
   // Attach side io links

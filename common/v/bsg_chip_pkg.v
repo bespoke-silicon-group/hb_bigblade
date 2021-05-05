@@ -1,6 +1,8 @@
 package bsg_chip_pkg;
 
   `include "bsg_defines.v"
+  import bsg_tag_pkg::*;
+  import bsg_noc_pkg::*;
 
   //////////////////////////////////////////////////
   //
@@ -56,8 +58,8 @@ package bsg_chip_pkg;
   parameter hb_addr_width_gp   = 28; // word addr
   parameter hb_data_width_gp   = 32;
 
-  parameter hb_num_pods_x_gp   = 4;
-  parameter hb_num_pods_y_gp   = 4;
+  parameter hb_num_pods_x_gp   = 1;
+  parameter hb_num_pods_y_gp   = 1;
 
   parameter hb_num_subarray_x_gp = 1;
   parameter hb_num_subarray_y_gp = 4;
@@ -99,17 +101,69 @@ package bsg_chip_pkg;
   // BSG CHIP TAG PARAMETERS
   //
 
+  // Number of tag_en signals needed in the whole system
+  // Usually equal to number of chips (Example: ASIC+Gateway)
+  // Note: excluding decentralized tag masters
   localparam tag_num_masters_gp = 2;
 
-  // Total number of clients the master will be driving
+  // Total number of clients in the whole system
   localparam tag_els_gp = 1024;
   localparam tag_lg_els_gp = `BSG_SAFE_CLOG2(tag_els_gp);
 
-  // Set maximum payload width to 9-bits
+  // maximum payload width in the whole design
   localparam tag_max_payload_width_gp = 9;
 
   // The number of bits required to represent the max payload width
   localparam tag_lg_width_gp = `BSG_SAFE_CLOG2(tag_max_payload_width_gp + 1);
+
+  typedef struct packed {
+    bsg_tag_s sel;
+    bsg_tag_s ds;
+    bsg_tag_s osc_trigger;
+    bsg_tag_s osc;
+    bsg_tag_s async_reset;
+  } bsg_chip_clk_gen_tag_lines_s;
+  localparam tag_clk_gen_local_els_gp = $bits(bsg_chip_clk_gen_tag_lines_s)/$bits(bsg_tag_s);
+
+  typedef struct packed {
+    bsg_tag_s uplink_reset;
+    bsg_tag_s downlink_reset;
+    bsg_tag_s downstream_reset;
+    bsg_tag_s token_reset;
+  } bsg_chip_sdr_tag_lines_s;
+  localparam tag_sdr_local_els_gp = $bits(bsg_chip_sdr_tag_lines_s)/$bits(bsg_tag_s);
+
+  typedef struct packed {
+    bsg_chip_clk_gen_tag_lines_s noc_clk;
+    bsg_chip_clk_gen_tag_lines_s io_clk;
+    bsg_tag_s core;
+    bsg_tag_s io;
+  } bsg_chip_io_link_ddr_tag_lines_s;
+
+  typedef struct packed {
+    bsg_chip_sdr_tag_lines_s sdr;
+    bsg_tag_s noc_reset;
+    bsg_chip_io_link_ddr_tag_lines_s [mem_link_rr_ratio_gp-1:0] ddr;
+  } bsg_chip_noc_tag_lines_s;
+  localparam tag_noc_local_els_gp = $bits(bsg_chip_noc_tag_lines_s)/$bits(bsg_tag_s);
+
+  // Warning: Dander Zone
+  // Setting parameters below incorrectly may result in chip failure
+  //
+  // // Struct for reference only
+  // typedef struct packed {
+  //   bsg_chip_clk_gen_tag_lines_s       [3:0] mc_clk;
+  //   bsg_tag_s                     [3:0][3:0] mc_reset;
+  //   bsg_chip_sdr_tag_lines_s      [3:0][3:0] mc_sdr;
+  //   bsg_chip_noc_tag_lines_s                 io_link;
+  //   bsg_chip_noc_tag_lines_s           [7:0] mem_link;
+  // } bsg_chip_tag_lines_s;
+  //
+  localparam tag_mem_link_offset_gp = 0;
+  localparam tag_io_link_offset_gp  = tag_mem_link_offset_gp + (8)  *tag_noc_local_els_gp;
+  localparam tag_mc_sdr_offset_gp   = tag_io_link_offset_gp  + (1)  *tag_noc_local_els_gp;
+  localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*tag_sdr_local_els_gp;
+  localparam tag_mc_clk_offset_gp   = tag_mc_reset_offset_gp + (4*4)*1;
 
 
 endpackage

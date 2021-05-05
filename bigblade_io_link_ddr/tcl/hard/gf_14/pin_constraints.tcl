@@ -67,18 +67,7 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 # tag
 set clk_reset_tag_ports [list]
 append_to_collection clk_reset_tag_ports [get_ports "tag_clk_i"]
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_core_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_async_reset_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_osc_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_osc_trigger_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_ds_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_io_sel_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_noc_async_reset_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_noc_osc_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_noc_osc_trigger_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_noc_ds_tag_lines_i[$i]"]}
-for {set i 0} {$i < 4} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_noc_sel_tag_lines_i[$i]"]}
+append_to_collection clk_reset_tag_ports [get_ports "tag_lines_i*"]
 
 # clock reset
 append_to_collection clk_reset_tag_ports [get_ports "ext_io_clk_i"]

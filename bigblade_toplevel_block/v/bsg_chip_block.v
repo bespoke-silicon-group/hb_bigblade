@@ -223,7 +223,7 @@ module bsg_chip_block
  
   ,.tag_clk_i                      (tag_clk_lo            )
   ,.tag_data_i                     (tag_data_lo           )
-  ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(mem_link_conc_num_gp*29))
+  ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(tag_io_link_offset_gp))
  
   ,.io_link_clk_o                  ({io_link_clk_lo [1], io_link_clk_lo [0]})
   ,.io_link_data_o                 ({io_link_data_lo[1], io_link_data_lo[0]})
@@ -280,7 +280,7 @@ module bsg_chip_block
    
     ,.tag_clk_i                      (tag_clk_lo            )
     ,.tag_data_i                     (tag_data_lo           )
-    ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(i*29))
+    ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(tag_mem_link_offset_gp+i*tag_noc_local_els_gp))
    
     ,.io_link_clk_o                  ({mem_link_clk_lo [idx1], mem_link_clk_lo [idx0]})
     ,.io_link_data_o                 ({mem_link_data_lo[idx1], mem_link_data_lo[idx0]})

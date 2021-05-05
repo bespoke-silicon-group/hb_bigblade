@@ -54,14 +54,11 @@ module bsg_chip_noc_io_link
   ,output                             mc_rev_link_token_o
   );
 
-  // ddr_tag_lines + noc_tag_lines + sdr_tag_lines
-  localparam tag_local_els_lp = 12*2 + 1 + 4;
-
   // tag master instance
-  bsg_tag_s [tag_local_els_lp-1:0] tag_lines_lo;
+  bsg_chip_noc_tag_lines_s tag_lines_lo;
   bsg_tag_master_decentralized
  #(.els_p      (tag_els_gp)
-  ,.local_els_p(tag_local_els_lp)
+  ,.local_els_p(tag_noc_local_els_gp)
   ,.lg_width_p (tag_lg_width_gp)
   ) btm
   (.clk_i           (tag_clk_i)
@@ -88,19 +85,8 @@ module bsg_chip_noc_io_link
     ,.async_output_disable_i         (async_output_disable_i)
     ,.noc_clk_o                      (noc_clk_raw_lo[i]     )
 
-    ,.tag_clk_i                      (tag_clk_i       )
-    ,.tag_io_tag_lines_i             (tag_lines_lo[i*12+0 ])
-    ,.tag_core_tag_lines_i           (tag_lines_lo[i*12+1 ])
-    ,.tag_io_async_reset_tag_lines_i (tag_lines_lo[i*12+2 ])
-    ,.tag_io_osc_tag_lines_i         (tag_lines_lo[i*12+3 ])
-    ,.tag_io_osc_trigger_tag_lines_i (tag_lines_lo[i*12+4 ])
-    ,.tag_io_ds_tag_lines_i          (tag_lines_lo[i*12+5 ])
-    ,.tag_io_sel_tag_lines_i         (tag_lines_lo[i*12+6 ])
-    ,.tag_noc_async_reset_tag_lines_i(tag_lines_lo[i*12+7 ])
-    ,.tag_noc_osc_tag_lines_i        (tag_lines_lo[i*12+8 ])
-    ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_lo[i*12+9 ])
-    ,.tag_noc_ds_tag_lines_i         (tag_lines_lo[i*12+10])
-    ,.tag_noc_sel_tag_lines_i        (tag_lines_lo[i*12+11])
+    ,.tag_clk_i                      (tag_clk_i          )
+    ,.tag_lines_i                    (tag_lines_lo.ddr[i])
 
     ,.core_v_i                       (core_links_li[i].v             )
     ,.core_data_i                    (core_links_li[i].data          )
@@ -129,28 +115,27 @@ module bsg_chip_noc_io_link
  #(.width_p       (1)
   ,.default_p     (0)
   ) btc_noc
-  (.bsg_tag_i     (tag_lines_lo[24])
+  (.bsg_tag_i     (tag_lines_lo.noc_reset)
   ,.recv_clk_i    (noc_clk_lo)
   ,.recv_reset_i  (1'b0)
   ,.recv_new_r_o  (noc_reset_new_lo)
   ,.recv_data_r_o (noc_reset_lo)
   );
 
-  typedef struct packed { 
-    logic uplink_reset;
-    logic downlink_reset;
-    logic downstream_reset;
-    logic token_reset;
-  } sdr_tag_payload_s;
-  sdr_tag_payload_s async_sdr_tag_data_lo;
+  logic sdr_uplink_reset, sdr_downlink_reset, sdr_downstream_reset, sdr_token_reset;
 
-  for (genvar i = 0; i < $bits(sdr_tag_payload_s); i++)
-  begin: btc_sdr
-    bsg_tag_client_unsync #(.width_p(1)) btc
-    (.bsg_tag_i     (tag_lines_lo[25+i])
-    ,.data_async_r_o(async_sdr_tag_data_lo[i])
-    );
-  end
+  bsg_tag_client_unsync #(.width_p(1)) btc0
+  (.bsg_tag_i     (tag_lines_lo.sdr.token_reset)
+  ,.data_async_r_o(sdr_token_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc1
+  (.bsg_tag_i     (tag_lines_lo.sdr.downstream_reset)
+  ,.data_async_r_o(sdr_downstream_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc2
+  (.bsg_tag_i     (tag_lines_lo.sdr.downlink_reset)
+  ,.data_async_r_o(sdr_downlink_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc3
+  (.bsg_tag_i     (tag_lines_lo.sdr.uplink_reset)
+  ,.data_async_r_o(sdr_uplink_reset));
 
   // mem link round robin arbiters
   core_link_sif_s core_links_conc_li, core_links_conc_lo;
@@ -230,12 +215,12 @@ module bsg_chip_noc_io_link
   logic uplink_reset_sync, downstream_reset_sync;
   bsg_sync_sync #(.width_p(1)) up_bss
   (.oclk_i     (noc_clk_lo                        )
-  ,.iclk_data_i(async_sdr_tag_data_lo.uplink_reset)
+  ,.iclk_data_i(sdr_uplink_reset)
   ,.oclk_data_o(uplink_reset_sync                 )
   );
   bsg_sync_sync #(.width_p(1)) down_bss
   (.oclk_i     (noc_clk_lo                            )
-  ,.iclk_data_i(async_sdr_tag_data_lo.downstream_reset)
+  ,.iclk_data_i(sdr_downstream_reset)
   ,.oclk_data_o(downstream_reset_sync                 )
   );
 
@@ -252,8 +237,8 @@ module bsg_chip_noc_io_link
   (.core_clk_i             (noc_clk_lo)
   ,.core_uplink_reset_i    (uplink_reset_sync)
   ,.core_downstream_reset_i(downstream_reset_sync)
-  ,.async_downlink_reset_i (async_sdr_tag_data_lo.downlink_reset)
-  ,.async_token_reset_i    (async_sdr_tag_data_lo.token_reset)
+  ,.async_downlink_reset_i (sdr_downlink_reset)
+  ,.async_token_reset_i    (sdr_token_reset)
 
   ,.core_data_i (mc_links_fwd_li.data)
   ,.core_v_i    (mc_links_fwd_li.v)
@@ -287,8 +272,8 @@ module bsg_chip_noc_io_link
   (.core_clk_i             (noc_clk_lo)
   ,.core_uplink_reset_i    (uplink_reset_sync)
   ,.core_downstream_reset_i(downstream_reset_sync)
-  ,.async_downlink_reset_i (async_sdr_tag_data_lo.downlink_reset)
-  ,.async_token_reset_i    (async_sdr_tag_data_lo.token_reset)
+  ,.async_downlink_reset_i (sdr_downlink_reset)
+  ,.async_token_reset_i    (sdr_token_reset)
 
   ,.core_data_i (mc_links_rev_li.data)
   ,.core_v_i    (mc_links_rev_li.v)
