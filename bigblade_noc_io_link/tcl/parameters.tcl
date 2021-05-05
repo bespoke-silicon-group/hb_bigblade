@@ -1,0 +1,21 @@
+set TOPLEVEL_PARAMETERS [join "
+  ds_width_p=6
+  num_adgs_p=1
+  width_p=33
+  channel_width_p=16
+  num_channels_p=1
+  lg_fifo_depth_p=6
+  lg_credit_to_token_decimation_p=3
+  use_extra_data_bit_p=1
+  tag_num_clients_p=512
+  tag_lg_max_payload_width_p=4
+  sdr_lg_fifo_depth_p=3
+  sdr_lg_credit_to_token_decimation_p=0
+  ct_num_in_p=2
+  ct_remote_credits_p=64
+  ct_use_pseudo_large_fifo_p=0
+  mc_addr_width_p=28
+  mc_data_width_p=32
+  mc_x_cord_width_p=7
+  mc_y_cord_width_p=7
+"]
