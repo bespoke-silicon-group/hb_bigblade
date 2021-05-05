@@ -11,7 +11,6 @@ module bsg_chip_block_core_complex
   ,parameter mc_rev_width_lp =
     `bsg_manycore_return_packet_width(hb_x_cord_width_gp,hb_y_cord_width_gp,hb_data_width_gp)
   ,parameter total_num_tiles_x_lp = (hb_num_pods_x_gp*hb_num_tiles_x_gp)
-  ,parameter tag_lg_els_lp = `BSG_SAFE_CLOG2(tag_num_clients_gp)
   )
 
   (input  [hb_num_pods_y_gp-1:0]   mc_clk_i
@@ -50,8 +49,8 @@ module bsg_chip_block_core_complex
   );
 
 
-  wire [hb_num_pods_y_gp-1:0][hb_num_pods_x_gp-1:0][tag_lg_els_lp-1:0] pod_tag_node_id_offset_li;
-  wire [hb_num_pods_y_gp-1:0][S:N][E:W][tag_lg_els_lp-1:0] async_reset_tag_node_id_offset_li;
+  wire [hb_num_pods_y_gp-1:0][hb_num_pods_x_gp-1:0][tag_lg_els_gp-1:0] pod_tag_node_id_offset_li;
+  wire [hb_num_pods_y_gp-1:0][S:N][E:W][tag_lg_els_gp-1:0] async_reset_tag_node_id_offset_li;
 
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_x_cord_width_gp-1:0] global_x_li;
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_y_cord_width_gp-1:0] global_y_li;
@@ -152,12 +151,12 @@ module bsg_chip_block_core_complex
   begin
     // assign pod tag offset
     for (genvar j = 0; j < hb_num_pods_x_gp; j++)
-        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_lp)'(9*29+(i*hb_num_pods_x_gp+j));
+        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(9*29+(i*hb_num_pods_x_gp+j));
 
     // assign async reset tag offset
     for (genvar j = N; j < S; j++)
         for (genvar k = W; k < E; k++)
-            assign async_reset_tag_node_id_offset_li[i][j][k] = (tag_lg_els_lp)'(9*29+4*4+((i*2+(j-N))*2+(k-W))*4);
+            assign async_reset_tag_node_id_offset_li[i][j][k] = (tag_lg_els_gp)'(9*29+4*4+((i*2+(j-N))*2+(k-W))*4);
 
     // assign global coordinates
     assign global_x_li[i][0] = {3'(0), 4'b1111};
