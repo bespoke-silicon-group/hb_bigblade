@@ -1,0 +1,14 @@
+
+# To build simv from RTL:
+$ make
+$ cd basejump_stl && git submodule update --init --recursive
+$ cd bsg_manycore && make checkout_submodules
+$ cd testing/rtl && make
+  (enable waveform: WAVE=1)
+  (faster iteration when debugging: OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1)
+  (use on-chip clock generator: USE_CLK_GEN=1)
+
+# To run tests:
+$ cd bsg_manycore && make tools
+> change machine path to $(BSG_MANYCORE_DIR)/../testing/rtl/out
+> run tests and regression normally (WAVE=1 flag must match generated simv)
