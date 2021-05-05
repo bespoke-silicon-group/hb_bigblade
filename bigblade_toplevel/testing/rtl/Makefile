@@ -123,6 +123,19 @@ VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
 
 ########################################
+## Toplevel Parameters
+########################################
+
+NUM_PODS_X ?= 4
+NUM_PODS_Y ?= 4
+
+# Note: Overriding parameters in bsg_chip_pkg.v
+
+VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(NUM_PODS_X)
+VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(NUM_PODS_Y)
+
+
+########################################
 ## DRAM Definitions
 ########################################
 
@@ -136,12 +149,6 @@ build: $(BSG_OUT_SIM)
 $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS)
 	$(VCS) $(VCS_OPTIONS) -o $(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/build.log
 	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
-
-run: $(BSG_OUT_SIM)
-	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
-
-view:
-	$(VCS_BIN)/dve -full64 -vpd $(BSG_OUT_DIR)/vcdplus.vpd
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
