@@ -183,30 +183,28 @@ module bsg_chip_noc_io_link
   ,.yumi_i      ({ct_links_fwd_li.then_ready_rev, ct_links_rev_li.then_ready_rev})
   );
 
-  `declare_bsg_then_ready_link_sif_s(mc_fwd_width_lp, mc_fwd_link_sif_s);
-  mc_fwd_link_sif_s mc_links_fwd_li, mc_links_fwd_lo;
-  `declare_bsg_then_ready_link_sif_s(mc_rev_width_lp, mc_rev_link_sif_s);
-  mc_rev_link_sif_s mc_links_rev_li, mc_links_rev_lo;
+  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
+  bsg_manycore_link_sif_s mc_links_sif_li, mc_links_sif_lo;
 
-  bsg_then_ready_link_to_bsg_link
+  bsg_wide_link_to_then_ready_link
  #(.wide_link_width_p (mc_fwd_width_lp)
   ,.bsg_link_width_p  (ct_width_gp)
   ) fwd_adapter
   (.clk_i             (noc_clk_lo)
   ,.reset_i           (noc_reset_lo)
-  ,.wide_link_i       (mc_links_fwd_lo)
-  ,.wide_link_o       (mc_links_fwd_li)
+  ,.wide_link_i       (mc_links_sif_lo.fwd)
+  ,.wide_link_o       (mc_links_sif_li.fwd)
   ,.bsg_link_i        (ct_links_fwd_lo)
   ,.bsg_link_o        (ct_links_fwd_li)
   );
-  bsg_then_ready_link_to_bsg_link
+  bsg_wide_link_to_then_ready_link
  #(.wide_link_width_p (mc_rev_width_lp)
   ,.bsg_link_width_p  (ct_width_gp)
   ) rev_adapter
   (.clk_i             (noc_clk_lo)
   ,.reset_i           (noc_reset_lo)
-  ,.wide_link_i       (mc_links_rev_lo)
-  ,.wide_link_o       (mc_links_rev_li)
+  ,.wide_link_i       (mc_links_sif_lo.rev)
+  ,.wide_link_o       (mc_links_sif_li.rev)
   ,.bsg_link_i        (ct_links_rev_lo)
   ,.bsg_link_o        (ct_links_rev_li)
   );
@@ -224,9 +222,6 @@ module bsg_chip_noc_io_link
   ,.oclk_data_o(downstream_reset_sync                 )
   );
 
-  logic mc_links_fwd_ready_and_lo;
-  assign mc_links_fwd_lo.then_ready_rev = mc_links_fwd_li.v & mc_links_fwd_ready_and_lo;
-
   bsg_link_sdr
  #(.width_p                        (mc_fwd_width_lp)
   ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_gp)
@@ -240,13 +235,13 @@ module bsg_chip_noc_io_link
   ,.async_downlink_reset_i (sdr_downlink_reset)
   ,.async_token_reset_i    (sdr_token_reset)
 
-  ,.core_data_i (mc_links_fwd_li.data)
-  ,.core_v_i    (mc_links_fwd_li.v)
-  ,.core_ready_o(mc_links_fwd_ready_and_lo)
+  ,.core_data_i (mc_links_sif_li.fwd.data)
+  ,.core_v_i    (mc_links_sif_li.fwd.v)
+  ,.core_ready_o(mc_links_sif_lo.fwd.ready_and_rev)
 
-  ,.core_data_o (mc_links_fwd_lo.data)
-  ,.core_v_o    (mc_links_fwd_lo.v)
-  ,.core_yumi_i (mc_links_fwd_li.then_ready_rev)
+  ,.core_data_o (mc_links_sif_lo.fwd.data)
+  ,.core_v_o    (mc_links_sif_lo.fwd.v)
+  ,.core_yumi_i (mc_links_sif_lo.fwd.v & mc_links_sif_li.fwd.ready_and_rev)
 
   ,.link_clk_o  (mc_fwd_link_clk_o  )
   ,.link_data_o (mc_fwd_link_data_o )
@@ -258,9 +253,6 @@ module bsg_chip_noc_io_link
   ,.link_v_i    (mc_fwd_link_v_i    )
   ,.link_token_o(mc_fwd_link_token_o)
   );
-
-  logic mc_links_rev_ready_and_lo;
-  assign mc_links_rev_lo.then_ready_rev = mc_links_rev_li.v & mc_links_rev_ready_and_lo;
 
   bsg_link_sdr
  #(.width_p                        (mc_rev_width_lp)
@@ -275,13 +267,13 @@ module bsg_chip_noc_io_link
   ,.async_downlink_reset_i (sdr_downlink_reset)
   ,.async_token_reset_i    (sdr_token_reset)
 
-  ,.core_data_i (mc_links_rev_li.data)
-  ,.core_v_i    (mc_links_rev_li.v)
-  ,.core_ready_o(mc_links_rev_ready_and_lo)
+  ,.core_data_i (mc_links_sif_li.rev.data)
+  ,.core_v_i    (mc_links_sif_li.rev.v)
+  ,.core_ready_o(mc_links_sif_lo.rev.ready_and_rev)
 
-  ,.core_data_o (mc_links_rev_lo.data)
-  ,.core_v_o    (mc_links_rev_lo.v)
-  ,.core_yumi_i (mc_links_rev_li.then_ready_rev)
+  ,.core_data_o (mc_links_sif_lo.rev.data)
+  ,.core_v_o    (mc_links_sif_lo.rev.v)
+  ,.core_yumi_i (mc_links_sif_lo.rev.v & mc_links_sif_li.rev.ready_and_rev)
 
   ,.link_clk_o  (mc_rev_link_clk_o  )
   ,.link_data_o (mc_rev_link_data_o )

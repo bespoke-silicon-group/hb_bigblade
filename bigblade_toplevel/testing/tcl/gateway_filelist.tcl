@@ -163,14 +163,16 @@ set TESTING_SOURCE_FILES [join "
   $board_dir/pcb/bigblade/v/bsg_asic_socket.v
   $board_dir/pcb/bigblade/v/bsg_gateway_socket.v
   $board_dir/pcb/bigblade/v/bsg_bigblade_pcb.v
+
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_core_complex.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v
-  $bsg_designs_target_dir/testing/v/bsg_wide_link_to_then_ready_link.v
 
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_then_ready_link_round_robin_static.v
+  $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_wide_link_to_then_ready_link.v
+
 "]
 
