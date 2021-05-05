@@ -6,28 +6,7 @@ module bsg_chip_noc_mem_link
 
  import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
-
- #(parameter ds_width_p                          = "inv"
-  ,parameter num_adgs_p                          = "inv"
-  ,parameter width_p                             = "inv"
-  ,parameter channel_width_p                     = "inv"
-  ,parameter num_channels_p                      = "inv"
-  ,parameter lg_fifo_depth_p                     = "inv"
-  ,parameter lg_credit_to_token_decimation_p     = "inv"
-  ,parameter use_extra_data_bit_p                = "inv"
-  ,parameter tag_num_clients_p                   = "inv"
-  ,parameter tag_lg_max_payload_width_p          = "inv"
-  ,parameter sdr_lg_fifo_depth_p                 = "inv"
-  ,parameter sdr_lg_credit_to_token_decimation_p = "inv"
-  ,parameter wh_ruche_factor_p                   = "inv"
-  ,parameter wh_flit_width_p                     = "inv"
-  ,parameter wh_len_width_p                      = "inv"
-  ,parameter wh_cid_width_p                      = "inv"
-  ,parameter wh_cord_width_p                     = "inv"
-  ,parameter lg_tag_num_clients_lp               = `BSG_SAFE_CLOG2(tag_num_clients_p)
-  ,parameter wh_link_sif_width_lp =
-    `bsg_ready_and_link_sif_width(wh_flit_width_p)
-  )
+ import bsg_chip_pkg::*;
 
   (input                              ext_io_clk_i
   ,input                              ext_noc_clk_i
@@ -35,38 +14,38 @@ module bsg_chip_noc_mem_link
 
   ,input                              tag_clk_i
   ,input                              tag_data_i
-  ,input  [lg_tag_num_clients_lp-1:0] tag_node_id_offset_i
+  ,input  [tag_lg_els_gp-1:0]         tag_node_id_offset_i
 
-  ,input  [1:0]                       io_link_clk_i
-  ,input  [1:0]                       io_link_v_i
-  ,input  [1:0][channel_width_p-1:0]  io_link_data_i
-  ,output [1:0]                       io_link_token_o
+  ,input  [1:0]                                 io_link_clk_i
+  ,input  [1:0]                                 io_link_v_i
+  ,input  [1:0][bsg_link_channel_width_gp-1:0]  io_link_data_i
+  ,output [1:0]                                 io_link_token_o
 
-  ,output [1:0]                       io_link_clk_o
-  ,output [1:0]                       io_link_v_o
-  ,output [1:0][channel_width_p-1:0]  io_link_data_o
-  ,input  [1:0]                       io_link_token_i
+  ,output [1:0]                                 io_link_clk_o
+  ,output [1:0]                                 io_link_v_o
+  ,output [1:0][bsg_link_channel_width_gp-1:0]  io_link_data_o
+  ,input  [1:0]                                 io_link_token_i
 
-  ,output [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_clk_o
-  ,output [1:0][wh_ruche_factor_p-1:0][wh_flit_width_p-1:0] io_wh_link_data_o
-  ,output [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_v_o
-  ,input  [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_token_i
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_o
+  ,output [1:0][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_o
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_v_o
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_token_i
 
-  ,input  [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_clk_i
-  ,input  [1:0][wh_ruche_factor_p-1:0][wh_flit_width_p-1:0] io_wh_link_data_i
-  ,input  [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_v_i
-  ,output [1:0][wh_ruche_factor_p-1:0]                      io_wh_link_token_o
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_i
+  ,input  [1:0][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_i
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_v_i
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_token_o
   );
 
   // ddr_tag_lines + noc_tag_lines + sdr_tag_lines
-  localparam tag_num_local_clients_lp = 12*2 + 1 + 4;
+  localparam tag_local_els_lp = 12*2 + 1 + 4;
 
   // tag master instance
-  bsg_tag_s [tag_num_local_clients_lp-1:0] tag_lines_lo;
+  bsg_tag_s [tag_local_els_lp-1:0] tag_lines_lo;
   bsg_tag_master_decentralized
- #(.els_p      (tag_num_clients_p)
-  ,.local_els_p(tag_num_local_clients_lp)
-  ,.lg_width_p (tag_lg_max_payload_width_p)
+ #(.els_p      (tag_els_gp)
+  ,.local_els_p(tag_local_els_lp)
+  ,.lg_width_p (tag_lg_width_gp)
   ) btm
   (.clk_i           (tag_clk_i)
   ,.data_i          (tag_data_i)
@@ -78,21 +57,12 @@ module bsg_chip_noc_mem_link
   wire [1:0] noc_clk_raw_lo;
   wire noc_clk_lo = noc_clk_raw_lo[0];
 
-  `declare_bsg_ready_and_link_sif_s(width_p, core_link_sif_s);
+  `declare_bsg_ready_and_link_sif_s(bsg_link_width_gp, core_link_sif_s);
   core_link_sif_s [1:0] core_links_li, core_links_lo;
 
   for (genvar i = 0; i < 2; i++)
   begin: ddr_link
-    bsg_chip_io_link_ddr
-   #(.ds_width_p                     (ds_width_p                     )
-    ,.num_adgs_p                     (num_adgs_p                     )
-    ,.width_p                        (width_p                        )
-    ,.channel_width_p                (channel_width_p                )
-    ,.num_channels_p                 (num_channels_p                 )
-    ,.lg_fifo_depth_p                (lg_fifo_depth_p                )
-    ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
-    ,.use_extra_data_bit_p           (use_extra_data_bit_p           )
-    ) link
+    bsg_chip_io_link_ddr link
     (.core_clk_i                     (noc_clk_lo            )
     ,.ext_io_clk_i                   (ext_io_clk_i          )
     ,.ext_noc_clk_i                  (ext_noc_clk_i         )
@@ -167,7 +137,7 @@ module bsg_chip_noc_mem_link
   core_link_sif_s core_links_conc_li, core_links_conc_lo;
 
   bsg_ready_and_link_round_robin_static 
- #(.width_p      (width_p)
+ #(.width_p      (bsg_link_width_gp)
   ,.num_in_p     (2)
   ) rr
   (.clk_i        (noc_clk_lo)
@@ -178,7 +148,7 @@ module bsg_chip_noc_mem_link
   ,.links_o      (core_links_li)
   );
 
-  `declare_bsg_ready_and_link_sif_s(wh_flit_width_p, wh_link_sif_s);
+  `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
   wh_link_sif_s wh_link_sif_li, wh_link_sif_lo;
 
   assign wh_link_sif_li.v             = core_links_conc_lo.v;
@@ -188,13 +158,13 @@ module bsg_chip_noc_mem_link
   assign core_links_conc_li.data          = wh_link_sif_lo.data;
   assign core_links_conc_li.ready_and_rev = wh_link_sif_lo.ready_and_rev;
 
-  wh_link_sif_s [1:0][wh_ruche_factor_p-1:0] wh_unconc_link_sif_li, wh_unconc_link_sif_lo;
+  wh_link_sif_s [1:0][wh_ruche_factor_gp-1:0] wh_unconc_link_sif_li, wh_unconc_link_sif_lo;
   bsg_wormhole_concentrator
- #(.flit_width_p(wh_flit_width_p)
-  ,.len_width_p (wh_len_width_p)
-  ,.cid_width_p (wh_cid_width_p)
-  ,.cord_width_p(wh_cord_width_p)
-  ,.num_in_p    (2*wh_ruche_factor_p)
+ #(.flit_width_p(wh_flit_width_gp)
+  ,.len_width_p (wh_len_width_gp)
+  ,.cid_width_p (wh_cid_width_gp)
+  ,.cord_width_p(wh_cord_width_gp)
+  ,.num_in_p    (2*wh_ruche_factor_gp)
   ) conc0
   (.clk_i  (noc_clk_lo)
   ,.reset_i(noc_reset_lo)
@@ -219,12 +189,12 @@ module bsg_chip_noc_mem_link
     ,.iclk_data_i(async_sdr_tag_data_lo.downstream_reset)
     ,.oclk_data_o(downstream_reset_sync                 )
     );
-    for (genvar j = 0; j < wh_ruche_factor_p; j++)
+    for (genvar j = 0; j < wh_ruche_factor_gp; j++)
       begin: wh_sdr
         bsg_link_sdr
-       #(.width_p                        (wh_flit_width_p)
-        ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_p)
-        ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_p)
+       #(.width_p                        (wh_flit_width_gp)
+        ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_gp)
+        ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp)
         ,.bypass_upstream_twofer_fifo_p  (0)
         ,.bypass_downstream_twofer_fifo_p(0)
         ) sdr

@@ -22,8 +22,7 @@ set TESTING_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
-
-  $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 "]
 
 set TESTING_SOURCE_FILES [join "

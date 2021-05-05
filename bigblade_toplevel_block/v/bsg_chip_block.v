@@ -216,34 +216,14 @@ module bsg_chip_block
   logic mc_rev_link_clk_lo, mc_rev_link_v_lo, mc_rev_link_token_li;
   logic [mc_rev_width_lp-1:0] mc_rev_link_data_lo;
 
-  bsg_chip_noc_io_link
- #(.ds_width_p                         (clk_gen_ds_width_gp                      )
-  ,.num_adgs_p                         (clk_gen_num_adgs_gp                      )
-  ,.width_p                            (bsg_link_width_gp                        )
-  ,.channel_width_p                    (bsg_link_channel_width_gp                )
-  ,.num_channels_p                     (bsg_link_num_channels_gp                 )
-  ,.lg_fifo_depth_p                    (bsg_link_lg_fifo_depth_gp                )
-  ,.lg_credit_to_token_decimation_p    (bsg_link_lg_credit_to_token_decimation_gp)
-  ,.use_extra_data_bit_p               (bsg_link_use_extra_data_bit_gp           )
-  ,.tag_num_clients_p                  (tag_num_clients_gp                       )
-  ,.tag_lg_max_payload_width_p         (tag_lg_max_payload_width_gp              )
-  ,.sdr_lg_fifo_depth_p                (sdr_lg_fifo_depth_gp                     )
-  ,.sdr_lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp     )
-  ,.ct_num_in_p                        (ct_num_in_gp                             )
-  ,.ct_remote_credits_p                (ct_remote_credits_gp                     )
-  ,.ct_use_pseudo_large_fifo_p         (ct_use_pseudo_large_fifo_gp              )
-  ,.mc_addr_width_p                    (hb_addr_width_gp                         )
-  ,.mc_data_width_p                    (hb_data_width_gp                         )
-  ,.mc_x_cord_width_p                  (hb_x_cord_width_gp                       )
-  ,.mc_y_cord_width_p                  (hb_y_cord_width_gp                       )
-  ) io_link
+  bsg_chip_noc_io_link io_link
   (.ext_io_clk_i                   (ext_io_clk_i          )
   ,.ext_noc_clk_i                  (ext_noc_clk_i         )
   ,.async_output_disable_i         (async_output_disable_i)
  
   ,.tag_clk_i                      (tag_clk_lo            )
   ,.tag_data_i                     (tag_data_lo           )
-  ,.tag_node_id_offset_i           ((`BSG_SAFE_CLOG2(tag_num_clients_gp))'(mem_link_conc_num_gp*29))
+  ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(mem_link_conc_num_gp*29))
  
   ,.io_link_clk_o                  ({io_link_clk_lo [1], io_link_clk_lo [0]})
   ,.io_link_data_o                 ({io_link_data_lo[1], io_link_data_lo[0]})
@@ -293,32 +273,14 @@ module bsg_chip_block
     localparam idx1 = i*mem_link_rr_ratio_gp+1;
     localparam idx0 = i*mem_link_rr_ratio_gp+0;
 
-    bsg_chip_noc_mem_link
-   #(.ds_width_p                         (clk_gen_ds_width_gp                      )
-    ,.num_adgs_p                         (clk_gen_num_adgs_gp                      )
-    ,.width_p                            (bsg_link_width_gp                        )
-    ,.channel_width_p                    (bsg_link_channel_width_gp                )
-    ,.num_channels_p                     (bsg_link_num_channels_gp                 )
-    ,.lg_fifo_depth_p                    (bsg_link_lg_fifo_depth_gp                )
-    ,.lg_credit_to_token_decimation_p    (bsg_link_lg_credit_to_token_decimation_gp)
-    ,.use_extra_data_bit_p               (bsg_link_use_extra_data_bit_gp           )
-    ,.tag_num_clients_p                  (tag_num_clients_gp                       )
-    ,.tag_lg_max_payload_width_p         (tag_lg_max_payload_width_gp              )
-    ,.sdr_lg_fifo_depth_p                (sdr_lg_fifo_depth_gp                     )
-    ,.sdr_lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp     )
-    ,.wh_ruche_factor_p                  (wh_ruche_factor_gp                       )
-    ,.wh_flit_width_p                    (wh_flit_width_gp                         )
-    ,.wh_len_width_p                     (wh_len_width_gp                          )
-    ,.wh_cid_width_p                     (wh_cid_width_gp                          )
-    ,.wh_cord_width_p                    (wh_cord_width_gp                         )
-    ) link
+    bsg_chip_noc_mem_link link
     (.ext_io_clk_i                   (ext_io_clk_i          )
     ,.ext_noc_clk_i                  (ext_noc_clk_i         )
     ,.async_output_disable_i         (async_output_disable_i)
    
     ,.tag_clk_i                      (tag_clk_lo            )
     ,.tag_data_i                     (tag_data_lo           )
-    ,.tag_node_id_offset_i           ((`BSG_SAFE_CLOG2(tag_num_clients_gp))'(i*29))
+    ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(i*29))
    
     ,.io_link_clk_o                  ({mem_link_clk_lo [idx1], mem_link_clk_lo [idx0]})
     ,.io_link_data_o                 ({mem_link_data_lo[idx1], mem_link_data_lo[idx0]})
