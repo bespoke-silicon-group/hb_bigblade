@@ -90,7 +90,7 @@ module bsg_gateway_chip
   //
 
   localparam tag_trace_rom_addr_width_lp = 32;
-  localparam tag_trace_rom_data_width_lp = 4+tag_num_masters_gp+`BSG_SAFE_CLOG2(tag_num_clients_gp)+1+tag_lg_max_payload_width_gp+tag_max_payload_width_gp;
+  localparam tag_trace_rom_data_width_lp = 4+tag_num_masters_gp+tag_lg_els_gp+1+tag_lg_width_gp+tag_max_payload_width_gp;
 
   logic [tag_trace_rom_addr_width_lp-1:0] rom_addr_li;
   logic [tag_trace_rom_data_width_lp-1:0] rom_data_lo;
@@ -112,7 +112,7 @@ module bsg_gateway_chip
   bsg_tag_trace_replay #(.rom_addr_width_p   ( tag_trace_rom_addr_width_lp )
                         ,.rom_data_width_p   ( tag_trace_rom_data_width_lp )
                         ,.num_masters_p      ( tag_num_masters_gp )
-                        ,.num_clients_p      ( tag_num_clients_gp )
+                        ,.num_clients_p      ( tag_els_gp )
                         ,.max_payload_width_p( tag_max_payload_width_gp )
                         )
     tag_trace_replay
@@ -147,12 +147,12 @@ module bsg_gateway_chip
   //
 
   //// All tag lines from the btm
-  //bsg_tag_s [tag_num_clients_gp-1:0] tag_lines_raw_lo;
+  //bsg_tag_s [tag_els_gp-1:0] tag_lines_raw_lo;
   //wire bsg_chip_tag_lines_s tag_lines_lo = tag_lines_raw_lo;
   //
   //// BSG tag master instance
-  //bsg_tag_master #(.els_p( tag_num_clients_gp )
-  //                ,.lg_width_p( tag_lg_max_payload_width_gp )
+  //bsg_tag_master #(.els_p( tag_els_gp )
+  //                ,.lg_width_p( tag_lg_width_gp )
   //                )
   //  btm
   //    (.clk_i      ( tag_clk )
@@ -233,20 +233,21 @@ module bsg_gateway_chip
   // BSG Chip IO
   //
 
-  bsg_chip_bsg_link_sif_s [io_link_num_gp-1:0] io_links_li, io_links_lo;
-  bsg_chip_bsg_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
+  `declare_bsg_ready_and_link_sif_s(bsg_link_width_gp, bsg_gateway_link_sif_s);
+  bsg_gateway_link_sif_s [io_link_num_gp-1:0] io_links_li, io_links_lo;
+  bsg_gateway_link_sif_s [mem_link_num_gp-1:0] mem_links_li, mem_links_lo;
 
   for (genvar i = 0; i < io_link_num_gp; i++)
   begin: io_link
     bsg_tag_s [1:0] tag_lines_lo;
     bsg_tag_master_decentralized
-   #(.els_p      (tag_num_clients_gp)
+   #(.els_p      (tag_els_gp)
     ,.local_els_p(2)
-    ,.lg_width_p (tag_lg_max_payload_width_gp)
+    ,.lg_width_p (tag_lg_width_gp)
     ) btm
     (.clk_i           (tag_clk)
     ,.data_i          (tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0 )
-    ,.node_id_offset_i((`BSG_SAFE_CLOG2(tag_num_clients_gp))'(mem_link_conc_num_gp*26+i*12))
+    ,.node_id_offset_i((tag_lg_els_gp)'(mem_link_conc_num_gp*26+i*12))
     ,.clients_o       (tag_lines_lo)
     );
 
@@ -286,13 +287,13 @@ module bsg_gateway_chip
   begin: mem_link
     bsg_tag_s [1:0] tag_lines_lo;
     bsg_tag_master_decentralized
-   #(.els_p      (tag_num_clients_gp)
+   #(.els_p      (tag_els_gp)
     ,.local_els_p(2)
-    ,.lg_width_p (tag_lg_max_payload_width_gp)
+    ,.lg_width_p (tag_lg_width_gp)
     ) btm
     (.clk_i           (tag_clk)
     ,.data_i          (tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0 )
-    ,.node_id_offset_i((`BSG_SAFE_CLOG2(tag_num_clients_gp))'((i/2)*26+(i%2)*12))
+    ,.node_id_offset_i((tag_lg_els_gp)'((i/2)*26+(i%2)*12))
     ,.clients_o       (tag_lines_lo)
     );
 

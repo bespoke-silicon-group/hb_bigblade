@@ -6,18 +6,23 @@ module bsg_gateway_chip_core_complex
  import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
 
+ #(parameter link_width_lp = `bsg_ready_and_link_sif_width(bsg_link_width_gp)
+  )
+
   (input  mc_clk_i
   ,input  tag_trace_done_i
 
-  ,input  bsg_chip_bsg_link_sif_s [io_link_num_gp-1:0] io_links_i
-  ,output bsg_chip_bsg_link_sif_s [io_link_num_gp-1:0] io_links_o
+  ,input  [io_link_num_gp-1:0][link_width_lp-1:0] io_links_i
+  ,output [io_link_num_gp-1:0][link_width_lp-1:0] io_links_o
 
-  ,input  bsg_chip_bsg_link_sif_s [mem_link_num_gp-1:0] mem_links_i
-  ,output bsg_chip_bsg_link_sif_s [mem_link_num_gp-1:0] mem_links_o
+  ,input  [mem_link_num_gp-1:0][link_width_lp-1:0] mem_links_i
+  ,output [mem_link_num_gp-1:0][link_width_lp-1:0] mem_links_o
   );
 
+  `declare_bsg_ready_and_link_sif_s(bsg_link_width_gp, bsg_gateway_link_sif_s);
+
   // mem link round robin arbiters
-  bsg_chip_bsg_link_sif_s io_links_conc_li, io_links_conc_lo;
+  bsg_gateway_link_sif_s io_links_conc_li, io_links_conc_lo;
   bsg_ready_and_link_round_robin_static 
  #(.width_p      (bsg_link_width_gp   )
   ,.num_in_p     (io_link_num_gp)
@@ -112,8 +117,8 @@ module bsg_gateway_chip_core_complex
   
   
   // mem link round robin arbiters
-  bsg_chip_bsg_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
-  bsg_chip_bsg_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
+  bsg_gateway_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_li;
+  bsg_gateway_link_sif_s [mem_link_conc_num_gp-1:0] mem_links_conc_lo;
   
   for (genvar i = 0; i < mem_link_conc_num_gp; i++) begin: mem_link_arb
     bsg_ready_and_link_round_robin_static 

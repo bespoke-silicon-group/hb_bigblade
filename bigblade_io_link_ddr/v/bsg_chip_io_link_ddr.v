@@ -2,16 +2,7 @@
 module bsg_chip_io_link_ddr
 
  import bsg_tag_pkg::*;
-
- #(parameter ds_width_p                      = "inv"
-  ,parameter num_adgs_p                      = "inv"
-  ,parameter width_p                         = "inv"
-  ,parameter channel_width_p                 = "inv"
-  ,parameter num_channels_p                  = "inv"
-  ,parameter lg_fifo_depth_p                 = "inv"
-  ,parameter lg_credit_to_token_decimation_p = "inv"
-  ,parameter use_extra_data_bit_p            = "inv"
-  )
+ import bsg_chip_pkg::*;
 
   (input                core_clk_i
   ,input                ext_io_clk_i
@@ -33,23 +24,23 @@ module bsg_chip_io_link_ddr
   ,input  [3:0]         tag_noc_ds_tag_lines_i
   ,input  [3:0]         tag_noc_sel_tag_lines_i
 
-  ,input                core_v_i
-  ,input  [width_p-1:0] core_data_i
-  ,output               core_ready_and_o
+  ,input                          core_v_i
+  ,input  [bsg_link_width_gp-1:0] core_data_i
+  ,output                         core_ready_and_o
 
-  ,output               core_v_o
-  ,output [width_p-1:0] core_data_o
-  ,input                core_yumi_i
+  ,output                         core_v_o
+  ,output [bsg_link_width_gp-1:0] core_data_o
+  ,input                          core_yumi_i
 
-  ,input  [num_channels_p-1:0]                      io_link_clk_i
-  ,input  [num_channels_p-1:0]                      io_link_v_i
-  ,input  [num_channels_p-1:0][channel_width_p-1:0] io_link_data_i
-  ,output [num_channels_p-1:0]                      io_link_token_o
+  ,input  [bsg_link_num_channels_gp-1:0]                                io_link_clk_i
+  ,input  [bsg_link_num_channels_gp-1:0]                                io_link_v_i
+  ,input  [bsg_link_num_channels_gp-1:0][bsg_link_channel_width_gp-1:0] io_link_data_i
+  ,output [bsg_link_num_channels_gp-1:0]                                io_link_token_o
 
-  ,output [num_channels_p-1:0]                      io_link_clk_o
-  ,output [num_channels_p-1:0]                      io_link_v_o
-  ,output [num_channels_p-1:0][channel_width_p-1:0] io_link_data_o
-  ,input  [num_channels_p-1:0]                      io_link_token_i
+  ,output [bsg_link_num_channels_gp-1:0]                                io_link_clk_o
+  ,output [bsg_link_num_channels_gp-1:0]                                io_link_v_o
+  ,output [bsg_link_num_channels_gp-1:0][bsg_link_channel_width_gp-1:0] io_link_data_o
+  ,input  [bsg_link_num_channels_gp-1:0]                                io_link_token_i
   );
 
   wire bsg_tag_s tag_io_tag_lines_li              = {tag_clk_i, tag_io_tag_lines_i             [2:0]};
@@ -70,8 +61,8 @@ module bsg_chip_io_link_ddr
   logic io_clk_lo;
 
   bsg_chip_clk_gen
- #(.ds_width_p             (ds_width_p)
-  ,.num_adgs_p             (num_adgs_p)
+ #(.ds_width_p             (bsg_link_clk_gen_ds_width_gp)
+  ,.num_adgs_p             (bsg_link_clk_gen_num_adgs_gp)
   ) clk_gen_io
   (.async_reset_tag_lines_i(tag_io_async_reset_tag_lines_li)
   ,.osc_tag_lines_i        (tag_io_osc_tag_lines_li        )
@@ -84,8 +75,8 @@ module bsg_chip_io_link_ddr
   );
 
   bsg_chip_clk_gen
- #(.ds_width_p             (ds_width_p)
-  ,.num_adgs_p             (num_adgs_p)
+ #(.ds_width_p             (bsg_link_clk_gen_ds_width_gp)
+  ,.num_adgs_p             (bsg_link_clk_gen_num_adgs_gp)
   ) clk_gen_noc
   (.async_reset_tag_lines_i(tag_noc_async_reset_tag_lines_li)
   ,.osc_tag_lines_i        (tag_noc_osc_tag_lines_li        )
@@ -134,12 +125,12 @@ module bsg_chip_io_link_ddr
   );
 
   bsg_link_ddr_upstream
- #(.width_p                        (width_p)
-  ,.channel_width_p                (channel_width_p)
-  ,.num_channels_p                 (num_channels_p)
-  ,.lg_fifo_depth_p                (lg_fifo_depth_p)
-  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
-  ,.use_extra_data_bit_p           (use_extra_data_bit_p)
+ #(.width_p                        (bsg_link_width_gp)
+  ,.channel_width_p                (bsg_link_channel_width_gp)
+  ,.num_channels_p                 (bsg_link_num_channels_gp)
+  ,.lg_fifo_depth_p                (bsg_link_lg_fifo_depth_gp)
+  ,.lg_credit_to_token_decimation_p(bsg_link_lg_credit_to_token_decimation_gp)
+  ,.use_extra_data_bit_p           (bsg_link_use_extra_data_bit_gp)
   ,.use_encode_p                   (1)
   ,.bypass_twofer_fifo_p           (1)
   ,.bypass_gearbox_p               (1)
@@ -161,8 +152,8 @@ module bsg_chip_io_link_ddr
   ,.token_clk_i        (io_link_token_i)
   );
 
-  logic [num_channels_p-1:0] downlink_reset_lo;
-  for (genvar i = 0; i < num_channels_p; i++)
+  logic [bsg_link_num_channels_gp-1:0] downlink_reset_lo;
+  for (genvar i = 0; i < bsg_link_num_channels_gp; i++)
   begin: down_bss
     bsg_sync_sync #(.width_p(1)) bss
     (.oclk_i     (io_link_clk_i[i])
@@ -172,12 +163,12 @@ module bsg_chip_io_link_ddr
   end
 
   bsg_link_ddr_downstream 
- #(.width_p                        (width_p)
-  ,.channel_width_p                (channel_width_p)
-  ,.num_channels_p                 (num_channels_p)
-  ,.lg_fifo_depth_p                (lg_fifo_depth_p)
-  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
-  ,.use_extra_data_bit_p           (use_extra_data_bit_p)
+ #(.width_p                        (bsg_link_width_gp)
+  ,.channel_width_p                (bsg_link_channel_width_gp)
+  ,.num_channels_p                 (bsg_link_num_channels_gp)
+  ,.lg_fifo_depth_p                (bsg_link_lg_fifo_depth_gp)
+  ,.lg_credit_to_token_decimation_p(bsg_link_lg_credit_to_token_decimation_gp)
+  ,.use_extra_data_bit_p           (bsg_link_use_extra_data_bit_gp)
   ,.use_encode_p                   (0)
   ,.bypass_twofer_fifo_p           (1)
   ,.bypass_gearbox_p               (0)

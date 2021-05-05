@@ -24,8 +24,7 @@ set SVERILOG_PACKAGE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $bsg_manycore_dir/imports/HardFloat/source/bsg_hardfloat_pkg.v
-
-  $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 "]
 
 # Best Practice: Keep bsg_defines first, then all pacakges (denoted by ending

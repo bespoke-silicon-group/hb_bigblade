@@ -22,7 +22,7 @@ set SVERILOG_INCLUDE_PATHS [join "
   $bsg_manycore_dir/imports/HardFloat/source
   $bsg_manycore_dir/imports/HardFloat/source/RISCV
 
-  $bsg_designs_target_dir/../bigblade_toplevel_block/v
+  $bsg_designs_target_dir/../common/v
   $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v
   $bsg_designs_target_dir/../common/sdr/sdr_vertical/v
   $bsg_designs_target_dir/../common/sdr/sdr_corner/v

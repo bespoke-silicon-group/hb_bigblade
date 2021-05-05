@@ -7,35 +7,12 @@ module bsg_chip_noc_io_link
  import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
+ import bsg_chip_pkg::*;
 
- #(parameter ds_width_p                          = "inv"
-  ,parameter num_adgs_p                          = "inv"
-  ,parameter width_p                             = "inv"
-  ,parameter channel_width_p                     = "inv"
-  ,parameter num_channels_p                      = "inv"
-  ,parameter lg_fifo_depth_p                     = "inv"
-  ,parameter lg_credit_to_token_decimation_p     = "inv"
-  ,parameter use_extra_data_bit_p                = "inv"
-  ,parameter tag_num_clients_p                   = "inv"
-  ,parameter tag_lg_max_payload_width_p          = "inv"
-  ,parameter sdr_lg_fifo_depth_p                 = "inv"
-  ,parameter sdr_lg_credit_to_token_decimation_p = "inv"
-  ,parameter ct_num_in_p                         = "inv"
-  ,parameter ct_remote_credits_p                 = "inv"
-  ,parameter ct_use_pseudo_large_fifo_p          = "inv"
-  ,parameter mc_addr_width_p                     = "inv"
-  ,parameter mc_data_width_p                     = "inv"
-  ,parameter mc_x_cord_width_p                   = "inv"
-  ,parameter mc_y_cord_width_p                   = "inv"
-  ,parameter lg_tag_num_clients_lp               = `BSG_SAFE_CLOG2(tag_num_clients_p)
-  ,parameter ct_tag_width_lp                     = `BSG_SAFE_CLOG2(ct_num_in_p + 1)
-  ,parameter ct_width_lp                         = width_p - ct_tag_width_lp
-  ,parameter ct_credit_decimation_lp             = ct_remote_credits_p/4
-  ,parameter ct_lg_credit_decimation_lp          = `BSG_SAFE_CLOG2(ct_credit_decimation_lp/2+1)
-  ,parameter mc_fwd_width_lp =
-    `bsg_manycore_packet_width(mc_addr_width_p,mc_data_width_p,mc_x_cord_width_p,mc_y_cord_width_p)
+ #(parameter mc_fwd_width_lp =
+    `bsg_manycore_packet_width(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp)
   ,parameter mc_rev_width_lp =
-    `bsg_manycore_return_packet_width(mc_x_cord_width_p,mc_y_cord_width_p,mc_data_width_p)
+    `bsg_manycore_return_packet_width(hb_x_cord_width_gp,hb_y_cord_width_gp,hb_data_width_gp)
   )
 
   (input                              ext_io_clk_i
@@ -44,17 +21,17 @@ module bsg_chip_noc_io_link
 
   ,input                              tag_clk_i
   ,input                              tag_data_i
-  ,input  [lg_tag_num_clients_lp-1:0] tag_node_id_offset_i
+  ,input  [tag_lg_els_gp-1:0]         tag_node_id_offset_i
 
-  ,input  [1:0]                       io_link_clk_i
-  ,input  [1:0]                       io_link_v_i
-  ,input  [1:0][channel_width_p-1:0]  io_link_data_i
-  ,output [1:0]                       io_link_token_o
+  ,input  [1:0]                                 io_link_clk_i
+  ,input  [1:0]                                 io_link_v_i
+  ,input  [1:0][bsg_link_channel_width_gp-1:0]  io_link_data_i
+  ,output [1:0]                                 io_link_token_o
 
-  ,output [1:0]                       io_link_clk_o
-  ,output [1:0]                       io_link_v_o
-  ,output [1:0][channel_width_p-1:0]  io_link_data_o
-  ,input  [1:0]                       io_link_token_i
+  ,output [1:0]                                 io_link_clk_o
+  ,output [1:0]                                 io_link_v_o
+  ,output [1:0][bsg_link_channel_width_gp-1:0]  io_link_data_o
+  ,input  [1:0]                                 io_link_token_i
 
   ,output                             mc_fwd_link_clk_o
   ,output [mc_fwd_width_lp-1:0]       mc_fwd_link_data_o
@@ -78,14 +55,14 @@ module bsg_chip_noc_io_link
   );
 
   // ddr_tag_lines + noc_tag_lines + sdr_tag_lines
-  localparam tag_num_local_clients_lp = 12*2 + 1 + 4;
+  localparam tag_local_els_lp = 12*2 + 1 + 4;
 
   // tag master instance
-  bsg_tag_s [tag_num_local_clients_lp-1:0] tag_lines_lo;
+  bsg_tag_s [tag_local_els_lp-1:0] tag_lines_lo;
   bsg_tag_master_decentralized
- #(.els_p      (tag_num_clients_p)
-  ,.local_els_p(tag_num_local_clients_lp)
-  ,.lg_width_p (tag_lg_max_payload_width_p)
+ #(.els_p      (tag_els_gp)
+  ,.local_els_p(tag_local_els_lp)
+  ,.lg_width_p (tag_lg_width_gp)
   ) btm
   (.clk_i           (tag_clk_i)
   ,.data_i          (tag_data_i)
@@ -97,23 +74,14 @@ module bsg_chip_noc_io_link
   wire [1:0] noc_clk_raw_lo;
   wire noc_clk_lo = noc_clk_raw_lo[0];
 
-  `declare_bsg_then_ready_link_sif_s(width_p, core_link_sif_s);
+  `declare_bsg_then_ready_link_sif_s(bsg_link_width_gp, core_link_sif_s);
   core_link_sif_s [1:0] core_links_li, core_links_lo;
   logic [1:0] core_links_ready_and_lo;
 
   for (genvar i = 0; i < 2; i++)
   begin: ddr_link
     assign core_links_lo[i].then_ready_rev = core_links_li[i].v & core_links_ready_and_lo[i];
-    bsg_chip_io_link_ddr
-   #(.ds_width_p                     (ds_width_p                     )
-    ,.num_adgs_p                     (num_adgs_p                     )
-    ,.width_p                        (width_p                        )
-    ,.channel_width_p                (channel_width_p                )
-    ,.num_channels_p                 (num_channels_p                 )
-    ,.lg_fifo_depth_p                (lg_fifo_depth_p                )
-    ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
-    ,.use_extra_data_bit_p           (use_extra_data_bit_p           )
-    ) link
+    bsg_chip_io_link_ddr link
     (.core_clk_i                     (noc_clk_lo            )
     ,.ext_io_clk_i                   (ext_io_clk_i          )
     ,.ext_noc_clk_i                  (ext_noc_clk_i         )
@@ -188,7 +156,7 @@ module bsg_chip_noc_io_link
   core_link_sif_s core_links_conc_li, core_links_conc_lo;
 
   bsg_then_ready_link_round_robin_static 
- #(.width_p      (width_p)
+ #(.width_p      (bsg_link_width_gp)
   ,.num_in_p     (2)
   ) rr
   (.clk_i        (noc_clk_lo)
@@ -199,16 +167,16 @@ module bsg_chip_noc_io_link
   ,.links_o      (core_links_li)
   );
 
-  `declare_bsg_then_ready_link_sif_s(ct_width_lp, ct_link_sif_s);
+  `declare_bsg_then_ready_link_sif_s(ct_width_gp, ct_link_sif_s);
   ct_link_sif_s ct_links_fwd_li, ct_links_fwd_lo;
   ct_link_sif_s ct_links_rev_li, ct_links_rev_lo;
 
   bsg_channel_tunnel
- #(.width_p                (ct_width_lp)
-  ,.num_in_p               (ct_num_in_p)
-  ,.remote_credits_p       (ct_remote_credits_p)
-  ,.use_pseudo_large_fifo_p(ct_use_pseudo_large_fifo_p)
-  ,.lg_credit_decimation_p (ct_lg_credit_decimation_lp)
+ #(.width_p                (ct_width_gp)
+  ,.num_in_p               (ct_num_in_gp)
+  ,.remote_credits_p       (ct_remote_credits_gp)
+  ,.use_pseudo_large_fifo_p(ct_use_pseudo_large_fifo_gp)
+  ,.lg_credit_decimation_p (ct_lg_credit_decimation_gp)
   ) tunnel
   (.clk_i       (noc_clk_lo)
   ,.reset_i     (noc_reset_lo)
@@ -237,7 +205,7 @@ module bsg_chip_noc_io_link
 
   bsg_then_ready_link_to_bsg_link
  #(.wide_link_width_p (mc_fwd_width_lp)
-  ,.bsg_link_width_p  (ct_width_lp)
+  ,.bsg_link_width_p  (ct_width_gp)
   ) fwd_adapter
   (.clk_i             (noc_clk_lo)
   ,.reset_i           (noc_reset_lo)
@@ -248,7 +216,7 @@ module bsg_chip_noc_io_link
   );
   bsg_then_ready_link_to_bsg_link
  #(.wide_link_width_p (mc_rev_width_lp)
-  ,.bsg_link_width_p  (ct_width_lp)
+  ,.bsg_link_width_p  (ct_width_gp)
   ) rev_adapter
   (.clk_i             (noc_clk_lo)
   ,.reset_i           (noc_reset_lo)
@@ -276,8 +244,8 @@ module bsg_chip_noc_io_link
 
   bsg_link_sdr
  #(.width_p                        (mc_fwd_width_lp)
-  ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_p)
-  ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_p)
+  ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_gp)
+  ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp)
   ,.bypass_upstream_twofer_fifo_p  (0)
   ,.bypass_downstream_twofer_fifo_p(0)
   ) fwd_sdr
@@ -311,8 +279,8 @@ module bsg_chip_noc_io_link
 
   bsg_link_sdr
  #(.width_p                        (mc_rev_width_lp)
-  ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_p)
-  ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_p)
+  ,.lg_fifo_depth_p                (sdr_lg_fifo_depth_gp)
+  ,.lg_credit_to_token_decimation_p(sdr_lg_credit_to_token_decimation_gp)
   ,.bypass_upstream_twofer_fifo_p  (0)
   ,.bypass_downstream_twofer_fifo_p(0)
   ) rev_sdr

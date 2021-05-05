@@ -110,6 +110,7 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
     $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
 
+    $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
     $bsg_designs_target_dir/v/bsg_chip_noc_mem_link.v
     $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v
 
