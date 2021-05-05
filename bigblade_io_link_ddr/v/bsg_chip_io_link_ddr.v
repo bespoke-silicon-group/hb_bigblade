@@ -10,19 +10,8 @@ module bsg_chip_io_link_ddr
   ,input                async_output_disable_i
   ,output               noc_clk_o
 
-  ,input                tag_clk_i
-  ,input  [3:0]         tag_io_tag_lines_i
-  ,input  [3:0]         tag_core_tag_lines_i
-  ,input  [3:0]         tag_io_async_reset_tag_lines_i
-  ,input  [3:0]         tag_io_osc_tag_lines_i
-  ,input  [3:0]         tag_io_osc_trigger_tag_lines_i
-  ,input  [3:0]         tag_io_ds_tag_lines_i
-  ,input  [3:0]         tag_io_sel_tag_lines_i
-  ,input  [3:0]         tag_noc_async_reset_tag_lines_i
-  ,input  [3:0]         tag_noc_osc_tag_lines_i
-  ,input  [3:0]         tag_noc_osc_trigger_tag_lines_i
-  ,input  [3:0]         tag_noc_ds_tag_lines_i
-  ,input  [3:0]         tag_noc_sel_tag_lines_i
+  ,input                                  tag_clk_i
+  ,input bsg_chip_io_link_ddr_tag_lines_s tag_lines_i
 
   ,input                          core_v_i
   ,input  [bsg_link_width_gp-1:0] core_data_i
@@ -43,20 +32,20 @@ module bsg_chip_io_link_ddr
   ,input  [bsg_link_num_channels_gp-1:0]                                io_link_token_i
   );
 
-  wire bsg_tag_s tag_io_tag_lines_li              = {tag_clk_i, tag_io_tag_lines_i             [2:0]};
-  wire bsg_tag_s tag_core_tag_lines_li            = {tag_clk_i, tag_core_tag_lines_i           [2:0]};
+  wire bsg_tag_s tag_io_tag_lines_li              = {tag_clk_i, tag_lines_i.io                 [2:0]};
+  wire bsg_tag_s tag_core_tag_lines_li            = {tag_clk_i, tag_lines_i.core               [2:0]};
 
-  wire bsg_tag_s tag_io_async_reset_tag_lines_li  = {tag_clk_i, tag_io_async_reset_tag_lines_i [2:0]};
-  wire bsg_tag_s tag_io_osc_tag_lines_li          = {tag_clk_i, tag_io_osc_tag_lines_i         [2:0]};
-  wire bsg_tag_s tag_io_osc_trigger_tag_lines_li  = {tag_clk_i, tag_io_osc_trigger_tag_lines_i [2:0]};
-  wire bsg_tag_s tag_io_ds_tag_lines_li           = {tag_clk_i, tag_io_ds_tag_lines_i          [2:0]};
-  wire bsg_tag_s tag_io_sel_tag_lines_li          = {tag_clk_i, tag_io_sel_tag_lines_i         [2:0]};
+  wire bsg_tag_s tag_io_async_reset_tag_lines_li  = {tag_clk_i, tag_lines_i.io_clk.async_reset [2:0]};
+  wire bsg_tag_s tag_io_osc_tag_lines_li          = {tag_clk_i, tag_lines_i.io_clk.osc         [2:0]};
+  wire bsg_tag_s tag_io_osc_trigger_tag_lines_li  = {tag_clk_i, tag_lines_i.io_clk.osc_trigger [2:0]};
+  wire bsg_tag_s tag_io_ds_tag_lines_li           = {tag_clk_i, tag_lines_i.io_clk.ds          [2:0]};
+  wire bsg_tag_s tag_io_sel_tag_lines_li          = {tag_clk_i, tag_lines_i.io_clk.sel         [2:0]};
 
-  wire bsg_tag_s tag_noc_async_reset_tag_lines_li = {tag_clk_i, tag_noc_async_reset_tag_lines_i[2:0]};
-  wire bsg_tag_s tag_noc_osc_tag_lines_li         = {tag_clk_i, tag_noc_osc_tag_lines_i        [2:0]};
-  wire bsg_tag_s tag_noc_osc_trigger_tag_lines_li = {tag_clk_i, tag_noc_osc_trigger_tag_lines_i[2:0]};
-  wire bsg_tag_s tag_noc_ds_tag_lines_li          = {tag_clk_i, tag_noc_ds_tag_lines_i         [2:0]};
-  wire bsg_tag_s tag_noc_sel_tag_lines_li         = {tag_clk_i, tag_noc_sel_tag_lines_i        [2:0]};
+  wire bsg_tag_s tag_noc_async_reset_tag_lines_li = {tag_clk_i, tag_lines_i.noc_clk.async_reset[2:0]};
+  wire bsg_tag_s tag_noc_osc_tag_lines_li         = {tag_clk_i, tag_lines_i.noc_clk.osc        [2:0]};
+  wire bsg_tag_s tag_noc_osc_trigger_tag_lines_li = {tag_clk_i, tag_lines_i.noc_clk.osc_trigger[2:0]};
+  wire bsg_tag_s tag_noc_ds_tag_lines_li          = {tag_clk_i, tag_lines_i.noc_clk.ds         [2:0]};
+  wire bsg_tag_s tag_noc_sel_tag_lines_li         = {tag_clk_i, tag_lines_i.noc_clk.sel        [2:0]};
 
   logic io_clk_lo;
 
