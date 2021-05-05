@@ -35,6 +35,7 @@ module bsg_gateway_chip_core_complex
     ,.y_cord_width_p(hb_y_cord_width_gp)
     ,.io_x_cord_p(7'b0001111)
     ,.io_y_cord_p(7'b0001000)
+    ,.verbose_p(1)
   ) host (
     .clk_i(mc_clk_i)
     ,.reset_i(~tag_trace_done_i)
