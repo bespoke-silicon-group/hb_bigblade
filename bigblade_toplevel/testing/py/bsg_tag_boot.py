@@ -1,5 +1,6 @@
-from bsg_tag_trace_gen import *
 import sys
+sys.path.append("../../../common/util")
+from bsg_tag_trace_gen import *
 
 if __name__ == "__main__":
 
