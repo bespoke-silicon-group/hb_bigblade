@@ -158,24 +158,19 @@ module bsg_chip_block_core_complex
         assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_reset_offset_gp+(i*hb_num_pods_x_gp+j)*1);
 
     // assign global x coordinates
-    localparam hb_local_x_cord_width_lp = hb_x_cord_width_gp-hb_pod_x_cord_width_gp;
-
-    assign global_x_li[i][0] = {(hb_pod_x_cord_width_gp)'(0), (hb_local_x_cord_width_lp)'((1<<hb_local_x_cord_width_lp)-1)};
+    assign global_x_li[i][0] = {(hb_pod_x_cord_width_gp)'(0), (hb_x_subcord_width_gp)'((1<<hb_x_subcord_width_gp)-1)};
     for (genvar j = 0; j < total_num_tiles_x_lp; j++)
-        assign global_x_li[i][j+1] = {(hb_pod_x_cord_width_gp)'((j/hb_num_tiles_x_gp)+1), (hb_local_x_cord_width_lp)'(j%hb_num_tiles_x_gp)};
-    assign global_x_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_x_cord_width_gp)'(hb_num_pods_x_gp+1), (hb_local_x_cord_width_lp)'(0)};
+        assign global_x_li[i][j+1] = {(hb_pod_x_cord_width_gp)'((j/hb_num_tiles_x_gp)+1), (hb_x_subcord_width_gp)'(j%hb_num_tiles_x_gp)};
+    assign global_x_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_x_cord_width_gp)'(hb_num_pods_x_gp+1), (hb_x_subcord_width_gp)'(0)};
     
     // assign global y coordinates
-    localparam hb_local_y_cord_width_lp = hb_y_cord_width_gp-hb_pod_y_cord_width_gp;
-
-    assign global_y_li[i][0] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'((1<<hb_local_y_cord_width_lp)-1)};
+    assign global_y_li[i][0] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-1)};
     for (genvar j = 0; j < total_num_tiles_x_lp; j++)
-        assign global_y_li[i][j+1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'((1<<hb_local_y_cord_width_lp)-2)};
-    assign global_y_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'((1<<hb_local_y_cord_width_lp)-1)};
+        assign global_y_li[i][j+1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-2)};
+    assign global_y_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-1)};
   end
 
   // TODO: fix temporary sdr input clock tieoff internally
-  // need to override downstream_v_o with downstream_reset
 
   // tieoff hor links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
@@ -248,26 +243,23 @@ module bsg_chip_block_core_complex
   // stitch ver links
   for (genvar i = 1; i < hb_num_pods_y_gp; i++)
   begin
-    for (genvar j = 0; j < 2+total_num_tiles_x_lp; j++)
-      begin
-        assign ver_io_fwd_link_clk_li  [i-1][S][j] = ver_io_fwd_link_clk_lo  [i][N][j];
-        assign ver_io_fwd_link_data_li [i-1][S][j] = ver_io_fwd_link_data_lo [i][N][j];
-        assign ver_io_fwd_link_v_li    [i-1][S][j] = ver_io_fwd_link_v_lo    [i][N][j];
-        assign ver_io_fwd_link_token_li[i-1][S][j] = ver_io_fwd_link_token_lo[i][N][j];
-        assign ver_io_rev_link_clk_li  [i-1][S][j] = ver_io_rev_link_clk_lo  [i][N][j];
-        assign ver_io_rev_link_data_li [i-1][S][j] = ver_io_rev_link_data_lo [i][N][j];
-        assign ver_io_rev_link_v_li    [i-1][S][j] = ver_io_rev_link_v_lo    [i][N][j];
-        assign ver_io_rev_link_token_li[i-1][S][j] = ver_io_rev_link_token_lo[i][N][j];
+    assign ver_io_fwd_link_clk_li  [i-1][S] = ver_io_fwd_link_clk_lo  [i][N];
+    assign ver_io_fwd_link_data_li [i-1][S] = ver_io_fwd_link_data_lo [i][N];
+    assign ver_io_fwd_link_v_li    [i-1][S] = ver_io_fwd_link_v_lo    [i][N];
+    assign ver_io_fwd_link_token_li[i-1][S] = ver_io_fwd_link_token_lo[i][N];
+    assign ver_io_rev_link_clk_li  [i-1][S] = ver_io_rev_link_clk_lo  [i][N];
+    assign ver_io_rev_link_data_li [i-1][S] = ver_io_rev_link_data_lo [i][N];
+    assign ver_io_rev_link_v_li    [i-1][S] = ver_io_rev_link_v_lo    [i][N];
+    assign ver_io_rev_link_token_li[i-1][S] = ver_io_rev_link_token_lo[i][N];
 
-        assign ver_io_fwd_link_clk_li  [i][N][j] = ver_io_fwd_link_clk_lo  [i-1][S][j];
-        assign ver_io_fwd_link_data_li [i][N][j] = ver_io_fwd_link_data_lo [i-1][S][j];
-        assign ver_io_fwd_link_v_li    [i][N][j] = ver_io_fwd_link_v_lo    [i-1][S][j];
-        assign ver_io_fwd_link_token_li[i][N][j] = ver_io_fwd_link_token_lo[i-1][S][j];
-        assign ver_io_rev_link_clk_li  [i][N][j] = ver_io_rev_link_clk_lo  [i-1][S][j];
-        assign ver_io_rev_link_data_li [i][N][j] = ver_io_rev_link_data_lo [i-1][S][j];
-        assign ver_io_rev_link_v_li    [i][N][j] = ver_io_rev_link_v_lo    [i-1][S][j];
-        assign ver_io_rev_link_token_li[i][N][j] = ver_io_rev_link_token_lo[i-1][S][j];
-      end
+    assign ver_io_fwd_link_clk_li  [i][N] = ver_io_fwd_link_clk_lo  [i-1][S];
+    assign ver_io_fwd_link_data_li [i][N] = ver_io_fwd_link_data_lo [i-1][S];
+    assign ver_io_fwd_link_v_li    [i][N] = ver_io_fwd_link_v_lo    [i-1][S];
+    assign ver_io_fwd_link_token_li[i][N] = ver_io_fwd_link_token_lo[i-1][S];
+    assign ver_io_rev_link_clk_li  [i][N] = ver_io_rev_link_clk_lo  [i-1][S];
+    assign ver_io_rev_link_data_li [i][N] = ver_io_rev_link_data_lo [i-1][S];
+    assign ver_io_rev_link_v_li    [i][N] = ver_io_rev_link_v_lo    [i-1][S];
+    assign ver_io_rev_link_token_li[i][N] = ver_io_rev_link_token_lo[i-1][S];
   end
 
 endmodule
