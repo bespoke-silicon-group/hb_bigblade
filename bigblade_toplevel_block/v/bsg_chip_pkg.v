@@ -62,8 +62,8 @@ package bsg_chip_pkg;
   parameter hb_addr_width_gp   = 28; // word addr
   parameter hb_data_width_gp   = 32;
 
-  parameter hb_num_pods_x_gp   = 4;
-  parameter hb_num_pods_y_gp   = 4;
+  parameter hb_num_pods_x_gp   = 1;
+  parameter hb_num_pods_y_gp   = 1;
 
   parameter hb_num_subarray_x_gp = 1;
   parameter hb_num_subarray_y_gp = 4;
@@ -111,7 +111,7 @@ package bsg_chip_pkg;
 
   // Total number of clients the master will be driving
   localparam tag_num_masters_gp = 2;
-  localparam tag_num_clients_gp = 512; //$bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
+  localparam tag_num_clients_gp = 1024; //$bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
 
   // Set mininum payload width to 9-bits
   localparam tag_max_payload_width_gp = 9;

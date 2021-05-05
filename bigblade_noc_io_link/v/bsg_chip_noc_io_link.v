@@ -77,8 +77,8 @@ module bsg_chip_noc_io_link
   ,output                             mc_rev_link_token_o
   );
 
-  // ddr_tag_lines + sdr_tag_lines + noc_tag_lines
-  localparam tag_num_local_clients_lp = 12*2 + 1 + 1;
+  // ddr_tag_lines + noc_tag_lines + sdr_tag_lines
+  localparam tag_num_local_clients_lp = 12*2 + 1 + 4;
 
   // tag master instance
   bsg_tag_s [tag_num_local_clients_lp-1:0] tag_lines_lo;
@@ -176,12 +176,13 @@ module bsg_chip_noc_io_link
   } sdr_tag_payload_s;
   sdr_tag_payload_s async_sdr_tag_data_lo;
 
-  bsg_tag_client_unsync
- #(.width_p       ($bits(sdr_tag_payload_s))
-  ) btc_sdr
-  (.bsg_tag_i     (tag_lines_lo[25])
-  ,.data_async_r_o(async_sdr_tag_data_lo)
-  );
+  for (genvar i = 0; i < $bits(sdr_tag_payload_s); i++)
+  begin: btc_sdr
+    bsg_tag_client_unsync #(.width_p(1)) btc
+    (.bsg_tag_i     (tag_lines_lo[25+i])
+    ,.data_async_r_o(async_sdr_tag_data_lo[i])
+    );
+  end
 
   // mem link round robin arbiters
   core_link_sif_s core_links_conc_li, core_links_conc_lo;

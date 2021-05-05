@@ -7,7 +7,7 @@ set TOPLEVEL_PARAMETERS [join "
   lg_fifo_depth_p=6
   lg_credit_to_token_decimation_p=3
   use_extra_data_bit_p=1
-  tag_num_clients_p=512
+  tag_num_clients_p=1024
   tag_lg_max_payload_width_p=4
   sdr_lg_fifo_depth_p=3
   sdr_lg_credit_to_token_decimation_p=0
