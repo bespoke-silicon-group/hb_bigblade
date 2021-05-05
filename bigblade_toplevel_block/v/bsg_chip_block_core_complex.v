@@ -152,12 +152,12 @@ module bsg_chip_block_core_complex
   begin
     // assign pod tag offset
     for (genvar j = 0; j < hb_num_pods_x_gp; j++)
-        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_lp)'(9*26+(i*hb_num_pods_x_gp+j));
+        assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_lp)'(9*29+(i*hb_num_pods_x_gp+j));
 
     // assign async reset tag offset
     for (genvar j = N; j < S; j++)
         for (genvar k = W; k < E; k++)
-            assign async_reset_tag_node_id_offset_li[i][j][k] = (tag_lg_els_lp)'(9*26+4*4+((i*2+(j-N))*2+(k-W)));
+            assign async_reset_tag_node_id_offset_li[i][j][k] = (tag_lg_els_lp)'(9*29+4*4+((i*2+(j-N))*2+(k-W))*4);
 
     // assign global coordinates
     assign global_x_li[i][0] = {3'(0), 4'b1111};

@@ -120,7 +120,7 @@ package bsg_chip_pkg;
 
   // Total number of clients the master will be driving
   localparam tag_num_masters_gp = 2;
-  localparam tag_num_clients_gp = 512; //$bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
+  localparam tag_num_clients_gp = 1024; //$bits(bsg_chip_tag_lines_s)/$bits(bsg_tag_s);
 
   // Set mininum payload width to 9-bits
   localparam tag_max_payload_width_gp = 9;
