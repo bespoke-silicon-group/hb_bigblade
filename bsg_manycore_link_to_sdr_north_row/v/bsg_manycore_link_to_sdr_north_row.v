@@ -20,7 +20,7 @@ module bsg_manycore_link_to_sdr_north_row
 
     , parameter num_clk_ports_p=1
 
-    , parameter tag_els_p=512
+    , parameter tag_els_p=1024
     , parameter tag_local_els_p=1
     , parameter tag_lg_width_p=4
     , parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
