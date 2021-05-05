@@ -1,0 +1,12 @@
+{ "memories": [
+    {"name": "gf14_1rw_d1024_w46_m4",      "width":  46, "depth": 1024, "mux": 4, "mask": 0, "banks": 1, "type": "rf"   },
+    {"name": "gf14_1rw_d64_w32_m2",        "width":  32, "depth": 64,   "mux": 2, "mask": 0, "banks": 1, "type": "rf"   },
+    {"name": "gf14_1rw_d1024_w32_m4_byte", "width":  32, "depth": 1024, "mux": 4, "mask": 8, "banks": 1, "type": "rf"   },
+  
+    {"name": "gf14_1rw_d512_w128_m2_byte",    "width":  128,  "depth": 512, "mux": 2, "mask": 8, "banks": 1, "type": "rf"   },
+    {"name": "gf14_1rw_d64_w80_m2_bit",       "width":  80,   "depth": 64,  "mux": 2, "mask": 1, "banks": 1, "type": "rf"   },
+    {"name": "gf14_1rw_d64_w7_m4_bit",        "width":  7,    "depth": 64,  "mux": 4, "mask": 1, "banks": 1, "type": "rf"   }
+  ],
+  "dont_compile": [
+  ]
+}
