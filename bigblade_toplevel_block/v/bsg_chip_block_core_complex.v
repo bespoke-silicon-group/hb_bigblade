@@ -174,8 +174,8 @@ module bsg_chip_block_core_complex
     assign global_y_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'((1<<hb_local_y_cord_width_lp)-1)};
   end
 
-  // TODO: temporary hack for SDR tieoff
-  wire tieoff_clk_lo = tag_clk_i;
+  // TODO: fix temporary sdr input clock tieoff internally
+  // need to override downstream_v_o with downstream_reset
 
   // tieoff hor links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
@@ -199,12 +199,12 @@ module bsg_chip_block_core_complex
               end
             else
               begin
-                assign hor_io_fwd_link_clk_li  [i][j][k] = tieoff_clk_lo;
+                assign hor_io_fwd_link_clk_li  [i][j][k] = hor_io_fwd_link_clk_lo[i][j][k];
                 assign hor_io_fwd_link_data_li [i][j][k] = '0;
                 assign hor_io_fwd_link_v_li    [i][j][k] = '0;
                 assign hor_io_rev_link_token_li[i][j][k] = '0;
               end
-            assign hor_io_rev_link_clk_li  [i][j][k] = tieoff_clk_lo;
+            assign hor_io_rev_link_clk_li  [i][j][k] = hor_io_rev_link_clk_lo[i][j][k];
             assign hor_io_rev_link_data_li [i][j][k] = '0;
             assign hor_io_rev_link_v_li    [i][j][k] = '0;
             assign hor_io_fwd_link_token_li[i][j][k] = '0;
@@ -233,12 +233,12 @@ module bsg_chip_block_core_complex
           end
         else
           begin
-            assign ver_io_rev_link_clk_li  [i][j][k] = tieoff_clk_lo;
+            assign ver_io_rev_link_clk_li  [i][j][k] = ver_io_rev_link_clk_lo[i][j][k];
             assign ver_io_rev_link_data_li [i][j][k] = '0;
             assign ver_io_rev_link_v_li    [i][j][k] = '0;
             assign ver_io_fwd_link_token_li[i][j][k] = '0;
           end
-        assign ver_io_fwd_link_clk_li  [i][j][k] = tieoff_clk_lo;
+        assign ver_io_fwd_link_clk_li  [i][j][k] = ver_io_fwd_link_clk_lo[i][j][k];
         assign ver_io_fwd_link_data_li [i][j][k] = '0;
         assign ver_io_fwd_link_v_li    [i][j][k] = '0;
         assign ver_io_rev_link_token_li[i][j][k] = '0;
