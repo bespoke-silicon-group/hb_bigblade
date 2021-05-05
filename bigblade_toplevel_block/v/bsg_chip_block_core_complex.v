@@ -171,28 +171,6 @@ module bsg_chip_block_core_complex
         assign global_y_li[i][j] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_local_y_cord_width_lp)'(1<<hb_local_y_cord_width_lp-2)};
   end
 
-  // Attach side io links
-  assign hor_io_fwd_link_clk_li  [0][W][0] = mc_fwd_link_clk_i;
-  assign hor_io_fwd_link_data_li [0][W][0] = mc_fwd_link_data_i;
-  assign hor_io_fwd_link_v_li    [0][W][0] = mc_fwd_link_v_i;
-  assign mc_fwd_link_token_o = hor_io_fwd_link_token_lo[0][W][0];
-
-  assign mc_rev_link_clk_o   = hor_io_rev_link_clk_lo  [0][W][0];
-  assign mc_rev_link_data_o  = hor_io_rev_link_data_lo [0][W][0];
-  assign mc_rev_link_v_o     = hor_io_rev_link_v_lo    [0][W][0];
-  assign hor_io_rev_link_token_li[0][W][0] = mc_rev_link_token_i;
-
-  // Attach top io links
-  assign mc_fwd_link_clk_o   = ver_io_fwd_link_clk_lo  [0][N][total_num_tiles_x_lp/2];
-  assign mc_fwd_link_data_o  = ver_io_fwd_link_data_lo [0][N][total_num_tiles_x_lp/2];
-  assign mc_fwd_link_v_o     = ver_io_fwd_link_v_lo    [0][N][total_num_tiles_x_lp/2];
-  assign ver_io_fwd_link_token_li[0][N][total_num_tiles_x_lp/2] = mc_fwd_link_token_i;
-
-  assign ver_io_rev_link_clk_li  [0][N][total_num_tiles_x_lp/2] = mc_rev_link_clk_i;
-  assign ver_io_rev_link_data_li [0][N][total_num_tiles_x_lp/2] = mc_rev_link_data_i;
-  assign ver_io_rev_link_v_li    [0][N][total_num_tiles_x_lp/2] = mc_rev_link_v_i;
-  assign mc_rev_link_token_o = ver_io_rev_link_token_lo[0][N][total_num_tiles_x_lp/2];
-
   // tieoff hor links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
   begin
@@ -200,7 +178,20 @@ module bsg_chip_block_core_complex
       begin
         for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
           begin
-            if ((i != 0) && (j != W) && (k != 0))
+            // Attach side io links, requests from host to chip
+            if ((i == 0) && (j == W) && (k == 0))
+              begin
+                assign hor_io_fwd_link_clk_li  [i][j][k] = mc_fwd_link_clk_i;
+                assign hor_io_fwd_link_data_li [i][j][k] = mc_fwd_link_data_i;
+                assign hor_io_fwd_link_v_li    [i][j][k] = mc_fwd_link_v_i;
+                assign mc_fwd_link_token_o = hor_io_fwd_link_token_lo[i][j][k];
+
+                assign mc_rev_link_clk_o   = hor_io_rev_link_clk_lo  [i][j][k];
+                assign mc_rev_link_data_o  = hor_io_rev_link_data_lo [i][j][k];
+                assign mc_rev_link_v_o     = hor_io_rev_link_v_lo    [i][j][k];
+                assign hor_io_rev_link_token_li[i][j][k] = mc_rev_link_token_i;
+              end
+            else
               begin
                 assign hor_io_fwd_link_clk_li  [i][j][k] = '0;
                 assign hor_io_fwd_link_data_li [i][j][k] = '0;
@@ -222,7 +213,20 @@ module bsg_chip_block_core_complex
       begin
         for (genvar k = 0 ; k < 2+total_num_tiles_x_lp; k++)
           begin
-            if ((i != 0) && (j != N) && (k != total_num_tiles_x_lp/2))
+            // Attach top io links, requests from chip to host
+            if ((i == 0) && (j == N) && (k == total_num_tiles_x_lp/2))
+              begin
+                assign ver_io_rev_link_clk_li  [i][j][k] = mc_rev_link_clk_i;
+                assign ver_io_rev_link_data_li [i][j][k] = mc_rev_link_data_i;
+                assign ver_io_rev_link_v_li    [i][j][k] = mc_rev_link_v_i;
+                assign mc_rev_link_token_o = ver_io_rev_link_token_lo[i][j][k];
+
+                assign mc_fwd_link_clk_o   = ver_io_fwd_link_clk_lo  [i][j][k];
+                assign mc_fwd_link_data_o  = ver_io_fwd_link_data_lo [i][j][k];
+                assign mc_fwd_link_v_o     = ver_io_fwd_link_v_lo    [i][j][k];
+                assign ver_io_fwd_link_token_li[i][j][k] = mc_fwd_link_token_i;
+              end
+            else
               begin
                 assign ver_io_rev_link_clk_li  [i][j][k] = '0;
                 assign ver_io_rev_link_data_li [i][j][k] = '0;
