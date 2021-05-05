@@ -174,7 +174,7 @@ module bsg_chip_block_core_complex
   // tieoff hor links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
   begin
-    for (genvar j = W ; j < E; j++)
+    for (genvar j = W ; j <= E; j++)
       begin
         for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
           begin
@@ -209,7 +209,7 @@ module bsg_chip_block_core_complex
   // tieoff ver links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
   begin
-    for (genvar j = N ; j < S; j++)
+    for (genvar j = N ; j <= S; j++)
       begin
         for (genvar k = 0 ; k < 2+total_num_tiles_x_lp; k++)
           begin
