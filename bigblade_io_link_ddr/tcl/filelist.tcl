@@ -101,8 +101,8 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
 
     $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
+    $bsg_designs_target_dir/../common/v/bsg_chip_clk_gen.v
+    $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
     $bsg_designs_target_dir/v/bsg_chip_io_link_ddr.v
-    $bsg_designs_target_dir/v/bsg_chip_clk_gen.v
-    $bsg_designs_target_dir/v/bsg_clk_gen_osc.v
 
 "]
