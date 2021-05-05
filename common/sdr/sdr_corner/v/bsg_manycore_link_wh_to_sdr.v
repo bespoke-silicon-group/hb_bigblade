@@ -14,8 +14,8 @@
   ,parameter wh_ruche_factor_p = "inv"
   ,parameter wh_flit_width_p   = "inv"
 
-  ,parameter tag_els_p=512
-  ,parameter tag_local_els_p=1
+  ,parameter tag_els_p=1024
+  ,parameter tag_local_els_p=4
   ,parameter tag_lg_width_p=4
   ,parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
     
@@ -107,11 +107,30 @@
   logic async_downlink_reset_lo;
   logic async_downstream_reset_lo;
   logic async_token_reset_lo;
+  
   bsg_tag_client_unsync #(
-    .width_p(4)
+    .width_p(1)
   ) btc0 (
-    .bsg_tag_i(clients_lo)
-    ,.data_async_r_o({async_uplink_reset_lo, async_downlink_reset_lo, async_downstream_reset_lo, async_token_reset_lo})
+    .bsg_tag_i(clients_lo[0])
+    ,.data_async_r_o({async_token_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc1 (
+    .bsg_tag_i(clients_lo[1])
+    ,.data_async_r_o({async_downstream_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc2 (
+    .bsg_tag_i(clients_lo[2])
+    ,.data_async_r_o({async_downlink_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc3 (
+    .bsg_tag_i(clients_lo[3])
+    ,.data_async_r_o({async_uplink_reset_lo})
   );
 
 
