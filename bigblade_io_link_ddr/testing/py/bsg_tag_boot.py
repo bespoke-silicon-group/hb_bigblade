@@ -24,18 +24,18 @@ if __name__ == "__main__":
   tg.send(masters=0b1, client_id=5, data_not_reset=0, length=7, data=0b1111111)
   tg.send(masters=0b1, client_id=6, data_not_reset=0, length=2, data=0b11)
 
+  tg.send(masters=0b1, client_id=7, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=8, data_not_reset=0, length=5, data=0b11111)
   tg.send(masters=0b1, client_id=9, data_not_reset=0, length=1, data=0b1)
-  tg.send(masters=0b1, client_id=10, data_not_reset=0, length=5, data=0b11111)
-  tg.send(masters=0b1, client_id=11, data_not_reset=0, length=1, data=0b1)
-  tg.send(masters=0b1, client_id=12, data_not_reset=0, length=7, data=0b1111111)
-  tg.send(masters=0b1, client_id=13, data_not_reset=0, length=2, data=0b11)
+  tg.send(masters=0b1, client_id=10, data_not_reset=0, length=7, data=0b1111111)
+  tg.send(masters=0b1, client_id=11, data_not_reset=0, length=2, data=0b11)
 
   if len(sys.argv) == 2 and (sys.argv[1] == 'use_clk_gen' or sys.argv[1] == 'sweep_clk_gen_io' or sys.argv[1] == 'sweep_clk_gen_noc'):
 
     for sel in range(2):
       id_offset = 0
       if sel == 1:
-        id_offset = 7
+        id_offset = 5
 
       # select zero output clk
       tg.send(masters=0b1, client_id=6+id_offset, data_not_reset=1, length=2, data=0b11)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     if sys.argv[1] == 'sweep_clk_gen_io' or sys.argv[1] == 'sweep_clk_gen_noc':
       id_offset = 0
       if sys.argv[1] == 'sweep_clk_gen_noc':
-        id_offset = 7
+        id_offset = 5
       # sweep oscillator values
       for tap in range(32):
         tg.send(masters=0b1, client_id=3+id_offset, data_not_reset=1, length=5, data=tap)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     # select ext output clk
     tg.send(masters=0b1, client_id=6, data_not_reset=1, length=2, data=0b10)
-    tg.send(masters=0b1, client_id=13, data_not_reset=1, length=2, data=0b10)
+    tg.send(masters=0b1, client_id=11, data_not_reset=1, length=2, data=0b10)
 
 
 
@@ -95,9 +95,9 @@ if __name__ == "__main__":
   tg.send(masters=0b1, client_id=0, data_not_reset=0, length=3, data=0b111)
   tg.send(masters=0b1, client_id=1, data_not_reset=0, length=2, data=0b11)
   # reset core clients
-  tg.send(masters=0b1, client_id=7, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=12, data_not_reset=0, length=1, data=0b1)
   # reset node clients
-  tg.send(masters=0b1, client_id=8, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=13, data_not_reset=0, length=1, data=0b1)
 
 
 
@@ -106,9 +106,9 @@ if __name__ == "__main__":
   tg.send(masters=0b1, client_id=0, data_not_reset=1, length=3, data=0b110)
   tg.send(masters=0b1, client_id=1, data_not_reset=1, length=2, data=0b11)
   # reset core clients
-  tg.send(masters=0b1, client_id=7, data_not_reset=1, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=12, data_not_reset=1, length=1, data=0b1)
   # reset node clients
-  tg.send(masters=0b1, client_id=8, data_not_reset=1, length=1, data=0b1)
+  tg.send(masters=0b1, client_id=13, data_not_reset=1, length=1, data=0b1)
 
 
 
@@ -143,13 +143,13 @@ if __name__ == "__main__":
 
   # STEP 8: de-assert core reset
   # de-assert reset for core
-  tg.send(masters=0b1, client_id=7, data_not_reset=1, length=1, data=0b0)
+  tg.send(masters=0b1, client_id=12, data_not_reset=1, length=1, data=0b0)
 
 
 
   # STEP 9: de-assert node reset
   # de-assert reset for node
-  tg.send(masters=0b1, client_id=8, data_not_reset=1, length=1, data=0b0)
+  tg.send(masters=0b1, client_id=13, data_not_reset=1, length=1, data=0b0)
 
 
 
