@@ -126,13 +126,13 @@ VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 ## Toplevel Parameters
 ########################################
 
-NUM_PODS_X ?= 4
-NUM_PODS_Y ?= 4
+# Note: For debugging purpose only, should not modify in regular runs
+OVERRIDE_PODS_X ?= 4
+OVERRIDE_PODS_Y ?= 4
 
 # Note: Overriding parameters in bsg_chip_pkg.v
-
-VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(NUM_PODS_X)
-VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(NUM_PODS_Y)
+VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(OVERRIDE_PODS_X)
+VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 
 
 ########################################
