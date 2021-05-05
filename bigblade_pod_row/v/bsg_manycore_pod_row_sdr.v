@@ -18,7 +18,7 @@ module bsg_manycore_pod_row_sdr
 
     , parameter num_clk_ports_p=1
 
-    , parameter tag_els_p=512
+    , parameter tag_els_p=1024
     , parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
   )
   (
