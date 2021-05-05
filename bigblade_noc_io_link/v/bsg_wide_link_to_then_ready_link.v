@@ -24,9 +24,6 @@ module bsg_wide_link_to_then_ready_link
   ,output [bsg_link_sif_width_lp-1:0] bsg_link_o
   );
 
-  genvar i;
-
-
   /********************* Interfacing wide and bsg link *********************/
 
   `declare_bsg_ready_and_link_sif_s(wide_link_width_p, wide_link_sif_s);
