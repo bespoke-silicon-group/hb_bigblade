@@ -7,12 +7,12 @@ source ../tcl/bsg_config_util.tcl
 #source $::env(BSG_TESTING_COMMON_DIR)/bsg_vcs_create_filelist_library.tcl
 
 # chip source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/tcl/include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/chip_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/chip_include.tcl
 
 # testing source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
