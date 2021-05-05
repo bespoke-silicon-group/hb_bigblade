@@ -56,7 +56,7 @@ module bsg_chip_block
   // BSG Clock Generator
   //
 
-  logic [hb_num_pods_y_gp] mc_clk_lo;
+  logic [hb_num_pods_y_gp-1:0] mc_clk_lo;
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
     assign mc_clk_lo[i] = ext_mc_clk_i;
 
