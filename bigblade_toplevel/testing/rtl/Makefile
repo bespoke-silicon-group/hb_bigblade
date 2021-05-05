@@ -106,8 +106,14 @@ BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
 
+ifeq ($(USE_CLK_GEN),1)
+  BSG_TRACE_PY_OPTION := use_clk_gen
+else
+  BSG_TRACE_PY_OPTION := use_ext_clk
+endif
+
 $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
-	python $< > $@
+	python $< $(BSG_TRACE_PY_OPTION) > $@
 
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
