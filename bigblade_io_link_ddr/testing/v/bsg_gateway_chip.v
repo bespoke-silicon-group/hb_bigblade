@@ -13,24 +13,16 @@
 module bsg_gateway_chip
 
  import bsg_tag_pkg::*;
+ import bsg_chip_pkg::*;
 
- #(parameter toplevel_ds_width_p                      = "inv"
-  ,parameter toplevel_num_adgs_p                      = "inv"
-  ,parameter toplevel_width_p                         = "inv"
-  ,parameter toplevel_channel_width_p                 = "inv"
-  ,parameter toplevel_num_channels_p                  = "inv"
-  ,parameter toplevel_lg_fifo_depth_p                 = "inv"
-  ,parameter toplevel_lg_credit_to_token_decimation_p = "inv"
-  ,parameter toplevel_use_extra_data_bit_p            = "inv"
-
-  ,parameter ds_width_p                      = toplevel_ds_width_p
-  ,parameter num_adgs_p                      = toplevel_num_adgs_p
-  ,parameter width_p                         = toplevel_width_p
-  ,parameter channel_width_p                 = toplevel_channel_width_p
-  ,parameter num_channels_p                  = toplevel_num_channels_p
-  ,parameter lg_fifo_depth_p                 = toplevel_lg_fifo_depth_p
-  ,parameter lg_credit_to_token_decimation_p = toplevel_lg_credit_to_token_decimation_p
-  ,parameter use_extra_data_bit_p            = toplevel_use_extra_data_bit_p
+ #(parameter ds_width_p                      = bsg_link_clk_gen_ds_width_gp
+  ,parameter num_adgs_p                      = bsg_link_clk_gen_num_adgs_gp
+  ,parameter width_p                         = bsg_link_width_gp
+  ,parameter channel_width_p                 = bsg_link_channel_width_gp
+  ,parameter num_channels_p                  = bsg_link_num_channels_gp
+  ,parameter lg_fifo_depth_p                 = bsg_link_lg_fifo_depth_gp
+  ,parameter lg_credit_to_token_decimation_p = bsg_link_lg_credit_to_token_decimation_gp
+  ,parameter use_extra_data_bit_p            = bsg_link_use_extra_data_bit_gp
   )
 
  ();
@@ -196,7 +188,7 @@ module bsg_gateway_chip
   //
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_m_core
-      (.bsg_tag_i     ( tag_lines[7] )
+      (.bsg_tag_i     ( tag_lines[12] )
       ,.recv_clk_i    ( m_core_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -205,7 +197,7 @@ module bsg_gateway_chip
 
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_s_core
-      (.bsg_tag_i     ( tag_lines[7] )
+      (.bsg_tag_i     ( tag_lines[12] )
       ,.recv_clk_i    ( s_core_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -214,7 +206,7 @@ module bsg_gateway_chip
 
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_node
-      (.bsg_tag_i     ( tag_lines[8] )
+      (.bsg_tag_i     ( tag_lines[13] )
       ,.recv_clk_i    ( node_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -266,17 +258,6 @@ module bsg_gateway_chip
   // DUT
   //
   `DUT_MODULE_NAME
-`ifndef NETLIST_LIBRARY_NAME
- #(.ds_width_p                     (ds_width_p                     )
-  ,.num_adgs_p                     (num_adgs_p                     )
-  ,.width_p                        (width_p                        )
-  ,.channel_width_p                (channel_width_p                )
-  ,.num_channels_p                 (num_channels_p                 )
-  ,.lg_fifo_depth_p                (lg_fifo_depth_p                )
-  ,.lg_credit_to_token_decimation_p(lg_credit_to_token_decimation_p)
-  ,.use_extra_data_bit_p           (use_extra_data_bit_p           )
-  )
-`endif
   DUT
   (.core_clk_i                 (m_core_clk)
   ,.ext_io_clk_i               (m_io_clk)
@@ -285,18 +266,7 @@ module bsg_gateway_chip
   ,.noc_clk_o                  (noc_clk)
 
   ,.tag_clk_i                  (tag_clk)
-  ,.tag_io_tag_lines_i         (tag_lines_dly[0])
-  ,.tag_core_tag_lines_i       (tag_lines_dly[1])
-  ,.tag_io_async_reset_tag_lines_i (tag_lines_dly[2])
-  ,.tag_io_osc_tag_lines_i         (tag_lines_dly[3])
-  ,.tag_io_osc_trigger_tag_lines_i (tag_lines_dly[4])
-  ,.tag_io_ds_tag_lines_i          (tag_lines_dly[5])
-  ,.tag_io_sel_tag_lines_i         (tag_lines_dly[6])
-  ,.tag_noc_async_reset_tag_lines_i(tag_lines_dly[9])
-  ,.tag_noc_osc_tag_lines_i        (tag_lines_dly[10])
-  ,.tag_noc_osc_trigger_tag_lines_i(tag_lines_dly[11])
-  ,.tag_noc_ds_tag_lines_i         (tag_lines_dly[12])
-  ,.tag_noc_sel_tag_lines_i        (tag_lines_dly[13])
+  ,.tag_lines_i                (tag_lines_dly[11:0])
 
   ,.core_v_i                   (m_core_v_li_dly)
   ,.core_data_i                (m_core_data_li_dly)
