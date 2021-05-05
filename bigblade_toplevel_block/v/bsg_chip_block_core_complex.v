@@ -213,37 +213,35 @@ module bsg_chip_block_core_complex
   end
 
   // tieoff ver links
-  for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
+  for (genvar j = N ; j <= S; j++)
   begin
-    for (genvar j = N ; j <= S; j++)
+    localparam i = (j == N)? 0 : hb_num_pods_y_gp-1;
+    for (genvar k = 0 ; k < 2+total_num_tiles_x_lp; k++)
       begin
-        for (genvar k = 0 ; k < 2+total_num_tiles_x_lp; k++)
+        // Attach top io links, requests from chip to host
+        if ((j == N) && (k == hb_num_tiles_x_gp+1-1))
           begin
-            // Attach top io links, requests from chip to host
-            if ((i == 0) && (j == N) && (k == hb_num_tiles_x_gp+1-1))
-              begin
-                assign ver_io_rev_link_clk_li  [i][j][k] = mc_rev_link_clk_i;
-                assign ver_io_rev_link_data_li [i][j][k] = mc_rev_link_data_i;
-                assign ver_io_rev_link_v_li    [i][j][k] = mc_rev_link_v_i;
-                assign mc_rev_link_token_o = ver_io_rev_link_token_lo[i][j][k];
+            assign ver_io_rev_link_clk_li  [i][j][k] = mc_rev_link_clk_i;
+            assign ver_io_rev_link_data_li [i][j][k] = mc_rev_link_data_i;
+            assign ver_io_rev_link_v_li    [i][j][k] = mc_rev_link_v_i;
+            assign mc_rev_link_token_o = ver_io_rev_link_token_lo[i][j][k];
 
-                assign mc_fwd_link_clk_o   = ver_io_fwd_link_clk_lo  [i][j][k];
-                assign mc_fwd_link_data_o  = ver_io_fwd_link_data_lo [i][j][k];
-                assign mc_fwd_link_v_o     = ver_io_fwd_link_v_lo    [i][j][k];
-                assign ver_io_fwd_link_token_li[i][j][k] = mc_fwd_link_token_i;
-              end
-            else
-              begin
-                assign ver_io_rev_link_clk_li  [i][j][k] = tieoff_clk_lo;
-                assign ver_io_rev_link_data_li [i][j][k] = '0;
-                assign ver_io_rev_link_v_li    [i][j][k] = '0;
-                assign ver_io_fwd_link_token_li[i][j][k] = '0;
-              end
-            assign ver_io_fwd_link_clk_li  [i][j][k] = tieoff_clk_lo;
-            assign ver_io_fwd_link_data_li [i][j][k] = '0;
-            assign ver_io_fwd_link_v_li    [i][j][k] = '0;
-            assign ver_io_rev_link_token_li[i][j][k] = '0;
+            assign mc_fwd_link_clk_o   = ver_io_fwd_link_clk_lo  [i][j][k];
+            assign mc_fwd_link_data_o  = ver_io_fwd_link_data_lo [i][j][k];
+            assign mc_fwd_link_v_o     = ver_io_fwd_link_v_lo    [i][j][k];
+            assign ver_io_fwd_link_token_li[i][j][k] = mc_fwd_link_token_i;
           end
+        else
+          begin
+            assign ver_io_rev_link_clk_li  [i][j][k] = tieoff_clk_lo;
+            assign ver_io_rev_link_data_li [i][j][k] = '0;
+            assign ver_io_rev_link_v_li    [i][j][k] = '0;
+            assign ver_io_fwd_link_token_li[i][j][k] = '0;
+          end
+        assign ver_io_fwd_link_clk_li  [i][j][k] = tieoff_clk_lo;
+        assign ver_io_fwd_link_data_li [i][j][k] = '0;
+        assign ver_io_fwd_link_v_li    [i][j][k] = '0;
+        assign ver_io_rev_link_token_li[i][j][k] = '0;
       end
   end
 
