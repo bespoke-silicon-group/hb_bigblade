@@ -59,7 +59,7 @@ set core_ready_and_out_ports   [get_ports core_ready_and_o]
 set core_valid_out_ports       [get_ports core_v_o]
 set core_data_out_ports        [get_ports core_data_o]
 set core_yumi_in_ports         [get_ports core_yumi_i]
-set tag_in_ports               [get_ports {tag_*_tag_lines_i[1] tag_*_tag_lines_i[2]}]
+set tag_in_ports               [get_ports {tag_lines_i*\[op\] tag_lines_i*\[param\]}]
 
 
 proc constraint_input_ports {clk_name ports max_delay min_delay} {
@@ -83,11 +83,11 @@ constraint_output_ports $core_clk_name   $core_valid_out_ports       [expr $core
 constraint_output_ports $core_clk_name   $core_data_out_ports        [expr $core_clk_period_ps-125]  -10
 constraint_input_ports  $core_clk_name   $core_yumi_in_ports         [expr $core_clk_period_ps-100]   25
 
-constraint_input_ports  $tag_clk_name    $tag_in_ports              4900   30
+constraint_input_ports  $tag_clk_name    $tag_in_ports              4800   50
 
 # false path
 set_false_path -from [get_ports async_output_disable_i]
-set_false_path -from [get_ports {tag_*_tag_lines_i[0] tag_*_tag_lines_i[3]}]
+set_false_path -from [get_ports {tag_lines_i*\[clk\] tag_lines_i*\[en\]}]
 
 
 # Source-sync link constraints
