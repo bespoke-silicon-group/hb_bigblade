@@ -25,8 +25,9 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
   # PE array
-  set pe_width  [round_up_to_nearest 37 [unit_width]]
-  set pe_height [round_up_to_nearest 82 [unit_height]]
+  set master_pe "PE_rc__0"
+  set pe_width [get_attribute [get_cell -hier $master_pe] width]
+  set pe_height [get_attribute [get_cell -hier $master_pe] height]
   
   set pe_num_x 8
   set pe_num_y 8
@@ -40,8 +41,8 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set pe_origin_x [expr $tile_width - $array_width - $keepout_margin_x]
   
   set sp_lx [expr 5+$keepout_margin_x]
-  set sp_ly [expr $pe_origin_y + 1*$array_height/4]
-  set sp_ry [expr $pe_origin_y + 3*$array_height/4]
+  set sp_ly [expr $pe_origin_y + 1*$array_height/8]
+  set sp_ry [expr $pe_origin_y + 7*$array_height/8]
   
   set rf_width 54
   set rf_height 83
