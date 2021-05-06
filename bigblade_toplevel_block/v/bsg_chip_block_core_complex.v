@@ -179,7 +179,9 @@ module bsg_chip_block_core_complex
       begin
         for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
           begin
-            // Attach side io links, requests from host to chip
+            // Attach to west sdr link (top-left corner)
+            // Requests from host to chip (route X then Y)
+            // Responses from chip to host (route Y then X)
             if ((i == 0) && (j == W) && (k == 0))
               begin
                 assign hor_io_fwd_link_clk_li  [i][j][k] = mc_fwd_link_clk_i;
@@ -194,6 +196,13 @@ module bsg_chip_block_core_complex
               end
             else
               begin
+                //
+                // Loopback link_clk to tieoff sdr links
+                // In sdr_downstream we have bsg_async_fifo, which cannot finish reset
+                // procedure until link_clk_i oscillates. Since we chain all async resets
+                // together, it is impossible to assert sdr_link_reset on specific tiles.
+                // So we loopback clk and let sdr_downstream finish reset procedure.
+                //
                 assign hor_io_fwd_link_clk_li  [i][j][k] = hor_io_fwd_link_clk_lo[i][j][k];
                 assign hor_io_fwd_link_data_li [i][j][k] = '0;
                 assign hor_io_fwd_link_v_li    [i][j][k] = '0;
@@ -213,7 +222,9 @@ module bsg_chip_block_core_complex
     localparam i = (j == N)? 0 : hb_num_pods_y_gp-1;
     for (genvar k = 0 ; k < 2+total_num_tiles_x_lp; k++)
       begin
-        // Attach top io links, requests from chip to host
+        // Attach to north sdr link (middle of row)
+        // Requests from chip to host (route X then Y)
+        // Responses from host to chip (route Y then X)
         if ((j == N) && (k == hb_num_tiles_x_gp+1-1))
           begin
             assign ver_io_rev_link_clk_li  [i][j][k] = mc_rev_link_clk_i;
