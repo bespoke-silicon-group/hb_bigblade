@@ -82,8 +82,8 @@ export BSG_POWER_INTENT :=sv_standard
 #     puts the CAD flow into the highest effort signoff quality mode we have.
 # - tt_only
 #     puts the CAD flow into a single scenario mode (typical corner).
-export BSG_CAD_SETUP :=tt_only
-#export BSG_CAD_SETUP :=default
+#export BSG_CAD_SETUP :=tt_only
+export BSG_CAD_SETUP :=default
 
 # Overrides the default memgen.json in bsg_14. Only these memories will be
 # generated when running make prep; however, SRAMs which have already been
@@ -152,6 +152,7 @@ export PTSI_FLOW_STRIP_PATH       :=bsg_gateway_chip/DUT
 
 synth_fakeout:
 	mkdir -p current_build/synth/brg_cgra_pod/results/
+	mkdir -p current_build/synth/ProcElement/results/
 	cp ../v/brg_cgra_pod.mapped.v current_build/synth/brg_cgra_pod/results/
 	cp ../sdc/brg_cgra_pod.mapped.sdc current_build/synth/brg_cgra_pod/results/
 	touch current_build/synth/ProcElement/results/ProcElement.mapped.v
