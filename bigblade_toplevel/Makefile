@@ -19,7 +19,7 @@ basejump_stl_commit  :=dev-bsg_link_ddr_encode
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
-bsg_manycore_commit  :=ci_bigblade
+bsg_manycore_commit  :=8066f6c
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
