@@ -27,6 +27,26 @@ module bsg_gateway_chip_core_complex
   // Manycore Testbench
   //
 
+  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp,hb_data_width_gp,hb_x_cord_width_gp,hb_y_cord_width_gp);
+  bsg_manycore_link_sif_s mc_links_credit_li, mc_links_credit_lo;
+
+  // bsg_manycore_endpoint_standard inside io_complex has credit-based interface
+  // for out response packets. Need to convert to normal manycore links.
+  bsg_manycore_link_resp_credit_to_ready_and_handshake
+ #(.addr_width_p        (hb_addr_width_gp)
+  ,.data_width_p        (hb_data_width_gp)
+  ,.x_cord_width_p      (hb_x_cord_width_gp)
+  ,.y_cord_width_p      (hb_y_cord_width_gp)
+  ,.fifo_els_p          (3)
+  ) credit_resp_link_adapter
+  (.clk_i               (mc_clk_i)
+  ,.reset_i             (~tag_trace_done_i)
+  ,.credit_link_sif_i   (mc_links_credit_li)
+  ,.credit_link_sif_o   (mc_links_credit_lo)
+  ,.ready_and_link_sif_i(mc_links_sif_i)
+  ,.ready_and_link_sif_o(mc_links_sif_o)
+  );
+
   // HOST CONNECTION
   bsg_nonsynth_manycore_io_complex #(
     .addr_width_p(hb_addr_width_gp)
@@ -39,8 +59,8 @@ module bsg_gateway_chip_core_complex
   ) host (
     .clk_i(mc_clk_i)
     ,.reset_i(~tag_trace_done_i)
-    ,.io_link_sif_i(mc_links_sif_i)
-    ,.io_link_sif_o(mc_links_sif_o)
+    ,.io_link_sif_i(mc_links_credit_lo)
+    ,.io_link_sif_o(mc_links_credit_li)
     ,.loader_done_o()
     ,.print_stat_v_o()
     ,.print_stat_tag_o()
