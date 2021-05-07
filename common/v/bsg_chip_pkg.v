@@ -38,6 +38,7 @@ package bsg_chip_pkg;
   localparam ct_credit_decimation_gp     = ct_remote_credits_gp/4;
   localparam ct_lg_credit_decimation_gp  = `BSG_SAFE_CLOG2(ct_credit_decimation_gp/2+1);
   localparam ct_use_pseudo_large_fifo_gp = 0;
+  localparam ct_use_harden_small_fifo_gp = 1;
 
 
   //////////////////////////////////////////////////
