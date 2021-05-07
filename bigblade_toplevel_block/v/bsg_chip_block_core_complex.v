@@ -203,12 +203,15 @@ module bsg_chip_block_core_complex
                 // together, it is impossible to assert sdr_link_reset on specific tiles.
                 // So we loopback clk and let sdr_downstream finish reset procedure.
                 //
-                assign hor_io_fwd_link_clk_li  [i][j][k] = hor_io_fwd_link_clk_lo[i][j][k];
+                // TODO: currently hardcoded to rev_clk_o -> fwd_clk_i and fwd_clk_o -> rev_clk_i
+                // to ensure sdr link clock output has at most 1 fanout
+                //
+                assign hor_io_fwd_link_clk_li  [i][j][k] = hor_io_rev_link_clk_lo[i][j][k];
                 assign hor_io_fwd_link_data_li [i][j][k] = '0;
                 assign hor_io_fwd_link_v_li    [i][j][k] = '0;
                 assign hor_io_rev_link_token_li[i][j][k] = '0;
               end
-            assign hor_io_rev_link_clk_li  [i][j][k] = hor_io_rev_link_clk_lo[i][j][k];
+            assign hor_io_rev_link_clk_li  [i][j][k] = hor_io_fwd_link_clk_lo[i][j][k];
             assign hor_io_rev_link_data_li [i][j][k] = '0;
             assign hor_io_rev_link_v_li    [i][j][k] = '0;
             assign hor_io_fwd_link_token_li[i][j][k] = '0;
@@ -239,12 +242,12 @@ module bsg_chip_block_core_complex
           end
         else
           begin
-            assign ver_io_rev_link_clk_li  [i][j][k] = ver_io_rev_link_clk_lo[i][j][k];
+            assign ver_io_rev_link_clk_li  [i][j][k] = ver_io_fwd_link_clk_lo[i][j][k];
             assign ver_io_rev_link_data_li [i][j][k] = '0;
             assign ver_io_rev_link_v_li    [i][j][k] = '0;
             assign ver_io_fwd_link_token_li[i][j][k] = '0;
           end
-        assign ver_io_fwd_link_clk_li  [i][j][k] = ver_io_fwd_link_clk_lo[i][j][k];
+        assign ver_io_fwd_link_clk_li  [i][j][k] = ver_io_rev_link_clk_lo[i][j][k];
         assign ver_io_fwd_link_data_li [i][j][k] = '0;
         assign ver_io_fwd_link_v_li    [i][j][k] = '0;
         assign ver_io_rev_link_token_li[i][j][k] = '0;
