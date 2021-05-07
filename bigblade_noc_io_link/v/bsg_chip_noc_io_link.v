@@ -161,7 +161,7 @@ module bsg_chip_noc_io_link
   ,.num_in_p               (ct_num_in_gp)
   ,.remote_credits_p       (ct_remote_credits_gp)
   ,.use_pseudo_large_fifo_p(ct_use_pseudo_large_fifo_gp)
-  ,.use_harden_small_fifo_p(ct_use_harden_small_fifo_gp)
+  ,.harden_small_fifo_p    (ct_harden_small_fifo_gp)
   ,.lg_credit_decimation_p (ct_lg_credit_decimation_gp)
   ) tunnel
   (.clk_i       (noc_clk_lo)
