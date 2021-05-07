@@ -21,6 +21,10 @@ bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
 
+bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
+bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
+bsg_replicant_commit :=bigblade
+
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
 bsg_14_commit        :=master
