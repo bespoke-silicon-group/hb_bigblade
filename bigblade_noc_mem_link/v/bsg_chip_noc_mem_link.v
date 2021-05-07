@@ -26,15 +26,15 @@ module bsg_chip_noc_mem_link
   ,output [1:0][bsg_link_channel_width_gp-1:0]  io_link_data_o
   ,input  [1:0]                                 io_link_token_i
 
-  ,output [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_o
-  ,output [S:N][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_o
-  ,output [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_v_o
-  ,input  [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_token_i
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_o
+  ,output [1:0][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_o
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_v_o
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_token_i
 
-  ,input  [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_i
-  ,input  [S:N][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_i
-  ,input  [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_v_i
-  ,output [S:N][wh_ruche_factor_gp-1:0]                      io_wh_link_token_o
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_clk_i
+  ,input  [1:0][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] io_wh_link_data_i
+  ,input  [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_v_i
+  ,output [1:0][wh_ruche_factor_gp-1:0]                      io_wh_link_token_o
   );
 
   // tag master instance
@@ -143,7 +143,7 @@ module bsg_chip_noc_mem_link
   assign core_links_conc_li.data          = wh_link_sif_lo.data;
   assign core_links_conc_li.ready_and_rev = wh_link_sif_lo.ready_and_rev;
 
-  wh_link_sif_s [S:N][wh_ruche_factor_gp-1:0] wh_unconc_link_sif_li, wh_unconc_link_sif_lo;
+  wh_link_sif_s [1:0][wh_ruche_factor_gp-1:0] wh_unconc_link_sif_li, wh_unconc_link_sif_lo;
   bsg_wormhole_concentrator
  #(.flit_width_p(wh_flit_width_gp)
   ,.len_width_p (wh_len_width_gp)
@@ -161,7 +161,7 @@ module bsg_chip_noc_mem_link
   ,.concentrated_link_o(wh_link_sif_lo)
   );
 
-  for (genvar i = N; i <= S; i++)
+  for (genvar i = 0; i < 2; i++)
   begin: sdr
     logic uplink_reset_sync, downstream_reset_sync;
     bsg_sync_sync #(.width_p(1)) up_bss
