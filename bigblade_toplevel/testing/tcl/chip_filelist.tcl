@@ -169,10 +169,9 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche_array.v
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
@@ -250,6 +249,7 @@ set SVERILOG_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/../common/v/bsg_chip_clk_gen.v
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
+  $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_west.v
   $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_east.v
   $bsg_designs_target_dir/../common/sdr/sdr_vertical/v/bsg_manycore_link_to_sdr_north.v

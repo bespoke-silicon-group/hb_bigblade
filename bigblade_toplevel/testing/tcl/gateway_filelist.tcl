@@ -139,10 +139,9 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche_array.v
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
@@ -170,6 +169,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v
 
+  $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_then_ready_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_wide_link_to_then_ready_link.v
