@@ -215,7 +215,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/cce/bp_cce_inst_predecode.sv
   $bp_me_dir/src/v/cce/bp_cce_inst_ram.sv
   $bp_me_dir/src/v/cce/bp_cce_inst_stall.sv
-  $bp_me_dir/src/v/cce/bp_cce_loopback.sv
+  $bp_top_dir/src/v/bp_loopback.sv
   $bp_me_dir/src/v/cce/bp_cce_msg.sv
   $bp_me_dir/src/v/cce/bp_cce_pending_bits.sv
   $bp_me_dir/src/v/cce/bp_cce_pma.sv
@@ -303,7 +303,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
-  $bsg_manycore_dir/v/vanilla_bean/hash_function.v
+  $bsg_manycore_dir/v/bsg_manycore_dram_hash_function.v
 
   $basejump_stl_dir/bsg_dmc/bsg_dmc_pkg.v
   $basejump_stl_dir/bsg_dmc/bsg_dmc.v
