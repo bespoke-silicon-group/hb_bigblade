@@ -163,28 +163,14 @@ module bsg_blackparrot_unicore_tile_sdr
   logic mc_cmd_v_lo, mc_cmd_ready_li;
   bp_bedrock_io_mem_msg_s mc_resp_li;
   logic mc_resp_v_li, mc_resp_yumi_lo;
-  bp_cce_serializer
-   #(.bp_params_p(bp_params_p))
-   io_serializer
-    (.clk_i(clk_i)
-     ,.reset_i(reset_r)
 
-     ,.io_cmd_i(io_cmd_lo)
-     ,.io_cmd_v_i(io_cmd_v_lo)
-     ,.io_cmd_ready_o(io_cmd_ready_li)
+  assign mc_cmd_lo = io_cmd_lo;
+  assign mc_cmd_v_lo = io_cmd_v_lo;
+  assign io_cmd_ready_li = mc_cmd_ready_li;
 
-     ,.io_resp_o(io_resp_li)
-     ,.io_resp_v_o(io_resp_v_li)
-     ,.io_resp_yumi_i(io_resp_yumi_lo)
-
-     ,.io_cmd_o(mc_cmd_lo)
-     ,.io_cmd_v_o(mc_cmd_v_lo)
-     ,.io_cmd_ready_i(mc_cmd_ready_li)
-
-     ,.io_resp_i(mc_resp_li)
-     ,.io_resp_v_i(mc_resp_v_li)
-     ,.io_resp_yumi_o(mc_resp_yumi_lo)
-     );
+  assign io_resp_li = mc_resp_li;
+  assign io_resp_v_li = mc_resp_v_li;
+  assign mc_resp_yumi_lo = io_resp_yumi_lo;
 
   bp_bedrock_io_mem_msg_s mc_cmd_li;
   logic mc_cmd_v_li, mc_cmd_yumi_lo;
@@ -198,6 +184,31 @@ module bsg_blackparrot_unicore_tile_sdr
   assign mc_resp_lo = io_resp_lo;
   assign mc_resp_v_lo = io_resp_v_lo;
   assign io_resp_ready_li = mc_resp_ready_li;
+
+  //bp_cce_serializer
+  // #(.bp_params_p(bp_params_p))
+  // io_serializer
+  //  (.clk_i(clk_i)
+  //   ,.reset_i(reset_r)
+
+  //   ,.io_cmd_i(io_cmd_lo)
+  //   ,.io_cmd_v_i(io_cmd_v_lo)
+  //   ,.io_cmd_ready_and_o(io_cmd_ready_li)
+
+  //   ,.io_resp_o(io_resp_li)
+  //   ,.io_resp_v_o(io_resp_v_li)
+  //   ,.io_resp_ready_and_i(io_resp_yumi_lo)
+
+  //   ,.io_cmd_o(mc_cmd_lo)
+  //   ,.io_cmd_v_o(mc_cmd_v_lo)
+  //   ,.io_cmd_ready_and_i(mc_cmd_ready_li)
+
+  //   ,.io_resp_i(mc_resp_li)
+  //   ,.io_resp_v_i(mc_resp_v_li)
+  //   ,.io_resp_ready_and_o(mc_resp_ready_and_lo)
+  //   );
+
+
 
   wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
   wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i;
@@ -298,8 +309,27 @@ module bsg_blackparrot_unicore_tile_sdr
          );
     end
 
+  bsg_manycore_link_sif_s [2:0] ep_link_sif_li, ep_link_sif_lo;     
   for (genvar i = 0; i < 3; i++)
     begin : links
+      // Convert credit links to ready
+      bsg_manycore_link_resp_credit_to_ready_and_handshake
+       #(.addr_width_p(mc_addr_width_gp)
+         ,.data_width_p(mc_data_width_gp)
+         ,.x_cord_width_p(mc_x_cord_width_gp)
+         ,.y_cord_width_p(mc_y_cord_width_gp)
+         )
+       rev_c2r
+        (.clk_i(clk_i)
+         ,.reset_i(reset_i)
+
+         ,.credit_link_sif_i(proc_link_sif_lo[i])
+         ,.credit_link_sif_o(proc_link_sif_li[i])
+
+         ,.ready_and_link_sif_i(ep_link_sif_li[i])
+         ,.ready_and_link_sif_o(ep_link_sif_lo[i])
+         );
+
       bsg_link_sdr
        #(.width_p(fwd_width_lp)
          ,.lg_fifo_depth_p(sdr_lg_fifo_depth_gp)
@@ -312,13 +342,13 @@ module bsg_blackparrot_unicore_tile_sdr
          ,.async_downlink_reset_i(async_downlink_reset_i)
          ,.async_token_reset_i(async_token_reset_i)
 
-         ,.core_data_i(proc_link_sif_lo[i].fwd.data)
-         ,.core_v_i(proc_link_sif_lo[i].fwd.v)
-         ,.core_ready_o(proc_link_sif_li[i].fwd.ready_and_rev)
+         ,.core_data_i(ep_link_sif_lo[i].fwd.data)
+         ,.core_v_i(ep_link_sif_lo[i].fwd.v)
+         ,.core_ready_o(ep_link_sif_li[i].fwd.ready_and_rev)
 
-         ,.core_data_o(proc_link_sif_li[i].fwd.data)
-         ,.core_v_o(proc_link_sif_li[i].fwd.v)
-         ,.core_yumi_i(proc_link_sif_li[i].fwd.v & proc_link_sif_lo[i].fwd.ready_and_rev)
+         ,.core_data_o(ep_link_sif_li[i].fwd.data)
+         ,.core_v_o(ep_link_sif_li[i].fwd.v)
+         ,.core_yumi_i(ep_link_sif_li[i].fwd.v & ep_link_sif_lo[i].fwd.ready_and_rev)
 
          ,.link_clk_o(io_fwd_link_clk_o[i])
          ,.link_data_o(io_fwd_link_data_o[i])
@@ -343,13 +373,13 @@ module bsg_blackparrot_unicore_tile_sdr
          ,.async_downlink_reset_i(async_downlink_reset_i)
          ,.async_token_reset_i(async_token_reset_i)
 
-         ,.core_data_i(proc_link_sif_lo[i].rev.data)
-         ,.core_v_i(proc_link_sif_lo[i].rev.v)
-         ,.core_ready_o(proc_link_sif_li[i].rev.ready_and_rev)
+         ,.core_data_i(ep_link_sif_lo[i].rev.data)
+         ,.core_v_i(ep_link_sif_lo[i].rev.v)
+         ,.core_ready_o(ep_link_sif_li[i].rev.ready_and_rev)
 
-         ,.core_data_o(proc_link_sif_li[i].rev.data)
-         ,.core_v_o(proc_link_sif_li[i].rev.v)
-         ,.core_yumi_i(proc_link_sif_li[i].rev.v & proc_link_sif_lo[i].rev.ready_and_rev)
+         ,.core_data_o(ep_link_sif_li[i].rev.data)
+         ,.core_v_o(ep_link_sif_li[i].rev.v)
+         ,.core_yumi_i(ep_link_sif_li[i].rev.v & ep_link_sif_lo[i].rev.ready_and_rev)
 
          ,.link_clk_o(io_rev_link_clk_o[i])
          ,.link_data_o(io_rev_link_data_o[i])

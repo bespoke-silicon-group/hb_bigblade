@@ -16,7 +16,10 @@ module bsg_blackparrot_halfpod
        `bsg_manycore_return_packet_width(mc_x_cord_width_gp, mc_y_cord_width_gp, mc_data_width_gp)
    )
   (
-   input                                          tag_clk_i
+   input                                          clk_i
+   , input                                        reset_i
+
+   , input                                        tag_clk_i
    , input                                        tag_data_i
    , input  [tag_lg_els_gp-1:0]                   tag_node_id_offset_i
 
@@ -73,13 +76,10 @@ module bsg_blackparrot_halfpod
 
   bsg_blackparrot_unicore_tile_sdr
    DUT
-    (.clk_i(clk)
-     ,.reset_i(reset)
-
-     ,.async_uplink_reset_i(async_uplink_reset)
-     ,.async_downlink_reset_i(async_downlink_reset)
-     ,.async_downstream_reset_i(async_downstream_reset)
-     ,.async_token_reset_i(async_token_reset)
+    (.async_uplink_reset_i(sdr_uplink_reset)
+     ,.async_downlink_reset_i(sdr_downlink_reset)
+     ,.async_downstream_reset_i(sdr_downstream_reset)
+     ,.async_token_reset_i(sdr_token_reset)
 
      ,.*
      );
