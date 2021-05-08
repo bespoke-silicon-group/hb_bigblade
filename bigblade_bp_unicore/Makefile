@@ -15,8 +15,7 @@ endif
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
-basejump_stl_commit  :=cam_zero_els
-# Plus dev-bsg_link_sdr
+basejump_stl_commit  :=dev-bsg_link_sdr
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
@@ -36,9 +35,7 @@ bsg_packaging_commit :=master
 
 blackparrot_dir      :=$(THIS_DIR)/black-parrot
 blackparrot_url      :=$(GITHUB)black-parrot/black-parrot
-blackparrot_commit   :=tapeout_bigblade_update
-# Plus be_dev_fix_zerosuperpage
-
+blackparrot_commit   :=tapeout_bigblade
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore

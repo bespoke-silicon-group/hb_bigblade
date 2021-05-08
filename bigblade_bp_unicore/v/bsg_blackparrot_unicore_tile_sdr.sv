@@ -26,17 +26,12 @@ module bsg_blackparrot_unicore_tile_sdr
   (input                                          clk_i
    , input                                        reset_i
 
-   , input [2:0][mc_y_cord_width_gp-1:0]          global_y_cord_i
+   , input [mc_y_cord_width_gp-1:0]               global_y_cord_i
 
    , input                                        async_uplink_reset_i
    , input                                        async_downlink_reset_i
    , input                                        async_downstream_reset_i
    , input                                        async_token_reset_i
-
-   , output logic                                 async_uplink_reset_o
-   , output logic                                 async_downlink_reset_o
-   , output logic                                 async_downstream_reset_o
-   , output logic                                 async_token_reset_o
 
    , output logic [2:0]                           io_fwd_link_clk_o
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o
@@ -60,7 +55,6 @@ module bsg_blackparrot_unicore_tile_sdr
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, io);
-  `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, mc);
   `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, uce);
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, dram);
 
@@ -95,18 +89,13 @@ module bsg_blackparrot_unicore_tile_sdr
      ,.oclk_data_o(downstream_reset_sync)
      );
 
-  assign async_uplink_reset_o     = async_uplink_reset_i;
-  assign async_downlink_reset_o   = async_downlink_reset_i;
-  assign async_downstream_reset_o = async_downstream_reset_i;
-  assign async_token_reset_o      = async_token_reset_i;
-
-  bp_bedrock_io_mem_msg_s io_cmd_lo;
+  bp_bedrock_uce_mem_msg_s io_cmd_lo;
   logic io_cmd_v_lo, io_cmd_ready_li;
-  bp_bedrock_io_mem_msg_s io_resp_li;
+  bp_bedrock_uce_mem_msg_s io_resp_li;
   logic io_resp_v_li, io_resp_yumi_lo;
-  bp_bedrock_io_mem_msg_s io_cmd_li;
+  bp_bedrock_uce_mem_msg_s io_cmd_li;
   logic io_cmd_v_li, io_cmd_yumi_lo;
-  bp_bedrock_io_mem_msg_s io_resp_lo;
+  bp_bedrock_uce_mem_msg_s io_resp_lo;
   logic io_resp_v_lo, io_resp_ready_li;
   bp_bedrock_uce_mem_msg_s mem_cmd_lo;
   logic mem_cmd_v_lo, mem_cmd_ready_li;
@@ -120,7 +109,7 @@ module bsg_blackparrot_unicore_tile_sdr
 
      ,.io_cmd_o(io_cmd_lo)
      ,.io_cmd_v_o(io_cmd_v_lo)
-     ,.io_cmd_ready_i(io_cmd_ready_li)
+     ,.io_cmd_ready_and_i(io_cmd_ready_li)
 
      ,.io_resp_i(io_resp_li)
      ,.io_resp_v_i(io_resp_v_li)
@@ -132,11 +121,11 @@ module bsg_blackparrot_unicore_tile_sdr
 
      ,.io_resp_o(io_resp_lo)
      ,.io_resp_v_o(io_resp_v_lo)
-     ,.io_resp_ready_i(io_resp_ready_li)
+     ,.io_resp_ready_and_i(io_resp_ready_li)
 
      ,.mem_cmd_o(mem_cmd_lo)
      ,.mem_cmd_v_o(mem_cmd_v_lo)
-     ,.mem_cmd_ready_i(mem_cmd_ready_li)
+     ,.mem_cmd_ready_and_i(mem_cmd_ready_li)
 
      ,.mem_resp_i(mem_resp_li)
      ,.mem_resp_v_i(mem_resp_v_li)
@@ -170,8 +159,48 @@ module bsg_blackparrot_unicore_tile_sdr
      ,.io_resp_yumi_o(dram_resp_yumi_lo)
      );
 
+  bp_bedrock_io_mem_msg_s mc_cmd_lo;
+  logic mc_cmd_v_lo, mc_cmd_ready_li;
+  bp_bedrock_io_mem_msg_s mc_resp_li;
+  logic mc_resp_v_li, mc_resp_yumi_lo;
+  bp_cce_serializer
+   #(.bp_params_p(bp_params_p))
+   io_serializer
+    (.clk_i(clk_i)
+     ,.reset_i(reset_r)
+
+     ,.io_cmd_i(io_cmd_lo)
+     ,.io_cmd_v_i(io_cmd_v_lo)
+     ,.io_cmd_ready_o(io_cmd_ready_li)
+
+     ,.io_resp_o(io_resp_li)
+     ,.io_resp_v_o(io_resp_v_li)
+     ,.io_resp_yumi_i(io_resp_yumi_lo)
+
+     ,.io_cmd_o(mc_cmd_lo)
+     ,.io_cmd_v_o(mc_cmd_v_lo)
+     ,.io_cmd_ready_i(mc_cmd_ready_li)
+
+     ,.io_resp_i(mc_resp_li)
+     ,.io_resp_v_i(mc_resp_v_li)
+     ,.io_resp_yumi_o(mc_resp_yumi_lo)
+     );
+
+  bp_bedrock_io_mem_msg_s mc_cmd_li;
+  logic mc_cmd_v_li, mc_cmd_yumi_lo;
+  bp_bedrock_io_mem_msg_s mc_resp_lo;
+  logic mc_resp_v_lo, mc_resp_ready_li;
+
+  assign io_cmd_li = mc_cmd_li;
+  assign io_cmd_v_li = mc_cmd_v_li;
+  assign mc_cmd_yumi_lo = io_cmd_yumi_lo;
+
+  assign mc_resp_lo = io_resp_lo;
+  assign mc_resp_v_lo = io_resp_v_lo;
+  assign io_resp_ready_li = mc_resp_ready_li;
+
   wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i[0];
+  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i;
   bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
      ,.host_enable_p(1)
@@ -195,21 +224,21 @@ module bsg_blackparrot_unicore_tile_sdr
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
-     ,.io_cmd_i(io_cmd_lo)
-     ,.io_cmd_v_i(io_cmd_v_lo)
-     ,.io_cmd_ready_o(io_cmd_ready_li)
+     ,.io_cmd_i(mc_cmd_lo)
+     ,.io_cmd_v_i(mc_cmd_v_lo)
+     ,.io_cmd_ready_o(mc_cmd_ready_li)
 
-     ,.io_resp_o(io_resp_li)
-     ,.io_resp_v_o(io_resp_v_li)
-     ,.io_resp_yumi_i(io_resp_yumi_lo)
+     ,.io_resp_o(mc_resp_li)
+     ,.io_resp_v_o(mc_resp_v_li)
+     ,.io_resp_yumi_i(mc_resp_yumi_lo)
 
-     ,.io_cmd_o(io_cmd_li)
-     ,.io_cmd_v_o(io_cmd_v_li)
-     ,.io_cmd_yumi_i(io_cmd_yumi_lo)
+     ,.io_cmd_o(mc_cmd_li)
+     ,.io_cmd_v_o(mc_cmd_v_li)
+     ,.io_cmd_yumi_i(mc_cmd_yumi_lo)
 
-     ,.io_resp_i(io_resp_lo)
-     ,.io_resp_v_i(io_resp_v_lo)
-     ,.io_resp_ready_o(io_resp_ready_li)
+     ,.io_resp_i(mc_resp_lo)
+     ,.io_resp_v_i(mc_resp_v_lo)
+     ,.io_resp_ready_o(mc_resp_ready_li)
 
      ,.link_sif_i(proc_link_sif_li[0])
      ,.link_sif_o(proc_link_sif_lo[0])
@@ -221,7 +250,7 @@ module bsg_blackparrot_unicore_tile_sdr
   for (genvar i = 0; i < 2; i++)
     begin : d
       wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
-      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = global_y_cord_i[1+i];
+      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = global_y_cord_i + 1'b1 + i;
       bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
          ,.host_enable_p(0)
