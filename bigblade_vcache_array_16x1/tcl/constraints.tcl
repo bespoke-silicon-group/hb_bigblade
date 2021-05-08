@@ -11,7 +11,8 @@ set manycore_clk_port             "clk_i*"
 set manycore_clk_period_ps        1000.0
 set manycore_clk_uncertainty_ps   20
 
-set_input_transition 50 [get_port $manycore_clk_port]
+set_input_transition 50 -max [get_port $manycore_clk_port]
+set_input_transition 10 -min [get_port $manycore_clk_port]
 create_clock -period $manycore_clk_period_ps -name $manycore_clk_name [get_ports $manycore_clk_port]
 set_clock_uncertainty $manycore_clk_uncertainty_ps [get_clocks $manycore_clk_name]
 
@@ -50,8 +51,15 @@ set_dont_touch $hard_inv_cells true
 set_dont_touch [get_nets -of [get_pins -of $hard_inv_cells -filter "name==A"]] true
 set_dont_touch [get_nets -of [get_pins -of $hard_inv_cells -filter "name==Z"]] true
 
-set_false_path -from [get_ports "global_*_i*"]
-set_false_path -to [get_ports "global_*_o*"]
+# global xy
+set_input_delay -max 20  -clock $manycore_clk_name [get_ports global_*_i*]
+set_input_delay -min 20  -clock $manycore_clk_name [get_ports global_*_i*]
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [get_ports global_*_i*]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" [get_ports global_*_i*]
+set_output_delay -max 20 -clock $manycore_clk_name [get_ports global_*_o*]
+set_output_delay -min 20 -clock $manycore_clk_name [get_ports global_*_o*]
+set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] [get_ports global_*_o*]
+set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] [get_ports global_*_o*]
 
 
 puts "BSG-info: Completed script [info script]\n"

@@ -41,9 +41,16 @@ set_false_path -from $tag_id_ports
 
 
 # global x/y
-set_false_path -from [get_ports global_*_i*]
-set_false_path -through [get_pins -filter "name=~*global_*_*"]
-set_false_path -through [get_pins -filter "name=~async*reset*"]
+#set_false_path -from [get_ports global_*_i*]
+#set_false_path -through [get_pins -filter "name=~*global_*_*"]
+#set_false_path -through [get_pins -filter "name=~async*reset*"]
+
+set_input_delay -max 0   -clock "manycore_clk" [get_ports global_*_i*]
+set_input_delay -min 200 -clock "manycore_clk" [get_ports global_*_i*]
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [get_ports global_*_i*]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" [get_ports global_*_i*]
+set_multicycle_path 2 -setup -from [get_ports global_*_i*]
+set_multicycle_path 2 -hold  -from [get_ports global_*_i*]
 
 # async path
 bsg_async_icl [all_clocks]

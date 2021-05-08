@@ -8,7 +8,8 @@ set clk_period_ps      1000
 set clk_uncertainty_ps 20
 create_clock -period ${clk_period_ps} -name ${clk_name} [get_ports clk_i]
 set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
-
+set_input_transition 10 -min [get_ports clk_i]
+set_input_transition 50 -max [get_ports clk_i]
 
 # Grouping ports...
 set reset_in_port  [get_ports reset_i]
@@ -157,19 +158,23 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset ports
-constraint_input_ports $clk_name $reset_in_port  500 40
-constraint_output_ports $clk_name $reset_out_port 500 40
+constraint_input_ports  $clk_name $reset_in_port  40 40
+constraint_output_ports $clk_name $reset_out_port 40 40
+constraint_input_ports  $clk_name [get_ports global_*_i*] 40 40
+constraint_output_ports $clk_name [get_ports global_*_o*] 40 40
+
+set multicycle_cells [list]
+append_to_collection multicycle_cells [get_cells dff_x/data_r_reg*]
+append_to_collection multicycle_cells [get_cells dff_y/data_r_reg*]
+append_to_collection multicycle_cells [get_cells dff_reset/data_r_reg*]
+set_multicycle_path 2 -setup -to   $multicycle_cells
+set_multicycle_path 2 -hold  -to   $multicycle_cells
+set_multicycle_path 2 -setup -from $multicycle_cells
+set_multicycle_path 2 -hold  -from $multicycle_cells
 
 
-#set cord_in_ports [list]
-#append_to_collection cord_in_ports [get_ports global_*_i*]
-#constraint_input_ports $clk_name $cord_in_ports 500 40
-
-#set cord_out_ports [list]
-#append_to_collection cord_out_ports [get_ports global_*_o*]
-#constraint_output_ports $clk_name $cord_out_ports 500 40
-set_false_path -from [get_ports global_*_i*]
-set_false_path -to   [get_ports global_*_o*]
+#set_false_path -from [get_ports global_*_i*]
+#set_false_path -to   [get_ports global_*_o*]
 
 
 
@@ -194,6 +199,7 @@ if { [sizeof $cells_to_derate] > 0 } {
 set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_fc"] true
 set_ungroup [get_designs -filter "hdl_template==network_tx"] true
 set_ungroup [get_designs -filter "hdl_template==network_rx"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true

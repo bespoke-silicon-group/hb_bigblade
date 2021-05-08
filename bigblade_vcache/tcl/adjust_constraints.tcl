@@ -8,8 +8,6 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constan
 set clk_name            "manycore_clk"
 set clk_period_ps       1000
 set clk_uncertainty_ps  20
-create_clock -period $clk_period_ps -name $clk_name [get_ports clk_i]
-set_clock_uncertainty $clk_uncertainty_ps [get_clocks $clk_name]
 
 
 # group the ports in orderly manner.
@@ -128,8 +126,6 @@ constraint_input_ports  $clk_name $reset_in_port  500 40
 constraint_output_ports $clk_name $reset_out_port 500 40
 
 
-#constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
-#constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
 
 
 

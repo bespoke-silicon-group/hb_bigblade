@@ -10,6 +10,8 @@ set clk_period_ps       1000
 set clk_uncertainty_ps  20
 create_clock -period $clk_period_ps -name $clk_name [get_ports clk_i]
 set_clock_uncertainty $clk_uncertainty_ps [get_clocks $clk_name]
+set_input_transition 10 -min [get_ports clk_i]
+set_input_transition 50 -max [get_ports clk_i]
 
 
 # group the ports in orderly manner.
@@ -130,15 +132,18 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset port
-constraint_input_ports  $clk_name $reset_in_port  500 40
-constraint_output_ports $clk_name $reset_out_port 500 40
+constraint_input_ports  $clk_name $reset_in_port  20 20
+constraint_output_ports $clk_name $reset_out_port 20 20
+constraint_input_ports  $clk_name [get_ports global_*_i*] 20 20
+constraint_output_ports $clk_name [get_ports global_*_o*] 20 20
 
 
-#constraint_input_ports $clk_name [get_ports global_*_i*]  0 40
-#constraint_output_ports $clk_name [get_ports global_*_o*] 0 40
-set_false_path -from [get_ports global_*_i*]
-set_false_path -to   [get_ports global_*_o*]
-
+#set_false_path -from [get_ports global_*_i*]
+#set_false_path -to   [get_ports global_*_o*]
+set_multicycle_path 2 -setup -to   [get_cells *_dff/data_r_reg*] 
+set_multicycle_path 2 -hold  -to   [get_cells *_dff/data_r_reg*] 
+set_multicycle_path 2 -setup -from [get_cells *_dff/data_r_reg*] 
+set_multicycle_path 2 -hold  -from [get_cells *_dff/data_r_reg*] 
 
 # ungrouping
 set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
