@@ -13,10 +13,13 @@ module bp_cce_to_mc_bridge
    , parameter mc_max_outstanding_p            = "inv"
    , parameter mc_x_cord_width_p               = "inv"
    , parameter mc_x_subcord_width_p            = "inv"
+   , parameter pod_x_cord_width_p              = "inv"
    , parameter mc_y_cord_width_p               = "inv"
    , parameter mc_y_subcord_width_p            = "inv"
+   , parameter pod_y_cord_width_p              = "inv"
    , parameter mc_data_width_p                 = "inv"
    , parameter mc_addr_width_p                 = "inv"
+   , parameter mc_num_vcache_rows_p            = "inv"
    , parameter mc_vcache_block_size_in_words_p = "inv"
    , parameter mc_vcache_size_p                = "inv"
    , parameter mc_vcache_sets_p                = "inv"
@@ -210,23 +213,42 @@ module bp_cce_to_mc_bridge
     );
 
   // DRAM hash function
-  localparam vcache_word_offset_width_lp = `BSG_SAFE_CLOG2(mc_vcache_block_size_in_words_p);
-  localparam hash_bank_input_width_lp = mc_data_width_p-1-2-vcache_word_offset_width_lp;
-  localparam hash_bank_index_width_lp = $clog2(((2**hash_bank_input_width_lp)+(2*mc_num_tiles_x_p)-1)/(mc_num_tiles_x_p*2));
+  logic [mc_x_cord_width_p-1:0] dram_x_cord_lo;
+  logic [mc_y_cord_width_p-1:0] dram_y_cord_lo;
+  logic [mc_addr_width_p-1:0] dram_epa_lo;
 
-  logic [mc_x_subcord_width_p:0] hash_bank_lo;  // {bot_not_top, x_cord}
-  logic [hash_bank_index_width_lp-1:0] hash_bank_index_lo;
-  wire [hash_bank_input_width_lp-1:0] hash_bank_input = io_cmd_eva_li[2+vcache_word_offset_width_lp+:hash_bank_input_width_lp];
-  hash_function
-   #(.banks_p(mc_num_tiles_x_p*2)
-     ,.width_p(hash_bank_input_width_lp)
-     ,.vcache_sets_p(mc_vcache_sets_p)
+  wire [mc_data_width_p-1:0]         dram_eva_li = {1'b1, io_cmd_li.header.addr[2+:mc_data_width_p-1]};
+  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[2+mc_data_width_p-1+:pod_x_cord_width_p];
+  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[2+mc_data_width_p-1+pod_x_cord_width_p+:pod_y_cord_width_p];
+  bsg_manycore_dram_hash_function
+   #(.data_width_p(mc_data_width_p)
+     ,.addr_width_p(mc_addr_width_p)
+     ,.x_cord_width_p(mc_x_cord_width_p)
+     ,.y_cord_width_p(mc_y_cord_width_p)
+     ,.pod_x_cord_width_p(pod_x_cord_width_p)
+     ,.pod_y_cord_width_p(pod_y_cord_width_p)
+     ,.x_subcord_width_p(mc_x_subcord_width_p)
+     ,.y_subcord_width_p(mc_y_subcord_width_p)
+     ,.num_vcache_rows_p(mc_num_vcache_rows_p)
+     ,.vcache_block_size_in_words_p(mc_vcache_block_size_in_words_p)
      )
-   hashb
-    (.i(hash_bank_input)
-     ,.bank_o(hash_bank_lo)
-     ,.index_o(hash_bank_index_lo)
+   dram_hash
+    (.eva_i(dram_eva_li)
+     ,.pod_x_i(dram_pod_x_li)
+     ,.pod_y_i(dram_pod_y_li)
+
+     ,.x_cord_o(dram_x_cord_lo)
+     ,.y_cord_o(dram_y_cord_lo)
+     ,.epa_o(dram_epa_lo)
      );
+
+  // Other MMIO
+  wire [mc_data_width_p-1:0]           mmio_eva_li = {1'b0, io_cmd_li.header.addr[2+:mc_data_width_p-1]};
+  wire [pod_x_cord_width_p-1:0] mmio_pod_x_cord_lo = io_cmd_li.header.addr[2+mc_data_width_p+:pod_x_cord_width_p];
+  wire [pod_y_cord_width_p-1:0] mmio_pod_y_cord_lo = io_cmd_li.header.addr[2+mc_data_width_p+pod_x_cord_width_p+:pod_y_cord_width_p];
+  wire [mc_x_cord_width_p-1:0]         mmio_x_cord_lo = io_cmd_eva_li.x_cord;
+  wire [mc_y_cord_width_p-1:0]         mmio_y_cord_lo = io_cmd_eva_li.y_cord;
+  wire [mc_addr_width_p-1:0]              mmio_epa_lo = io_cmd_eva_li.addr;
 
   logic [(mc_data_width_p>>3)-1:0] store_mask;
   always_comb
@@ -304,58 +326,50 @@ module bp_cce_to_mc_bridge
      ,.op_o(store_op)
      );
 
+  wire mc_not_bp_li = io_cmd_li.header.addr[paddr_width_p-1];
+  wire bp_dram_li = io_cmd_li.header.addr > dram_base_addr_gp;
   bsg_manycore_packet_s mmio_out_packet_li;
   always_comb
     begin
       mmio_out_packet_li = '0;
       mmio_out_packet_li.src_y_cord = my_y_i;
       mmio_out_packet_li.src_x_cord = my_x_i;
-      // Local access
-      if (io_cmd_eva_li.remote == 2'b00)
+      if (mc_not_bp_li)
+        begin
+          mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
+          mmio_out_packet_li.y_cord = io_cmd_eva_li.y_cord;
+          mmio_out_packet_li.x_cord = io_cmd_eva_li.x_cord;
+        end
+      else if (bp_dram_li)
+        begin
+          mmio_out_packet_li.addr   = dram_epa_lo;
+          mmio_out_packet_li.y_cord = dram_y_cord_lo;
+          mmio_out_packet_li.x_cord = dram_x_cord_lo;
+        end
+      else
         begin
           // Hardcoded host at 0,0
           mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
           mmio_out_packet_li.y_cord = '0;
           mmio_out_packet_li.x_cord = '0;
         end
-      else if (io_cmd_eva_li.remote == 2'b01)
-        begin
-          mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
-          mmio_out_packet_li.y_cord = io_cmd_eva_li.y_cord;
-          mmio_out_packet_li.x_cord = io_cmd_eva_li.x_cord;
-        end
-      // DRAM accesses
-      // TODO: Pod support
-      else
-        begin
-          mmio_out_packet_li.addr = {
-            1'b0,
-            {(mc_addr_width_p-1-vcache_word_offset_width_lp-hash_bank_index_width_lp){1'b0}},
-            hash_bank_index_lo,
-            io_cmd_eva_li[2+:vcache_word_offset_width_lp]
-          };
-          mmio_out_packet_li.y_cord = hash_bank_lo[mc_x_subcord_width_p]
-            ? (mc_y_cord_width_p)'(mc_num_tiles_y_p+1) // V$ ports are at the top and bottom of the manycore network
-            : {mc_y_cord_width_p{1'b0}};
-          mmio_out_packet_li.x_cord = hash_bank_lo[0+:mc_x_subcord_width_p] + 1'b1;
-        end
 
-        case (io_cmd_li.header.msg_type)
-          e_bedrock_mem_uc_rd, e_bedrock_mem_rd:
-            begin
-              mmio_out_packet_li.op_v2                                    = e_remote_load;
-              mmio_out_packet_li.payload.load_info_s.load_info.is_byte_op = (io_cmd_li.header.size == e_bedrock_msg_size_1);
-              mmio_out_packet_li.payload.load_info_s.load_info.is_hex_op  = (io_cmd_li.header.size == e_bedrock_msg_size_2);
-              mmio_out_packet_li.payload.load_info_s.load_info.part_sel   = io_cmd_eva_li.low_bits;
-              mmio_out_packet_li.reg_id                                   = bsg_manycore_reg_id_width_gp'(trans_id_lo);
-            end
-          default: // e_bedrock_mem_uc_wr, e_bedrock_mem_wr:
-            begin
-              mmio_out_packet_li.op_v2                                    = store_op;
-              mmio_out_packet_li.payload.data                             = store_payload;
-              mmio_out_packet_li.reg_id                                   = store_reg_id;
-            end
-        endcase
+      case (io_cmd_li.header.msg_type)
+        e_bedrock_mem_uc_rd, e_bedrock_mem_rd:
+          begin
+            mmio_out_packet_li.op_v2                                    = e_remote_load;
+            mmio_out_packet_li.payload.load_info_s.load_info.is_byte_op = (io_cmd_li.header.size == e_bedrock_msg_size_1);
+            mmio_out_packet_li.payload.load_info_s.load_info.is_hex_op  = (io_cmd_li.header.size == e_bedrock_msg_size_2);
+            mmio_out_packet_li.payload.load_info_s.load_info.part_sel   = io_cmd_eva_li.low_bits;
+            mmio_out_packet_li.reg_id                                   = bsg_manycore_reg_id_width_gp'(trans_id_lo);
+          end
+        default: // e_bedrock_mem_uc_wr, e_bedrock_mem_wr:
+          begin
+            mmio_out_packet_li.op_v2                                    = store_op;
+            mmio_out_packet_li.payload.data                             = store_payload;
+            mmio_out_packet_li.reg_id                                   = store_reg_id;
+          end
+      endcase
     end
 
   //////////////////////////////////////////////

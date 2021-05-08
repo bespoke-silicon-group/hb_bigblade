@@ -34,6 +34,7 @@ package bsg_chip_pkg;
 
   localparam ruche_factor_X_gp = 3;
 
+  localparam mc_num_vcache_rows_gp = 1;
   localparam mc_vcache_ways_gp = 4;
   localparam mc_vcache_sets_gp = 64;
   localparam mc_vcache_block_size_in_words_gp = 8;
