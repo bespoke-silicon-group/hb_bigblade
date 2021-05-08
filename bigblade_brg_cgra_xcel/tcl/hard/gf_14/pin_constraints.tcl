@@ -27,7 +27,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
   append_to_collection misc_pins [get_ports -filter "name=~async_*"]
   
   set misc_pins_len [expr [sizeof_collection $misc_pins]]
-  set start_x [expr ($core_width / 2)  - (2*$c_pitch*$misc_pins_len/2)]
+  set start_x [expr ($core_width / 4)  - (2*$c_pitch*$misc_pins_len/2)]
   set last_loc [bsg_pins_line_constraint $misc_pins "C5" top $start_x "self" {} 1 1 1]
   
   # Read horizontal pins from csv file
@@ -65,7 +65,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
   #-------------------------------------------------------------------------
   # MISC pins
   #-------------------------------------------------------------------------
-  set master_pe "PE_rc__0"
+  set master_pe "cgra_dpath_PE_rc__0"
 
   set pe_llx [lindex [get_attribute [get_cell -hier $master_pe] boundary_bbox] 0 0]
   set pe_lly [lindex [get_attribute [get_cell -hier $master_pe] boundary_bbox] 0 1]

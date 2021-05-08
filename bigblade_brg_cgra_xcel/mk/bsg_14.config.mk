@@ -156,5 +156,6 @@ synth_fakeout:
 	cp ../v/brg_cgra_pod.mapped.v current_build/synth/brg_cgra_pod/results/
 	cp ../sdc/brg_cgra_pod.mapped.sdc current_build/synth/brg_cgra_pod/results/
 	touch current_build/synth/ProcElement/results/ProcElement.mapped.v
+	mkdir -p current_build/touchfiles/
 	touch current_build/touchfiles/synth.ProcElement
 	touch current_build/touchfiles/synth.brg_cgra_pod

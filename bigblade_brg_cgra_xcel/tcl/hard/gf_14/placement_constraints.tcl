@@ -25,7 +25,7 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 
   # PE array
-  set master_pe "PE_rc__0"
+  set master_pe "cgra_dpath_PE_rc__0"
   set pe_width [get_attribute [get_cell -hier $master_pe] width]
   set pe_height [get_attribute [get_cell -hier $master_pe] height]
   
@@ -33,12 +33,12 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set pe_num_y 8
   
   set pe_margin_x 3.276
-  set pe_margin_y 4.32
+  set pe_margin_y 9.12
   
   set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
   set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
-  set pe_origin_y [expr ($tile_height - $array_height) / 2]
   set pe_origin_x [expr $tile_width - $array_width - $keepout_margin_x]
+  set pe_origin_y 11.68
   
   set sp_lx [expr 5+$keepout_margin_x]
   set sp_ly [expr $pe_origin_y + 1*$array_height/8]
@@ -69,7 +69,98 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
 
   set isdr_bound [create_bound -name "isdr" -type soft -boundary {{0 0} {5 757.4}}]
   set osdr_bound [create_bound -name "osdr" -type soft -boundary {{0 0} {5 757.4}}]
-  add_to_bound ${isdr_bound} [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
-  add_to_bound ${osdr_bound} [get_cells -hier -filter "full_name=~*/osdr_phy/*"]
+  add_to_bound $isdr_bound [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
+  add_to_bound $osdr_bound [get_cells -hier -filter "full_name=~*/osdr_phy/*"]
 
-}
+  ##### Broadcast placement
+  foreach {idx_x} {0 1 2 3 4 5 6 7} {
+    foreach {idx_y} {0 1 2 3 4 5 6 7} {
+      set id [expr $idx_y + $pe_num_y * $idx_x]
+      set cell [get_cells -hier cgra_dpath_col_broadcast_${idx_x}__row_broadcast_${idx_y}__r_buf_*]
+      set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
+      set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ur_y]]
+      move_objects $cell -x $x -y $y
+      set_attribute $cell -name physical_status -value placed
+    }
+    set id [expr $pe_num_y/2-1 + $pe_num_x*$idx_x]
+    set cell [get_cells -hier cgra_dpath_col_broadcast_${idx_x}__c_buf_*]
+    set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
+    set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y]]
+    move_objects $cell -x $x -y $y
+    set_attribute $cell -name physical_status -value placed
+  }
+  set id 28
+  set cell [get_cells -hier cgra_dpath_cter_buf_*]
+  set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] + $pe_width/2]
+  set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ur_y] + $pe_margin_y/2]
+  move_objects $cell -x $x -y $y
+  set_attribute $cell -name physical_status -value placed
+
+  ##### Reduction placement
+  foreach {idx_x} {0 1 2 3 4 5 6 7} {
+    set id [expr 1+$pe_num_y*$idx_x]
+    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b0123_*"]
+    set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
+    set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+    move_objects $cell -x $x -y $y
+    set_attribute $cell -name physical_status -value placed
+
+    set id [expr 3+$pe_num_y*$idx_x]
+    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b01234567_*"]
+    set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
+    set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+    move_objects $cell -x $x -y $y
+    set_attribute $cell -name physical_status -value placed
+
+    set id [expr 5+$pe_num_y*$idx_x]
+    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b4567_*"]
+    set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
+    set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+    move_objects $cell -x $x -y $y
+    set_attribute $cell -name physical_status -value placed
+  }
+
+  set id 12
+  set cell [get_cells -hier "cgra_dpath_col_rb8_b0123_*"]
+  set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
+  set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+  move_objects $cell -x $x -y $y
+  set_attribute $cell -name physical_status -value placed
+   
+  set id 44
+  set cell [get_cells -hier "cgra_dpath_col_rb8_b4567_*"]
+  set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
+  set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+  move_objects $cell -x $x -y $y
+  set_attribute $cell -name physical_status -value placed
+
+  set id 28
+  set cell [get_cells -hier "cgra_dpath_col_rb8_b01234567_*"]
+  set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
+  set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
+  move_objects $cell -x $x -y $y
+  set_attribute $cell -name physical_status -value placed
+
+  ### Placement bounds
+  #set osdr_bound [create_bound -name "osdr" -type soft -boundary {{0 0} {5 757.4}}]
+  #add_to_bound $isdr_bound [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
+#  set ce_bound [create_bound -name "ce" \
+#    -type soft \
+#    -boundary [list [list [expr $pe_origin_x - 15.628] 0] [list $tile_width 11.68]]]
+#  add_to_bound $ce_bound [get_cells -hier cgra_dpath_CE_e__*]
+#
+#  set me_s_bound [create_bound -name "me_s" \
+#    -type soft \
+#    -boundary [list [list [expr $pe_origin_x - 40] 0] [list [expr $pe_origin_x] $tile_height]]]
+#  add_to_bound $me_s_bound [get_cells -hier cgra_dpath_CE_s]
+#  foreach {i} {0 1 2 3 4 5 6 7} {
+#    add_to_bound $me_s_bound [get_cells -hier cgra_dpath_ME__${i}]
+#  }
+#
+#  set me_n_bound [create_bound -name "me_n" \
+#    -type soft \
+#    -boundary [list [list [expr $pe_origin_x - 15.628] [expr $tile_height-17.76]] [list $tile_width $tile_height]]]
+#  foreach {i} {8 9 10 11 12 13 14 15} {
+#    add_to_bound $me_n_bound [get_cells -hier cgra_dpath_ME__${i}]
+#  }
+#}
