@@ -58,12 +58,16 @@ set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 ########################################
 ## In2Reg
 set core_input_pins [get_ports global_y_cord_i[*]]
+# TODO: Goes away with clk_gen
+append_to_collection input_pins [get_ports clk_i]
+append_to_collection input_pins [get_ports reset_i]
 set_input_delay -min $core_input_delay_min_ps -clock $core_clk_name $core_input_pins
 set_input_delay -max $core_input_delay_max_ps -clock $core_clk_name $core_input_pins
 set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
 set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 set tag_in_ports [get_ports tag_data_i]
+append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
@@ -106,7 +110,8 @@ for {set i 0} {$i < 3} {incr i} {
 
 ########################################
 ## False paths
-set_false_path -from [get_ports global_*_cord_i]
+set_false_path -from [get_ports global_*_cord_i[*]]
+set_false_path -from [get_ports tag_node_id_offset_i[*]]
 
 ########################################
 ## Disable timing
@@ -157,7 +162,8 @@ set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"            
 
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"          ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_fc"        ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_standard"  ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_dram_hash_function" ] true
 
 set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                    ] true
@@ -171,7 +177,6 @@ set_ungroup [get_designs -filter "hdl_template==bp_fe_instr_scan"               
 set_ungroup [get_designs -filter "hdl_template==bp_mmu"                          ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                       ] true
 set_ungroup [get_designs -filter "hdl_template==bp_tlb"                          ] true
-#set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                    ] true
 
 set_ungroup [get_designs -filter "hdl_template==compareRecFN"                    ] true 
 set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"         ] true
