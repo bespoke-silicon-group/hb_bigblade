@@ -147,18 +147,15 @@ module bp_cce_to_mc_bridge
   logic                                    returned_credit_v_r_lo;
   logic [bsg_manycore_reg_id_width_gp-1:0] returned_credit_reg_id_r_lo;
 
-  logic [3:0]                              out_credits_lo;
+  logic [3:0]                              out_credits_used_lo;
 
   bsg_manycore_endpoint_standard
    #(.x_cord_width_p(mc_x_cord_width_p)
      ,.y_cord_width_p(mc_y_cord_width_p)
-    ,.fifo_els_p(2)
     ,.data_width_p(mc_data_width_p)
     ,.addr_width_p(mc_addr_width_p)
-
-    ,.max_out_credits_p(15)
-    ,.warn_out_of_credits_p(0)
-    ,.debug_p(0)
+    ,.credit_counter_width_p(`BSG_WIDTH(15))
+    ,.fifo_els_p(2)
     )
    blackparrot_endpoint
    (.clk_i(clk_i)
@@ -206,7 +203,7 @@ module bp_cce_to_mc_bridge
     ,.returned_credit_v_r_o(returned_credit_v_r_lo)
     ,.returned_credit_reg_id_r_o(returned_credit_reg_id_r_lo)
 
-    ,.out_credits_o(out_credits_lo)
+    ,.out_credits_used_o(out_credits_used_lo)
 
     ,.global_x_i(my_x_i)
     ,.global_y_i(my_y_i)
@@ -522,7 +519,7 @@ module bp_cce_to_mc_bridge
         end
       else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_req_credits_addr_gp) & host_enable_p)
         begin
-          io_resp_cast_o = '{header: io_cmd_li.header, data: out_credits_lo};
+          io_resp_cast_o = '{header: io_cmd_li.header, data: out_credits_used_lo};
           io_resp_v_o    = 1'b1;
           io_cmd_yumi_lo = io_resp_yumi_i;
         end

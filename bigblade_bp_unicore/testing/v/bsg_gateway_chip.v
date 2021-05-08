@@ -175,10 +175,7 @@ module bsg_gateway_chip
   bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_li, mc_hor_links_lo;
   bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_raw_lo;
 
-  logic [2:0][mc_y_cord_width_gp-1:0] global_y_cord_li;
-  assign global_y_cord_li[0] = 1;
-  assign global_y_cord_li[1] = 2;
-  assign global_y_cord_li[2] = 3;
+  wire [mc_y_cord_width_gp-1:0] global_y_cord_li= 1'b1;
 
   logic [2:0] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
   logic [2:0][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
@@ -199,11 +196,6 @@ module bsg_gateway_chip
      ,.async_downlink_reset_i(async_downlink_reset)
      ,.async_downstream_reset_i(async_downstream_reset)
      ,.async_token_reset_i(async_token_reset)
-
-     ,.async_uplink_reset_o()
-     ,.async_downlink_reset_o()
-     ,.async_downstream_reset_o()
-     ,.async_token_reset_o()
 
      ,.io_fwd_link_clk_o(io_fwd_link_clk_lo)
      ,.io_fwd_link_data_o(io_fwd_link_data_lo)
