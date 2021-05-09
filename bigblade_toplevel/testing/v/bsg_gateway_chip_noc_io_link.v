@@ -63,7 +63,7 @@ module bsg_gateway_chip_noc_io_link
     ,.io_clk_i                       (io_clk_i              )
 
     ,.tag_clk_i                      (tag_clk_i          )
-    ,.tag_lines_i                    (tag_lines_lo.ddr[i])
+    ,.tag_lines_i                    (tag_lines_lo.ddr[i].main)
 
     ,.core_v_i                       (core_links_li[i].v             )
     ,.core_data_i                    (core_links_li[i].data          )

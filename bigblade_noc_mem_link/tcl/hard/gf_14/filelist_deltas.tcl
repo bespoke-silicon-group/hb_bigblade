@@ -11,6 +11,7 @@ set bp_me_dir     ${blackparrot_dir}/bp_me
 
 # list of files to replace
 set HARD_SWAP_FILELIST [join "
+  $bsg_designs_target_dir/../common/v/hard/gf_14/bsg_link_delay_line.v
   $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_mux.v
   $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
   $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
