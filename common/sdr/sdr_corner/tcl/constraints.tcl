@@ -250,7 +250,6 @@ constraint_input_ports "tag_clk" [get_ports "tag_data_i"] 500 0
 set cdc_clocks [list]
 append_to_collection cdc_clocks [get_clocks "tag_clk"]
 append_to_collection cdc_clocks [get_clocks "manycore_clk"]
-# TODO fix this
 bsg_async_icl [all_clocks]
 
 
