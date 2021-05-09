@@ -112,6 +112,8 @@ bsg_link_ddr_constraints                    \
   [get_ports io_link_token_i]               \
   $link_clk_uncertainty_ps
 
+# Override DDR input driving cells
+set_driving_cell -no_design_rule -lib_cell "SC7P5T_MUX4X4_SSC16L" -pin Z [get_ports {io_link_clk_i io_link_v_i io_link_data_i}]
 
 # CDC
 set cdc_clocks [all_clocks]

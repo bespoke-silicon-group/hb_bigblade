@@ -33,13 +33,13 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 
 
 set                ddr_link_0_cell [get_cells "ddr_link_0__link"]
-move_object       $ddr_link_0_cell -x 13.44 -y 0
-set_attribute     $ddr_link_0_cell orientation R0
+move_object       $ddr_link_0_cell -x 13.44 -y 152.64
+set_attribute     $ddr_link_0_cell orientation MX
 set_fixed_objects $ddr_link_0_cell
 
 set                ddr_link_1_cell [get_cells "ddr_link_1__link"]
-move_object       $ddr_link_1_cell -x 13.44 -y 152.64
-set_attribute     $ddr_link_1_cell orientation MX
+move_object       $ddr_link_1_cell -x 13.44 -y 0
+set_attribute     $ddr_link_1_cell orientation R0
 set_fixed_objects $ddr_link_1_cell
 
 for {set i 0} {$i < 2} {incr i} {
@@ -58,7 +58,7 @@ for {set i 0} {$i < 2} {incr i} {
 }
 
 for {set i 0} {$i < 2} {incr i} {
-  set ori [expr {$i == 0} ? {"R0"} : {"MX"}]
+  set ori [expr {$i == 0} ? {"MX"} : {"R0"}]
   foreach {dir} {"in" "out"} {
     create_rp_group -name "RP${dir}_${i}" -rows 18
     add_to_rp_group "RP${dir}_${i}" -rp_group "RP${dir}_${i}_16" -row 0
