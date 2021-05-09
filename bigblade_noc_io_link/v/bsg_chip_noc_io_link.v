@@ -75,8 +75,21 @@ module bsg_chip_noc_io_link
   core_link_sif_s [1:0] core_links_li, core_links_lo;
   logic [1:0] core_links_ready_and_lo;
 
+  wire [1:0] io_link_clk_li, io_link_v_li, io_link_clk_lo, io_link_v_lo;
+  wire [1:0][bsg_link_channel_width_gp-1:0] io_link_data_li, io_link_data_lo;
+
   for (genvar i = 0; i < 2; i++)
   begin: ddr_link
+    bsg_link_delay_line idelay
+    (.tag_lines_i(tag_lines_lo.ddr[i].idelay)
+    ,.i({io_link_clk_i [i], io_link_v_i [i], io_link_data_i [i]})
+    ,.o({io_link_clk_li[i], io_link_v_li[i], io_link_data_li[i]}));
+
+    bsg_link_delay_line odelay
+    (.tag_lines_i(tag_lines_lo.ddr[i].odelay)
+    ,.i({io_link_clk_lo[i], io_link_v_lo[i], io_link_data_lo[i]})
+    ,.o({io_link_clk_o [i], io_link_v_o [i], io_link_data_o [i]}));
+
     assign core_links_lo[i].then_ready_rev = core_links_li[i].v & core_links_ready_and_lo[i];
     bsg_chip_io_link_ddr link
     (.core_clk_i                     (noc_clk_lo            )
@@ -96,14 +109,14 @@ module bsg_chip_noc_io_link
     ,.core_data_o                    (core_links_lo[i].data          )
     ,.core_yumi_i                    (core_links_li[i].then_ready_rev)
 
-    ,.io_link_clk_o                  (io_link_clk_o  [i])
-    ,.io_link_data_o                 (io_link_data_o [i])
-    ,.io_link_v_o                    (io_link_v_o    [i])
+    ,.io_link_clk_o                  (io_link_clk_lo [i])
+    ,.io_link_data_o                 (io_link_data_lo[i])
+    ,.io_link_v_o                    (io_link_v_lo   [i])
     ,.io_link_token_i                (io_link_token_i[i])
 
-    ,.io_link_clk_i                  (io_link_clk_i  [i])
-    ,.io_link_data_i                 (io_link_data_i [i])
-    ,.io_link_v_i                    (io_link_v_i    [i])
+    ,.io_link_clk_i                  (io_link_clk_li [i])
+    ,.io_link_data_i                 (io_link_data_li[i])
+    ,.io_link_v_i                    (io_link_v_li   [i])
     ,.io_link_token_o                (io_link_token_o[i])
     );
   end

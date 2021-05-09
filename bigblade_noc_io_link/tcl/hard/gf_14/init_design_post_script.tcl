@@ -22,3 +22,11 @@ proc bsg_dont_touch_regexp_type {arg1} {
 #bsg_dont_touch_regexp *BSG_BAL41MUX*
 
 bsg_dont_touch_regexp_type *SYNC*SDFF*
+
+# set dont touch on all delay lines
+set_dont_touch_network [get_pins "ddr_link*link/io_link_clk_o*"]
+set_dont_touch_network [get_pins "ddr_link*link/io_link_v_o*"]
+set_dont_touch_network [get_pins "ddr_link*link/io_link_data_o*"]
+set_dont_touch_network [get_ports "io_link_clk_i*"]
+set_dont_touch_network [get_ports "io_link_v_i*"]
+set_dont_touch_network [get_ports "io_link_data_i*"]
