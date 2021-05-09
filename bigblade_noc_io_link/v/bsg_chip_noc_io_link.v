@@ -81,12 +81,14 @@ module bsg_chip_noc_io_link
   for (genvar i = 0; i < 2; i++)
   begin: ddr_link
     bsg_link_delay_line idelay
-    (.tag_lines_i(tag_lines_lo.ddr[i].idelay)
+    (.tag_clk_i(tag_clk_i)
+    ,.tag_lines_i(tag_lines_lo.ddr[i].idelay)
     ,.i({io_link_clk_i [i], io_link_v_i [i], io_link_data_i [i]})
     ,.o({io_link_clk_li[i], io_link_v_li[i], io_link_data_li[i]}));
 
     bsg_link_delay_line odelay
-    (.tag_lines_i(tag_lines_lo.ddr[i].odelay)
+    (.tag_clk_i(tag_clk_i)
+    ,.tag_lines_i(tag_lines_lo.ddr[i].odelay)
     ,.i({io_link_clk_lo[i], io_link_v_lo[i], io_link_data_lo[i]})
     ,.o({io_link_clk_o [i], io_link_v_o [i], io_link_data_o [i]}));
 
