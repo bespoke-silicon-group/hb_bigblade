@@ -112,7 +112,7 @@ package bsg_chip_pkg;
   localparam tag_lg_els_gp = `BSG_SAFE_CLOG2(tag_els_gp);
 
   // maximum payload width in the whole design
-  localparam tag_max_payload_width_gp = 9;
+  localparam tag_max_payload_width_gp = 12;
 
   // The number of bits required to represent the max payload width
   localparam tag_lg_width_gp = `BSG_SAFE_CLOG2(tag_max_payload_width_gp + 1);
@@ -142,9 +142,20 @@ package bsg_chip_pkg;
   } bsg_chip_io_link_ddr_tag_lines_s;
 
   typedef struct packed {
+    bsg_tag_s clk;
+    bsg_tag_s [2:0] data;
+  } bsg_chip_delay_tag_lines_s;
+
+  typedef struct packed {
+    bsg_chip_delay_tag_lines_s odelay;
+    bsg_chip_delay_tag_lines_s idelay;
+    bsg_chip_io_link_ddr_tag_lines_s main;
+  } bsg_chip_ddr_tag_lines_s;
+
+  typedef struct packed {
     bsg_chip_sdr_tag_lines_s sdr;
     bsg_tag_s noc_reset;
-    bsg_chip_io_link_ddr_tag_lines_s [mem_link_rr_ratio_gp-1:0] ddr;
+    bsg_chip_ddr_tag_lines_s [mem_link_rr_ratio_gp-1:0] ddr;
   } bsg_chip_noc_tag_lines_s;
   localparam tag_noc_local_els_gp = $bits(bsg_chip_noc_tag_lines_s)/$bits(bsg_tag_s);
 
