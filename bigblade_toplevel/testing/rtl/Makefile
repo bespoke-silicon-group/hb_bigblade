@@ -27,6 +27,8 @@ export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BSG_REPLICANT_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_replicant
+export BSG_F1_DIR             ?= $(BSG_REPLICANT_DIR)
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -34,8 +36,10 @@ export TESTING_BSG_DESIGNS_DIR        ?= $(BSG_OUT_DIR)/root/$(notdir $(BSG_DESI
 export TESTING_BSG_DESIGNS_TARGET_DIR ?= $(TESTING_BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
 export TESTING_BASEJUMP_STL_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export TESTING_BSG_MANYCORE_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export TESTING_BSG_REPLICANT_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export TESTING_BSG_PACKAGING_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export TESTING_BOARD_DIR              ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/board
+export TESTING_BSG_OUT_DIR                ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
@@ -100,7 +104,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 ########################################
 ## Trace Replay Roms
 ########################################
-  
+
 BSG_TRACE_NAME  := bsg_tag_boot
 BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
@@ -118,9 +122,17 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
 
-
 VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
+BSG_BLADERUNNER_GENERATED_SOURCES   := $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+BSG_BLADERUNNER_GENERATED_LIBRARIES := $(BSG_OUT_DIR)/libbsg_manycore_runtime.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libdramsim3.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libdmamem.so
+BSG_BLADERUNNER_GENERATED           := $(BSG_BLADERUNNER_GENERATED_SOURCES)
+BSG_BLADERUNNER_GENERATED           += $(BSG_BLADERUNNER_GENERATED_LIBRARIES)
+
+#VCS_OPTIONS += $(addprefix -v ,$(BSG_BLADERUNNER_GENERATED_SOURCES))
+VCS_OPTIONS += $(BSG_BLADERUNNER_GENERATED_SOURCES)
 
 ########################################
 ## Toplevel Parameters
@@ -134,7 +146,6 @@ OVERRIDE_PODS_Y ?= 4
 VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(OVERRIDE_PODS_X)
 VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 
-
 ########################################
 ## DRAM Definitions
 ########################################
@@ -146,15 +157,19 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ########################################
 
 build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS)
+$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED)
 	$(VCS) $(VCS_OPTIONS) -o $(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/build.log
-	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
 
 $(BSG_OUT_DIR):
 	mkdir -p $@
+	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
+
+export BSG_MACHINE_PATH=$(BSG_OUT_DIR)
+$(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)
+	$(MAKE) -f bladerunner.mk $@
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
