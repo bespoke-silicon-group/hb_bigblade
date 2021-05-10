@@ -48,6 +48,21 @@ module bsg_gateway_chip_core_complex
   );
 
   // HOST CONNECTION
+`ifdef REPLICANT
+  bsg_gateway_chip_dpi_manycore mc_dpi 
+    (
+     .clk_i(mc_clk_i)
+     // reset
+     ,.reset_i(~tag_trace_done_i)
+     ,.reset_done_i(~tag_trace_done_i)
+     // manycore link
+     ,.link_sif_i(mc_links_credit_lo)
+     ,.link_sif_o(mc_links_credit_li)
+     // x,y
+     ,.global_y_i(7'b0001000)
+     ,.global_x_i(7'b0001111)
+     );  
+  `else
   bsg_nonsynth_manycore_io_complex #(
     .addr_width_p(hb_addr_width_gp)
     ,.data_width_p(hb_data_width_gp)
@@ -65,7 +80,7 @@ module bsg_gateway_chip_core_complex
     ,.print_stat_v_o()
     ,.print_stat_tag_o()
   );
-
+  `endif
 
   // wormhole test mem
   // in bytes
