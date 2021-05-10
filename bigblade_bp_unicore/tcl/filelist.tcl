@@ -325,7 +325,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
 
-  $bsg_designs_target_dir/../common/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
+  $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
 
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
