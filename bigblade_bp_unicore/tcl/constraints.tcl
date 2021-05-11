@@ -126,18 +126,22 @@ bsg_link_sdr_dont_touch_constraints [get_ports {io_*_link_data_i[*] io_*_link_v_
 for {set i 0} {$i < 3} {incr i} {
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 }
 
