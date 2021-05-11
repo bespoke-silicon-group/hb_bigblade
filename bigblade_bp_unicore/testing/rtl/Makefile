@@ -155,7 +155,7 @@ endif
 
 PLUSARGS ?= +nbf_file=prog.nbf
 PLUSARGS += +max_cycle=1000000
-PLUSARGS += +num_pods=1
+PLUSARGS += +num_finish=1
 
 ########################################
 ## Run Targets

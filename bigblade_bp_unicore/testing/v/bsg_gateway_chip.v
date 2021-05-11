@@ -319,7 +319,7 @@ module bsg_gateway_chip
     logic [cb_num_in_lp-1:0] retval;
     for (int i = 0; i < cb_num_in_y_lp; i++) begin
       for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = 1'b0;
+        retval[(i*cb_num_in_x_lp)+j] = 1'b1;
       end
     end
     return retval;
