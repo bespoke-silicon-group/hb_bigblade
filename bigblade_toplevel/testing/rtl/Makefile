@@ -8,7 +8,7 @@
 # Simulation run-time flags
 ########################################
 WAVE       ?= 0
-
+CUDA       ?= 0
 
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
@@ -57,6 +57,9 @@ VCS_OPTIONS := -full64
 VCS_OPTIONS += -notice
 ifeq ($(WAVE),1)
   VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+endif
+ifeq ($(CUDA),1)
+  VCS_OPTIONS += +define+REPLICANT=1
 endif
 VCS_OPTIONS += -V
 VCS_OPTIONS += +v2k
