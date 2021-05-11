@@ -58,8 +58,6 @@ module bsg_gateway_chip_dpi_manycore
     ,.global_y_i(global_y_i)
     );
 
-  `define COSIM_MAIN
-  `ifdef COSIM_MAIN
   // In VCS, the C/C++ testbench is controlled by the
   // simulator. Therefore, we need to "call into" the C/C++ program
   // using the cosim_main function, during the initial block.
@@ -84,7 +82,6 @@ module bsg_gateway_chip_dpi_manycore
         $finish;
       end
    end
-  `endif //  `ifndef COSIM_MAIN
   
    // Global Counter for Profilers, Tracing, Debugging
    localparam global_counter_width_lp = 64;
