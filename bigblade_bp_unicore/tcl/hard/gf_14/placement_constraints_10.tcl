@@ -210,32 +210,18 @@ set int_regfile_ma [create_macro_array \
   -align left \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation N \
+  -orientation FN \
   $int_regfile_mems]
 
 set_macro_relative_location \
   -target_object $int_regfile_ma \
-  -target_corner br \
+  -target_corner bl \
   -target_orientation R0 \
-  -anchor_corner tr \
-  -anchor_object $fp_regfile_ma \
-  -offset [list 0 0]
+  -anchor_corner br \
+  -anchor_object $dcache_data_ma_east \
+  -offset [list $keepout_margin_x 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
-
-#####################################
-### D CACHE STAT
-###
-
-set_macro_relative_location \
-  -target_object $dcache_stat_mem \
-  -target_corner tr \
-  -target_orientation N \
-  -anchor_object $btb_mem \
-  -anchor_corner br \
-  -offset [list 0 -$keepout_margin_y]
-
-create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
 #####################################
 ### I CACHE STAT
@@ -245,11 +231,25 @@ set_macro_relative_location \
   -target_object $icache_stat_mem \
   -target_corner tr \
   -target_orientation N \
-  -anchor_object $dcache_stat_mem \
-  -anchor_corner tl \
-  -offset [list -$keepout_margin_x 0]
+  -anchor_object $btb_mem \
+  -anchor_corner br \
+  -offset [list 0 -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $icache_stat_mem
+
+#####################################
+### D CACHE STAT
+###
+
+set_macro_relative_location \
+  -target_object $dcache_stat_mem \
+  -target_corner br \
+  -target_orientation N \
+  -anchor_object $fp_regfile_ma \
+  -anchor_corner tr \
+  -offset [list 0 0]
+
+create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
 #####################################
 ### GUI setup
