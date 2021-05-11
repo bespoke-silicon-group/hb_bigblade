@@ -39,7 +39,7 @@ export TESTING_BSG_MANYCORE_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_m
 export TESTING_BSG_REPLICANT_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export TESTING_BSG_PACKAGING_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export TESTING_BOARD_DIR              ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/board
-export TESTING_BSG_OUT_DIR                ?= $(BSG_OUT_DIR)
+export TESTING_BSG_OUT_DIR            ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
@@ -128,6 +128,7 @@ BSG_BLADERUNNER_GENERATED_SOURCES   := $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 BSG_BLADERUNNER_GENERATED_LIBRARIES := $(BSG_OUT_DIR)/libbsg_manycore_runtime.so
 BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libdramsim3.so
 BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libdmamem.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libbsg_manycore_regression.so
 BSG_BLADERUNNER_GENERATED           := $(BSG_BLADERUNNER_GENERATED_SOURCES)
 BSG_BLADERUNNER_GENERATED           += $(BSG_BLADERUNNER_GENERATED_LIBRARIES)
 
@@ -170,6 +171,12 @@ $(BSG_OUT_DIR):
 export BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)
 	$(MAKE) -f bladerunner.mk $@
+
+VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
+VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
+VCS_OPTIONS += -LDFLAGS -lm
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
