@@ -15,11 +15,13 @@ BSG_BLADERUNNER_LINKS := $(BSG_MACHINE_PATH)/libdmamem.so
 BSG_BLADERUNNER_LINKS += $(BSG_MACHINE_PATH)/libdramsim3.so
 BSG_BLADERUNNER_LINKS += $(BSG_MACHINE_PATH)/libbsg_manycore_runtime.so
 BSG_BLADERUNNER_LINKS += $(BSG_MACHINE_PATH)/libbsg_manycore_regression.so
+BSG_BLADERUNNER_LINKS += $(BSG_MACHINE_PATH)/libbsgmc_cuda_legacy_pod_repl.so
 
 $(BSG_MACHINE_PATH)/libdmamem.so: $(LIBRARIES_PATH)/features/dma/simulation/libdmamem.so
 $(BSG_MACHINE_PATH)/libdramsim3.so: $(LIBRARIES_PATH)/features/dma/simulation/libdramsim3.so
 $(BSG_MACHINE_PATH)/libbsg_manycore_runtime.so: $(BSG_PLATFORM_PATH)/libbsg_manycore_runtime.so
 $(BSG_MACHINE_PATH)/libbsg_manycore_regression.so: $(BSG_PLATFORM_PATH)/libbsg_manycore_regression.so
+$(BSG_MACHINE_PATH)/libbsgmc_cuda_legacy_pod_repl.so: $(BSG_PLATFORM_PATH)/libbsgmc_cuda_legacy_pod_repl.so
 $(BSG_BLADERUNNER_LINKS):
 	ln -nsf $< $@
 
