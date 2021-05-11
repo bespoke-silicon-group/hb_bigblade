@@ -40,6 +40,10 @@ hardfloat_dir        :=$(THIS_DIR)/HardFloat
 hardfloat_url        :=$(GITHUB)bsg-external/HardFloat
 hardfloat_commit     :=master
 
+cgra_dir             :=$(THIS_DIR)/cgra
+cgra_url             :=$(GITHUB)cornell-brg/hb_bigblade_cgra
+cgra_commit          :=master
+
 prep_dir := .pdk_prep
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))

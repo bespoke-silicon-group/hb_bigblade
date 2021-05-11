@@ -97,23 +97,24 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set_attribute $cell -name physical_status -value placed
 
   ##### Reduction placement
+  set prefix pod/hb_cgra_xcel/cgra_xcel/dpath/cgra_dpath
   foreach {idx_x} {0 1 2 3 4 5 6 7} {
     set id [expr 1+$pe_num_y*$idx_x]
-    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b0123_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b0123_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
     set_attribute $cell -name physical_status -value placed
 
     set id [expr 3+$pe_num_y*$idx_x]
-    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b01234567_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b01234567_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
     set_attribute $cell -name physical_status -value placed
 
     set id [expr 5+$pe_num_y*$idx_x]
-    set cell [get_cells -hier "cgra_dpath_row_reduce_${idx_x}__rb8_b4567_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b4567_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
@@ -121,21 +122,21 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   }
 
   set id 12
-  set cell [get_cells -hier "cgra_dpath_col_rb8_b0123_*"]
+  set cell [get_cells "${prefix}_col_rb8/b0123_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
   set_attribute $cell -name physical_status -value placed
    
   set id 44
-  set cell [get_cells -hier "cgra_dpath_col_rb8_b4567_*"]
+  set cell [get_cells "${prefix}_col_rb8/b4567_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
   set_attribute $cell -name physical_status -value placed
 
   set id 28
-  set cell [get_cells -hier "cgra_dpath_col_rb8_b01234567_*"]
+  set cell [get_cells "${prefix}_col_rb8/b01234567_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
