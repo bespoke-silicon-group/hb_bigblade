@@ -20,7 +20,21 @@ module bsg_gateway_chip_dpi_manycore
 
     ,output bit debug_o
   );
-  
+
+  localparam reset_depth_lp = 3;
+  logic reset_done_r;
+  bsg_dff_chain
+     #(
+       .width_p(1)
+       ,.num_stages_p(reset_depth_lp)
+       )
+   reset_dff
+     (
+      .clk_i(clk_i)
+      ,.data_i(reset_done_i)
+      ,.data_o(reset_done_r)
+      );
+
   localparam ep_fifo_els_lp = 4;
   bsg_nonsynth_dpi_manycore #(
      .x_cord_width_p(hb_x_cord_width_gp)
@@ -39,7 +53,7 @@ module bsg_gateway_chip_dpi_manycore
     ,.reset_i(reset_i)
     ,.link_sif_i(link_sif_i)
     ,.link_sif_o(link_sif_o)
-    ,.reset_done_i(reset_done_i)
+    ,.reset_done_i(reset_done_r)
     ,.global_x_i(global_x_i)
     ,.global_y_i(global_y_i)
     );
