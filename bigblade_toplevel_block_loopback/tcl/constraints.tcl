@@ -7,22 +7,39 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constan
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_async.constraints.tcl
 
 
-proc bsg_link_ddr_out_constraints {clk_name clk_port ports setup_time hold_time} {
+set BSG_LINK_DDR_USE_GENERATED_CLOCK 1
+
+proc bsg_link_ddr_in_constraints {clk_name ports max_delay min_delay} {
+  set_input_delay -max $max_delay -clock $clk_name -source_latency_included -network_latency_included $ports
+  set_input_delay -max $max_delay -clock $clk_name -source_latency_included -network_latency_included $ports -add_delay -clock_fall
+  set_input_delay -min $min_delay -clock $clk_name -source_latency_included -network_latency_included $ports
+  set_input_delay -min $min_delay -clock $clk_name -source_latency_included -network_latency_included $ports -add_delay -clock_fall
+}
+
+proc bsg_link_ddr_out_constraints {clk_port ports setup_time hold_time} {
   foreach_in_collection obj $ports {
-    set_data_check -clock [get_clocks $clk_name] -from $clk_port -to $obj -setup $setup_time
-    set_data_check -clock [get_clocks $clk_name] -from $clk_port -to $obj -hold  $hold_time
+    set_data_check -from $clk_port -to $obj -setup $setup_time
+    set_data_check -from $clk_port -to $obj -hold  $hold_time
     set_multicycle_path -end   -setup 1 -to $obj
     set_multicycle_path -start -hold  0 -to $obj
   }
 }
 
+proc bsg_link_ddr_out_generated_clock_constraints {clk_name ports max_delay min_delay} {
+  set_output_delay -max $max_delay -clock $clk_name $ports
+  set_output_delay -max $max_delay -clock $clk_name $ports -add_delay -clock_fall
+  set_output_delay -min $min_delay -clock $clk_name $ports
+  set_output_delay -min $min_delay -clock $clk_name $ports -add_delay -clock_fall
+}
+
 proc bsg_link_ddr_constraints { \
-  master_out_clk_name           \
+  master_clk_name               \
+  out_clk_name                  \
   out_clk_period                \
   out_clk_margin                \
   out_clk_port                  \
   out_dv_port                   \
-  master_in_clk_name            \
+  in_clk_name                   \
   in_clk_period                 \
   in_clk_margin                 \
   in_clk_port                   \
@@ -37,15 +54,31 @@ proc bsg_link_ddr_constraints { \
   set_clock_uncertainty $uncertainty [get_clocks $tkn_clk_name]
 
   # input
-  set setup_time_input       [expr ($in_clk_period/2.0)-$in_clk_margin]
-  set hold_time_input        [expr -$in_clk_margin]
-  bsg_link_ddr_out_constraints $master_in_clk_name $in_clk_port $in_dv_port $setup_time_input $hold_time_input
+  set max_input_delay        [expr ($in_clk_period/2.0)-$in_clk_margin]
+  set min_input_delay        [expr $in_clk_margin]
+  create_clock -period $in_clk_period -name $in_clk_name $in_clk_port
+  set_clock_uncertainty $uncertainty [get_clocks $in_clk_name]
+  bsg_link_ddr_in_constraints $in_clk_name $in_dv_port $max_input_delay $min_input_delay
+  set_driving_cell -no_design_rule -lib_cell "IN12LP_GPIO18_13M9S30P_IO_H" -pin Y $in_clk_port
+  set_driving_cell -no_design_rule -lib_cell "IN12LP_GPIO18_13M9S30P_IO_H" -pin Y $in_dv_port
 
   # output
-  set setup_time_output      [expr ($out_clk_period/4.0)-$out_clk_margin]
-  set hold_time_output       [expr ($out_clk_period/4.0)-$out_clk_margin]
-  bsg_link_ddr_out_constraints $master_out_clk_name $out_clk_port $out_dv_port $setup_time_output $hold_time_output
+  global BSG_LINK_DDR_USE_GENERATED_CLOCK
+  puts "BSG_LINK_DDR_USE_GENERATED_CLOCK = $BSG_LINK_DDR_USE_GENERATED_CLOCK"
+  if {$BSG_LINK_DDR_USE_GENERATED_CLOCK == 0} {
+    set setup_time_output      [expr ($out_clk_period/4.0)-$out_clk_margin]
+    set hold_time_output       [expr ($out_clk_period/4.0)-$out_clk_margin]
+    bsg_link_ddr_out_constraints $out_clk_port $out_dv_port $setup_time_output $hold_time_output
+  } else {
+    set max_output_delay       [expr ($out_clk_period/4.0)-$out_clk_margin]
+    set min_output_delay       [expr $out_clk_margin-($out_clk_period/4.0)]
+    create_generated_clock -edges {2 4 6} -master_clock $master_clk_name -source [get_attribute [get_clocks $master_clk_name] sources] -name $out_clk_name $out_clk_port
+    bsg_link_ddr_out_generated_clock_constraints $out_clk_name $out_dv_port $max_output_delay $min_output_delay
+  }
+  set_load [load_of [get_lib_pin "*/IN12LP_GPIO18_13M9S30P_IO_H/DATA"]] $out_clk_port
+  set_load [load_of [get_lib_pin "*/IN12LP_GPIO18_13M9S30P_IO_H/DATA"]] $out_dv_port
 }
+
 
 
 ########################################
@@ -93,8 +126,8 @@ set io_clk_uncertainty_ps     20
 
 set link_clk_period_ps        [expr $io_clk_period_ps*2.0]
 set link_clk_uncertainty_ps   20
-set max_io_output_margin_ps   300
-set max_io_input_margin_ps    300
+set max_io_output_margin_ps   380
+set max_io_input_margin_ps    380
 
 for {set i 0} {$i < 8} {incr i} {
   for {set j 0} {$j < 2} {incr j} {
@@ -102,47 +135,34 @@ for {set i 0} {$i < 8} {incr i} {
     create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "mem_link*${i}*link/io_link_${j}_io_clk"]
     set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
 
-    set master_in_clk_name   "mem_link_in_${i}_${j}_io_clk"
-    create_clock -period $io_clk_period_ps -name $master_in_clk_name
-    set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $master_in_clk_name]
-
     set side [expr {$i < 4} ? {"DL"} : {"DR"}]
     set num  [expr ($i % 4) * 2 + $j]
     set loc  "pad_${side}${num}"
 
     set in_dv  [list]
-    set in_ports [list]
     set out_dv [list]
 
                                       append_to_collection out_dv [get_ports "${loc}_v_o_int"]
     for {set k 0} {$k < 16} {incr k} {append_to_collection out_dv [get_ports "${loc}_${k}_o_int"]}
-    append_to_collection in_dv  [get_flat_pins -filter "full_name=~mem_link*${i}*link/io_link_v_i[$j]"]
-    for {set k [expr $j*16]} {$k < [expr ($j+1)*16]} {incr k} {
-      append_to_collection in_dv  [get_flat_pins -filter "full_name=~mem_link*${i}*link/io_link_data_i[$k]"]
-    }
 
-                                      append_to_collection in_ports [get_ports "${loc}_clk_i_int"]
-                                      append_to_collection in_ports [get_ports "${loc}_v_i_int"]
-    for {set k 0} {$k < 16} {incr k} {append_to_collection in_ports [get_ports "${loc}_${k}_i_int"]}
-    set_input_delay 0 -clock [get_clocks $master_in_clk_name] $in_ports
+                                      append_to_collection in_dv [get_ports "${loc}_v_i_int"]
+    for {set k 0} {$k < 16} {incr k} {append_to_collection in_dv [get_ports "${loc}_${k}_i_int"]}
 
-    bsg_link_ddr_constraints              \
-      $io_clk_name                        \
-      $link_clk_period_ps                 \
-      $max_io_output_margin_ps            \
-      [get_ports "${loc}_clk_o_int"]      \
-      $out_dv                             \
-      $master_in_clk_name                 \
-      $link_clk_period_ps                 \
-      $max_io_input_margin_ps             \
-      [get_flat_pins -filter "full_name=~mem_link*${i}*link/io_link_clk_i[$j]"]     \
-      $in_dv                              \
-      "mem_link_${i}_${j}_tkn_clk"        \
-      [get_ports "${loc}_tkn_i_int"]      \
+    bsg_link_ddr_constraints            \
+      $io_clk_name                      \
+      "mem_link_${i}_${j}_out_clk"      \
+      $link_clk_period_ps               \
+      $max_io_output_margin_ps          \
+      [get_ports "${loc}_clk_o_int"]    \
+      $out_dv                           \
+      "mem_link_${i}_${j}_in_clk"       \
+      $link_clk_period_ps               \
+      $max_io_input_margin_ps           \
+      [get_ports "${loc}_clk_i_int"]    \
+      $in_dv                            \
+      "mem_link_${i}_${j}_tkn_clk"      \
+      [get_ports "${loc}_tkn_i_int"]    \
       $link_clk_uncertainty_ps
-
-    set_max_delay -from [get_ports "${loc}_clk_i_int"] 2000
-    set_max_delay -to   [get_ports "${loc}_clk_o_int"] 2000
 
   }
 }
@@ -153,53 +173,40 @@ for {set i 0} {$i < 8} {incr i} {
     create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "io_link/io_link_${j}_io_clk"]
     set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
 
-    set master_in_clk_name   "io_link_in_${j}_io_clk"
-    create_clock -period $io_clk_period_ps -name $master_in_clk_name
-    set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $master_in_clk_name]
-
     set side "IT"
     set num  $j
     set loc  "pad_${side}${num}"
 
     set in_dv  [list]
-    set in_ports [list]
     set out_dv [list]
 
                                       append_to_collection out_dv [get_ports "${loc}_v_o_int"]
     for {set k 0} {$k < 16} {incr k} {append_to_collection out_dv [get_ports "${loc}_${k}_o_int"]}
-    append_to_collection in_dv  [get_flat_pins -filter "full_name=~io_link/io_link_v_i[$j]"]
-    for {set k [expr $j*16]} {$k < [expr ($j+1)*16]} {incr k} {
-      append_to_collection in_dv  [get_flat_pins -filter "full_name=~io_link/io_link_data_i[$k]"]
-    }
 
-                                      append_to_collection in_ports [get_ports "${loc}_clk_i_int"]
-                                      append_to_collection in_ports [get_ports "${loc}_v_i_int"]
-    for {set k 0} {$k < 16} {incr k} {append_to_collection in_ports [get_ports "${loc}_${k}_i_int"]}
-    set_input_delay 0 -clock [get_clocks $master_in_clk_name] $in_ports
+                                      append_to_collection in_dv [get_ports "${loc}_v_i_int"]
+    for {set k 0} {$k < 16} {incr k} {append_to_collection in_dv [get_ports "${loc}_${k}_i_int"]}
 
-    bsg_link_ddr_constraints              \
-      $io_clk_name                        \
-      $link_clk_period_ps                 \
-      $max_io_output_margin_ps            \
-      [get_ports "${loc}_clk_o_int"]      \
-      $out_dv                             \
-      $master_in_clk_name                 \
-      $link_clk_period_ps                 \
-      $max_io_input_margin_ps             \
-      [get_flat_pins -filter "full_name=~io_link/io_link_clk_i[$j]"]      \
-      $in_dv                              \
-      "io_link_${j}_tkn_clk"              \
-      [get_ports "${loc}_tkn_i_int"]      \
+    bsg_link_ddr_constraints            \
+      $io_clk_name                      \
+      "io_link_${j}_out_clk"            \
+      $link_clk_period_ps               \
+      $max_io_output_margin_ps          \
+      [get_ports "${loc}_clk_o_int"]    \
+      $out_dv                           \
+      "io_link_${j}_in_clk"             \
+      $link_clk_period_ps               \
+      $max_io_input_margin_ps           \
+      [get_ports "${loc}_clk_i_int"]    \
+      $in_dv                            \
+      "io_link_${j}_tkn_clk"            \
+      [get_ports "${loc}_tkn_i_int"]    \
       $link_clk_uncertainty_ps
-
-    set_max_delay -from [get_ports "${loc}_clk_i_int"] 2000
-    set_max_delay -to   [get_ports "${loc}_clk_o_int"] 2000
 
   }
 
 
 # CDC
-set cdc_clocks [all_clocks]
+set cdc_clocks [remove_from_collection [remove_from_collection [all_clocks] [get_clocks mem_link_*_*_out_clk]] [get_clocks io_link_*_out_clk]]
 bsg_async_icl $cdc_clocks
 
 
