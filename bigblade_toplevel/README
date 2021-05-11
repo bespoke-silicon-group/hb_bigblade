@@ -5,6 +5,7 @@ $ cd basejump_stl && git submodule update --init --recursive
 $ cd bsg_manycore && make checkout_submodules
 $ cd testing/rtl && make (5~10 minutes)
   (enable waveform: WAVE=1, default 0)
+  (use CUDA-Lite instead of SPMD loader: CUDA=1, default 0)
   (faster iteration when debugging: OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1, default 4x4)
   (use on-chip clock generator: USE_CLK_GEN=1, default 0)
 
