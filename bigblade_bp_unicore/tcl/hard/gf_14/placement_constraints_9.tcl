@@ -72,7 +72,7 @@ set icache_data_ma_west [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 8*$keepout_margin_x] \
   -orientation FN \
   $icache_data_mems_west]
 
@@ -91,7 +91,7 @@ set icache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 8*$keepout_margin_x] \
   -orientation N \
   $icache_data_mems_east]
 
@@ -135,7 +135,7 @@ set dcache_data_ma_west [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation [list FN FN FN FN] \
   $dcache_data_mems_west]
 
@@ -145,7 +145,7 @@ set_macro_relative_location \
   -target_object $dcache_data_ma_west \
   -target_corner bl \
   -target_orientation R0 \
-  -anchor_corner bl \
+  -anchor_corner br \
   -anchor_object $dcache_tag_ma \
   -offset [list 0 0]
 
@@ -154,7 +154,7 @@ set dcache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation [list N N N N] \
   $dcache_data_mems_east]
 

@@ -12,13 +12,13 @@
   //////////////////////////////////////////////////
   // This testbench is structured like this, with the overlying network being
   //   a giant crossbar and infinite memories instead of vcaches
-  //       PX=0                                  PX=1
-  // PY=0 [ IO ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
+  //       PX=0                                       PX=1
+  // PY=0 [ 00 ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
   //
+  //      [ IO ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  // PY=1 [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  // PY=1 [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
@@ -26,16 +26,21 @@
   //
   // PY=2 [ 00 ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
   //
-  // PY=3 [ IO ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
   //
-  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  //
+  // TODO: Implement for testing
+  //
+  //
+  // PY=3 [ 00 ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
+  //
+  //      [ IO ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   // PY=4 [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
-  //      [ 00 ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
+  //      [ BP ]  [ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ][ 0 ]
   //
   // PY=5 [ 00 ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
 
@@ -172,19 +177,19 @@ module bsg_gateway_chip
   //
   `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
-  bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_li, mc_hor_links_lo;
-  bsg_manycore_link_sif_s [2:0][E:E] mc_hor_links_raw_lo;
+  bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_li, mc_proc_links_lo;
+  bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_raw_lo;
 
-  wire [mc_y_cord_width_gp-1:0] global_y_cord_li= 1'b1;
+  wire [mc_y_cord_width_gp-1:0] global_y_cord_li = {pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(1'b0)};
 
-  logic [2:0] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
-  logic [2:0][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
-  logic [2:0] io_rev_link_clk_lo, io_rev_link_v_lo, io_rev_link_token_li;
-  logic [2:0][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_lo;
-  logic [2:0] io_fwd_link_clk_li, io_fwd_link_v_li, io_fwd_link_token_lo;
-  logic [2:0][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_li;
-  logic [2:0] io_rev_link_clk_li, io_rev_link_v_li, io_rev_link_token_lo;
-  logic [2:0][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_li;
+  logic [3:1] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
+  logic [3:1][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
+  logic [3:1] io_rev_link_clk_lo, io_rev_link_v_lo, io_rev_link_token_li;
+  logic [3:1][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_lo;
+  logic [3:1] io_fwd_link_clk_li, io_fwd_link_v_li, io_fwd_link_token_lo;
+  logic [3:1][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_li;
+  logic [3:1] io_rev_link_clk_li, io_rev_link_v_li, io_rev_link_token_lo;
+  logic [3:1][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_li;
   bsg_blackparrot_unicore_tile_sdr
    DUT
     (.clk_i(blackparrot_clk)
@@ -218,7 +223,7 @@ module bsg_gateway_chip
      ,.io_rev_link_token_o(io_rev_link_token_lo)
      );
 
-  for (genvar i = 0; i < 3; i++)
+  for (genvar i = 1; i < 4; i++)
     begin : sdr
       bsg_link_sdr
        #(.width_p($bits(bsg_manycore_fwd_link_sif_s)-2)
@@ -232,13 +237,13 @@ module bsg_gateway_chip
          ,.async_downlink_reset_i(async_downlink_reset)
          ,.async_token_reset_i(async_token_reset)
 
-         ,.core_data_i(mc_hor_links_li[i][E].fwd.data)
-         ,.core_v_i(mc_hor_links_li[i][E].fwd.v)
-         ,.core_ready_o(mc_hor_links_raw_lo[i][E].fwd.ready_and_rev)
+         ,.core_data_i(mc_proc_links_li[i][P].fwd.data)
+         ,.core_v_i(mc_proc_links_li[i][P].fwd.v)
+         ,.core_ready_o(mc_proc_links_raw_lo[i][P].fwd.ready_and_rev)
 
-         ,.core_data_o(mc_hor_links_raw_lo[i][E].fwd.data)
-         ,.core_v_o(mc_hor_links_raw_lo[i][E].fwd.v)
-         ,.core_yumi_i(mc_hor_links_raw_lo[i][E].fwd.v & mc_hor_links_li[i][E].fwd.ready_and_rev)
+         ,.core_data_o(mc_proc_links_raw_lo[i][P].fwd.data)
+         ,.core_v_o(mc_proc_links_raw_lo[i][P].fwd.v)
+         ,.core_yumi_i(mc_proc_links_raw_lo[i][P].fwd.v & mc_proc_links_li[i][P].fwd.ready_and_rev)
 
          ,.link_clk_o(io_fwd_link_clk_li[i])
          ,.link_data_o(io_fwd_link_data_li[i])
@@ -263,13 +268,13 @@ module bsg_gateway_chip
          ,.async_downlink_reset_i(async_downlink_reset)
          ,.async_token_reset_i(async_token_reset)
 
-         ,.core_data_i(mc_hor_links_li[i][E].rev.data)
-         ,.core_v_i(mc_hor_links_li[i][E].rev.v)
-         ,.core_ready_o(mc_hor_links_raw_lo[i][E].rev.ready_and_rev)
+         ,.core_data_i(mc_proc_links_li[i][P].rev.data)
+         ,.core_v_i(mc_proc_links_li[i][P].rev.v)
+         ,.core_ready_o(mc_proc_links_raw_lo[i][P].rev.ready_and_rev)
 
-         ,.core_data_o(mc_hor_links_raw_lo[i][E].rev.data)
-         ,.core_v_o(mc_hor_links_raw_lo[i][E].rev.v)
-         ,.core_yumi_i(mc_hor_links_raw_lo[i][E].rev.v & mc_hor_links_li[i][E].rev.ready_and_rev)
+         ,.core_data_o(mc_proc_links_raw_lo[i][P].rev.data)
+         ,.core_v_o(mc_proc_links_raw_lo[i][P].rev.v)
+         ,.core_yumi_i(mc_proc_links_raw_lo[i][P].rev.v & mc_proc_links_li[i][P].rev.ready_and_rev)
 
          ,.link_clk_o(io_rev_link_clk_li[i])
          ,.link_data_o(io_rev_link_data_li[i])
@@ -319,7 +324,7 @@ module bsg_gateway_chip
     logic [cb_num_in_lp-1:0] retval;
     for (int i = 0; i < cb_num_in_y_lp; i++) begin
       for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = 1'b1;
+        retval[(i*cb_num_in_x_lp)+j] = ((i > '0) && (i < cb_num_in_y_lp-1'b1));
       end
     end
     return retval;
@@ -367,40 +372,41 @@ module bsg_gateway_chip
      ,.data_width_p(mc_data_width_gp)
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
-     ,.io_x_cord_p(0)
-     ,.io_y_cord_p(0)
+     ,.io_x_cord_p({pod_x_cord_width_gp'(1'b0), mc_x_cord_width_gp'(1'b0)})
+     ,.io_y_cord_p({pod_y_cord_width_gp'(1'b1), mc_y_cord_width_gp'(1'b1)})
      )
    io
     (.clk_i(manycore_clk)
      ,.reset_i(manycore_reset | ~reset_done)
 
-     ,.io_link_sif_i(link_out[0][0])
-     ,.io_link_sif_o(link_in[0][0])
+     ,.io_link_sif_i(link_out[1][0])
+     ,.io_link_sif_o(link_in[1][0])
      ,.print_stat_v_o()
      ,.print_stat_tag_o()
      ,.loader_done_o()
      );
 
   always_comb
-    for (integer j = 0; j < 3; j++)
+    for (integer j = 1; j <= 3; j++)
       for (integer i = 0; i < $bits(bsg_manycore_link_sif_s); i++)
         begin
-          if (mc_hor_links_raw_lo[i] == 1'bX) mc_hor_links_lo[i] = 1'b0;
-          else mc_hor_links_lo[i] = mc_hor_links_raw_lo[i];
+          if (mc_proc_links_raw_lo[j][i] == 1'bX) mc_proc_links_lo[j][i] = 1'b0;
+          else mc_proc_links_lo[j][i] = mc_proc_links_raw_lo[j][i];
         end
 
   // BP <--> Fake network connections
   // mc_hor_link[0] = I/O
   // mc_hor_link[1] = DRAM 1
   // mc_hor_link[2] = DRAM 2
-  for (genvar i = 1; i <= 3; i++)
+  assign link_in[0][0] = '0;
+  for (genvar i = 2; i <= 4; i++)
     begin : bp_connect
-      assign link_in[i][0] = mc_hor_links_lo[i-1];
-      assign mc_hor_links_li[i-1] = link_out[i][0];
+      assign link_in[i][0] = mc_proc_links_lo[i-1];
+      assign mc_proc_links_li[i-1] = link_out[i][0];
     end
 
   // Tie off all links below BP
-  for (genvar i = 4; i <= mc_num_tiles_y_gp+1; i++)
+  for (genvar i = 5; i <= mc_num_tiles_y_gp+1; i++)
     begin : bp_tieoff
       assign link_in[i][0] = '0;
     end
@@ -421,8 +427,10 @@ module bsg_gateway_chip
         begin : mem_col
           localparam x_idx_lp = j;
           localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp+1 : 0;
-          wire [mc_x_cord_width_gp-1:0] my_x_li = x_idx_lp;
-          wire [mc_y_cord_width_gp-1:0] my_y_li = y_idx_lp;
+          localparam x_pod_lp = 1;
+          localparam y_pod_lp = (i == S) ? 2 : 0;
+          wire [mc_x_cord_width_gp-1:0] my_x_li = {pod_x_cord_width_gp'(x_pod_lp), mc_x_subcord_width_gp'(x_idx_lp)};
+          wire [mc_y_cord_width_gp-1:0] my_y_li = {pod_y_cord_width_gp'(y_pod_lp), mc_y_subcord_width_gp'(1'b0)};
 
           bsg_nonsynth_mem_infinite
            #(.data_width_p(mc_data_width_gp)

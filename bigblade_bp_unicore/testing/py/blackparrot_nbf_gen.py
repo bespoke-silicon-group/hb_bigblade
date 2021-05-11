@@ -92,16 +92,13 @@ class NBF:
                 for i in range(0, len(word), 2):
                     data = word[i:i+2] + data
                 data = int(data, 16)
-                x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1) + 1
+                x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1)
                 y = self.select_bits(addr, lg_block_size + lg_x, lg_block_size + lg_x)
                 index = self.select_bits(addr, lg_block_size+lg_x+1, lg_block_size+lg_x+1+index_width-1)
                 epa = self.select_bits(addr, 0, lg_block_size-1) | (index << lg_block_size)
                 curr_addr += 4
 
-                if y == 0:
-                    self.print_nbf(x, 0, epa, data)
-                else:
-                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
+                self.print_nbf(1<<4 | x, y<<3, epa, data)
 
     # Initialize V$ or infinite memories (Useful for no DRAM mode)
     # Emulates the hashing function in bsg_manycore/v/vanilla_bean/hash_function.v
@@ -139,10 +136,7 @@ class NBF:
                 epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
 
-                if y == 0:
-                    self.print_nbf(x, 0, epa, data)
-                else:
-                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
+                self.print_nbf(1<<4 | x, y<<3, epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
@@ -156,10 +150,10 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        self.print_nbf(0, 1, cfg_base_addr + cfg_domain_mask, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_sac_mask, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_icache_mode, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_domain_mask, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_sac_mask, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
 
     # print finish
     def finish(self):
@@ -172,9 +166,9 @@ class NBF:
     # Dump the nbf
     def dump(self):
         # Freeze BP
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 0)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_reset, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_reset, 0)
         # Initialize BP configuration registers
         self.init_config()
         self.fence()
@@ -185,7 +179,7 @@ class NBF:
             self.init_dram()
         self.fence()
         # Unfreeze BP
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 0)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 0)
         self.fence()
         self.finish()
 
