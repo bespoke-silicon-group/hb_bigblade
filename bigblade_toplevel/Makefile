@@ -1,6 +1,7 @@
 THIS_DIR :=$(realpath $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 GIT_CLONE_STYLE :=ssh
+CUDA            ?= 0
 #GIT_CLONE_STYLE :=https
 
 ifeq ($(GIT_CLONE_STYLE),ssh)
@@ -52,6 +53,12 @@ all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 init_repos  = bsg_manycore.init
 init_repos += basejump_stl.init
 init_repos += aws-fpga.init
+
+ifneq ($(CUDA),1)
+  # Do not fetch aws-fpga unless we are compiling for CUDA
+  all_repos  := $(filter-out aws-fpga.repo,$(all_repos))
+  init_repos := $(filter-out aws-fpga.init,$(init_repos))
+endif
 
 $(prep_dir): $(bsg_14.repo)
 	ln -nsf $(bsg_14_dir)/.pdk_prep $@
