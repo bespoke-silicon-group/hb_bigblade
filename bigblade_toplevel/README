@@ -1,6 +1,7 @@
 
 # To build simv from RTL:
 $ make
+  (if you want to run CUDA-Lite, edit Makefile: set CUDA=1)
 $ cd basejump_stl && git submodule update --init --recursive
 $ cd bsg_manycore && make checkout_submodules
 $ cd testing/rtl && make (5~10 minutes)
@@ -15,7 +16,7 @@ $ cd bsg_manycore && make tools (takes long time)
 >> run single test: cd software/spmd/hello; make bsg_pods_X=4 bsg_pods_Y=4
 >> run regression: cd software/spmd; make -j16 recurse-all bsg_pods_X=4 bsg_pods_Y=4
 
-# To run cuda-lite tests: (WAVE=1 flag must match generated simv)
+# To run cuda-lite tests: (WAVE=1 and CUDA=1 flag must match generated simv)
 # cd bsg_manycore && make tools (takes long time)
 >> update bsg_replicant/machine.mk, set BSG_MACHINE_PATH=$(BSG_F1_DIR)/../testing/rtl/out
 >> update bsg_replicant/platform.mk, set BSG_PLATFORM=tapeout-vcs
