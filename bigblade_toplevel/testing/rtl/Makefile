@@ -136,9 +136,6 @@ BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libbsgmc_cuda_legacy_pod_r
 BSG_BLADERUNNER_GENERATED           := $(BSG_BLADERUNNER_GENERATED_SOURCES)
 BSG_BLADERUNNER_GENERATED           += $(BSG_BLADERUNNER_GENERATED_LIBRARIES)
 
-#VCS_OPTIONS += $(addprefix -v ,$(BSG_BLADERUNNER_GENERATED_SOURCES))
-VCS_OPTIONS += $(BSG_BLADERUNNER_GENERATED_SOURCES)
-
 ########################################
 ## Toplevel Parameters
 ########################################
