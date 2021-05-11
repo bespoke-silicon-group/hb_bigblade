@@ -92,18 +92,17 @@ set icache_data_ma_east [create_macro_array \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation FN \
+  -orientation N \
   $icache_data_mems_east]
 
 create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_east
 
 set_macro_relative_location \
   -target_object $icache_data_ma_east \
-  -target_corner tl \
+  -target_corner tr \
   -target_orientation R0 \
   -anchor_corner tr \
-  -anchor_object $icache_data_ma_west \
-  -offset [list 0 0]
+  -offset [list -$io_link_gap_x -$keepout_margin_y]
 
 #####################################
 ### D CACHE TAG
@@ -137,7 +136,7 @@ set dcache_data_ma_west [create_macro_array \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation FN \
+  -orientation [list FN FN FN FN] \
   $dcache_data_mems_west]
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_west
@@ -146,7 +145,7 @@ set_macro_relative_location \
   -target_object $dcache_data_ma_west \
   -target_corner bl \
   -target_orientation R0 \
-  -anchor_corner br \
+  -anchor_corner bl \
   -anchor_object $dcache_tag_ma \
   -offset [list 0 0]
 
@@ -156,18 +155,17 @@ set dcache_data_ma_east [create_macro_array \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation FN \
+  -orientation [list N N N N] \
   $dcache_data_mems_east]
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_east
 
 set_macro_relative_location \
   -target_object $dcache_data_ma_east \
-  -target_corner bl \
+  -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
-  -anchor_object $dcache_data_ma_west \
-  -offset [list 0 0]
+  -offset [list -$io_link_gap_x 0]
 
 #####################################
 ### BTB Memory
@@ -212,15 +210,15 @@ set int_regfile_ma [create_macro_array \
   -align left \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation FN \
+  -orientation N \
   $int_regfile_mems]
 
 set_macro_relative_location \
   -target_object $int_regfile_ma \
-  -target_corner bl \
+  -target_corner br \
   -target_orientation R0 \
-  -anchor_corner br \
-  -anchor_object $fp_regfile_ma \
+  -anchor_corner tr \
+  -anchor_object $dcache_data_ma_east \
   -offset [list 0 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
