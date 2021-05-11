@@ -22,7 +22,7 @@ set c_pitch 0.160
 set                  misc_pins [get_ports -filter "name=~clk_i"]
 append_to_collection misc_pins [get_ports -filter "name=~reset_i"]
 append_to_collection misc_pins [get_ports -filter "name=~global_y_cord_i*"]
-append_to_collection misc_pins [get_ports -filter "name=~bsg_tag*"]
+append_to_collection misc_pins [get_ports -filter "name=~tag_*"]
 
 set misc_pins_len [expr [sizeof_collection $misc_pins]]
 set start_x [expr ($core_width / 2)  - (2*$c_pitch*$misc_pins_len/2)]
