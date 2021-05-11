@@ -43,6 +43,48 @@ module bsg_gateway_chip_dpi_manycore
     ,.global_x_i(global_x_i)
     ,.global_y_i(global_y_i)
     );
+
+  `define COSIM_MAIN
+  `ifdef COSIM_MAIN
+  // In VCS, the C/C++ testbench is controlled by the
+  // simulator. Therefore, we need to "call into" the C/C++ program
+  // using the cosim_main function, during the initial block.
+  //
+  // DPI Calls in cosim_main will cause simulator time to progress.
+  //
+  // This mirrors the DPI functions in aws simulation
+  import "DPI-C" context task cosim_main(output int unsigned exit_code, input string args, input string path);
+   initial begin
+      int exit_code;
+      string args;
+      string path;
+      longint t;
+      $value$plusargs("c_path=%s", path);
+      $value$plusargs("c_args=%s", args);
+      bsg_bigblade_pcb.GW.bgc.core_complex.mc_dpi.cosim_main(exit_code, args, path);
+      if(exit_code < 0) begin
+        $display("BSG COSIM FAIL: Test failed with exit code: %d", exit_code);
+        $fatal;
+      end else begin
+        $display("BSG COSIM PASS: Test passed!");
+        $finish;
+      end
+   end
+  `endif //  `ifndef COSIM_MAIN
   
+   // Global Counter for Profilers, Tracing, Debugging
+   localparam global_counter_width_lp = 64;
+   logic [global_counter_width_lp-1:0] global_ctr;
+
+  
+   bsg_nonsynth_dpi_cycle_counter
+     #(.width_p(global_counter_width_lp))
+   ctr
+     (
+      .clk_i(clk_i)
+      ,.reset_i(reset_i)
+      ,.ctr_r_o(global_ctr)
+      );
+
   
 endmodule
