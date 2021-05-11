@@ -1,0 +1,9 @@
+Summary for repository bsg_cadenv:
+    EXPECTED COMMIT/BRANCH: master
+    CURRENT COMMIT: ebbbb15
+    PASS: NO Uncommitted Files
+    PASS: commit ebbbb15 is in remote
+    PASS: Expected branch found match in remote
+    PASS: No Untracked Files
+Summary for bsg_cadenv finished
+

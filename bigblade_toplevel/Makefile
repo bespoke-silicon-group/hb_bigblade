@@ -65,6 +65,13 @@ basejump_stl.init:
 
 %.init: %.repo
 
+summaries=$(subst .repo,.summary,$(all_repos))
+.PHONY: $(summaries)
+$(summaries): %.summary: 
+	@./summarize.sh $* $($*_commit) $($*_url) | tee $@
+
+summaries: $(summaries)
+
 clean: are_you_sure
 	rm -rf $(subst .repo,,$(all_repos))
 	rm -rf .pdk_prep
