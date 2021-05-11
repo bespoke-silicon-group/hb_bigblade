@@ -54,7 +54,7 @@ module bsg_gateway_chip_core_complex
      .clk_i(mc_clk_i)
      // reset
      ,.reset_i(~tag_trace_done_i)
-     ,.reset_done_i(~tag_trace_done_i)
+     ,.reset_done_i(tag_trace_done_i)
      // manycore link
      ,.link_sif_i(mc_links_credit_lo)
      ,.link_sif_o(mc_links_credit_li)
