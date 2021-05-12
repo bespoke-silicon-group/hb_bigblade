@@ -13,7 +13,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 # before-mirror margins
 set keepout_margin_left   0.058
 set keepout_margin_bottom 0.134
-set keepout_margin_right  0.007
+set keepout_margin_right  0.058 ;#0.007
 set keepout_margin_top    0.134
 set keepout_margins [list $keepout_margin_left $keepout_margin_bottom $keepout_margin_right $keepout_margin_top]
 #
@@ -42,6 +42,11 @@ move_object       $ddr_link_1_cell -x 194.88 -y 40.32
 set_attribute     $ddr_link_1_cell orientation MY
 set_fixed_objects $ddr_link_1_cell
 
+# placement boundaries next to hardened blocks
+create_placement_blockage -boundary {{13.104 40.32} {13.44 115.2}}
+create_placement_blockage -boundary {{53.76 40.32} {54.096 115.2}}
+create_placement_blockage -boundary {{154.224 40.32} {154.56 115.2}}
+create_placement_blockage -boundary {{194.88 40.32} {195.216 115.2}}
 
 for {set i 0} {$i < 2} {incr i} {
   foreach {dir} {"in" "out"} {
@@ -78,14 +83,18 @@ set_macro_relative_location \
   -target_corner tr \
   -target_orientation R0 \
   -anchor_corner tl \
-  -offset [list [expr 103.16] [expr -$keepout_margin_top-$boundary_cell_height]]
+  -offset [list [expr 104.11] [expr -$keepout_margin_top-$boundary_cell_height]]
+
+create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem0
 
 set_macro_relative_location \
   -target_object $harden_fifo_mem1 \
   -target_corner tl \
   -target_orientation MY \
   -anchor_corner tl \
-  -offset [list [expr 105.16] [expr -$keepout_margin_top-$boundary_cell_height]]
+  -offset [list [expr 104.21] [expr -$keepout_margin_top-$boundary_cell_height]]
+
+create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem1
 
 
 #set clk_gen_noc_bound [create_bound -name "clk_gen_noc" -type soft -boundary {{26.32 64.88} {40.32 74.88}}]
