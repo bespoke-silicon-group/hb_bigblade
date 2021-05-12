@@ -46,7 +46,9 @@ set_app_var case_analysis_propagate_through_icg true
   # This constraint sets the load capacitance in picofarads of the
   # output pins of your design.
   
-  set_load -pin_load $ADK_TYPICAL_ON_CHIP_LOAD [all_outputs]
+  #set_load -pin_load $ADK_TYPICAL_ON_CHIP_LOAD [all_outputs]
+  set load_lib_pin $LIB_CELLS(invx8,load_pin)
+  set_load [load_of [get_lib_pin */${load_lib_pin}]] [all_outputs]
   
   # This constraint sets the input drive strength of the input pins of
   # your design. We specifiy a specific standard cell which models what
@@ -56,26 +58,28 @@ set_app_var case_analysis_propagate_through_icg true
   
   #set_driving_cell -no_design_rule \
   #  -lib_cell $ADK_DRIVING_CELL [all_inputs]
+
+  set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
+  set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+  set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports clk]
   
   # set_input_delay constraints for input ports
   #
   # - make this non-zero to avoid hold buffers on input-registered designs
   
-  set_input_delay -clock ${clock_name} [expr ${clock_period}*0.2] [all_inputs]
-  set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-  set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+  set_input_delay -clock ${clock_name} [expr ${clock_period}*0.3] [all_inputs]
   
   # set_output_delay constraints for output ports
   
-  set_output_delay -clock ${clock_name} [expr ${clock_period}*0.5] [all_outputs]
+  set_output_delay -clock ${clock_name} [expr ${clock_period}*0.6] [all_outputs]
   
   # Make all signals limit their fanout
   
-  set_max_fanout 20 $DESIGN_NAME
+  #set_max_fanout 20 $DESIGN_NAME
   
   # Make all signals meet good slew
   
-  set_max_transition [expr 0.25*${clock_period}] $DESIGN_NAME
+  #set_max_transition [expr 0.25*${clock_period}] $DESIGN_NAME
   
   #set_input_transition 1 [all_inputs]
   #set_max_transition 10 [all_outputs]
