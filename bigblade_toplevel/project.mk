@@ -38,6 +38,3 @@ BASEJUMP_STL_DIR       := $(BLADERUNNER_ROOT)/basejump_stl
 BASEJUMP_STL_COMMIT_ID := $(shell cd $(BASEJUMP_STL_DIR); git rev-parse --short HEAD)
 
 FPGA_IMAGE_VERSION     := 6.0.0
-F12XLARGE_TEMPLATE_ID  := lt-01bc73811e48f0b26
-AFI_ID                 :=
-AGFI_ID                :=
