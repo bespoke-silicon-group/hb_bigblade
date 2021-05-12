@@ -9,7 +9,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_async.constra
 
 set manycore_clk_name             "manycore_clk"
 set manycore_clk_port             "ext_clk_i"
-set manycore_clk_period_ps        1200.0
+set manycore_clk_period_ps        1100.0
 set manycore_clk_uncertainty_ps   20
 
 set_input_transition 75 [get_port $manycore_clk_port]
