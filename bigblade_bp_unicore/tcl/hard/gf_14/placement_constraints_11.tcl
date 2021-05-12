@@ -15,7 +15,7 @@ set tile_width  [core_width]
 set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
-set io_link_gap_x 0
+set io_link_gap_x [round_up_to_nearest 5 [unit_width]]
 
 set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
 set icache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 0 3]
@@ -258,7 +258,7 @@ create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 #gui_explore_logic_hierarchy -create -cycle [get_cells -hier *bp_fe_*]
 #gui_explore_logic_hierarchy -create -cycle [get_cells -hier *io_router*]
 
-#set isdr_bound [create_bound -name "isdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
-#set osdr_bound [create_bound -name "osdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
-#add_to_bound ${isdr_bound} [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
-#add_to_bound ${osdr_bound} [get_cells -hier -filter "full_name=~*/osdr_phy/*"]
+set isdr_bound [create_bound -name "isdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
+set osdr_bound [create_bound -name "osdr" -type soft -boundary {{277.5360 0} {282.576 567.36}}]
+add_to_bound ${isdr_bound} [get_cells -hier -filter "full_name=~*/isdr_phy/*"]
+add_to_bound ${osdr_bound} [get_cells -hier -filter "full_name=~*/osdr_phy/*"]
