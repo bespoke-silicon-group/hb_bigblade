@@ -1,7 +1,6 @@
 
 # To build simv from RTL:
 $ make
-  (if you want to run CUDA-Lite, edit Makefile: set CUDA=1)
 $ cd basejump_stl && git submodule update --init --recursive
 $ cd bsg_manycore && make checkout_submodules
 $ cd testing/rtl && make (5~10 minutes)
