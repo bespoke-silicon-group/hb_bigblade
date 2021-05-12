@@ -33,14 +33,20 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 
 
 set                ddr_link_0_cell [get_cells "ddr_link_0__link"]
-move_object       $ddr_link_0_cell -x 13.44 -y 152.64
-set_attribute     $ddr_link_0_cell orientation MX
+move_object       $ddr_link_0_cell -x 13.44 -y 80.64
+set_attribute     $ddr_link_0_cell orientation R0
 set_fixed_objects $ddr_link_0_cell
 
 set                ddr_link_1_cell [get_cells "ddr_link_1__link"]
 move_object       $ddr_link_1_cell -x 13.44 -y 0
 set_attribute     $ddr_link_1_cell orientation R0
 set_fixed_objects $ddr_link_1_cell
+
+# placement boundaries next to hardened blocks
+create_placement_blockage -boundary {{13.104 80.64} {13.44 155.52}}
+create_placement_blockage -boundary {{53.76 80.64} {54.096 155.52}}
+create_placement_blockage -boundary {{13.104 0} {13.44 74.88}}
+create_placement_blockage -boundary {{53.76 0} {54.096 74.88}}
 
 for {set i 0} {$i < 2} {incr i} {
   foreach {dir} {"in" "out"} {
@@ -58,14 +64,13 @@ for {set i 0} {$i < 2} {incr i} {
 }
 
 for {set i 0} {$i < 2} {incr i} {
-  set ori [expr {$i == 0} ? {"MX"} : {"R0"}]
   foreach {dir} {"in" "out"} {
     create_rp_group -name "RP${dir}_${i}" -rows 18
     add_to_rp_group "RP${dir}_${i}" -rp_group "RP${dir}_${i}_16" -row 0
     for {set j 0} {$j < 8} {incr j} {add_to_rp_group "RP${dir}_${i}" -rp_group "RP${dir}_${i}_${j}" -row [expr $j+1]}
     add_to_rp_group "RP${dir}_${i}" -rp_group "RP${dir}_${i}_17" -row 9
     for {set j 8} {$j < 16} {incr j} {add_to_rp_group "RP${dir}_${i}" -rp_group "RP${dir}_${i}_${j}" -row [expr $j+2]}
-    set_rp_group_options "RP${dir}_${i}" -group_orientation $ori
+    set_rp_group_options "RP${dir}_${i}" -group_orientation "R0"
   }
 }
 
