@@ -163,6 +163,11 @@ constraint_output_ports $clk_name $reset_out_port 40 40
 constraint_input_ports  $clk_name [get_ports global_*_i*] 40 40
 constraint_output_ports $clk_name [get_ports global_*_o*] 40 40
 
+
+
+# The timing paths to/from these registers don't need a single-cycle requirement,
+# because the signals are mostly static. We relax the constraints by allowing double cycle.
+# The hold cycle is set to 2, so that it becomes much easier to meet hold check.
 set multicycle_cells [list]
 append_to_collection multicycle_cells [get_cells dff_x/data_r_reg*]
 append_to_collection multicycle_cells [get_cells dff_y/data_r_reg*]

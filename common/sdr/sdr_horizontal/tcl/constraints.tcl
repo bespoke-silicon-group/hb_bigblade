@@ -180,6 +180,9 @@ constraint_input_ports  $core_clk_name [get_ports core_global_*_i*]   40 40
 constraint_output_ports $core_clk_name [get_ports core_global_*_o*]   40 40
 
 # global coordinates
+# The timing paths to/from these registers don't need a single-cycle requirement, 
+# so relax the constraints by allowing double cycle.
+# The hold cycle is set to 2, so that it becomes much easier to meet hold check.
 set multicycle_cells [list]
 append_to_collection multicycle_cells [get_cells dff_global_x/data_r_reg*]
 append_to_collection multicycle_cells [get_cells dff_global_y/data_r_reg*]
