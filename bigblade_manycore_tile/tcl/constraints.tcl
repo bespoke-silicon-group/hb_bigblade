@@ -200,6 +200,7 @@ set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_fc"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_standard"] true
 set_ungroup [get_designs -filter "hdl_template==network_tx"] true
 set_ungroup [get_designs -filter "hdl_template==network_rx"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"] true
@@ -211,6 +212,7 @@ set_ungroup [get_designs -filter "hdl_template==bsg_transpose"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"] true
 set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"] true
+set_ungroup [get_designs -filter "hdl_template==bsg_encode_one_hot"] true
 set_ungroup [get_designs fpu_float_fma] false
 set_ungroup [get_designs fpu_float_fma_round] false
 ungroup [get_cells proc/h.z/vcore/fpu_int0/*] -flatten
