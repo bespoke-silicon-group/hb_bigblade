@@ -38,7 +38,7 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
   set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
   set pe_origin_x [expr $tile_width - $array_width - $keepout_margin_x]
-  set pe_origin_y 11.68
+  set pe_origin_y 3.276
   
   set sp_lx [expr 5+$keepout_margin_x]
   set sp_ly [expr $pe_origin_y + 1*$array_height/8]

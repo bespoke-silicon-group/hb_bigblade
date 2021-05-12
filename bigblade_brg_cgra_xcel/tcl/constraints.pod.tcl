@@ -52,8 +52,8 @@ append_to_collection xcel_input_pins [get_ports global_y_cord_i[*]]
 append_to_collection xcel_input_pins [get_ports async_*_reset_i]
 set_input_delay -min $xcel_input_delay_min_ps -clock $xcel_clk_name $xcel_input_pins
 set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_pins
-set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_CKINVX2_SSC14R" [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_CKINVX8_SSC14R" [all_inputs]
+set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports clk_i]
 
@@ -137,11 +137,6 @@ for {set i 0} {$i < 4} {incr i} {
 bsg_chip_derate_cells
 bsg_chip_derate_mems
 #report_timing_derate
-
-########################################
-## Disabled or false paths
-bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
-bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
 ########################################
 ## Ungrouping
