@@ -173,19 +173,6 @@ $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.mac
 $(BSG_OUT_DIR):
 	@mkdir -p $@
 
-# It would be nice to include bladerunner.mk (and possible) but the
-# restriction is that this Makefile moves Makefile.machine.include
-# into out during compilation. This causes an error when the makefile
-# is first read, even though make will force a remake after reading
-# all the makefiles and it is fine. This can be solved by silently
-# including Makefile.machine.include in hardware.mk, but that's
-# dangerous because a missing Makefile.machine.include becomes a
-# non-fatal error. In addition, then memsys.mk still has syntax errors
-# because the variables BSG_MACHINE_DRAM_BANK_WORDS and
-# BSG_MACHINE_MAX_EPA_WIDTH are undefined when used for bc. One could
-# be fixed by definining it in Makefile.machine.include.machineWe
-# could solve that problem by conditionally defining those variables
-# but that seems dangerous. This should remain as is.
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
 $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
 	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
