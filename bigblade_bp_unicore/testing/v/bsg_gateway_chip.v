@@ -180,7 +180,7 @@ module bsg_gateway_chip
   bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_li, mc_proc_links_lo;
   bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_raw_lo;
 
-  wire [mc_y_cord_width_gp-1:0] global_y_cord_li = {pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(1'b0)};
+  wire [mc_y_cord_width_gp-1:0] global_y_cord_li = {pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(1'b1)};
 
   logic [3:1] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
   logic [3:1][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
@@ -288,104 +288,240 @@ module bsg_gateway_chip
          );
     end
 
-  // Fake network --> Giant crossbar to mimic where hammerblade will sit
-  // Network parameters
-  localparam cb_num_in_x_lp = mc_num_tiles_x_gp+1;
-  localparam cb_num_in_y_lp = mc_num_tiles_y_gp+2;
-  localparam cb_num_in_lp = cb_num_in_x_lp*cb_num_in_y_lp;
-  localparam cb_fwd_fifo_els_lp = 32;
-  localparam cb_rev_fifo_els_lp = 32;
+  // Router Network
+  // All routers on this network uses 2 element FIFOs and no credit counting on any port
+  // Real manycore uses 3 element FIFOs on the P port and credit counting on the P port
 
-  typedef int fifo_els_arr_t[cb_num_in_lp-1:0];
-  function logic [cb_num_in_lp-1:0] get_fwd_use_credits();
-    logic [cb_num_in_lp-1:0] retval;
-    for (int i = 0; i < cb_num_in_y_lp; i++) begin
-      for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = 1'b0;
-      end
-    end
+  localparam num_links_y_lp = mc_num_tiles_y_gp+2;
+  localparam num_links_x_lp = mc_num_tiles_x_gp+1;
+  localparam num_rtrs_y_lp = num_links_y_lp;
+  localparam num_rtrs_x_lp = num_links_x_lp;
 
-    return retval;
-  endfunction
+  bsg_manycore_link_sif_s [num_links_y_lp-1:0][num_links_x_lp-1:0][S:W] link_in;;
+  bsg_manycore_link_sif_s [num_links_y_lp-1:0][num_links_x_lp-1:0][S:W] link_out;
+  bsg_manycore_link_sif_s [num_links_y_lp-1:0][num_links_x_lp-1:0] proc_link_in;
+  bsg_manycore_link_sif_s [num_links_y_lp-1:0][num_links_x_lp-1:0] proc_link_out;
 
-  function fifo_els_arr_t get_fwd_fifo_els();
-    fifo_els_arr_t retval;
+  genvar i, j;
 
-    for (int i = 0; i < cb_num_in_y_lp; i++) begin
-      for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = cb_fwd_fifo_els_lp;
-      end
-    end
-
-    return retval;
-  endfunction
-
-  function logic [cb_num_in_lp-1:0] get_rev_use_credits();
-    logic [cb_num_in_lp-1:0] retval;
-    for (int i = 0; i < cb_num_in_y_lp; i++) begin
-      for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = ((i > '0) && (i < cb_num_in_y_lp-1'b1));
-      end
-    end
-    return retval;
-  endfunction
-
-  function fifo_els_arr_t get_rev_fifo_els();
-    fifo_els_arr_t retval;
-
-    for (int i = 0; i < cb_num_in_y_lp; i++) begin
-      for (int j = 0; j < cb_num_in_x_lp; j++) begin
-        retval[(i*cb_num_in_x_lp)+j] = cb_rev_fifo_els_lp;
-      end
-    end
-
-    return retval;
-  endfunction
-
-  bsg_manycore_link_sif_s [cb_num_in_y_lp-1:0][cb_num_in_x_lp-1:0] link_in;
-  bsg_manycore_link_sif_s [cb_num_in_y_lp-1:0][cb_num_in_x_lp-1:0] link_out;
-  bsg_manycore_crossbar
-   #(.num_in_x_p(cb_num_in_x_lp)
-     ,.num_in_y_p(cb_num_in_y_lp)
-
-     ,.addr_width_p(mc_addr_width_gp)
+  // Router for PX = 0, PY = 0
+  bsg_manycore_mesh_node
+    #(.addr_width_p(mc_addr_width_gp)
      ,.data_width_p(mc_data_width_gp)
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
-
-     ,.fwd_use_credits_p(get_fwd_use_credits())
-     ,.fwd_fifo_els_p(get_fwd_fifo_els())
-     ,.rev_use_credits_p(get_rev_use_credits())
-     ,.rev_fifo_els_p(get_rev_fifo_els())
+     // This router does not talk to anything, so stub all ports
+     ,.stub_p(4'b1111) // SNEW
+     // 2-D mesh routing
+     ,.dims_p(2)
      )
-   network
+    rtr00
     (.clk_i(manycore_clk)
-     ,.reset_i(manycore_reset | ~reset_done)
+    ,.reset_i(manycore_reset | ~reset_done)
 
-     ,.links_sif_i(link_in)
-     ,.links_sif_o(link_out)
-     );
+    ,.links_sif_i(link_in[0][0])
+    ,.links_sif_o(link_out[0][0])
 
-  // I/O Complex --> At coordinates (0, 0)
+    ,.proc_link_sif_i(proc_link_in[0][0])
+    ,.proc_link_sif_o(proc_link_out[0][0])
+
+    ,.global_x_i({pod_x_cord_width_gp'(1'b0), mc_x_subcord_width_gp'(1'b0)})
+    ,.global_y_i({pod_y_cord_width_gp'(1'b0), mc_y_subcord_width_gp'(1'b0)})
+    );
+
+  // Router for PX = 0, PY = 2
+  bsg_manycore_mesh_node
+    #(.addr_width_p(mc_addr_width_gp)
+     ,.data_width_p(mc_data_width_gp)
+     ,.x_cord_width_p(mc_x_cord_width_gp)
+     ,.y_cord_width_p(mc_y_cord_width_gp)
+     // This router does not talk to anything, so stub all ports
+     ,.stub_p(4'b1111) // SNEW
+     // 2-D mesh routing
+     ,.dims_p(2)
+     )
+    rtr02
+    (.clk_i(manycore_clk)
+    ,.reset_i(manycore_reset | ~reset_done)
+
+    ,.links_sif_i(link_in[num_links_y_lp-1][0])
+    ,.links_sif_o(link_out[num_links_y_lp-1][0])
+
+    ,.proc_link_sif_i(proc_link_in[num_links_y_lp-1][0])
+    ,.proc_link_sif_o(proc_link_out[num_links_y_lp-1][0])
+
+    ,.global_x_i({pod_x_cord_width_gp'(1'b0), mc_x_subcord_width_gp'(1'b0)})
+    ,.global_y_i({pod_y_cord_width_gp'(2'b10), mc_y_subcord_width_gp'(1'b0)})
+    );
+  
+  // Stub proc links for above routers since they are unused
+  assign proc_link_in[0][0] = '0;
+  assign proc_link_in[num_links_y_lp-1][0] = '0;
+
+  // Routers for PX = 0, PY = 1 --> I/O + BP
+  for(i = 1; i < num_rtrs_y_lp-1; i++)
+    begin : x0y1
+      bsg_manycore_mesh_node
+      #(.addr_width_p(mc_addr_width_gp)
+      ,.data_width_p(mc_data_width_gp)
+      ,.x_cord_width_p(mc_x_cord_width_gp)
+      ,.y_cord_width_p(mc_y_cord_width_gp)
+      // W port is not used
+      ,.stub_p(4'b0001) // SNEW
+      // 2-D mesh routing
+      ,.dims_p(2)
+      )
+      rtr
+      (.clk_i(manycore_clk)
+      ,.reset_i(manycore_reset | ~reset_done)
+
+      ,.links_sif_i(link_in[i][0])
+      ,.links_sif_o(link_out[i][0])
+
+      // BlackParrot and I/O should be on the P ports
+      ,.proc_link_sif_i(proc_link_in[i][0])
+      ,.proc_link_sif_o(proc_link_out[i][0])
+
+      ,.global_x_i({pod_x_cord_width_gp'(1'b0), mc_x_subcord_width_gp'(1'b0)})
+      ,.global_y_i({pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(i-1)})
+      );
+    end
+
+  // Router Network for PX = 1, PY = 0 --> North V$
+  for(i = 1; i < num_rtrs_x_lp; i++)
+    begin : x1y0
+      bsg_manycore_mesh_node
+      #(.addr_width_p(mc_addr_width_gp)
+      ,.data_width_p(mc_data_width_gp)
+      ,.x_cord_width_p(mc_x_cord_width_gp)
+      ,.y_cord_width_p(mc_y_cord_width_gp)
+      // V$'s dont talk to other V$ on the same row
+      // North V$'s don't use the North port
+      ,.stub_p(4'b0111) // SNEW
+      // 2-D mesh routing
+      ,.dims_p(2)
+      )
+      rtr
+      (.clk_i(manycore_clk)
+      ,.reset_i(manycore_reset | ~reset_done)
+
+      ,.links_sif_i(link_in[0][i])
+      ,.links_sif_o(link_out[0][i])
+
+      ,.proc_link_sif_i(proc_link_in[0][i])
+      ,.proc_link_sif_o(proc_link_out[0][i])
+
+      ,.global_x_i({pod_x_cord_width_gp'(1'b1), mc_x_subcord_width_gp'(i-1)})
+      ,.global_y_i({pod_y_cord_width_gp'(1'b0), mc_y_subcord_width_gp'(1'b0)})
+      );
+    end
+
+  // Router Network for PX = 1, PY = 2 --> South V$
+  for(i = 1; i < num_rtrs_x_lp; i++)
+    begin : x1y2
+      bsg_manycore_mesh_node
+      #(.addr_width_p(mc_addr_width_gp)
+      ,.data_width_p(mc_data_width_gp)
+      ,.x_cord_width_p(mc_x_cord_width_gp)
+      ,.y_cord_width_p(mc_y_cord_width_gp)
+      // V$'s dont talk to other V$ on the same row
+      // South V$'s don't use the South port
+      ,.stub_p(4'b1011) // SNEW
+      // 2-D mesh routing
+      ,.dims_p(2)
+      )
+      rtr
+      (.clk_i(manycore_clk)
+      ,.reset_i(manycore_reset | ~reset_done)
+
+      ,.links_sif_i(link_in[num_links_y_lp-1][i])
+      ,.links_sif_o(link_out[num_links_y_lp-1][i])
+
+      ,.proc_link_sif_i(proc_link_in[num_links_y_lp-1][i])
+      ,.proc_link_sif_o(proc_link_out[num_links_y_lp-1][i])
+
+      ,.global_x_i({pod_x_cord_width_gp'(1'b1), mc_x_subcord_width_gp'(i-1)})
+      ,.global_y_i({pod_y_cord_width_gp'(2'b10), mc_y_subcord_width_gp'(1'b0)})
+      );
+    end
+
+  // Router Network for PX = 1, PY = 1 --> Compute array
+  for(i = 1; i < num_rtrs_x_lp; i++)
+    begin : x
+      for (j = 1; j < num_rtrs_y_lp-1; j++)
+        begin : y
+          bsg_manycore_mesh_node
+          #(.addr_width_p(mc_addr_width_gp)
+          ,.data_width_p(mc_data_width_gp)
+          ,.x_cord_width_p(mc_x_cord_width_gp)
+          ,.y_cord_width_p(mc_y_cord_width_gp)
+          // All SNEW ports will be used for routing
+          // P ports are stubbed because there are no compute tiles
+          ,.stub_p(4'b0000) // SNEW
+          // 2-D mesh routing
+          ,.dims_p(2)
+          )
+          rtr
+          (.clk_i(manycore_clk)
+          ,.reset_i(manycore_reset | ~reset_done)
+
+          ,.links_sif_i(link_in[j][i])
+          ,.links_sif_o(link_out[j][i])
+
+          ,.proc_link_sif_i(proc_link_in[j][i])
+          ,.proc_link_sif_o(proc_link_out[j][i])
+
+          ,.global_x_i({pod_x_cord_width_gp'(1'b1), mc_x_subcord_width_gp'(i-1)})
+          ,.global_y_i({pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(j-1)})
+          );
+        end
+    end
+
+  // Stitch the links together
+  bsg_manycore_link_sif_s [E:W][num_links_y_lp-1:0] link_hor_in;;
+  bsg_manycore_link_sif_s [E:W][num_links_y_lp-1:0] link_hor_out;
+  bsg_manycore_link_sif_s [S:N][num_links_x_lp-1:0] link_ver_in;;
+  bsg_manycore_link_sif_s [S:N][num_links_x_lp-1:0] link_ver_out;
+  bsg_mesh_stitch
+   #(.width_p($bits(bsg_manycore_link_sif_s))
+    ,.x_max_p(num_rtrs_x_lp)
+    ,.y_max_p(num_rtrs_y_lp)
+    )
+    mesh
+    (.outs_i(link_out)
+    ,.ins_o(link_in)
+    
+    ,.hor_i(link_hor_in)
+    ,.hor_o(link_hor_out)
+    ,.ver_i(link_ver_in)
+    ,.ver_o(link_ver_out)
+    );
+
+  // Tie off the greater links
+  assign link_hor_in = '0;
+  assign link_ver_in = '0;
+    
+  // I/O Complex (At PX = 0, P_subX = 0, PY = 1, P_subY = 0)
   bsg_nonsynth_manycore_io_complex
    #(.addr_width_p(mc_addr_width_gp)
      ,.data_width_p(mc_data_width_gp)
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
      ,.io_x_cord_p({pod_x_cord_width_gp'(1'b0), mc_x_cord_width_gp'(1'b0)})
-     ,.io_y_cord_p({pod_y_cord_width_gp'(1'b1), mc_y_cord_width_gp'(1'b1)})
+     ,.io_y_cord_p({pod_y_cord_width_gp'(1'b1), mc_y_cord_width_gp'(1'b0)})
      )
    io
     (.clk_i(manycore_clk)
      ,.reset_i(manycore_reset | ~reset_done)
 
-     ,.io_link_sif_i(link_out[1][0])
-     ,.io_link_sif_o(link_in[1][0])
+     ,.io_link_sif_i(proc_link_out[1][0])
+     ,.io_link_sif_o(proc_link_in[1][0])
      ,.print_stat_v_o()
      ,.print_stat_tag_o()
      ,.loader_done_o()
      );
 
+  // BP link connections
   always_comb
     for (integer j = 1; j <= 3; j++)
       for (integer i = 0; i < $bits(bsg_manycore_link_sif_s); i++)
@@ -395,35 +531,34 @@ module bsg_gateway_chip
         end
 
   // BP <--> Fake network connections
-  // mc_hor_link[0] = I/O
-  // mc_hor_link[1] = DRAM 1
-  // mc_hor_link[2] = DRAM 2
-  assign link_in[0][0] = '0;
-  for (genvar i = 2; i <= 4; i++)
+  // mc_proc_link[0] = I/O
+  // mc_proc_link[1] = DRAM 1
+  // mc_proc_link[2] = DRAM 2
+  for (i = 2; i <= 4; i++)
     begin : bp_connect
-      assign link_in[i][0] = mc_proc_links_lo[i-1];
-      assign mc_proc_links_li[i-1] = link_out[i][0];
+      assign proc_link_in[i][0] = mc_proc_links_lo[i-1];
+      assign mc_proc_links_li[i-1] = proc_link_out[i][0];
     end
-
+  
   // Tie off all links below BP
-  for (genvar i = 5; i <= mc_num_tiles_y_gp+1; i++)
-    begin : bp_tieoff
-      assign link_in[i][0] = '0;
+  for (i = 5; i < num_links_y_lp-2; i++)
+    begin : below_bp
+      assign proc_link_in[i][0] = '0;
     end
 
-  // Tie off where the manycore would be
-  for (genvar i = 1; i <= mc_num_tiles_y_gp; i++)
+  // Tie off proc_links where the compute tiles would be
+  for (i = 1; i < num_links_y_lp - 1; i++)
     begin : tile_stubs_y
-      for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
+      for (j = 1; j < num_links_x_lp; j++)
         begin : tile_stubs_x
-          assign link_in[i][j] = '0;
+          assign proc_link_in[i][j] = '0;
         end
     end
 
-  // Connect infinite memories where the caches would be
-  for (genvar i = N; i <= S; i++)
+  // Connect infinite memories where the V$s would be
+  for (i = N; i <= S; i++)
     begin : mem_row
-      for (genvar j = 1; j <= mc_num_tiles_x_gp; j++)
+      for (j = 1; j <= mc_num_tiles_x_gp; j++)
         begin : mem_col
           localparam x_idx_lp = j;
           localparam y_idx_lp = (i == S) ? mc_num_tiles_y_gp+1 : 0;
@@ -444,8 +579,8 @@ module bsg_gateway_chip
             (.clk_i(manycore_clk)
              ,.reset_i(manycore_reset | ~reset_done)
 
-             ,.link_sif_i(link_out[y_idx_lp][x_idx_lp])
-             ,.link_sif_o(link_in[y_idx_lp][x_idx_lp])
+             ,.link_sif_i(proc_link_out[y_idx_lp][x_idx_lp])
+             ,.link_sif_o(proc_link_in[y_idx_lp][x_idx_lp])
 
              ,.my_x_i(my_x_li)
              ,.my_y_i(my_y_li)

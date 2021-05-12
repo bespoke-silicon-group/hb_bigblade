@@ -98,7 +98,8 @@ class NBF:
                 epa = self.select_bits(addr, 0, lg_block_size-1) | (index << lg_block_size)
                 curr_addr += 4
 
-                self.print_nbf(1<<4 | x, y<<3, epa, data)
+                # Fixme: This works only for 1 north vcache pod and 1 south vcache pod
+                self.print_nbf(1<<4 | x, y<<4, epa, data)
 
     # Initialize V$ or infinite memories (Useful for no DRAM mode)
     # Emulates the hashing function in bsg_manycore/v/vanilla_bean/hash_function.v
@@ -131,12 +132,13 @@ class NBF:
                 data = int(data, 16)
                 bank = self.select_bits(addr, 2+vcache_word_offset_width, 2+vcache_word_offset_width+lg_banks-1)
                 index = self.select_bits(addr, 2+vcache_word_offset_width+lg_banks, 2+vcache_word_offset_width+lg_banks+index_width-1)
-                x = self.select_bits(bank, 0, lg_x-1) + 1
+                x = self.select_bits(bank, 0, lg_x-1)
                 y = self.select_bits(bank, lg_x, lg_x)
                 epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
-
-                self.print_nbf(1<<4 | x, y<<3, epa, data)
+                
+                # Fixme: This works only for only 1 north vcache pod and 1 south vcache pod
+                self.print_nbf(1<<4 | x, y<<4, epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
