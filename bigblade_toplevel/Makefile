@@ -26,10 +26,6 @@ bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
 bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
 bsg_replicant_commit :=bigblade-tapeout
 
-aws-fpga_dir         :=$(THIS_DIR)/aws-fpga
-aws-fpga_url         :=$(GITHUB)aws/aws-fpga.git
-aws-fpga_commit      :=v1.4.12
-
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
 bsg_14_commit        :=master
@@ -52,13 +48,6 @@ all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
 init_repos  = bsg_manycore.init
 init_repos += basejump_stl.init
-init_repos += aws-fpga.init
-
-ifneq ($(CUDA),1)
-  # Do not fetch aws-fpga unless we are compiling for CUDA
-  all_repos  := $(filter-out aws-fpga.repo,$(all_repos))
-  init_repos := $(filter-out aws-fpga.init,$(init_repos))
-endif
 
 $(prep_dir): $(bsg_14.repo)
 	ln -nsf $(bsg_14_dir)/.pdk_prep $@
@@ -75,15 +64,11 @@ bsg_manycore.init:
 basejump_stl.init:
 	cd $(basejump_stl_dir) && git submodule update --init --recursive
 
-aws-fpga.init: bsg_cadenv.repo
-	$(MAKE) -f amibuild.mk setup-aws-fpga
-
 %.init: %.repo
 
 clean: are_you_sure
 	rm -rf $(subst .repo,,$(all_repos))
 	rm -rf .pdk_prep
-	rm -rf aws-fpga.setup.log
 
 DISABLE_SAFETY_PROMPT ?= false
 are_you_sure:
