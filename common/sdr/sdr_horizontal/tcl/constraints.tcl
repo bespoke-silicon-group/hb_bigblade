@@ -174,14 +174,24 @@ constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  760 0
 constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   830 0
 
 # core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]     500 40
-constraint_output_ports $core_clk_name [get_ports core_reset_o]     500 40
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]       40 40
+constraint_output_ports $core_clk_name [get_ports core_reset_o]       40 40
+constraint_input_ports  $core_clk_name [get_ports core_global_*_i*]   40 40
+constraint_output_ports $core_clk_name [get_ports core_global_*_o*]   40 40
 
 # global coordinates
-#constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 850 40
-#constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 850 40
-set_false_path -from [get_ports "core_global_*_i*"]
-set_false_path -to   [get_ports "core_global_*_o*"]
+# The timing paths to/from these registers don't need a single-cycle requirement, 
+# so relax the constraints by allowing double cycle.
+# The hold cycle is set to 2, so that it becomes much easier to meet hold check.
+set multicycle_cells [list]
+append_to_collection multicycle_cells [get_cells dff_global_x/data_r_reg*]
+append_to_collection multicycle_cells [get_cells dff_global_y/data_r_reg*]
+append_to_collection multicycle_cells [get_cells dff_core_reset/data_r_reg*]
+set_multicycle_path 2 -setup -to   $multicycle_cells
+set_multicycle_path 2 -hold  -to   $multicycle_cells
+set_multicycle_path 2 -setup -from $multicycle_cells
+set_multicycle_path 2 -hold  -from $multicycle_cells
+
 
 # false path
 set_false_path -from [get_ports async_*_reset_i]
@@ -234,9 +244,10 @@ bsg_link_sdr_disable_timing_constraints
 # set dont touch
 bsg_link_sdr_dont_touch_constraints [get_ports {io_*_link_data_i[*] io_*_link_v_i}]
 
-set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
-set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
-
+if {$::env(EAST_NOT_WEST) == 0} {
+  set_dont_touch [get_cells -hier -filter "name=~*hard_inv*"] true
+  set_dont_touch [get_cells -hier -filter "name=~*hard_buf*"] true
+}
 
 # CDC
 set cdc_clocks [list]
