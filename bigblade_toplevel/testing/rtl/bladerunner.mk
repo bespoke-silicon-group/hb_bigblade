@@ -1,5 +1,5 @@
 #export BSG_MACHINE_PATH	=$(BSG_OUT_DIR)
-export BSG_MACHINE_NAME =tapout
+export BSG_MACHINE_NAME =tapeout
 export BSG_PLATFORM     =tapeout-vcs
 export CL_DIR		=$(BSG_F1_DIR)
 export HARDWARE_PATH	=$(CL_DIR)/hardware
