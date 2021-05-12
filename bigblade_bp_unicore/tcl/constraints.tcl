@@ -214,6 +214,7 @@ set_ungroup [get_designs -filter "hdl_template==compressBy4"                    
 set_optimize_registers true -designs [get_designs bp_be_pipe_aux* ] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_pipe_fma* ] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_pipe_long*] -check_design -verbose
+set_optimize_registers true -designs [get_designs bp_be_dcache*   ] -check_design -verbose
 
 puts "BSG-info: Completed script [info script]\n"
 

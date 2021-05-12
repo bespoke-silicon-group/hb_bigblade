@@ -105,6 +105,7 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 export DC_FLOW_RMPLUS_FLOW :=hplp
 #export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 #export DC_FLOW_RMPLUS_FLOW :=hc
+#export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are
