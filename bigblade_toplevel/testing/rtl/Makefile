@@ -176,7 +176,7 @@ export BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)
 	$(MAKE) -f bladerunner.mk $@
 
-ifeq($(CUDA),1)
+ifeq ($(CUDA),1)
   VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
   VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
   VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
