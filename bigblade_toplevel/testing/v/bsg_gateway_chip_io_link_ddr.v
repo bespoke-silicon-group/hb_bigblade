@@ -106,28 +106,24 @@ module bsg_gateway_chip_io_link_ddr
     );
   end
 
-  bsg_link_ddr_downstream 
+  bsg_link_ddr_downstream_encode
  #(.width_p                        (bsg_link_width_gp)
   ,.channel_width_p                (bsg_link_channel_width_gp)
   ,.num_channels_p                 (bsg_link_num_channels_gp)
   ,.lg_fifo_depth_p                (bsg_link_lg_fifo_depth_gp)
   ,.lg_credit_to_token_decimation_p(bsg_link_lg_credit_to_token_decimation_gp)
   ,.use_extra_data_bit_p           (bsg_link_use_extra_data_bit_gp)
-  ,.use_encode_p                   (1)
-  ,.bypass_twofer_fifo_p           (1)
-  ,.bypass_gearbox_p               (0)
-  ,.use_hardened_fifo_p            (0)
   ) downlink
   (.core_clk_i       (core_clk_i)
   ,.core_link_reset_i(core_tag_data_lo.down_link_reset)
 
-  ,.io_link_reset_i  (downlink_reset_lo)
+  ,.io_link_reset_i  ({2{downlink_reset_lo}})
 
   ,.core_data_o      (core_data_o)
   ,.core_valid_o     (core_v_o)
   ,.core_yumi_i      (core_yumi_i)
 
-  ,.io_clk_i         (io_link_clk_i)
+  ,.io_clk_i         ({2{io_link_clk_i}})
   ,.io_data_i        (io_link_data_i)
   ,.io_valid_i       (io_link_v_i)
   ,.core_token_r_o   (io_link_token_o)
