@@ -38,3 +38,7 @@ BASEJUMP_STL_DIR       := $(BLADERUNNER_ROOT)/basejump_stl
 BASEJUMP_STL_COMMIT_ID := $(shell cd $(BASEJUMP_STL_DIR); git rev-parse --short HEAD)
 
 FPGA_IMAGE_VERSION     := 6.0.0
+BSG_MACHINE_PATH       := $(BLADERUNNER_ROOT)/testing/rtl/out
+$(warning BSG MAKE WARN: Overriding BSG_MACHINE_PATH with $(BSG_MACHINE_PATH))
+BSG_PLATFORM           := tapeout-vcs
+$(warning BSG MAKE WARN: Overriding BSG_PLATFORM with $(BSG_PLATFORM))

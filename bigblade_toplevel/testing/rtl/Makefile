@@ -8,7 +8,6 @@
 # Simulation run-time flags
 ########################################
 WAVE       ?= 0
-CUDA       ?= 0
 
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
@@ -17,10 +16,14 @@ BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 ifeq ($(WAVE),1)
-  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv-debug
+  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv-debug
 else
-  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
+  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv
 endif
+
+BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
+BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
+BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -58,9 +61,6 @@ VCS_OPTIONS += -notice
 ifeq ($(WAVE),1)
   VCS_OPTIONS += -debug_pp +vcs+vcdpluson
 endif
-ifeq ($(CUDA),1)
-  VCS_OPTIONS += +define+REPLICANT=1
-endif
 VCS_OPTIONS += -V
 VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
@@ -69,7 +69,6 @@ VCS_OPTIONS += +vc
 VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
 VCS_OPTIONS += -diag timescale 
-VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
 
 ########################################
@@ -160,9 +159,26 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ## Run Targets
 ########################################
 
-build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED)
-	$(VCS) $(VCS_OPTIONS) -o $(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/build.log
+build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
+debug: $(BSG_CUDA_DBG)
+$(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
+$(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
+
+$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
+$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
+
+$(BSG_CUDA_DBG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
+
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
@@ -170,7 +186,7 @@ $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
 	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
-$(BSG_OUT_DIR):
+$(BSG_OUT_DIR) $(BSG_CUDA_PATH):
 	@mkdir -p $@
 
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
@@ -178,11 +194,6 @@ $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
 	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
 ifeq ($(CUDA),1)
-  VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-  VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-  VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
-  VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
-  VCS_OPTIONS += -LDFLAGS -lm
 endif
 
 clean:
