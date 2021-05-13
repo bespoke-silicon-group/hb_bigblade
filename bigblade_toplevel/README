@@ -15,7 +15,5 @@ $ cd testing/rtl && make (5~10 minutes)
 >> run regression: cd software/spmd; make -j16 recurse-all bsg_pods_X=4 bsg_pods_Y=4
 
 # To run cuda-lite tests
->> update bsg_replicant/machine.mk, set BSG_MACHINE_PATH=$(BSG_F1_DIR)/../testing/rtl/out
->> update bsg_replicant/platform.mk, set BSG_PLATFORM=tapeout-vcs
 >> run single test: cd examples/cuda/test_vec_add; make main.exec.log
 >> run regression: cd examples/cuda; make regression -j16
