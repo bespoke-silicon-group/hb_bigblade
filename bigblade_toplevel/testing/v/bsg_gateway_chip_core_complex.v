@@ -116,4 +116,21 @@ module bsg_gateway_chip_core_complex
       end
   end
 
+  // synopsys translate off
+  localparam cycle_counter_width_lp = 64;
+   
+  logic [cycle_counter_width_lp-1:0] cycle_counter;
+  bsg_cycle_counter
+    #(.width_p(cycle_counter_width_lp))
+  ctr
+    (
+     .clk_i($root.bsg_bigblade_pcb.IC.ASIC.block.core_complex.mc_clk_i[0])
+     ,.reset_i(~tag_trace_done_i)
+     ,.ctr_r_o(cycle_counter)
+     );
+   
+  final begin
+     $display("BSG INFO: %d cycles completed @ finish", cycle_counter);
+  end
+  // synopsys translate on
 endmodule
