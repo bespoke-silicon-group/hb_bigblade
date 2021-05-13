@@ -5,8 +5,6 @@ bsg_cadenv/
 bsg_packaging/
 bsg_manycore/
 bsg_replicant/
-aws-fpga/
-aws-fpga.setup.log
 out/
 vc_hdrs.h
 simv*
