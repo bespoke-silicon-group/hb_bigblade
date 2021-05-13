@@ -68,7 +68,7 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 set clk_reset_tag_ports [list]
 append_to_collection clk_reset_tag_ports [get_ports "tag_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "tag_data_i"]
-for {set i 0} {$i < 9} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_node_id_offset_i[$i]"]}
+for {set i 0} {$i < 10} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_node_id_offset_i[$i]"]}
 # clock reset
 append_to_collection clk_reset_tag_ports [get_ports "ext_io_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "ext_noc_clk_i"]
