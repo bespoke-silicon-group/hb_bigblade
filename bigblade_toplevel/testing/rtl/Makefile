@@ -21,8 +21,9 @@ else
   BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv
 endif
 
-BSG_CUDA_SIM  := $(BSG_OUT_DIR)/machine.exec
-BSG_CUDA_DBG  := $(BSG_OUT_DIR)/machine.debug
+BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
+BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
+BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -164,8 +165,8 @@ $(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
 $(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
-$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/cuda
-$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/cuda-debug
+$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
+$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
 
 $(BSG_CUDA_DBG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
 
@@ -176,7 +177,7 @@ $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
 
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED)
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
@@ -185,7 +186,7 @@ $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
 	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
-$(BSG_OUT_DIR):
+$(BSG_OUT_DIR) $(BSG_CUDA_PATH):
 	@mkdir -p $@
 
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
