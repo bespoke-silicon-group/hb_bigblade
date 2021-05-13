@@ -20,7 +20,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set core_clk_name "core_clk" ;# main clock running black parrot
-set core_clk_period_ps       1100
+set core_clk_period_ps       1200
 set core_clk_uncertainty_per 3.0
 set core_clk_uncertainty_ps  [expr min([expr $core_clk_period_ps*($core_clk_uncertainty_per/100.0)], 20)]
 
