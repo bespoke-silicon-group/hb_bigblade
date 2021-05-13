@@ -167,13 +167,15 @@ $(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_F
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
 
-$(BSG_OUT_DIR):
-	mkdir -p $@
-	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
+$(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
+	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
-export BSG_MACHINE_PATH=$(BSG_OUT_DIR)
-$(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)
-	$(MAKE) -f bladerunner.mk $@
+$(BSG_OUT_DIR):
+	@mkdir -p $@
+
+BSG_MACHINE_PATH := $(BSG_OUT_DIR)
+$(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
+	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
 ifeq ($(CUDA),1)
   VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
@@ -184,6 +186,7 @@ ifeq ($(CUDA),1)
 endif
 
 clean:
+	$(MAKE) -f bladerunner.mk libraries.clean BSG_MACHINE_PATH=$(BSG_WORK_DIR)/../machine/
 	rm -rf $(BSG_OUT_DIR)
 	rm -rf DVEfiles
 	rm -rf stack.info.*
@@ -191,4 +194,3 @@ clean:
 	rm -f  vcdplus.vpd
 	rm -f  inter.vpd
 	rm -f  ucli.key
-
