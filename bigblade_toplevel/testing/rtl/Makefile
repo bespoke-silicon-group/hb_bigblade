@@ -193,9 +193,6 @@ BSG_MACHINE_PATH := $(BSG_OUT_DIR)
 $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
 	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
-ifeq ($(CUDA),1)
-endif
-
 clean:
 	$(MAKE) -f bladerunner.mk libraries.clean BSG_MACHINE_PATH=$(BSG_WORK_DIR)/../machine/
 	rm -rf $(BSG_OUT_DIR)

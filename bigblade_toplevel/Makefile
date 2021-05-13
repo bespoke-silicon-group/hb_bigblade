@@ -1,7 +1,6 @@
 THIS_DIR :=$(realpath $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 GIT_CLONE_STYLE :=ssh
-CUDA            ?= 0
 #GIT_CLONE_STYLE :=https
 
 ifeq ($(GIT_CLONE_STYLE),ssh)
