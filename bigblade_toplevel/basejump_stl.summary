@@ -5,8 +5,6 @@ Summary for repository basejump_stl:
     PASS: commit aa7ba71 is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
-    WARN: UNTRACKED FILES EXIST
-    Untracked Files:
-        .foo
+    PASS: No Untracked Files
 Summary for basejump_stl finished
 
