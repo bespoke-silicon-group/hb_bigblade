@@ -39,6 +39,7 @@ append_to_collection tag_id_ports [get_ports "pod_tag_node_id_offset_i*"]
 append_to_collection tag_id_ports [get_ports "async_reset_tag_node_id_offset_i*"]
 set_false_path -from $tag_id_ports
 
+set_false_path -from [get_ports async_*_disable_i*]
 
 # global x/y
 #set_false_path -from [get_ports global_*_i*]

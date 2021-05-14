@@ -35,6 +35,11 @@ module bsg_manycore_link_to_sdr_south_row
     , output async_downstream_reset_o
     , output async_token_reset_o
 
+    ,input  [num_tiles_x_p-1:0] async_fwd_link_i_disable_i
+    ,input  [num_tiles_x_p-1:0] async_fwd_link_o_disable_i
+    ,input  [num_tiles_x_p-1:0] async_rev_link_i_disable_i
+    ,input  [num_tiles_x_p-1:0] async_rev_link_o_disable_i
+
     ,output [num_tiles_x_p-1:0]                   io_fwd_link_clk_o
     ,output [num_tiles_x_p-1:0][fwd_width_lp-1:0] io_fwd_link_data_o
     ,output [num_tiles_x_p-1:0]                   io_fwd_link_v_o
@@ -95,6 +100,11 @@ module bsg_manycore_link_to_sdr_south_row
       ,.async_downlink_reset_o    (async_downlink_reset_lo[x])
       ,.async_downstream_reset_o  (async_downstream_reset_lo[x])
       ,.async_token_reset_o       (async_token_reset_lo[x])
+
+      ,.async_fwd_link_i_disable_i(async_fwd_link_i_disable_i[x])
+      ,.async_fwd_link_o_disable_i(async_fwd_link_o_disable_i[x])
+      ,.async_rev_link_i_disable_i(async_rev_link_i_disable_i[x])
+      ,.async_rev_link_o_disable_i(async_rev_link_o_disable_i[x])
 
       ,.io_fwd_link_clk_o         (io_fwd_link_clk_o[x])
       ,.io_fwd_link_data_o        (io_fwd_link_data_o[x])

@@ -15,7 +15,7 @@
   ,parameter wh_flit_width_p   = "inv"
 
   ,parameter tag_els_p=1024
-  ,parameter tag_local_els_p=4
+  ,parameter tag_local_els_p=4*2
   ,parameter tag_lg_width_p=4
   ,parameter tag_lg_els_lp=`BSG_SAFE_CLOG2(tag_els_p)
     
@@ -55,6 +55,11 @@
   ,output async_downlink_reset_o
   ,output async_downstream_reset_o
   ,output async_token_reset_o
+
+  ,input  async_fwd_link_i_disable_i
+  ,input  async_fwd_link_o_disable_i
+  ,input  async_rev_link_i_disable_i
+  ,input  async_rev_link_o_disable_i
 
   ,output                    io_fwd_link_clk_o
   ,output [fwd_width_lp-1:0] io_fwd_link_data_o
@@ -134,6 +139,36 @@
   );
 
 
+  logic async_wh_uplink_reset_lo;
+  logic async_wh_downlink_reset_lo;
+  logic async_wh_downstream_reset_lo;
+  logic async_wh_token_reset_lo;
+  
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc4 (
+    .bsg_tag_i(clients_lo[4])
+    ,.data_async_r_o({async_wh_token_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc5 (
+    .bsg_tag_i(clients_lo[5])
+    ,.data_async_r_o({async_wh_downstream_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc6 (
+    .bsg_tag_i(clients_lo[6])
+    ,.data_async_r_o({async_wh_downlink_reset_lo})
+  );
+  bsg_tag_client_unsync #(
+    .width_p(1)
+  ) btc7 (
+    .bsg_tag_i(clients_lo[7])
+    ,.data_async_r_o({async_wh_uplink_reset_lo})
+  );
+
 
   //-------------------------------------------
   //As the manycore will distribute across large area, it will take long
@@ -198,6 +233,18 @@
   ,.oclk_data_o(core_downstream_reset_sync)
   );
 
+  logic core_wh_uplink_reset_sync, core_wh_downstream_reset_sync;
+  bsg_sync_sync #(.width_p(1)) wh_up_bss
+  (.oclk_i     (core_clk_i            )
+  ,.iclk_data_i(async_wh_uplink_reset_lo  )
+  ,.oclk_data_o(core_wh_uplink_reset_sync)
+  );
+  bsg_sync_sync #(.width_p(1)) wh_down_bss
+  (.oclk_i     (core_clk_i                )
+  ,.iclk_data_i(async_wh_downstream_reset_lo  )
+  ,.oclk_data_o(core_wh_downstream_reset_sync)
+  );
+
   bsg_link_sdr
  #(.width_p                        (fwd_width_lp)
   ,.lg_fifo_depth_p                (lg_fifo_depth_p)
@@ -206,10 +253,10 @@
   ,.bypass_downstream_twofer_fifo_p(0)
   ) fwd_sdr
   (.core_clk_i             (core_clk_i)
-  ,.core_uplink_reset_i    (core_uplink_reset_sync)
-  ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_lo)
-  ,.async_token_reset_i    (async_token_reset_lo)
+  ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_fwd_link_o_disable_i)
+  ,.core_downstream_reset_i(core_downstream_reset_sync | async_fwd_link_i_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo    | async_fwd_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_lo       | async_fwd_link_o_disable_i)
 
   ,.core_data_i (ver_link_sif_li.fwd.data)
   ,.core_v_i    (ver_link_sif_li.fwd.v)
@@ -238,10 +285,10 @@
   ,.bypass_downstream_twofer_fifo_p(0)
   ) rev_sdr
   (.core_clk_i             (core_clk_i)
-  ,.core_uplink_reset_i    (core_uplink_reset_sync)
-  ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_lo)
-  ,.async_token_reset_i    (async_token_reset_lo)
+  ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_rev_link_o_disable_i)
+  ,.core_downstream_reset_i(core_downstream_reset_sync | async_rev_link_i_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo    | async_rev_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_lo       | async_rev_link_o_disable_i)
 
   ,.core_data_i (ver_link_sif_li.rev.data)
   ,.core_v_i    (ver_link_sif_li.rev.v)
@@ -272,10 +319,10 @@
     ,.bypass_downstream_twofer_fifo_p(0)
     ) sdr
     (.core_clk_i             (core_clk_i)
-    ,.core_uplink_reset_i    (core_uplink_reset_sync)
-    ,.core_downstream_reset_i(core_downstream_reset_sync)
-    ,.async_downlink_reset_i (async_downlink_reset_lo)
-    ,.async_token_reset_i    (async_token_reset_lo)
+    ,.core_uplink_reset_i    (core_wh_uplink_reset_sync)
+    ,.core_downstream_reset_i(core_wh_downstream_reset_sync)
+    ,.async_downlink_reset_i (async_wh_downlink_reset_lo)
+    ,.async_token_reset_i    (async_wh_token_reset_lo)
 
     ,.core_data_i (wh_link_sif_li[i].data)
     ,.core_v_i    (wh_link_sif_li[i].v)
