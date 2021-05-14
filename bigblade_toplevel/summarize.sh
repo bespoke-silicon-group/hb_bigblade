@@ -34,8 +34,15 @@ else
     echo "    PASS: commit $REPOSITORY_CURRENT_COMMIT is in remote"
 fi
 
-# Check that the expected commit matches the current commit, else,
-# that the expected branch matches a branch in the remote. Otherwise, fail.
+# Check that the expected commit matches the current commit. This
+# works when the EXPECTED commit (2nd arg) is a hash.
+# 
+# Else, the expected commit may be a branch. Check that it branch
+# matches a branch name in the remote. If a matching branch is found
+# in the remote, check that the remote HEAD commit matches the local
+# HEAD commit. This ensures that a pull has happened.
+#
+# Otherwise, fail.
 if [[ $REPOSITORY_EXPECTED_COMMIT == $REPOSITORY_CURRENT_COMMIT ]]; then
     echo "    PASS: Expected commit matches current commit"
 else
