@@ -1,34 +1,34 @@
 remove_individual_pin_constraints
 remove_block_pin_constraints
 
-set_block_pin_constraints -self -allowed_layers { C4 }
+set_block_pin_constraints -self -allowed_layers {C4 C5 K1 K2 K3 K4}
 
 proc bsg_create_terminal { name side offset } {
-  set offset [round_to_nearest $offset 0.08]
+  set offset [round_to_nearest $offset 0.128]
   if {$side == "left"} {
-    set layer    "C4"
-    while {[bsg_pins_check_location [die_llx] $offset $layer] != 1} {set offset [expr $offset + 0.08]; puts "invalid location ${name} ${offset}"}
+    set layer    "K1"
+    while {[bsg_pins_check_location [die_llx] $offset $layer] != 1} {set offset [expr $offset + 0.128]}
     set term_llx [die_llx]
     set term_lly [expr $offset - 0.02]
     set term_urx [expr [die_llx] + 0.04]
     set term_ury [expr $offset + 0.02]
   } elseif {$side == "right"} {
-    set layer    "C4"
-    while {[bsg_pins_check_location [die_urx] $offset $layer] != 1} {set offset [expr $offset + 0.08]; puts "invalid location ${name} ${offset}"}
+    set layer    "K1"
+    while {[bsg_pins_check_location [die_urx] $offset $layer] != 1} {set offset [expr $offset + 0.128]}
     set term_llx [expr [die_urx] - 0.04]
     set term_lly [expr $offset - 0.02]
     set term_urx [die_urx]
     set term_ury [expr $offset + 0.02]
   } elseif {$side == "top"} {
-    set layer    "C5"
-    while {[bsg_pins_check_location $offset [die_ury] $layer] != 1} {set offset [expr $offset + 0.08]; puts "invalid location ${name} ${offset}"}
+    set layer    "K2"
+    while {[bsg_pins_check_location $offset [die_ury] $layer] != 1} {set offset [expr $offset + 0.128]}
     set term_llx [expr $offset - 0.02]
     set term_lly [expr [die_ury] - 0.04]
     set term_urx [expr $offset + 0.02]
     set term_ury [die_ury]
   } elseif {$side == "bottom"} {
-    set layer    "C5"
-    while {[bsg_pins_check_location $offset [die_lly] $layer] != 1} {set offset [expr $offset + 0.08]; puts "invalid location ${name} ${offset}"}
+    set layer    "K2"
+    while {[bsg_pins_check_location $offset [die_lly] $layer] != 1} {set offset [expr $offset + 0.128]}
     set term_llx [expr $offset - 0.02]
     set term_lly [die_lly]
     set term_urx [expr $offset + 0.02]
