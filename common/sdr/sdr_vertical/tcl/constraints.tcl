@@ -107,6 +107,7 @@ if {$::env(SOUTH_NOT_NORTH) == 0} {
 # false path
 set_false_path -from [get_ports async_*_reset_i]
 set_false_path -to   [get_ports async_*_reset_o]
+set_false_path -from [get_ports async_*_disable_i]
 
 
 # Source-sync link constraints

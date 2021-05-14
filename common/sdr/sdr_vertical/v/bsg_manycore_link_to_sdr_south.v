@@ -36,6 +36,11 @@ module bsg_manycore_link_to_sdr_south
   ,output async_downstream_reset_o
   ,output async_token_reset_o
 
+  ,input  async_fwd_link_i_disable_i
+  ,input  async_fwd_link_o_disable_i
+  ,input  async_rev_link_i_disable_i
+  ,input  async_rev_link_o_disable_i
+
   ,output                    io_fwd_link_clk_o
   ,output [fwd_width_lp-1:0] io_fwd_link_data_o
   ,output                    io_fwd_link_v_o
@@ -93,10 +98,10 @@ module bsg_manycore_link_to_sdr_south
   ,.bypass_downstream_twofer_fifo_p(0)
   ) fwd_sdr
   (.core_clk_i             (core_clk_i)
-  ,.core_uplink_reset_i    (core_uplink_reset_sync)
-  ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_i)
-  ,.async_token_reset_i    (async_token_reset_i)
+  ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_fwd_link_o_disable_i)
+  ,.core_downstream_reset_i(core_downstream_reset_sync | async_fwd_link_i_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_i     | async_fwd_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_i        | async_fwd_link_o_disable_i)
 
   ,.core_data_i (core_link_sif_li.fwd.data)
   ,.core_v_i    (core_link_sif_li.fwd.v)
@@ -125,10 +130,10 @@ module bsg_manycore_link_to_sdr_south
   ,.bypass_downstream_twofer_fifo_p(0)
   ) rev_sdr
   (.core_clk_i             (core_clk_i)
-  ,.core_uplink_reset_i    (core_uplink_reset_sync)
-  ,.core_downstream_reset_i(core_downstream_reset_sync)
-  ,.async_downlink_reset_i (async_downlink_reset_i)
-  ,.async_token_reset_i    (async_token_reset_i)
+  ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_rev_link_o_disable_i)
+  ,.core_downstream_reset_i(core_downstream_reset_sync | async_rev_link_i_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_i     | async_rev_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_i        | async_rev_link_o_disable_i)
 
   ,.core_data_i (core_link_sif_li.rev.data)
   ,.core_v_i    (core_link_sif_li.rev.v)

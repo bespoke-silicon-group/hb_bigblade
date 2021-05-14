@@ -29,3 +29,4 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX2_SSC14R/A"]] $output_ports
 # false path
 set_false_path -from [get_ports "async_*_reset_i"]
 set_false_path -to   [get_ports "async_*_reset_o"]
+set_false_path -from [get_ports "async_*_disable_i"]
