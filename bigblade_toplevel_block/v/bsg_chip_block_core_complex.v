@@ -55,6 +55,9 @@ module bsg_chip_block_core_complex
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_x_cord_width_gp-1:0] global_x_li;
   wire [hb_num_pods_y_gp-1:0][2+total_num_tiles_x_lp-1:0][hb_y_cord_width_gp-1:0] global_y_li;
 
+  wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0]                      async_ver_fwd_link_i_disable_li, async_ver_fwd_link_o_disable_li;
+  wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0]                      async_ver_rev_link_i_disable_li, async_ver_rev_link_o_disable_li;
+
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0]                      ver_io_fwd_link_clk_lo, ver_io_fwd_link_v_lo, ver_io_fwd_link_token_li;
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0][mc_fwd_width_lp-1:0] ver_io_fwd_link_data_lo;
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0]                      ver_io_fwd_link_clk_li, ver_io_fwd_link_v_li, ver_io_fwd_link_token_lo;
@@ -64,6 +67,9 @@ module bsg_chip_block_core_complex
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0][mc_rev_width_lp-1:0] ver_io_rev_link_data_lo;
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0]                      ver_io_rev_link_clk_li, ver_io_rev_link_v_li, ver_io_rev_link_token_lo;
   wire [hb_num_pods_y_gp-1:0][S:N][2+total_num_tiles_x_lp-1:0][mc_rev_width_lp-1:0] ver_io_rev_link_data_li;
+
+  wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0]                      async_hor_fwd_link_i_disable_li, async_hor_fwd_link_o_disable_li;
+  wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0]                      async_hor_rev_link_i_disable_li, async_hor_rev_link_o_disable_li;
 
   wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0]                      hor_io_fwd_link_clk_lo, hor_io_fwd_link_v_lo, hor_io_fwd_link_token_li;
   wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0][mc_fwd_width_lp-1:0] hor_io_fwd_link_data_lo;
@@ -93,6 +99,11 @@ module bsg_chip_block_core_complex
     ,.global_x_i                      (global_x_li             [i])
     ,.global_y_i                      (global_y_li             [i])
 
+    ,.async_ver_fwd_link_i_disable_i  (async_ver_fwd_link_i_disable_li[i])
+    ,.async_ver_fwd_link_o_disable_i  (async_ver_fwd_link_o_disable_li[i])
+    ,.async_ver_rev_link_i_disable_i  (async_ver_rev_link_i_disable_li[i])
+    ,.async_ver_rev_link_o_disable_i  (async_ver_rev_link_o_disable_li[i])
+
     ,.ver_io_fwd_link_clk_o           (ver_io_fwd_link_clk_lo  [i])
     ,.ver_io_fwd_link_data_o          (ver_io_fwd_link_data_lo [i])
     ,.ver_io_fwd_link_v_o             (ver_io_fwd_link_v_lo    [i])
@@ -112,6 +123,11 @@ module bsg_chip_block_core_complex
     ,.ver_io_rev_link_data_i          (ver_io_rev_link_data_li [i])
     ,.ver_io_rev_link_v_i             (ver_io_rev_link_v_li    [i])
     ,.ver_io_rev_link_token_o         (ver_io_rev_link_token_lo[i])
+
+    ,.async_hor_fwd_link_i_disable_i  (async_hor_fwd_link_i_disable_li[i])
+    ,.async_hor_fwd_link_o_disable_i  (async_hor_fwd_link_o_disable_li[i])
+    ,.async_hor_rev_link_i_disable_i  (async_hor_rev_link_i_disable_li[i])
+    ,.async_hor_rev_link_o_disable_i  (async_hor_rev_link_o_disable_li[i])
 
     ,.hor_io_fwd_link_clk_o           (hor_io_fwd_link_clk_lo  [i])
     ,.hor_io_fwd_link_data_o          (hor_io_fwd_link_data_lo [i])
@@ -149,9 +165,9 @@ module bsg_chip_block_core_complex
   // hard-wire constants
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
   begin
-    // assign async reset tag offset, 4 corners in total
+    // assign async reset tag offset, 4 corners in total, each corner has 2 sdr links
     for (genvar j = 0; j < 4; j++)
-        assign async_reset_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_sdr_offset_gp+(i*4+j)*tag_sdr_local_els_gp);
+        assign async_reset_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_sdr_offset_gp+(i*4+j)*(2*tag_sdr_local_els_gp));
 
     // assign pod tag offset
     for (genvar j = 0; j < hb_num_pods_x_gp; j++)
@@ -170,7 +186,6 @@ module bsg_chip_block_core_complex
     assign global_y_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-1)};
   end
 
-  // TODO: fix temporary sdr input clock tieoff internally
 
   // tieoff hor links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
@@ -184,6 +199,9 @@ module bsg_chip_block_core_complex
             // Responses from chip to host (route Y then X)
             if ((i == 0) && (j == W) && (k == 0))
               begin
+                assign async_hor_fwd_link_i_disable_li[i][j][k] = '0;
+                assign async_hor_rev_link_o_disable_li[i][j][k] = '0;
+
                 assign hor_io_fwd_link_clk_li  [i][j][k] = mc_fwd_link_clk_i;
                 assign hor_io_fwd_link_data_li [i][j][k] = mc_fwd_link_data_i;
                 assign hor_io_fwd_link_v_li    [i][j][k] = mc_fwd_link_v_i;
@@ -196,22 +214,16 @@ module bsg_chip_block_core_complex
               end
             else
               begin
-                //
-                // Loopback link_clk to tieoff sdr links
-                // In sdr_downstream we have bsg_async_fifo, which cannot finish reset
-                // procedure until link_clk_i oscillates. Since we chain all async resets
-                // together, it is impossible to assert sdr_link_reset on specific tiles.
-                // So we loopback clk and let sdr_downstream finish reset procedure.
-                //
-                // TODO: currently hardcoded to rev_clk_o -> fwd_clk_i and fwd_clk_o -> rev_clk_i
-                // to ensure sdr link clock output has at most 1 fanout
-                //
-                assign hor_io_fwd_link_clk_li  [i][j][k] = hor_io_rev_link_clk_lo[i][j][k];
+                assign async_hor_fwd_link_i_disable_li[i][j][k] = '1;
+                assign async_hor_rev_link_o_disable_li[i][j][k] = '1;
+                assign hor_io_fwd_link_clk_li  [i][j][k] = '0;
                 assign hor_io_fwd_link_data_li [i][j][k] = '0;
                 assign hor_io_fwd_link_v_li    [i][j][k] = '0;
                 assign hor_io_rev_link_token_li[i][j][k] = '0;
               end
-            assign hor_io_rev_link_clk_li  [i][j][k] = hor_io_fwd_link_clk_lo[i][j][k];
+            assign async_hor_rev_link_i_disable_li[i][j][k] = '1;
+            assign async_hor_fwd_link_o_disable_li[i][j][k] = '1;
+            assign hor_io_rev_link_clk_li  [i][j][k] = '0;
             assign hor_io_rev_link_data_li [i][j][k] = '0;
             assign hor_io_rev_link_v_li    [i][j][k] = '0;
             assign hor_io_fwd_link_token_li[i][j][k] = '0;
@@ -230,6 +242,9 @@ module bsg_chip_block_core_complex
         // Responses from host to chip (route Y then X)
         if ((j == N) && (k == hb_num_tiles_x_gp+1-1))
           begin
+            assign async_ver_rev_link_i_disable_li[i][j][k] = '0;
+            assign async_ver_fwd_link_o_disable_li[i][j][k] = '0;
+
             assign ver_io_rev_link_clk_li  [i][j][k] = mc_rev_link_clk_i;
             assign ver_io_rev_link_data_li [i][j][k] = mc_rev_link_data_i;
             assign ver_io_rev_link_v_li    [i][j][k] = mc_rev_link_v_i;
@@ -242,12 +257,16 @@ module bsg_chip_block_core_complex
           end
         else
           begin
-            assign ver_io_rev_link_clk_li  [i][j][k] = ver_io_fwd_link_clk_lo[i][j][k];
+            assign async_ver_rev_link_i_disable_li[i][j][k] = '1;
+            assign async_ver_fwd_link_o_disable_li[i][j][k] = '1;
+            assign ver_io_rev_link_clk_li  [i][j][k] = '0;
             assign ver_io_rev_link_data_li [i][j][k] = '0;
             assign ver_io_rev_link_v_li    [i][j][k] = '0;
             assign ver_io_fwd_link_token_li[i][j][k] = '0;
           end
-        assign ver_io_fwd_link_clk_li  [i][j][k] = ver_io_rev_link_clk_lo[i][j][k];
+        assign async_ver_fwd_link_i_disable_li[i][j][k] = '1;
+        assign async_ver_rev_link_o_disable_li[i][j][k] = '1;
+        assign ver_io_fwd_link_clk_li  [i][j][k] = '0;
         assign ver_io_fwd_link_data_li [i][j][k] = '0;
         assign ver_io_fwd_link_v_li    [i][j][k] = '0;
         assign ver_io_rev_link_token_li[i][j][k] = '0;
@@ -257,6 +276,11 @@ module bsg_chip_block_core_complex
   // stitch ver links
   for (genvar i = 1; i < hb_num_pods_y_gp; i++)
   begin
+    assign async_ver_fwd_link_i_disable_li[i-1][S] = '0;
+    assign async_ver_rev_link_i_disable_li[i-1][S] = '0;
+    assign async_ver_fwd_link_o_disable_li[i][N] = '0;
+    assign async_ver_rev_link_o_disable_li[i][N] = '0;
+
     assign ver_io_fwd_link_clk_li  [i-1][S] = ver_io_fwd_link_clk_lo  [i][N];
     assign ver_io_fwd_link_data_li [i-1][S] = ver_io_fwd_link_data_lo [i][N];
     assign ver_io_fwd_link_v_li    [i-1][S] = ver_io_fwd_link_v_lo    [i][N];
@@ -265,6 +289,11 @@ module bsg_chip_block_core_complex
     assign ver_io_rev_link_data_li [i-1][S] = ver_io_rev_link_data_lo [i][N];
     assign ver_io_rev_link_v_li    [i-1][S] = ver_io_rev_link_v_lo    [i][N];
     assign ver_io_rev_link_token_li[i-1][S] = ver_io_rev_link_token_lo[i][N];
+
+    assign async_ver_fwd_link_i_disable_li[i][N] = '0;
+    assign async_ver_rev_link_i_disable_li[i][N] = '0;
+    assign async_ver_fwd_link_o_disable_li[i-1][S] = '0;
+    assign async_ver_rev_link_o_disable_li[i-1][S] = '0;
 
     assign ver_io_fwd_link_clk_li  [i][N] = ver_io_fwd_link_clk_lo  [i-1][S];
     assign ver_io_fwd_link_data_li [i][N] = ver_io_fwd_link_data_lo [i-1][S];
