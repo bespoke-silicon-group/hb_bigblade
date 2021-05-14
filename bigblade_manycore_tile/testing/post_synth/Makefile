@@ -3,7 +3,7 @@
 BSG_MANYCORE_DIR := $(abspath ../../bsg_manycore)
 # By convention, basejump_stl is in the same directory as $(BSG_MANYCORE_DIR)
 BASEJUMP_STL_DIR := $(abspath ../../basejump_stl)
-BSG_14_DIR := $(abspath ../../bsg_14)
+HB_BIGBLADE_DIR := $(abspath ../../../)
 
 # Sets "VCS" variable
 include ../../bsg_cadenv/cadenv.mk
@@ -89,6 +89,7 @@ out/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEAD
 # with debug option for waveform generation.
 out/simv-debug : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEADERS) 
 	mkdir -p out
+	cp Makefile.machine.include out/
 	$(call set_machine_variables,$<)
 	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > out/pod_trace.tr
 	python $(ASCII_TO_ROM_PY) out/pod_trace.tr bsg_tag_boot_rom > out/bsg_tag_boot_rom.v
