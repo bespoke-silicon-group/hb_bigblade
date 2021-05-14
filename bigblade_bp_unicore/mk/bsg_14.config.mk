@@ -102,10 +102,12 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 #     in terms of speed and power at the expense of area
 # - rtm_exp
 #     Runtime exploration is designed to be quick and used for early experiments
-export DC_FLOW_RMPLUS_FLOW :=hplp
+#export DC_FLOW_RMPLUS_FLOW :=hplp
+#export DC_FLOW_RMPLUS_FLOW :=hc
 #export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 #export DC_FLOW_RMPLUS_FLOW :=hc
 #export DC_FLOW_RMPLUS_FLOW :=
+export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are
@@ -114,7 +116,6 @@ export DC_FLOW_RMPLUS_FLOW :=hplp
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE :=false
 
 # Turns off automatic clock gate insertion during synthesis compilation.
-export DC_FLOW_COMPILE_DISABLE_CLOCK_GATING :=false
 
 # Turns on design flattening during synthesis compilation,
 # removing all logical hierarchy in the design.

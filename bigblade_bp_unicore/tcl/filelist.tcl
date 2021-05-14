@@ -240,6 +240,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
   $bp_common_dir/src/v/bsg_async_noc_link.sv
+  $bp_common_dir/src/v/bsg_dff_reset_half.v
   $bp_top_dir/src/v/bp_cacc_complex.sv
   $bp_top_dir/src/v/bp_cfg.sv
   $bp_top_dir/src/v/bp_clint_slice.sv

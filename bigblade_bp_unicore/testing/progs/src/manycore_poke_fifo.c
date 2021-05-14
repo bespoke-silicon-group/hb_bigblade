@@ -64,8 +64,8 @@ void main(uint64_t argc, char * argv[]) {
     req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0xdeadbeef;
     // Store mask
-    req_packet.request.reg_id   = 0xf;
-    req_packet.request.op_v2    = 1; // Store
+    req_packet.request.reg_id   = 0xff;
+    req_packet.request.op_v2    = 2; // Store Word
     req_packet.request.addr     = some_mc_dram_eva;
 
     *mc_link_bp_req_fifo_addr = req_packet.words[0];
