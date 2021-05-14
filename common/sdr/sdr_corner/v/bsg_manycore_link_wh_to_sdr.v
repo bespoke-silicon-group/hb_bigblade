@@ -255,8 +255,8 @@
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_fwd_link_o_disable_i)
   ,.core_downstream_reset_i(core_downstream_reset_sync | async_fwd_link_i_disable_i)
-  ,.async_downlink_reset_i (async_downlink_reset_i     | async_fwd_link_i_disable_i)
-  ,.async_token_reset_i    (async_token_reset_i        | async_fwd_link_o_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo    | async_fwd_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_lo       | async_fwd_link_o_disable_i)
 
   ,.core_data_i (ver_link_sif_li.fwd.data)
   ,.core_v_i    (ver_link_sif_li.fwd.v)
@@ -287,8 +287,8 @@
   (.core_clk_i             (core_clk_i)
   ,.core_uplink_reset_i    (core_uplink_reset_sync     | async_rev_link_o_disable_i)
   ,.core_downstream_reset_i(core_downstream_reset_sync | async_rev_link_i_disable_i)
-  ,.async_downlink_reset_i (async_downlink_reset_i     | async_rev_link_i_disable_i)
-  ,.async_token_reset_i    (async_token_reset_i        | async_rev_link_o_disable_i)
+  ,.async_downlink_reset_i (async_downlink_reset_lo    | async_rev_link_i_disable_i)
+  ,.async_token_reset_i    (async_token_reset_lo       | async_rev_link_o_disable_i)
 
   ,.core_data_i (ver_link_sif_li.rev.data)
   ,.core_v_i    (ver_link_sif_li.rev.v)
