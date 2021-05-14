@@ -215,8 +215,9 @@ module bp_cce_to_mc_bridge
   logic [mc_addr_width_p-1:0] dram_epa_lo;
 
   wire [mc_data_width_p-1:0]         dram_eva_li = {1'b1, io_cmd_li.header.addr[2+:mc_data_width_p-1]};
-  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[2+mc_data_width_p-1+:pod_x_cord_width_p];
-  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[2+mc_data_width_p-1+pod_x_cord_width_p+:pod_y_cord_width_p];
+  // Need to stripe across mc_compute pods, 4x4
+  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = 1'b1 + io_cmd_li.header.addr[2+mc_data_width_p-1+:2];
+  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = 1'b1 + io_cmd_li.header.addr[2+mc_data_width_p-1+2+:2];
   bsg_manycore_dram_hash_function
    #(.data_width_p(mc_data_width_p)
      ,.addr_width_p(mc_addr_width_p)
@@ -324,7 +325,7 @@ module bp_cce_to_mc_bridge
      );
 
   wire mc_not_bp_li = io_cmd_li.header.addr[paddr_width_p-1];
-  wire bp_dram_li = io_cmd_li.header.addr > dram_base_addr_gp;
+  wire bp_dram_li = io_cmd_li.header.addr >= dram_base_addr_gp;
   bsg_manycore_packet_s mmio_out_packet_li;
   always_comb
     begin
