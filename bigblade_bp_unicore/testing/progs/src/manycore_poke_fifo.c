@@ -38,16 +38,16 @@ void main(uint64_t argc, char * argv[]) {
     // All addresses >= 0x80000000 live in the manycore. Therefore, enable all domains
     *did_mask_addr = 0xFFF;
     
-    uint64_t  bp_coproc_offset             = 2UL << 36UL;
+    uint64_t  mc_hi_bit = 1 << 41;
 
-    volatile uint32_t *mc_link_bp_req_fifo_addr     = (uint32_t *) (0x01000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_req_credits_addr  = (uint32_t *) (0x02000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_resp_fifo_addr    = (uint32_t *) (0x03000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_resp_entries_addr = (uint32_t *) (0x04000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_mc_req_fifo_addr     = (uint32_t *) (0x05000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_mc_req_entries_addr  = (uint32_t *) (0x06000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_rom_start_addr       = (uint32_t *) (0x07000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_rom_end_addr         = (uint32_t *) (0x07fff + bp_coproc_offset);
+    volatile uint64_t *mc_link_bp_req_fifo_addr     = (uint64_t *) (0x01000 | mc_hi_bit );
+    volatile uint64_t *mc_link_bp_req_credits_addr  = (uint64_t *) (0x02000 | mc_hi_bit );
+    volatile uint64_t *mc_link_bp_resp_fifo_addr    = (uint64_t *) (0x03000 | mc_hi_bit );
+    volatile uint64_t *mc_link_bp_resp_entries_addr = (uint64_t *) (0x04000 | mc_hi_bit );
+    volatile uint64_t *mc_link_mc_req_fifo_addr     = (uint64_t *) (0x05000 | mc_hi_bit );
+    volatile uint64_t *mc_link_mc_req_entries_addr  = (uint64_t *) (0x06000 | mc_hi_bit );
+    volatile uint64_t *mc_link_rom_start_addr       = (uint64_t *) (0x07000 | mc_hi_bit );
+    volatile uint64_t *mc_link_rom_end_addr         = (uint64_t *) (0x07fff | mc_hi_bit );
 
     // Set up EPA mapping according to vanilla core map
     // For now, store to some manycore V$ EVA
