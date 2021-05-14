@@ -1,0 +1,6 @@
+# remove temporary placement blockages for I/O
+remove_placement_blockages [get_placement_blockages sdr_place_blockage_0]
+remove_placement_blockages [get_placement_blockages sdr_place_blockage_1]
+remove_placement_blockages [get_placement_blockages sdr_place_blockage_2]
+remove_placement_blockages [get_placement_blockages sdr_place_blockage_3]
+remove_placement_blockages [get_placement_blockages sdr_place_blockage_4]
