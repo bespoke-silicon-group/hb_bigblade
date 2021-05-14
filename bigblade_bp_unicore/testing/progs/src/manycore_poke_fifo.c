@@ -56,12 +56,12 @@ void main(uint64_t argc, char * argv[]) {
     hb_mc_packet_t req_packet;
 
     // Store deadbeef to manycore V$ at the right coordinates (based on data striping)
-    req_packet.request.x_dst    = 1;
-    req_packet.request.y_dst    = 0;
+    req_packet.request.x_dst    = (1 << 4) | 1;
+    req_packet.request.y_dst    = (0 << 3) | 7;
     // Unused
-    req_packet.request.x_src    = 0;
+    req_packet.request.x_src    = (0 << 0) | 0;
     // Unused
-    req_packet.request.y_src    = 1;
+    req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0xdeadbeef;
     // Store mask
     req_packet.request.reg_id   = 0xf;
@@ -74,12 +74,12 @@ void main(uint64_t argc, char * argv[]) {
     *mc_link_bp_req_fifo_addr = req_packet.words[3];
 
     // Read deadbeef from manycore V$ at the right coordinates (based on data striping)
-    req_packet.request.x_dst    = 1;
-    req_packet.request.y_dst    = 0;
+    req_packet.request.x_dst    = (1 << 4) | 1;
+    req_packet.request.y_dst    = (0 << 3) | 7;
     // Unused
-    req_packet.request.x_src    = 0;
+    req_packet.request.x_src    = (0 << 0) | 0;
     // Unused
-    req_packet.request.y_src    = 1;
+    req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0;
     // Store mask
     req_packet.request.reg_id   = 0x10;
