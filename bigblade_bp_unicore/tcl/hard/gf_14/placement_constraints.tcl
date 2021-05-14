@@ -251,6 +251,15 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
+
+# create temporary placement blockages for I/O
+create_placement_blockage -name sdr_place_blockage_0 -boundary {{155.98 167.04} {240.408 169.54}}
+create_placement_blockage -name sdr_place_blockage_1 -boundary {{240.408 246.24} {282.24 248.74}}
+create_placement_blockage -name sdr_place_blockage_2 -boundary {{155.98 397.34} {282.24 399.84}}
+create_placement_blockage -name sdr_place_blockage_3 -boundary {{237.908 167.04} {240.408 246.24}}
+create_placement_blockage -name sdr_place_blockage_4 -boundary {{279.74 246.24} {282.24 399.84}}
+
+
 #####################################
 ### GUI setup
 ###

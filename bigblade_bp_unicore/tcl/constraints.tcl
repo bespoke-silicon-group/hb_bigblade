@@ -37,8 +37,8 @@ set token_clk_period_ps       [expr 2*$link_clk_period_ps]
 set token_clk_uncertainty_per 3.0
 set token_clk_uncertainty_ps  [expr min([expr $token_clk_period_ps*($token_clk_uncertainty_per/100.0)], 20)]
 
-set max_io_output_margin_ps   140
-set max_io_input_margin_ps    140
+set max_io_output_margin_ps   200
+set max_io_input_margin_ps    200
 
 set tag_clk_name "tag_clk"
 set tag_clk_period_ps      5000.0 ;# 200 MHz
