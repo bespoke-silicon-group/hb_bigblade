@@ -25,7 +25,7 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
     if {$x == [expr $HB_SUBARRAY_NUM_TILES_X_P-1]} {
       set tapx [expr $tile_array_width-1.176]
     } else {
-      set tapx [expr $llx+$TAPCELL_X_OFFSET]
+      set tapx [expr $llx+(0.084*42)]
     }
     set tap_cells [get_cells -filter "name=~tapfiller*" -within $search_bbox]
     foreach_in_collection tap_cell $tap_cells {
@@ -49,7 +49,7 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
 
     # left side of buffer
     set llx [get_attribute [get_cells "y_${y}__x_${x}__tile"] boundary_bounding_box.ur_x]
-    set urx [expr $llx + $RB_RP_X_OFFSET]
+    set urx [expr $llx + (0.084*11)]
     set boundary [list [list $llx $lly] [list $urx $ury]]
     create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_left"
 
@@ -58,8 +58,8 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
       set urx [expr $tile_array_width]
       set llx [expr $urx - (0.084*25)]
     } else {
-      set urx [expr $llx+$tile_x_space]
-      set llx [expr $urx - (0.084*25)]
+      set urx [expr $llx+4.704]
+      set llx [expr $urx-1.176]
     }
     set boundary [list [list $llx $lly] [list $urx $ury]]
     create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_right"
