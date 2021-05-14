@@ -311,7 +311,7 @@ module bsg_gateway_chip
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
      // This router does not talk to anything, so stub all ports
-     ,.stub_p(4'b1111) // SNEW
+     ,.stub_p(4'b0101) // SNEW
      // 2-D mesh routing
      ,.dims_p(2)
      )
@@ -336,7 +336,7 @@ module bsg_gateway_chip
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
      // This router does not talk to anything, so stub all ports
-     ,.stub_p(4'b1111) // SNEW
+     ,.stub_p(4'b1001) // SNEW
      // 2-D mesh routing
      ,.dims_p(2)
      )
