@@ -99,7 +99,7 @@ class NBF:
                 curr_addr += 4
 
                 # Fixme: This works only for 1 north vcache pod and 1 south vcache pod
-                self.print_nbf(1<<4 | x, y<<4, epa, data)
+                self.print_nbf(1<<4 | x, y<<4 | (7-7*y), epa, data)
 
     # Initialize V$ or infinite memories (Useful for no DRAM mode)
     # Emulates the hashing function in bsg_manycore/v/vanilla_bean/hash_function.v

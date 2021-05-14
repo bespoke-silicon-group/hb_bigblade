@@ -336,8 +336,6 @@ module bsg_gateway_chip
      ,.y_cord_width_p(mc_y_cord_width_gp)
      // This router does not talk to anything, so stub all ports
      ,.stub_p(4'b1001) // SNEW
-     // 2-D mesh routing
-     ,.dims_p(2)
      )
     rtr02
     (.clk_i(manycore_clk)
@@ -367,8 +365,6 @@ module bsg_gateway_chip
       ,.y_cord_width_p(mc_y_cord_width_gp)
       // W port is not used
       ,.stub_p(4'b0001) // SNEW
-      // 2-D mesh routing
-      ,.dims_p(2)
       )
       rtr
       (.clk_i(manycore_clk)
@@ -394,11 +390,7 @@ module bsg_gateway_chip
       ,.data_width_p(mc_data_width_gp)
       ,.x_cord_width_p(mc_x_cord_width_gp)
       ,.y_cord_width_p(mc_y_cord_width_gp)
-      // V$'s dont talk to other V$ on the same row
-      // North V$'s don't use the North port
-      ,.stub_p(4'b0111) // SNEW
-      // 2-D mesh routing
-      ,.dims_p(2)
+      ,.stub_p(4'b0100) // SNEW
       )
       rtr
       (.clk_i(manycore_clk)
@@ -411,7 +403,7 @@ module bsg_gateway_chip
       ,.proc_link_sif_o(proc_link_out[0][i])
 
       ,.global_x_i({pod_x_cord_width_gp'(1'b1), mc_x_subcord_width_gp'(i-1)})
-      ,.global_y_i({pod_y_cord_width_gp'(1'b0), mc_y_subcord_width_gp'(1'b0)})
+      ,.global_y_i({pod_y_cord_width_gp'(1'b0), mc_y_subcord_width_gp'('1)})
       );
     end
 
@@ -423,11 +415,7 @@ module bsg_gateway_chip
       ,.data_width_p(mc_data_width_gp)
       ,.x_cord_width_p(mc_x_cord_width_gp)
       ,.y_cord_width_p(mc_y_cord_width_gp)
-      // V$'s dont talk to other V$ on the same row
-      // South V$'s don't use the South port
-      ,.stub_p(4'b1011) // SNEW
-      // 2-D mesh routing
-      ,.dims_p(2)
+      ,.stub_p(4'b1000) // SNEW
       )
       rtr
       (.clk_i(manycore_clk)
@@ -440,7 +428,7 @@ module bsg_gateway_chip
       ,.proc_link_sif_o(proc_link_out[num_links_y_lp-1][i])
 
       ,.global_x_i({pod_x_cord_width_gp'(1'b1), mc_x_subcord_width_gp'(i-1)})
-      ,.global_y_i({pod_y_cord_width_gp'(2'b10), mc_y_subcord_width_gp'(1'b0)})
+      ,.global_y_i({pod_y_cord_width_gp'(2'b10), mc_y_subcord_width_gp'('0)})
       );
     end
 
