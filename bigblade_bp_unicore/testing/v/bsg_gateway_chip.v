@@ -178,7 +178,6 @@ module bsg_gateway_chip
   `declare_bp_bedrock_mem_if(paddr_width_p, cce_block_width_p, lce_id_width_p, lce_assoc_p, cce);
   `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
   bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_li, mc_proc_links_lo;
-  bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_raw_lo;
 
   wire [mc_y_cord_width_gp-1:0] global_y_cord_li = {pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(1'b1)};
 
@@ -239,11 +238,11 @@ module bsg_gateway_chip
 
          ,.core_data_i(mc_proc_links_li[i][P].fwd.data)
          ,.core_v_i(mc_proc_links_li[i][P].fwd.v)
-         ,.core_ready_o(mc_proc_links_raw_lo[i][P].fwd.ready_and_rev)
+         ,.core_ready_o(mc_proc_links_lo[i][P].fwd.ready_and_rev)
 
-         ,.core_data_o(mc_proc_links_raw_lo[i][P].fwd.data)
-         ,.core_v_o(mc_proc_links_raw_lo[i][P].fwd.v)
-         ,.core_yumi_i(mc_proc_links_raw_lo[i][P].fwd.v & mc_proc_links_li[i][P].fwd.ready_and_rev)
+         ,.core_data_o(mc_proc_links_lo[i][P].fwd.data)
+         ,.core_v_o(mc_proc_links_lo[i][P].fwd.v)
+         ,.core_yumi_i(mc_proc_links_lo[i][P].fwd.v & mc_proc_links_li[i][P].fwd.ready_and_rev)
 
          ,.link_clk_o(io_fwd_link_clk_li[i])
          ,.link_data_o(io_fwd_link_data_li[i])
@@ -270,11 +269,11 @@ module bsg_gateway_chip
 
          ,.core_data_i(mc_proc_links_li[i][P].rev.data)
          ,.core_v_i(mc_proc_links_li[i][P].rev.v)
-         ,.core_ready_o(mc_proc_links_raw_lo[i][P].rev.ready_and_rev)
+         ,.core_ready_o(mc_proc_links_lo[i][P].rev.ready_and_rev)
 
-         ,.core_data_o(mc_proc_links_raw_lo[i][P].rev.data)
-         ,.core_v_o(mc_proc_links_raw_lo[i][P].rev.v)
-         ,.core_yumi_i(mc_proc_links_raw_lo[i][P].rev.v & mc_proc_links_li[i][P].rev.ready_and_rev)
+         ,.core_data_o(mc_proc_links_lo[i][P].rev.data)
+         ,.core_v_o(mc_proc_links_lo[i][P].rev.v)
+         ,.core_yumi_i(mc_proc_links_lo[i][P].rev.v & mc_proc_links_li[i][P].rev.ready_and_rev)
 
          ,.link_clk_o(io_rev_link_clk_li[i])
          ,.link_data_o(io_rev_link_data_li[i])
@@ -507,8 +506,8 @@ module bsg_gateway_chip
      ,.data_width_p(mc_data_width_gp)
      ,.x_cord_width_p(mc_x_cord_width_gp)
      ,.y_cord_width_p(mc_y_cord_width_gp)
-     ,.io_x_cord_p({pod_x_cord_width_gp'(1'b0), mc_x_cord_width_gp'(1'b0)})
-     ,.io_y_cord_p({pod_y_cord_width_gp'(1'b1), mc_y_cord_width_gp'(1'b0)})
+     ,.io_x_cord_p({pod_x_cord_width_gp'(1'b0), mc_x_subcord_width_gp'(1'b0)})
+     ,.io_y_cord_p({pod_y_cord_width_gp'(1'b1), mc_y_subcord_width_gp'(1'b0)})
      )
    io
     (.clk_i(manycore_clk)
@@ -521,15 +520,6 @@ module bsg_gateway_chip
      ,.loader_done_o()
      );
 
-  // BP link connections
-  always_comb
-    for (integer j = 1; j <= 3; j++)
-      for (integer i = 0; i < $bits(bsg_manycore_link_sif_s); i++)
-        begin
-          if (mc_proc_links_raw_lo[j][i] == 1'bX) mc_proc_links_lo[j][i] = 1'b0;
-          else mc_proc_links_lo[j][i] = mc_proc_links_raw_lo[j][i];
-        end
-
   // BP <--> Fake network connections
   // mc_proc_link[0] = I/O
   // mc_proc_link[1] = DRAM 1
@@ -541,7 +531,7 @@ module bsg_gateway_chip
     end
   
   // Tie off all links below BP
-  for (i = 5; i < num_links_y_lp-2; i++)
+  for (i = 5; i < num_links_y_lp-1; i++)
     begin : below_bp
       assign proc_link_in[i][0] = '0;
     end
