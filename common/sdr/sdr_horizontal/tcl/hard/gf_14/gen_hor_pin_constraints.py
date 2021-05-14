@@ -99,6 +99,24 @@ HB_RUCHE_FWD_READY_IDX      =  138
 HB_RUCHE_FWD_VALID_IDX      =  139
 
 
+# disable pins
+port = "async_rev_link_o_disable_i"
+key = "ruche_link_o[{}]".format(0)
+place_pin(port, key, sdr_link_x_loc)
+
+port = "async_fwd_link_o_disable_i"
+key = "ruche_link_o[{}]".format(1)
+place_pin(port, key, sdr_link_x_loc)
+
+port = "async_rev_link_i_disable_i"
+key = "ruche_link_o[{}]".format(2)
+place_pin(port, key, sdr_link_x_loc)
+
+port = "async_fwd_link_i_disable_i"
+key = "ruche_link_o[{}]".format(3)
+place_pin(port, key, sdr_link_x_loc)
+
+
 # rev upstream
 for i in range(HB_REV_PACKET_WIDTH):
   port = "io_rev_link_data_o[{}]".format(i)

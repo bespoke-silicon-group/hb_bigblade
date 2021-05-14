@@ -197,6 +197,8 @@ append_to_collection tag_ports [get_ports "tag_clk_i"]
 append_to_collection tag_ports [get_ports "tag_data_i"]
 append_to_collection tag_ports [get_ports "tag_node_id_offset_i"]
 
+set disable_ports [get_ports "async_*_disable_i*"]
+
 if {$::env(EAST_NOT_WEST) == 1} {
   if {$::env(SOUTH_NOT_NORTH) == 1} {
     # SE
@@ -208,6 +210,7 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection south_misc_ports [get_ports "core_reset_o"]
     append_to_collection south_misc_ports [sort_collection [get_ports "core_global_*_o*"] name]
     append_to_collection south_misc_ports $tag_ports
+    append_to_collection south_misc_ports $disable_ports
     
     place_pins_k2_k4 $north_misc_ports [expr 0.128*311] $core_ury
     place_pins_k2_k4 $south_misc_ports [expr 0.128*311] $core_lly
@@ -217,6 +220,7 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection north_misc_ports [get_ports "core_reset_i"]
     append_to_collection north_misc_ports [sort_collection [get_ports "core_global_*_i*"] name]
     append_to_collection north_misc_ports $tag_ports
+    append_to_collection north_misc_ports $disable_ports
     set south_misc_ports [list]
     append_to_collection south_misc_ports [sort_collection [get_ports "async_*_reset_o"] name]
     append_to_collection south_misc_ports [get_ports "core_reset_o"]
@@ -236,6 +240,7 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection south_misc_ports [get_ports "core_reset_o"]
     append_to_collection south_misc_ports [sort_collection [get_ports "core_global_*_o*"] name]
     append_to_collection south_misc_ports $tag_ports
+    append_to_collection south_misc_ports $disable_ports
     
     place_pins_k2_k4 $north_misc_ports [expr 0.128*8] $core_ury
     place_pins_k2_k4 $south_misc_ports [expr 0.128*8] $core_lly
@@ -245,6 +250,7 @@ if {$::env(EAST_NOT_WEST) == 1} {
     append_to_collection north_misc_ports [get_ports "core_reset_i"]
     append_to_collection north_misc_ports [sort_collection [get_ports "core_global_*_i*"] name]
     append_to_collection north_misc_ports $tag_ports
+    append_to_collection north_misc_ports $disable_ports
     append_to_collection north_misc_ports [sort_collection [get_ports "async_*_reset_o"] name]
     set south_misc_ports [list]
     append_to_collection south_misc_ports [get_ports "core_reset_o"]

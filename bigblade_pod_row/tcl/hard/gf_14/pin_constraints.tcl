@@ -14,6 +14,7 @@ append_to_collection matching_ports [get_ports "hor_io_*"]
 append_to_collection matching_ports [get_ports "io_wh_*"]
 append_to_collection matching_ports [get_ports "async_reset_tag_*"]
 append_to_collection matching_ports [get_ports "pod_tag_*"]
+append_to_collection matching_ports [get_ports "async_*_disable_i*"]
 
 bsg_create_macro_matching_ports $matching_ports false
 

@@ -163,7 +163,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/imports/HardFloat/source/mulAddRecFN.v
   $bsg_manycore_dir/imports/HardFloat/source/recFNToFN.v
   $bsg_manycore_dir/imports/HardFloat/source/recFNToIN.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
@@ -172,7 +171,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_link_async_to_wormhole.v
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
   $bsg_manycore_dir/v/bsg_manycore_mesh_node.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v

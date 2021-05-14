@@ -85,16 +85,29 @@ constraint_input_ports  $core_clk_name $core_link_fwd_ready_in_ports   840 0
 
 if {$::env(SOUTH_NOT_NORTH) == 0} {
   # core reset
-  constraint_input_ports  $core_clk_name [get_ports core_reset_i]     0 40
-  constraint_output_ports $core_clk_name [get_ports core_reset_o]     0 40
+  constraint_input_ports  $core_clk_name [get_ports core_reset_i]   40 40
+  constraint_output_ports $core_clk_name [get_ports core_reset_o]   40 40
+  constraint_input_ports  $core_clk_name [get_ports core_global_*_i*]    40 40
+  constraint_output_ports $core_clk_name [get_ports core_global_*_o*]    40 40
+
   # global coordinates
-  set_false_path -from [core_global_*_i*]
-  set_false_path -to   [core_global_*_o*]
+  # The timing paths to/from these registers don't need a single-cycle requirement, 
+  # so relax the constraints by allowing double cycle.
+  # The hold cycle is set to 2, so that it becomes much easier to meet hold check.
+  set multicycle_cells [list]
+  append_to_collection multicycle_cells [get_cells dff_global_x/data_r_reg*]
+  append_to_collection multicycle_cells [get_cells dff_global_y/data_r_reg*]
+  append_to_collection multicycle_cells [get_cells dff_core_reset/data_r_reg*]
+  set_multicycle_path 2 -setup -to   $multicycle_cells
+  set_multicycle_path 2 -hold  -to   $multicycle_cells
+  set_multicycle_path 2 -setup -from $multicycle_cells
+  set_multicycle_path 2 -hold  -from $multicycle_cells
 }
 
 # false path
 set_false_path -from [get_ports async_*_reset_i]
 set_false_path -to   [get_ports async_*_reset_o]
+set_false_path -from [get_ports async_*_disable_i]
 
 
 # Source-sync link constraints

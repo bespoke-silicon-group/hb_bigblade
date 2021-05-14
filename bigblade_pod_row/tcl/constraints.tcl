@@ -9,7 +9,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_async.constra
 
 set manycore_clk_name             "manycore_clk"
 set manycore_clk_port             "ext_clk_i"
-set manycore_clk_period_ps        1200.0
+set manycore_clk_period_ps        1100.0
 set manycore_clk_uncertainty_ps   20
 
 set_input_transition 75 [get_port $manycore_clk_port]
@@ -39,11 +39,19 @@ append_to_collection tag_id_ports [get_ports "pod_tag_node_id_offset_i*"]
 append_to_collection tag_id_ports [get_ports "async_reset_tag_node_id_offset_i*"]
 set_false_path -from $tag_id_ports
 
+set_false_path -from [get_ports async_*_disable_i*]
 
 # global x/y
-set_false_path -from [get_ports global_*_i*]
-set_false_path -through [get_pins -filter "name=~*global_*_*"]
-set_false_path -through [get_pins -filter "name=~async*reset*"]
+#set_false_path -from [get_ports global_*_i*]
+#set_false_path -through [get_pins -filter "name=~*global_*_*"]
+#set_false_path -through [get_pins -filter "name=~async*reset*"]
+
+set_input_delay -max 0   -clock "manycore_clk" [get_ports global_*_i*]
+set_input_delay -min 200 -clock "manycore_clk" [get_ports global_*_i*]
+set_driving_cell -min -no_design_rule -lib_cell "SC7P5T_INVX8_SSC14R" [get_ports global_*_i*]
+set_driving_cell -max -no_design_rule -lib_cell "SC7P5T_INVX2_SSC14R" [get_ports global_*_i*]
+set_multicycle_path 2 -setup -from [get_ports global_*_i*]
+set_multicycle_path 2 -hold  -from [get_ports global_*_i*]
 
 # async path
 bsg_async_icl [all_clocks]

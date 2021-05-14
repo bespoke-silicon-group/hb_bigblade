@@ -40,6 +40,11 @@ module bsg_manycore_pod_row_sdr
     , input [2+total_num_tiles_x_lp-1:0][hb_y_cord_width_gp-1:0] global_y_i
 
     // ver IO
+    , input  [S:N][2+total_num_tiles_x_lp-1:0] async_ver_fwd_link_i_disable_i
+    , input  [S:N][2+total_num_tiles_x_lp-1:0] async_ver_fwd_link_o_disable_i
+    , input  [S:N][2+total_num_tiles_x_lp-1:0] async_ver_rev_link_i_disable_i
+    , input  [S:N][2+total_num_tiles_x_lp-1:0] async_ver_rev_link_o_disable_i
+
     , output [S:N][2+total_num_tiles_x_lp-1:0]                    ver_io_fwd_link_clk_o
     , output [S:N][2+total_num_tiles_x_lp-1:0][fwd_width_lp-1:0]  ver_io_fwd_link_data_o
     , output [S:N][2+total_num_tiles_x_lp-1:0]                    ver_io_fwd_link_v_o
@@ -61,6 +66,11 @@ module bsg_manycore_pod_row_sdr
     , output [S:N][2+total_num_tiles_x_lp-1:0]                    ver_io_rev_link_token_o
 
     // hor manycore IO
+    , input  [E:W][hb_num_tiles_y_gp-1:0] async_hor_fwd_link_i_disable_i
+    , input  [E:W][hb_num_tiles_y_gp-1:0] async_hor_fwd_link_o_disable_i
+    , input  [E:W][hb_num_tiles_y_gp-1:0] async_hor_rev_link_i_disable_i
+    , input  [E:W][hb_num_tiles_y_gp-1:0] async_hor_rev_link_o_disable_i
+
     , output [E:W][hb_num_tiles_y_gp-1:0]                         hor_io_fwd_link_clk_o
     , output [E:W][hb_num_tiles_y_gp-1:0][fwd_width_lp-1:0]       hor_io_fwd_link_data_o
     , output [E:W][hb_num_tiles_y_gp-1:0]                         hor_io_fwd_link_v_o
@@ -215,6 +225,11 @@ module bsg_manycore_pod_row_sdr
       ,.async_downstream_reset_o  (sdr_n_async_downstream_reset_lo[x])
       ,.async_token_reset_o       (sdr_n_async_token_reset_lo[x])
 
+      ,.async_fwd_link_i_disable_i(async_ver_fwd_link_i_disable_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_fwd_link_o_disable_i(async_ver_fwd_link_o_disable_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_rev_link_i_disable_i(async_ver_rev_link_i_disable_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_rev_link_o_disable_i(async_ver_rev_link_o_disable_i[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+
       ,.io_fwd_link_clk_o         (ver_io_fwd_link_clk_o[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
       ,.io_fwd_link_data_o        (ver_io_fwd_link_data_o[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
       ,.io_fwd_link_v_o           (ver_io_fwd_link_v_o[N][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
@@ -289,6 +304,11 @@ module bsg_manycore_pod_row_sdr
       ,.async_downlink_reset_o    (sdr_s_async_downlink_reset_lo[x])
       ,.async_downstream_reset_o  (sdr_s_async_downstream_reset_lo[x])
       ,.async_token_reset_o       (sdr_s_async_token_reset_lo[x])
+
+      ,.async_fwd_link_i_disable_i(async_ver_fwd_link_i_disable_i[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_fwd_link_o_disable_i(async_ver_fwd_link_o_disable_i[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_rev_link_i_disable_i(async_ver_rev_link_i_disable_i[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
+      ,.async_rev_link_o_disable_i(async_ver_rev_link_o_disable_i[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
 
       ,.io_fwd_link_clk_o         (ver_io_fwd_link_clk_o[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
       ,.io_fwd_link_data_o        (ver_io_fwd_link_data_o[S][(x*hb_num_tiles_x_gp)+1+:hb_num_tiles_x_gp])
@@ -371,6 +391,11 @@ module bsg_manycore_pod_row_sdr
       ,.async_downlink_reset_o    (sdr_w_async_downlink_reset_lo[y])
       ,.async_downstream_reset_o  (sdr_w_async_downstream_reset_lo[y])
       ,.async_token_reset_o       (sdr_w_async_token_reset_lo[y])
+
+      ,.async_fwd_link_i_disable_i(async_hor_fwd_link_i_disable_i[W][y])
+      ,.async_fwd_link_o_disable_i(async_hor_fwd_link_o_disable_i[W][y])
+      ,.async_rev_link_i_disable_i(async_hor_rev_link_i_disable_i[W][y])
+      ,.async_rev_link_o_disable_i(async_hor_rev_link_o_disable_i[W][y])
 
       ,.io_fwd_link_clk_o       (hor_io_fwd_link_clk_o[W][y])
       ,.io_fwd_link_data_o      (hor_io_fwd_link_data_o[W][y])
@@ -462,6 +487,11 @@ module bsg_manycore_pod_row_sdr
       ,.async_downstream_reset_o  (sdr_e_async_downstream_reset_lo[y])
       ,.async_token_reset_o       (sdr_e_async_token_reset_lo[y])
 
+      ,.async_fwd_link_i_disable_i(async_hor_fwd_link_i_disable_i[E][y])
+      ,.async_fwd_link_o_disable_i(async_hor_fwd_link_o_disable_i[E][y])
+      ,.async_rev_link_i_disable_i(async_hor_rev_link_i_disable_i[E][y])
+      ,.async_rev_link_o_disable_i(async_hor_rev_link_o_disable_i[E][y])
+
       ,.io_fwd_link_clk_o       (hor_io_fwd_link_clk_o[E][y])
       ,.io_fwd_link_data_o      (hor_io_fwd_link_data_o[E][y])
       ,.io_fwd_link_v_o         (hor_io_fwd_link_v_o[E][y])
@@ -540,6 +570,11 @@ module bsg_manycore_pod_row_sdr
     ,.async_downstream_reset_o    (sdr_n_async_downstream_reset_li[0])
     ,.async_token_reset_o         (sdr_n_async_token_reset_li[0])
 
+    ,.async_fwd_link_i_disable_i  (async_ver_fwd_link_i_disable_i[N][0])
+    ,.async_fwd_link_o_disable_i  (async_ver_fwd_link_o_disable_i[N][0])
+    ,.async_rev_link_i_disable_i  (async_ver_rev_link_i_disable_i[N][0])
+    ,.async_rev_link_o_disable_i  (async_ver_rev_link_o_disable_i[N][0])
+
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[N][0])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[N][0])
     ,.io_fwd_link_v_o             (ver_io_fwd_link_v_o[N][0])
@@ -608,6 +643,11 @@ module bsg_manycore_pod_row_sdr
     ,.async_downstream_reset_o    (sdr_e_async_downstream_reset_li[0])
     ,.async_token_reset_o         (sdr_e_async_token_reset_li[0])
 
+    ,.async_fwd_link_i_disable_i  (async_ver_fwd_link_i_disable_i[N][2+total_num_tiles_x_lp-1])
+    ,.async_fwd_link_o_disable_i  (async_ver_fwd_link_o_disable_i[N][2+total_num_tiles_x_lp-1])
+    ,.async_rev_link_i_disable_i  (async_ver_rev_link_i_disable_i[N][2+total_num_tiles_x_lp-1])
+    ,.async_rev_link_o_disable_i  (async_ver_rev_link_o_disable_i[N][2+total_num_tiles_x_lp-1])
+
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[N][2+total_num_tiles_x_lp-1])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[N][2+total_num_tiles_x_lp-1])
     ,.io_fwd_link_v_o             (ver_io_fwd_link_v_o[N][2+total_num_tiles_x_lp-1])
@@ -674,6 +714,11 @@ module bsg_manycore_pod_row_sdr
     ,.async_downlink_reset_o      (sdr_w_async_downlink_reset_li[hb_num_tiles_y_gp-1])
     ,.async_downstream_reset_o    (sdr_w_async_downstream_reset_li[hb_num_tiles_y_gp-1])
     ,.async_token_reset_o         (sdr_w_async_token_reset_li[hb_num_tiles_y_gp-1])
+
+    ,.async_fwd_link_i_disable_i  (async_ver_fwd_link_i_disable_i[S][0])
+    ,.async_fwd_link_o_disable_i  (async_ver_fwd_link_o_disable_i[S][0])
+    ,.async_rev_link_i_disable_i  (async_ver_rev_link_i_disable_i[S][0])
+    ,.async_rev_link_o_disable_i  (async_ver_rev_link_o_disable_i[S][0])
 
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[S][0])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[S][0])
@@ -743,6 +788,11 @@ module bsg_manycore_pod_row_sdr
     ,.async_downlink_reset_o    (sdr_s_async_downlink_reset_li[hb_num_pods_x_gp-1])
     ,.async_downstream_reset_o  (sdr_s_async_downstream_reset_li[hb_num_pods_x_gp-1])
     ,.async_token_reset_o       (sdr_s_async_token_reset_li[hb_num_pods_x_gp-1])
+
+    ,.async_fwd_link_i_disable_i  (async_ver_fwd_link_i_disable_i[S][2+total_num_tiles_x_lp-1])
+    ,.async_fwd_link_o_disable_i  (async_ver_fwd_link_o_disable_i[S][2+total_num_tiles_x_lp-1])
+    ,.async_rev_link_i_disable_i  (async_ver_rev_link_i_disable_i[S][2+total_num_tiles_x_lp-1])
+    ,.async_rev_link_o_disable_i  (async_ver_rev_link_o_disable_i[S][2+total_num_tiles_x_lp-1])
 
     ,.io_fwd_link_clk_o           (ver_io_fwd_link_clk_o[S][2+total_num_tiles_x_lp-1])
     ,.io_fwd_link_data_o          (ver_io_fwd_link_data_o[S][2+total_num_tiles_x_lp-1])

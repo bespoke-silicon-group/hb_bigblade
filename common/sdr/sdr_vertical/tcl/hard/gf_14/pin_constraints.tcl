@@ -122,6 +122,9 @@ for {set i [expr $HB_FWD_PACKET_WIDTH/2]} {$i < $HB_FWD_PACKET_WIDTH} {incr i} {
 # core clock
 set clk_ports [get_ports "core_clk_i"]
 
+# link disable
+set disable_ports [sort_collection [get_ports "async_*_disable_i*"] name]
+
 # cord reset pins
 
 
@@ -132,6 +135,8 @@ if {$::env(SOUTH_NOT_NORTH) == 1} {
 
   place_pins_k2_k4 $sdr_out_ports       $NORTH_INPUT_OFFSET $core_lly
   place_pins_k2_k4 $sdr_in_ports        $NORTH_OUTPUT_OFFSET $core_lly
+
+  place_pins_k2_k4 $disable_ports [expr $core_llx+(0.128*50)] $core_lly
 } else {
   place_pins_k2_k4 $core_link_in_ports  $NORTH_OUTPUT_OFFSET $core_lly
   place_pins_k2_k4 $core_link_out_ports $NORTH_INPUT_OFFSET $core_lly
@@ -140,6 +145,7 @@ if {$::env(SOUTH_NOT_NORTH) == 1} {
   place_pins_k2_k4 $sdr_out_ports       $NORTH_OUTPUT_OFFSET $core_ury
   place_pins_k2_k4 $sdr_in_ports        $NORTH_INPUT_OFFSET  $core_ury
 
+  place_pins_k2_k4 $disable_ports [expr $core_llx+(0.128*50)] $core_ury
 
   set cord_reset_in_pins [list]
   append_to_collection cord_reset_in_pins [sort_collection [get_ports "core_global_*_i*"] name]

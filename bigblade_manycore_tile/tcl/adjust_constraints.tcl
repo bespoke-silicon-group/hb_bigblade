@@ -7,8 +7,6 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constan
 set clk_name           "manycore_clk"
 set clk_period_ps      1000
 set clk_uncertainty_ps 20
-create_clock -period ${clk_period_ps} -name ${clk_name} [get_ports clk_i]
-set_clock_uncertainty ${clk_uncertainty_ps} [get_clocks ${clk_name}]
 
 
 # Grouping ports...
@@ -153,15 +151,6 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 # reset ports
 constraint_input_ports $clk_name $reset_in_port  500 40
 constraint_output_ports $clk_name $reset_out_port 500 40
-
-#set cord_in_ports [list]
-#append_to_collection cord_in_ports [get_ports global_*_i*]
-#constraint_input_ports $clk_name $cord_in_ports 500 40
-#set cord_out_ports [list]
-#append_to_collection cord_out_ports [get_ports global_*_o*]
-#constraint_output_ports $clk_name $cord_out_ports 500 40
-set_false_path -from [get_ports global_*_i*]
-set_false_path -to   [get_ports global_*_o*]
 
 
 
