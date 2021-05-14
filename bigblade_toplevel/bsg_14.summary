@@ -4,6 +4,7 @@ Summary for repository bsg_14:
     PASS: NO Uncommitted Files
     PASS: commit 5ce566b is in remote
     PASS: Expected branch found match in remote
+    PASS: Head of remote branch matches current commit
     PASS: No Untracked Files
 Summary for bsg_14 finished
 

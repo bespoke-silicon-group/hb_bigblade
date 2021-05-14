@@ -20,6 +20,7 @@ else
     for f in $REPOSITORY_UNCOMMITTED; do
         echo "        $f"
     done
+    echo ""
     exit 1
 fi
 
@@ -43,6 +44,16 @@ else
         n=`echo $b | sed 's/.*\///'`
         if [[ $REPOSITORY_EXPECTED_COMMIT == $n ]]; then
             echo "    PASS: Expected branch found match in remote"
+            REPOSITORY_REMOTE_COMMIT=`cd $REPOSITORY_PATH && git rev-parse --short $b`
+            if [[ $REPOSITORY_CURRENT_COMMIT == $REPOSITORY_REMOTE_COMMIT ]]; then
+                echo "    PASS: Head of remote branch matches current commit"
+            else 
+                echo "    FAIL: HEAD OF REMOTE BRANCH AHEAD OF CURRENT BRANCH. Pull!"
+                echo "          $b (remote): $REPOSITORY_REMOTE_COMMIT"
+                echo "          $REPOSITORY_EXPECTED_COMMIT (local): $REPOSITORY_CURRENT_COMMIT"
+                echo
+                exit -1
+            fi
             found=1
             break
         fi

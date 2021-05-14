@@ -4,6 +4,7 @@ Summary for repository bsg_packaging:
     PASS: NO Uncommitted Files
     PASS: commit dcacd77 is in remote
     PASS: Expected branch found match in remote
+    PASS: Head of remote branch matches current commit
     PASS: No Untracked Files
 Summary for bsg_packaging finished
 

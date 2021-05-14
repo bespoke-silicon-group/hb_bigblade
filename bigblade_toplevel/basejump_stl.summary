@@ -1,9 +1,10 @@
 Summary for repository basejump_stl:
     EXPECTED COMMIT/BRANCH: dev-bsg_link_ddr_encode
-    CURRENT COMMIT: 3b11552
+    CURRENT COMMIT: aa7ba71
     PASS: NO Uncommitted Files
-    PASS: commit 3b11552 is in remote
+    PASS: commit aa7ba71 is in remote
     PASS: Expected branch found match in remote
+    PASS: Head of remote branch matches current commit
     WARN: UNTRACKED FILES EXIST
     Untracked Files:
         .foo

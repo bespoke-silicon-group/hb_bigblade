@@ -67,6 +67,8 @@ basejump_stl.init:
 
 summaries=$(subst .repo,.summary,$(all_repos))
 .PHONY: $(summaries)
+
+$(summaries): .SHELLFLAGS = -o pipefail -c
 $(summaries): %.summary: 
 	@./summarize.sh $* $($*_commit) $($*_url) | tee $@
 
