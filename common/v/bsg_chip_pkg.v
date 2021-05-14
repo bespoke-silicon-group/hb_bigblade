@@ -166,7 +166,7 @@ package bsg_chip_pkg;
   // typedef struct packed {
   //   bsg_chip_clk_gen_tag_lines_s       [3:0] mc_clk;
   //   bsg_tag_s                     [3:0][3:0] mc_reset;
-  //   bsg_chip_sdr_tag_lines_s      [3:0][3:0] mc_sdr;
+  //   bsg_chip_sdr_tag_lines_s      [3:0][7:0] mc_sdr;
   //   bsg_chip_noc_tag_lines_s                 io_link;
   //   bsg_chip_noc_tag_lines_s           [7:0] mem_link;
   // } bsg_chip_tag_lines_s;
@@ -174,7 +174,7 @@ package bsg_chip_pkg;
   localparam tag_mem_link_offset_gp = 0;
   localparam tag_io_link_offset_gp  = tag_mem_link_offset_gp + (8)  *tag_noc_local_els_gp;
   localparam tag_mc_sdr_offset_gp   = tag_io_link_offset_gp  + (1)  *tag_noc_local_els_gp;
-  localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*tag_sdr_local_els_gp;
+  localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*(2*tag_sdr_local_els_gp);
   localparam tag_mc_clk_offset_gp   = tag_mc_reset_offset_gp + (4*4)*1;
 
 
