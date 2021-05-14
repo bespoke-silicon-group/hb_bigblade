@@ -143,7 +143,13 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
-  
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem_with_dma.v
+  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1rw_sync_mask_write_byte_dma.v
+  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1r1w_sync_mask_write_byte_dma.v
+  $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_passthrough.v
+  $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_passthrough.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up_one_hot.v
+
   $bsg_manycore_dir/testbenches/dpi/bsg_nonsynth_dpi_manycore.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_gpio.v

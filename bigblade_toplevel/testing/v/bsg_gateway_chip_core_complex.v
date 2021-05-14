@@ -94,7 +94,11 @@ module bsg_gateway_chip_core_complex
       begin: ver
         for (genvar r = 0; r < wh_ruche_factor_gp; r++)
           begin: ruche
+            `ifdef REPLICANT
+            bsg_nonsynth_wormhole_test_mem_with_dma #(
+            `else
             bsg_nonsynth_wormhole_test_mem #(
+            `endif
               .vcache_data_width_p(vcache_data_width_gp)
               ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
               ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
@@ -106,6 +110,11 @@ module bsg_gateway_chip_core_complex
               ,.wh_ruche_factor_p(wh_ruche_factor_gp)
               ,.no_concentration_p(1)
               ,.mem_size_p(mem_size_lp)
+            `ifdef REPLICANT
+              ,.wh_subcord_width_p(hb_x_subcord_width_gp)
+              ,.id_p(i*wh_ruche_factor_gp*(S-N+1) + (j-N)*wh_ruche_factor_gp + r)
+              ,.debug_p(0)                                             
+            `endif
             ) test_mem (
               .clk_i(mc_clk_i)
               ,.reset_i(~tag_trace_done_i)
