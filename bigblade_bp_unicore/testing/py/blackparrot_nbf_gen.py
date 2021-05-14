@@ -138,7 +138,7 @@ class NBF:
                 curr_addr += 4
                 
                 # Fixme: This works only for only 1 north vcache pod and 1 south vcache pod
-                self.print_nbf(1<<4 | x, y<<4, epa, data)
+                self.print_nbf(1<<4 | x, y<<4 | (7 - 7*y), epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
