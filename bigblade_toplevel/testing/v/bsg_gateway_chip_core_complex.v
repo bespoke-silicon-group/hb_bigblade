@@ -48,6 +48,21 @@ module bsg_gateway_chip_core_complex
   );
 
   // HOST CONNECTION
+`ifdef REPLICANT
+  bsg_gateway_chip_dpi_manycore mc_dpi 
+    (
+     .clk_i(mc_clk_i)
+     // reset
+     ,.reset_i(~tag_trace_done_i)
+     ,.reset_done_i(tag_trace_done_i)
+     // manycore link
+     ,.link_sif_i(mc_links_credit_lo)
+     ,.link_sif_o(mc_links_credit_li)
+     // x,y
+     ,.global_y_i(7'b0001000)
+     ,.global_x_i(7'b0001111)
+     );  
+  `else
   bsg_nonsynth_manycore_io_complex #(
     .addr_width_p(hb_addr_width_gp)
     ,.data_width_p(hb_data_width_gp)
@@ -65,7 +80,7 @@ module bsg_gateway_chip_core_complex
     ,.print_stat_v_o()
     ,.print_stat_tag_o()
   );
-
+  `endif
 
   // wormhole test mem
   // in bytes
@@ -79,7 +94,11 @@ module bsg_gateway_chip_core_complex
       begin: ver
         for (genvar r = 0; r < wh_ruche_factor_gp; r++)
           begin: ruche
+            `ifdef REPLICANT
+            bsg_nonsynth_wormhole_test_mem_with_dma #(
+            `else
             bsg_nonsynth_wormhole_test_mem #(
+            `endif
               .vcache_data_width_p(vcache_data_width_gp)
               ,.vcache_dma_data_width_p(vcache_dma_data_width_gp)
               ,.vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
@@ -91,6 +110,11 @@ module bsg_gateway_chip_core_complex
               ,.wh_ruche_factor_p(wh_ruche_factor_gp)
               ,.no_concentration_p(1)
               ,.mem_size_p(mem_size_lp)
+            `ifdef REPLICANT
+              ,.wh_subcord_width_p(hb_x_subcord_width_gp)
+              ,.id_p(i*wh_ruche_factor_gp*(S-N+1) + (j-N)*wh_ruche_factor_gp + r)
+              ,.debug_p(0)                                             
+            `endif
             ) test_mem (
               .clk_i(mc_clk_i)
               ,.reset_i(~tag_trace_done_i)
@@ -101,4 +125,21 @@ module bsg_gateway_chip_core_complex
       end
   end
 
+  // synopsys translate off
+  localparam cycle_counter_width_lp = 64;
+   
+  logic [cycle_counter_width_lp-1:0] cycle_counter;
+  bsg_cycle_counter
+    #(.width_p(cycle_counter_width_lp))
+  ctr
+    (
+     .clk_i($root.bsg_bigblade_pcb.IC.ASIC.block.core_complex.mc_clk_i[0])
+     ,.reset_i(~tag_trace_done_i)
+     ,.ctr_r_o(cycle_counter)
+     );
+   
+  final begin
+     $display("BSG INFO: %d cycles completed @ finish", cycle_counter);
+  end
+  // synopsys translate on
 endmodule
