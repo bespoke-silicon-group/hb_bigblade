@@ -90,7 +90,7 @@ int main(uint64_t argc, char *argv[]) {
     for(int x = 0; x < 16; x++) {
       req_packet.request.x_dst = (1 << 4) | x;
       req_packet.request.y_dst = (y == 1) ? ((2 << 3) | 0): ((0 << 3) | 7);
-      req_packet.request.data = data[x + (y * 16)];
+      req_packet.request.data = data[x + (y * 16)] + 1;
       req_packet.request.addr = some_mc_dram_eva + ((x + (y * 16)) * vcache_block_offset);
       
       while (*mc_link_bp_req_credits_addr != 0);
@@ -152,7 +152,7 @@ int main(uint64_t argc, char *argv[]) {
 
   req_packet.request.x_src = (0 << 4) | 0;
   req_packet.request.y_src = (1 << 3) | 1;
-  req_packet.request.op_v2 = 9; // AMOOR
+  req_packet.request.op_v2 = 8; // AMOOR
   req_packet.request.reg_id = 0xff;
 
   for (int y = 0; y < 2; y++) {
@@ -180,7 +180,7 @@ int main(uint64_t argc, char *argv[]) {
         bp_finish(3);
       }
       
-      data[x + (y * 16)] = 0xBADFFFFF;
+      data[x + (y * 16)] |= 0xBAD00000;
     }
   }
 
