@@ -99,62 +99,62 @@ proc constraint_output_ports {clk_name ports max_delay min_delay} {
 #   FIFO input constraints
 #   N/S ver link
 for {set i 0} {$i <= 1} {incr i} {
-  constraint_input_ports $core_clk_name   $ver_rev_data_in_ports($i)     800 200
-  constraint_input_ports $core_clk_name   $ver_rev_valid_in_ports($i)    720 200
-  constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports($i)   750 200
+  constraint_input_ports $core_clk_name   $ver_rev_data_in_ports($i)     780 200
+  constraint_input_ports $core_clk_name   $ver_rev_valid_in_ports($i)    700 200
+  constraint_output_ports $core_clk_name  $ver_rev_ready_out_ports($i)   730 200
 
-  constraint_input_ports $core_clk_name   $ver_fwd_data_in_ports($i)     800 200
-  constraint_input_ports $core_clk_name   $ver_fwd_valid_in_ports($i)    720 200
-  constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports($i)   750 200
+  constraint_input_ports $core_clk_name   $ver_fwd_data_in_ports($i)     780 200
+  constraint_input_ports $core_clk_name   $ver_fwd_valid_in_ports($i)    700 200
+  constraint_output_ports $core_clk_name  $ver_fwd_ready_out_ports($i)   730 200
 }
 
 # hor link
-constraint_input_ports $core_clk_name   $hor_rev_data_in_ports          800 200
+constraint_input_ports $core_clk_name   $hor_rev_data_in_ports          780 200
 constraint_input_ports $core_clk_name   $hor_rev_valid_in_ports         740 200
-constraint_output_ports $core_clk_name  $hor_rev_ready_out_ports        740 200
+constraint_output_ports $core_clk_name  $hor_rev_ready_out_ports        730 200
 
-constraint_input_ports $core_clk_name   $hor_fwd_data_in_ports          800 200
+constraint_input_ports $core_clk_name   $hor_fwd_data_in_ports          780 200
 constraint_input_ports $core_clk_name   $hor_fwd_valid_in_ports         720 200
-constraint_output_ports $core_clk_name  $hor_fwd_ready_out_ports        750 200
+constraint_output_ports $core_clk_name  $hor_fwd_ready_out_ports        740 200
 
 # ruche link
 constraint_input_ports $core_clk_name   $ruche_rev_data_in_ports        800 200
 constraint_input_ports $core_clk_name   $ruche_rev_valid_in_ports       710 200
 constraint_output_ports $core_clk_name  $ruche_rev_ready_out_ports      740 200
 
-constraint_input_ports $core_clk_name   $ruche_fwd_data_in_ports        500 0
-constraint_input_ports $core_clk_name   $ruche_fwd_valid_in_ports       500 0
-constraint_output_ports $core_clk_name  $ruche_fwd_ready_out_ports      550 0
+constraint_input_ports $core_clk_name   $ruche_fwd_data_in_ports        750 200
+constraint_input_ports $core_clk_name   $ruche_fwd_valid_in_ports       660 200
+constraint_output_ports $core_clk_name  $ruche_fwd_ready_out_ports      690 200
 
 # router output constraints
 # N/S ver link
 for {set i 0} {$i <= 1} {incr i} {
-  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   450 -75
-  constraint_output_ports $core_clk_name $ver_rev_valid_out_ports($i)  580 -75
-  constraint_input_ports  $core_clk_name $ver_rev_ready_in_ports($i)   680 -75
+  constraint_output_ports $core_clk_name $ver_rev_data_out_ports($i)   430 -50
+  constraint_output_ports $core_clk_name $ver_rev_valid_out_ports($i)  560 -50
+  constraint_input_ports  $core_clk_name $ver_rev_ready_in_ports($i)   630 -50
 
-  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   450 -75
-  constraint_output_ports $core_clk_name $ver_fwd_valid_out_ports($i)  580 -75
-  constraint_input_ports  $core_clk_name $ver_fwd_ready_in_ports($i)   660 -75
+  constraint_output_ports $core_clk_name $ver_fwd_data_out_ports($i)   430 -50
+  constraint_output_ports $core_clk_name $ver_fwd_valid_out_ports($i)  560 -50
+  constraint_input_ports  $core_clk_name $ver_fwd_ready_in_ports($i)   630 -50
 }
 
 # hor link
-constraint_output_ports $core_clk_name $hor_rev_data_out_ports   450 -75
-constraint_output_ports $core_clk_name $hor_rev_valid_out_ports  590 -75
-constraint_input_ports  $core_clk_name $hor_rev_ready_in_ports   690 -75
+constraint_output_ports $core_clk_name $hor_rev_data_out_ports   430 -50
+constraint_output_ports $core_clk_name $hor_rev_valid_out_ports  580 -50
+constraint_input_ports  $core_clk_name $hor_rev_ready_in_ports   670 -50
 
-constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   450 -75
-constraint_output_ports $core_clk_name $hor_fwd_valid_out_ports  650 -75
-constraint_input_ports  $core_clk_name $hor_fwd_ready_in_ports   740 -75
+constraint_output_ports $core_clk_name $hor_fwd_data_out_ports   430 -50
+constraint_output_ports $core_clk_name $hor_fwd_valid_out_ports  640 -50
+constraint_input_ports  $core_clk_name $hor_fwd_ready_in_ports   720 -50
 
 # ruche link
-constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   450 -75
-constraint_output_ports $core_clk_name $ruche_rev_valid_out_ports  800 -75
-constraint_input_ports  $core_clk_name $ruche_rev_ready_in_ports   410 -75
+constraint_output_ports $core_clk_name $ruche_rev_data_out_ports   430 -50
+constraint_output_ports $core_clk_name $ruche_rev_valid_out_ports  800 -50
+constraint_input_ports  $core_clk_name $ruche_rev_ready_in_ports   410 -50
 
-constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   450 -75
-constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  660 -75
-constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   730 -75
+constraint_output_ports $core_clk_name $ruche_fwd_data_out_ports   430 -50
+constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  660 -50
+constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   720 -50
 
 
 
