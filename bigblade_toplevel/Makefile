@@ -57,13 +57,12 @@ all: $(all_repos) $(prep_dir) $(init_repos)
 	-git clone $($*_url) $($*_dir)
 	-cd $($*_dir) ; git checkout $($*_commit)
 
-bsg_manycore.init:
+
+bsg_manycore.init: bsg_manycore.repo
 	$(MAKE) -C $(bsg_manycore_dir) checkout_submodules
 
-basejump_stl.init:
+basejump_stl.init: basejump_stl.init
 	cd $(basejump_stl_dir) && git submodule update --init --recursive
-
-%.init: %.repo
 
 summaries=$(subst .repo,.summary,$(all_repos))
 .PHONY: $(summaries)
