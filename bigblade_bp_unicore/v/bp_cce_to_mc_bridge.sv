@@ -411,7 +411,7 @@ module bp_cce_to_mc_bridge
       assign bp_to_mc_out_packet_li = '{addr       : bp_to_mc_lo.addr[2+:mc_addr_width_p]
                                         ,op_v2     : bsg_manycore_packet_op_e'(bp_to_mc_lo.op_v2)
                                         ,reg_id    : bp_to_mc_lo.reg_id
-                                        ,payload   : (bp_to_mc_lo.op_v2 inside {e_remote_store, e_remote_sw})
+                                        ,payload   : (bp_to_mc_lo.op_v2 inside {e_remote_store, e_remote_sw, e_remote_amoswap, e_remote_amoadd, e_remote_amoor})
                                                      ? bp_to_mc_lo.payload
                                                      : bp_to_mc_load_info
                                         ,src_y_cord: bp_to_mc_lo.y_src
