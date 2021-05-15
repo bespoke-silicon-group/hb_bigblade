@@ -465,9 +465,9 @@ module bsg_gateway_chip
     end
 
   // Stitch the links together
-  bsg_manycore_link_sif_s [E:W][num_links_y_lp-1:0] link_hor_in;;
+  bsg_manycore_link_sif_s [E:W][num_links_y_lp-1:0] link_hor_in;
   bsg_manycore_link_sif_s [E:W][num_links_y_lp-1:0] link_hor_out;
-  bsg_manycore_link_sif_s [S:N][num_links_x_lp-1:0] link_ver_in;;
+  bsg_manycore_link_sif_s [S:N][num_links_x_lp-1:0] link_ver_in;
   bsg_manycore_link_sif_s [S:N][num_links_x_lp-1:0] link_ver_out;
   bsg_mesh_stitch
    #(.width_p($bits(bsg_manycore_link_sif_s))
