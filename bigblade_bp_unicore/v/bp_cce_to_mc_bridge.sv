@@ -96,12 +96,12 @@ module bp_cce_to_mc_bridge
     logic [11:0] addr;
   } bp_epa_s;
 
-  localparam mc_link_bp_req_fifo_addr_gp     = 20'h0_1000;
-  localparam mc_link_bp_req_credits_addr_gp  = 20'h0_2000;
-  localparam mc_link_bp_resp_fifo_addr_gp    = 20'h0_3000;
-  localparam mc_link_bp_resp_entries_addr_gp = 20'h0_4000;
-  localparam mc_link_mc_req_fifo_addr_gp     = 20'h0_5000;
-  localparam mc_link_mc_req_entries_addr_gp  = 20'h0_6000;
+  localparam mc_link_bp_req_fifo_addr_gp     = host_dev_base_addr_gp + 20'h0_1000;
+  localparam mc_link_bp_req_credits_addr_gp  = host_dev_base_addr_gp + 20'h0_2000;
+  localparam mc_link_bp_resp_fifo_addr_gp    = host_dev_base_addr_gp + 20'h0_3000;
+  localparam mc_link_bp_resp_entries_addr_gp = host_dev_base_addr_gp + 20'h0_4000;
+  localparam mc_link_mc_req_fifo_addr_gp     = host_dev_base_addr_gp + 20'h0_5000;
+  localparam mc_link_mc_req_entries_addr_gp  = host_dev_base_addr_gp + 20'h0_6000;
 
   bp_bedrock_cce_mem_msg_s io_cmd_li;
   logic io_cmd_v_li, io_cmd_yumi_lo;
