@@ -12,20 +12,20 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set brg_cgra_xcel_dir $bsg_designs_target_dir/brg_cgra_xcel
 set hardfloat_dir     $bsg_designs_target_dir/HardFloat
 set bigblade_dir      $bsg_designs_target_dir/..
 
 set cgra_dir $bsg_designs_target_dir/cgra
 
 set SVERILOG_SOURCE_FILES [join "
-
   $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_pkg.v
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_misc/bsg_less_than.v
   $basejump_stl_dir/bsg_misc/bsg_reduce.v
   $basejump_stl_dir/bsg_misc/bsg_abs.v
@@ -169,6 +169,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
   $bigblade_dir/common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_east.v
   
+  $cgra_dir/v/bsg_chip_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
   $cgra_dir/v/hard/gf_14/sram/SramWrapper.v

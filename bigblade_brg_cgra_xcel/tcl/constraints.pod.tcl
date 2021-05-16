@@ -2,10 +2,10 @@ puts "BSG-info: Running script [info script]\n"
 
 ########################################
 ## Source common scripts
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/common/hb_design_constants.tcl
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/common/bsg_async.constraints.tcl
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/common/bsg_chip_cdc.constraints.tcl
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/common/bsg_chip_misc.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_design_constants.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_async.constraints.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_cdc.constraints.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/bsg_chip_misc.tcl
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/basejump_stl/hard/gf_14/bsg_link/tcl/bsg_link_sdr.constraints.tcl
 
 ########################################
@@ -40,10 +40,20 @@ set token_clk_uncertainty_ps  [expr min([expr $token_clk_period_ps*($token_clk_u
 set max_io_output_margin_ps   200
 set max_io_input_margin_ps    200
 
+set tag_clk_name "tag_clk"
+set tag_clk_period_ps      5000.0 ;# 200 MHz
+set tag_clk_uncertainty_ps 20
+
+set tag_input_delay_min_ps 100
+set tag_input_delay_max_ps 4000
+
 ########################################
 ## Reg2Reg
 create_clock -period $xcel_clk_period_ps -name $xcel_clk_name [get_ports clk_i]
 set_clock_uncertainty $xcel_clk_uncertainty_ps [get_clocks $xcel_clk_name]
+
+create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports tag_clk_i]
+set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
 ########################################
 ## In2Reg
@@ -55,7 +65,9 @@ set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_
 set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
 set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports clk_i]
+set tag_in_ports [get_ports tag_data_i]
+append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
 ## SDR constraints
@@ -98,8 +110,7 @@ for {set i 0} {$i < 4} {incr i} {
 ########################################
 ## False paths
 set_false_path -from [get_ports global_*_cord_i]
-set_false_path -from [get_ports async_*_reset_i]
-set_false_path -to [get_ports async_*_reset_o]
+set_false_path -from [get_ports tag_node_id_offset_i[*]]
 
 ########################################
 ## Disable timing
@@ -117,18 +128,22 @@ set_dont_touch [get_cells -hier -filter "full_name=~*BSG_DONT_TOUCH*"] true
 for {set i 0} {$i < 4} {incr i} {
   set cdc_clocks [get_clocks $xcel_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 
   set cdc_clocks [get_clocks $xcel_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 
   set cdc_clocks [get_clocks $xcel_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 
   set cdc_clocks [get_clocks $xcel_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 }
 
@@ -143,9 +158,9 @@ bsg_chip_derate_mems
 # PP: ungroup this data path module and hopefully DC will stop inserting buffers
 # to the is_calc control signal...
 set_ungroup [get_designs -filter "hdl_template==bsg_gf_14_reduce_and_b8" ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACoreCtrl__07e21c4d4fa663e6" ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACoreDpath__07e21c4d4fa663e6" ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACore__07e21c4d4fa663e6" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACoreCtrl__1736738b526e3fb9" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACoreDpath__1736738b526e3fb9" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACore__1736738b526e3fb9" ] true
 
 ########################################
 ## Flattening
