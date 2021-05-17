@@ -1,9 +1,10 @@
-all: | bsg_cadenv bsg_manycore basejump_stl bsg_14
+all: | bsg_cadenv bsg_manycore basejump_stl bsg_14 bsg_replicant
 
 bsg_cadenv:    commit=master
 basejump_stl:  commit=master
 bsg_14:        commit=master
-bsg_manycore:        commit=ci_bigblade
+bsg_manycore:  commit=ci_bigblade
+bsg_replicant: commit=bigblade-tapeout
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@
@@ -20,3 +21,7 @@ bsg_manycore:
 	git clone git@github.com:bespoke-silicon-group/bsg_manycore.git $@
 	cd $@ ; git checkout $(commit) ;
 	cd $@ ; git submodule update --init imports/HardFloat;
+
+bsg_replicant:
+	git clone git@github.com:bespoke-silicon-group/bsg_replicant.git $@
+	cd $@ ; git checkout $(commit) ;
