@@ -51,15 +51,17 @@ foreach {side} {"DL" "DR"} {
 }
 
 
+# flow default timing_driven true
+#set_app_options -name route.global.timing_driven -value false
+#set_app_options -name route.track.timing_driven -value false
+#set_app_options -name route.detail.timing_driven -value false
 
-set_app_options -name route.global.timing_driven -value false
-set_app_options -name route.track.timing_driven -value false
-set_app_options -name route.detail.timing_driven -value false
+# disable crosstalk driven to avoid zigzag shaped routing
+set_app_options -name route.global.crosstalk_driven -value false
+set_app_options -name route.track.crosstalk_driven -value false
 
-set_app_options -name route.global.crosstalk_driven -value true
-set_app_options -name route.track.crosstalk_driven -value true
-
-set_app_options -name route.common.rc_driven_setup_effort_level -value high
+# This option takes effect only if timing-driven routing is enabled
+#set_app_options -name route.common.rc_driven_setup_effort_level -value high
 
 route_global
 route_track
