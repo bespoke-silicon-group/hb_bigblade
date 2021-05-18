@@ -133,8 +133,9 @@ for {set i 0} {$i < 2} {incr i} {
 }
 
 # exclude delay cells and sel signals from timing analysis
-set_disable_timing [get_flat_cells -filter "full_name=~*delay/sig*dly*_BSG_DONT_TOUCH"]
-set_false_path -through [get_flat_pins -filter "full_name=~*delay/sig*mux_BSG_DONT_TOUCH/S*"]
+#set_disable_timing [get_flat_cells -filter "full_name=~*delay/sig*dly*_BSG_DONT_TOUCH"]
+#set_false_path -through [get_flat_pins -filter "full_name=~*delay/sig*mux_BSG_DONT_TOUCH/S*"]
+set_case_analysis 0 [get_flat_pins -filter "full_name=~*delay/sig*mux_BSG_DONT_TOUCH/S*"]
 
 # set dont touch on all delay lines
 set_dont_touch_network [get_pins "ddr_link*link/io_link_clk_o*"]
