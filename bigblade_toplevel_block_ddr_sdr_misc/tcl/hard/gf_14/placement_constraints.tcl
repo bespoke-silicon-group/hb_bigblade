@@ -30,7 +30,7 @@ create_placement_blockage -boundary {{369.63 512.44} {9938.87 8013.56}}
 create_placement_blockage -boundary {{87.13 657.88 } {369.63 2232.28}}
 create_placement_blockage -boundary {{87.13 2523.16} {369.63 4097.56}}
 create_placement_blockage -boundary {{87.13 4388.44} {369.63 5962.84}}
-create_placement_blockage -boundary {{87.13 6253.72} {369.63 7828.12}}
+create_placement_blockage -boundary {{87.13 6253.72} {369.63 7631.32}}
 create_placement_blockage -boundary {{9938.87 657.88 } {10438.87 2232.28}}
 create_placement_blockage -boundary {{9938.87 2523.16} {10438.87 4097.56}}
 create_placement_blockage -boundary {{9938.87 4388.44} {10438.87 5962.84}}
@@ -41,7 +41,7 @@ create_routing_blockage -layers [get_layers] -boundary {{369.63 512.44} {9938.87
 create_routing_blockage -layers [get_layers] -boundary {{87.13 657.88 } {369.63 2232.28}}
 create_routing_blockage -layers [get_layers] -boundary {{87.13 2523.16} {369.63 4097.56}}
 create_routing_blockage -layers [get_layers] -boundary {{87.13 4388.44} {369.63 5962.84}}
-create_routing_blockage -layers [get_layers] -boundary {{87.13 6253.72} {369.63 7828.12}}
+create_routing_blockage -layers [get_layers] -boundary {{87.13 6253.72} {369.63 7631.32}}
 create_routing_blockage -layers [get_layers] -boundary {{9938.87 657.88 } {10438.87 2232.28}}
 create_routing_blockage -layers [get_layers] -boundary {{9938.87 2523.16} {10438.87 4097.56}}
 create_routing_blockage -layers [get_layers] -boundary {{9938.87 4388.44} {10438.87 5962.84}}
@@ -56,7 +56,7 @@ set_fixed_objects $TAG_AND_cell
 
 
 set                DL01_cell [get_cells "mem_link_0__link"]
-move_object       $DL01_cell -x $io_link_west_offset -y [round_up_to_nearest [expr 7828.12+10*$grid_height] $grid_height]
+move_object       $DL01_cell -x $io_link_west_offset -y [round_up_to_nearest [expr $core_ury-40*$grid_height] $grid_height]
 set_attribute     $DL01_cell orientation R0
 set_fixed_objects $DL01_cell
 
@@ -76,7 +76,7 @@ set_attribute     $DL67_cell orientation MY
 set_fixed_objects $DL67_cell
 
 set                DR01_cell [get_cells "mem_link_4__link"]
-move_object       $DR01_cell -x $io_link_east_offset -y [round_up_to_nearest [expr 7828.12+10*$grid_height] $grid_height]
+move_object       $DR01_cell -x $io_link_east_offset -y [round_up_to_nearest [expr $core_ury-40*$grid_height] $grid_height]
 set_attribute     $DR01_cell orientation MY
 set_fixed_objects $DR01_cell
 

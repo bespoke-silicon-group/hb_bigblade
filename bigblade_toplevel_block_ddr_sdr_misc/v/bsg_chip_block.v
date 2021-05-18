@@ -225,15 +225,15 @@ module bsg_chip_block
   ,.tag_data_i                     (tag_data_lo           )
   ,.tag_node_id_offset_i           ((tag_lg_els_gp)'(tag_io_link_offset_gp))
  
-  ,.io_link_clk_o                  (/*{io_link_clk_lo [1], io_link_clk_lo [0]}*/)
-  ,.io_link_data_o                 (/*{io_link_data_lo[1], io_link_data_lo[0]}*/)
-  ,.io_link_v_o                    (/*{io_link_v_lo   [1], io_link_v_lo   [0]}*/)
-  ,.io_link_token_i                (/*{io_link_tkn_li [1], io_link_tkn_li [0]}*/)
-                                    /*                                        */
-  ,.io_link_clk_i                  (/*{io_link_clk_li [1], io_link_clk_li [0]}*/)
-  ,.io_link_data_i                 (/*{io_link_data_li[1], io_link_data_li[0]}*/)
-  ,.io_link_v_i                    (/*{io_link_v_li   [1], io_link_v_li   [0]}*/)
-  ,.io_link_token_o                (/*{io_link_tkn_lo [1], io_link_tkn_lo [0]}*/)
+  ,.io_link_clk_o                  ({io_link_clk_lo [1], io_link_clk_lo [0]})
+  ,.io_link_data_o                 ({io_link_data_lo[1], io_link_data_lo[0]})
+  ,.io_link_v_o                    ({io_link_v_lo   [1], io_link_v_lo   [0]})
+  ,.io_link_token_i                ({io_link_tkn_li [1], io_link_tkn_li [0]})
+
+  ,.io_link_clk_i                  ({io_link_clk_li [1], io_link_clk_li [0]})
+  ,.io_link_data_i                 ({io_link_data_li[1], io_link_data_li[0]})
+  ,.io_link_v_i                    ({io_link_v_li   [1], io_link_v_li   [0]})
+  ,.io_link_token_o                ({io_link_tkn_lo [1], io_link_tkn_lo [0]})
  
   ,.mc_fwd_link_clk_o              (mc_fwd_link_clk_lo  )
   ,.mc_fwd_link_data_o             (mc_fwd_link_data_lo )

@@ -38,13 +38,13 @@ for {set i 0} {$i < 8} {incr i} {
 }
 set_routing_rule -rule ss_x2_ndr -min_routing_layer K1 -max_routing_layer K4 $ss_WH_nets
 
-foreach {side} {"DL" "DR"} {
+foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
   for {set i 0} {$i < $limit} {incr i} {
     foreach {dir} {"i" "o"} {
       set ss_link_nets [get_nets -of_object [get_ports "pad_${side}${i}_*_${dir}_int"]]
       set ss_link_nets [remove_from_collection $ss_link_nets [get_ports "pad_${side}${i}_extra_${dir}_int"]]
-      set ndr [expr {$i == 0} ? {"x8"} : {[expr {$i == 7} ? {"x8"} : {"x4"}]}]
+      set ndr [expr {$side == "IT"} ? {"x8"} : {[expr {$i == 0 || $i == 7} ? {"x8"} : {"x4"}]}]
       set_routing_rule -rule "ss_${ndr}_ndr" -min_routing_layer K1 -max_routing_layer K4 $ss_link_nets
     }
   }
@@ -130,13 +130,13 @@ for {set i 0} {$i < 8} {incr i} {
 }
 set_routing_rule -rule ss_x2_ndr -min_routing_layer M2 -max_routing_layer K4 $ss_WH_nets
 
-foreach {side} {"DL" "DR"} {
+foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
   for {set i 0} {$i < $limit} {incr i} {
     foreach {dir} {"i" "o"} {
       set ss_link_nets [get_nets -of_object [get_ports "pad_${side}${i}_*_${dir}_int"]]
       set ss_link_nets [remove_from_collection $ss_link_nets [get_ports "pad_${side}${i}_extra_${dir}_int"]]
-      set ndr [expr {$i == 0} ? {"x8"} : {[expr {$i == 7} ? {"x8"} : {"x4"}]}]
+      set ndr [expr {$side == "IT"} ? {"x8"} : {[expr {$i == 0 || $i == 7} ? {"x8"} : {"x4"}]}]
       set_routing_rule -rule "ss_${ndr}_ndr" -min_routing_layer M2 -max_routing_layer K4 $ss_link_nets
     }
   }
@@ -187,7 +187,7 @@ for {set i 0} {$i < 8} {incr i} {
 }
 add_buffer_on_route -net_prefix bsg_ss -cell_prefix bsg_ss -repeater_distance 100.00 -respect_blockages $ss_WH_nets $ss_buffer
 
-foreach {side} {"DL" "DR"} {
+foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
   for {set i 0} {$i < $limit} {incr i} {
     foreach {dir} {"i" "o"} {

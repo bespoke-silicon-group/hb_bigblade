@@ -182,6 +182,20 @@ for {set i 0} {$i < 8} {incr i} {
   }
 }
 
+  set wh_master_clk_name   "io_link_master_clk"
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "io_link/core_clk"]
+  set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+  foreach {j} {"fwd" "rev"} {
+    create_generated_clock \
+        -divide_by 1 \
+        -invert \
+        -master_clock $wh_master_clk_name \
+        -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+        -name "io_link_${j}_clk" \
+        [get_pins "io_link/mc_${j}_link_clk_o"]
+    append_to_collection sdr_clocks [get_clocks "io_link_${j}_clk"]
+  }
+
   for {set j 0} {$j < 2} {incr j} {
     set io_clk_name   "io_link_${j}_io_clk"
     create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "io_link/io_link_${j}_io_clk"]
