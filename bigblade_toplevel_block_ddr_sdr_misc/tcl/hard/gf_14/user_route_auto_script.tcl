@@ -36,7 +36,9 @@ set ss_WH_nets [list]
 for {set i 0} {$i < 8} {incr i} {
   append_to_collection ss_WH_nets [get_nets -of_object [get_pins "mem_link_${i}__link/io_wh_link_*"]]
 }
+set ss_mc_nets [get_nets -of_object [get_pins "io_link/mc_*_link_*"]]
 set_routing_rule -rule ss_x2_ndr -min_routing_layer K1 -max_routing_layer K4 $ss_WH_nets
+set_routing_rule -rule ss_x4_ndr -min_routing_layer K1 -max_routing_layer K4 $ss_mc_nets
 
 foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
@@ -128,7 +130,9 @@ set ss_WH_nets [list]
 for {set i 0} {$i < 8} {incr i} {
   append_to_collection ss_WH_nets [get_nets -of_object [get_pins "mem_link_${i}__link/io_wh_link_*"]]
 }
+set ss_mc_nets [get_nets -of_object [get_pins "io_link/mc_*_link_*"]]
 set_routing_rule -rule ss_x2_ndr -min_routing_layer M2 -max_routing_layer K4 $ss_WH_nets
+set_routing_rule -rule ss_x4_ndr -min_routing_layer M2 -max_routing_layer K4 $ss_mc_nets
 
 foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
@@ -185,7 +189,9 @@ set ss_WH_nets [list]
 for {set i 0} {$i < 8} {incr i} {
   append_to_collection ss_WH_nets [get_nets -of_object [get_pins "mem_link_${i}__link/io_wh_link_*"]]
 }
+set ss_mc_nets [get_nets -of_object [get_pins "io_link/mc_*_link_*"]]
 add_buffer_on_route -net_prefix bsg_ss -cell_prefix bsg_ss -repeater_distance 100.00 -respect_blockages $ss_WH_nets $ss_buffer
+add_buffer_on_route -net_prefix bsg_ss -cell_prefix bsg_ss -repeater_distance 100.00 -respect_blockages $ss_mc_nets $ss_buffer
 
 foreach {side} {"DL" "DR" "IT"} {
   set limit [expr {$side == "IT"} ? 2 : 8]
@@ -212,7 +218,7 @@ append_to_collection msc_nets [get_nets -of_object $TAG_AND_cell -filter "(full_
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_v_i_int"]]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_0_i_int"]]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_1_i_int"]]
-# append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_2_i_int"]]
+append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_2_i_int"]]
 add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -respect_blockages $msc_nets $msc_buffer
 
 

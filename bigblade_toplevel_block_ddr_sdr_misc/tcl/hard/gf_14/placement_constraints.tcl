@@ -104,6 +104,16 @@ set_fixed_objects $IT01_cell
 set wh_link_west_offset  [expr $io_link_west_offset+8*$grid_width+16*$grid_width]
 set wh_link_east_offset  [expr $io_link_east_offset-8*$grid_width-20*$grid_width]
 
+set                WEST_wh_cell [get_cells "west_link"]
+move_object       $WEST_wh_cell -x [expr 23*$grid_width] -y [round_up_to_nearest [expr 7631.32+1*$grid_height] $grid_height]
+set_attribute     $WEST_wh_cell orientation R0
+set_fixed_objects $WEST_wh_cell
+
+set                NORTH_wh_cell [get_cells "north_link"]
+move_object       $NORTH_wh_cell -x [expr 300*$grid_width] -y [round_up_to_nearest [expr 8013.56+1*$grid_height] $grid_height]
+set_attribute     $NORTH_wh_cell orientation R0
+set_fixed_objects $NORTH_wh_cell
+
 set                DL0_wh_cell [get_cells "wh_link_0__link"]
 move_object       $DL0_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 7828.12+10*$grid_height] $grid_height]
 set_attribute     $DL0_wh_cell orientation MY

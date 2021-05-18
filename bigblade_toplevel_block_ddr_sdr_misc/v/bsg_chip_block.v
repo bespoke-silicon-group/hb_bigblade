@@ -395,6 +395,127 @@ module bsg_chip_block
 
   end
 
+    bsg_manycore_link_ruche_to_sdr_west #(
+      .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)
+      ,.lg_credit_to_token_decimation_p (sdr_lg_credit_to_token_decimation_gp)
+
+      ,.x_cord_width_p      (hb_x_cord_width_gp)
+      ,.y_cord_width_p      (hb_y_cord_width_gp)
+      ,.addr_width_p        (hb_addr_width_gp)
+      ,.data_width_p        (hb_data_width_gp)
+      ,.ruche_factor_X_p    (hb_ruche_factor_X_gp)
+    ) west_link (
+      .core_clk_i       (mc_clk_lo[0])
+      ,.core_reset_i    ()
+      ,.core_reset_o    ()
+
+      ,.core_ver_link_sif_i   ()
+      ,.core_ver_link_sif_o   ()
+
+      ,.core_hor_link_sif_i   ()
+      ,.core_hor_link_sif_o   ()
+
+      ,.core_ruche_link_i     ()
+      ,.core_ruche_link_o     ()
+
+      ,.core_global_x_i       ()
+      ,.core_global_y_i       ()
+      ,.core_global_x_o       ()
+      ,.core_global_y_o       ()
+
+      ,.async_uplink_reset_i      ()
+      ,.async_downlink_reset_i    ()
+      ,.async_downstream_reset_i  ()
+      ,.async_token_reset_i       ()
+
+      ,.async_uplink_reset_o      ()
+      ,.async_downlink_reset_o    ()
+      ,.async_downstream_reset_o  ()
+      ,.async_token_reset_o       ()
+
+      ,.async_fwd_link_i_disable_i()
+      ,.async_fwd_link_o_disable_i()
+      ,.async_rev_link_i_disable_i()
+      ,.async_rev_link_o_disable_i()
+
+      ,.io_fwd_link_clk_o       ()
+      ,.io_fwd_link_data_o      ()
+      ,.io_fwd_link_v_o         ()
+      ,.io_fwd_link_token_i     ()
+
+      ,.io_fwd_link_clk_i       (mc_fwd_link_clk_lo  )
+      ,.io_fwd_link_data_i      (mc_fwd_link_data_lo )
+      ,.io_fwd_link_v_i         (mc_fwd_link_v_lo    )
+      ,.io_fwd_link_token_o     (mc_fwd_link_token_li)
+
+      ,.io_rev_link_clk_o       (mc_rev_link_clk_li  )
+      ,.io_rev_link_data_o      (mc_rev_link_data_li )
+      ,.io_rev_link_v_o         (mc_rev_link_v_li    )
+      ,.io_rev_link_token_i     (mc_rev_link_token_lo)
+
+      ,.io_rev_link_clk_i       ()
+      ,.io_rev_link_data_i      ()
+      ,.io_rev_link_v_i         ()
+      ,.io_rev_link_token_o     ()
+    );
+
+    bsg_manycore_link_to_sdr_north #(
+      .lg_fifo_depth_p                  (sdr_lg_fifo_depth_gp)
+      ,.lg_credit_to_token_decimation_p (sdr_lg_credit_to_token_decimation_gp)
+      ,.x_cord_width_p                  (hb_x_cord_width_gp)
+      ,.y_cord_width_p                  (hb_y_cord_width_gp)
+      ,.addr_width_p                    (hb_addr_width_gp)
+      ,.data_width_p                    (hb_data_width_gp)
+
+    ) north_link (
+      .core_clk_i                 (mc_clk_lo[0])
+      ,.core_reset_i              ()
+      ,.core_reset_o              ()
+
+      ,.core_global_x_i           ()
+      ,.core_global_y_i           ()
+      ,.core_global_x_o           ()
+      ,.core_global_y_o           ()
+
+      ,.core_link_sif_i           ()
+      ,.core_link_sif_o           ()
+
+      ,.async_uplink_reset_i      ()
+      ,.async_downlink_reset_i    ()
+      ,.async_downstream_reset_i  ()
+      ,.async_token_reset_i       ()
+
+      ,.async_uplink_reset_o      ()
+      ,.async_downlink_reset_o    ()
+      ,.async_downstream_reset_o  ()
+      ,.async_token_reset_o       ()
+
+      ,.async_fwd_link_i_disable_i()
+      ,.async_fwd_link_o_disable_i()
+      ,.async_rev_link_i_disable_i()
+      ,.async_rev_link_o_disable_i()
+
+      ,.io_fwd_link_clk_o         (mc_fwd_link_clk_li  )
+      ,.io_fwd_link_data_o        (mc_fwd_link_data_li )
+      ,.io_fwd_link_v_o           (mc_fwd_link_v_li    )
+      ,.io_fwd_link_token_i       (mc_fwd_link_token_lo)
+
+      ,.io_fwd_link_clk_i         ()
+      ,.io_fwd_link_data_i        ()
+      ,.io_fwd_link_v_i           ()
+      ,.io_fwd_link_token_o       ()
+
+      ,.io_rev_link_clk_o         ()
+      ,.io_rev_link_data_o        ()
+      ,.io_rev_link_v_o           ()
+      ,.io_rev_link_token_i       ()
+
+      ,.io_rev_link_clk_i         (mc_rev_link_clk_lo  )
+      ,.io_rev_link_data_i        (mc_rev_link_data_lo )
+      ,.io_rev_link_v_i           (mc_rev_link_v_lo    )
+      ,.io_rev_link_token_o       (mc_rev_link_token_li)
+    );
+
   //////////////////////////////////////////////////
   //
   // HB Core Complex

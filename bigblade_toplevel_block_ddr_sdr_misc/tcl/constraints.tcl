@@ -77,6 +77,9 @@ set ext_noc_clk_name           "ext_noc_clk"
 create_clock -period $osc_period_ps -name $ext_noc_clk_name [get_ports pad_CT0_1_i_int]
 set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_noc_clk_name]
 
+set ext_mc_clk_name           "ext_mc_clk"
+create_clock -period 1000.0 -name $ext_mc_clk_name [get_ports pad_CT0_2_i_int]
+set_clock_uncertainty 20  [get_clocks $ext_mc_clk_name]
 
 # tag constraints
 set tag_in_ports [get_ports {pad_ML0_1_i_int pad_ML0_2_i_int}]
@@ -195,6 +198,30 @@ for {set i 0} {$i < 8} {incr i} {
         [get_pins "io_link/mc_${j}_link_clk_o"]
     append_to_collection sdr_clocks [get_clocks "io_link_${j}_clk"]
   }
+
+  set wh_master_clk_name   "west_link_master_clk"
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "west_link/core_clk_i"]
+  set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+  create_generated_clock \
+      -divide_by 1 \
+      -invert \
+      -master_clock $wh_master_clk_name \
+      -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+      -name "west_link_rev_clk" \
+      [get_pins "west_link/io_rev_link_clk_o"]
+  append_to_collection sdr_clocks [get_clocks "west_link_rev_clk"]
+
+  set wh_master_clk_name   "north_link_master_clk"
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "north_link/core_clk_i"]
+  set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+  create_generated_clock \
+      -divide_by 1 \
+      -invert \
+      -master_clock $wh_master_clk_name \
+      -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+      -name "north_link_fwd_clk" \
+      [get_pins "north_link/io_fwd_link_clk_o"]
+  append_to_collection sdr_clocks [get_clocks "north_link_fwd_clk"]
 
   for {set j 0} {$j < 2} {incr j} {
     set io_clk_name   "io_link_${j}_io_clk"
