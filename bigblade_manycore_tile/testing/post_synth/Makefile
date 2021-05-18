@@ -1,9 +1,11 @@
 .DEFAULT_GOAL = all
 
-BSG_MANYCORE_DIR := $(abspath ../../bsg_manycore)
+export BSG_MANYCORE_DIR := $(abspath ../../bsg_manycore)
 # By convention, basejump_stl is in the same directory as $(BSG_MANYCORE_DIR)
-BASEJUMP_STL_DIR := $(abspath ../../basejump_stl)
-HB_BIGBLADE_DIR := $(abspath ../../../)
+export BASEJUMP_STL_DIR := $(abspath ../../basejump_stl)
+export BSG_F1_DIR       := $(abspath ../../bsg_replicant)
+export BSG_REPLICANT_DIR := $(BSG_F1_DIR)
+export HB_BIGBLADE_DIR := $(abspath ../../../)
 
 # Sets "VCS" variable
 include ../../bsg_cadenv/cadenv.mk
@@ -14,6 +16,7 @@ include $(hb_bigblade_netlists_dir)/interface.mk
 # Include source lists
 include arch_filelist.mk
 include sim_filelist.mk
+#include rtl_filelist.mk
 
 VSOURCES += $(bsg_manycore_tile-post-synth-filelist)
 #VSOURCES += $(bigblade_io_link_ddr-post-synth-filelist)
@@ -24,7 +27,7 @@ VCS_INCLUDES += $(foreach inc,$(VINCLUDES),+incdir+"$(inc)")
 VCS_DEFINES  += $(foreach def,$(VDEFINES),+define+"$(def)")
 VCS_SOURCES  += $(VHEADERS) $(VSOURCES) 
 VCS_FLAGS    += +v2k -sverilog -full64 -timescale=1ps/1ps \
-    +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS -top spmd_testbench
+    +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
 VCS_FLAGS    += -licqueue
 VCS_FLAGS    += -reportstats +notimingcheck +nospecify
 VCS_FLAGS    += -assert svaext  # needed for "assert final"
@@ -33,11 +36,35 @@ VCS_FLAGS    += -assert svaext  # needed for "assert final"
 
 .PHONY: clean
 
+###############################################
+# Bladerunner generated libraries and sources #
+###############################################
+BSG_CUDA_OUT_DIR = $(abspath .)/out/cuda
+BSG_BLADERUNNER_GENERATED_SOURCES   := $(BSG_CUDA_OUT_DIR)/bsg_bladerunner_pkg.v
+BSG_BLADERUNNER_GENERATED_SOURCES   += $(BSG_CUDA_OUT_DIR)/bsg_manycore_machine.h
+BSG_BLADERUNNER_GENERATED_LIBRARIES := $(BSG_CUDA_OUT_DIR)/libbsg_manycore_runtime.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_CUDA_OUT_DIR)/libbsg_manycore_regression.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_CUDA_OUT_DIR)/libbsgmc_cuda_legacy_pod_repl.so
+#BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_CUDA_OUT_DIR)/libdmamem.so
+BSG_BLADERUNNER_GENERATED           := $(BSG_BLADERUNNER_GENERATED_SOURCES)
+BSG_BLADERUNNER_GENERATED           += $(BSG_BLADERUNNER_GENERATED_LIBRARIES)
+BSG_MACHINE_PATH := $(BSG_CUDA_OUT_DIR)
+
+$(BSG_CUDA_OUT_DIR)/Makefile.machine.include: Makefile.machine.include
+	mkdir -p $(dir $@)
+	cp $< $@
+
+$(BSG_BLADERUNNER_GENERATED): $(BSG_CUDA_OUT_DIR)/Makefile.machine.include
+	mkdir -p $(BSG_CUDA_OUT_DIR)
+	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_CUDA_OUT_DIR)
+
 
 # set_machine_variables includes the Makefile.machine.include file and sets the
 # VCS_DEFINES that define the architecture for a machine. This should be called
 # from inside of the rule that builds the machine-specific executable for a
 # machine so that the *correct* Makfile.machine.include can be included
+# $1 = machine makefile
+# $2 = toplevel
 define set_machine_variables
 	$(eval include $1)
 	$(eval VCS_DEFINES := +define+BSG_MACHINE_PODS_X=${BSG_MACHINE_PODS_X})
@@ -69,7 +96,8 @@ define set_machine_variables
 	$(eval VCS_DEFINES += +define+BSG_MACHINE_DRAMSIM3_PKG="${BSG_MACHINE_DRAMSIM3_PKG}")
 	# specify where the host module is instantiated for profiler trigger (print_stat).
 	# relative to $root
-	$(eval VCS_DEFINES += +define+HOST_MODULE_PATH=spmd_testbench) 
+	$(eval VCS_DEFINES += +define+HOST_MODULE_PATH=$2)
+	$(eval VCS_FLAGS   += -top $2)
 	# These define are required by mobile_ddr.v.
 	# density     	= 2048 Mbit
 	# speed grade 	= 5
@@ -80,13 +108,18 @@ endef
 
 # boot tag rom gen
 POD_TRACE_GEN_PY = $(BSG_MANYCORE_DIR)/testbenches/py/pod_trace_gen.py
-ASCII_TO_ROM_PY = $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py 
+ASCII_TO_ROM_PY = $(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py
+
+# set top level
+out/simv out/simv-debug: TOP_LEVEL := spmd_testbench
+out/cuda/simv: TOP_LEVEL := replicant_tb_top
+
 # build simv
 # without debug option for faster simulation.
 out/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEADERS) 
 	mkdir -p out
 	cp Makefile.machine.include out/
-	$(call set_machine_variables,$<)
+	$(call set_machine_variables,$<,$(TOP_LEVEL))
 	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > out/pod_trace.tr
 	python $(ASCII_TO_ROM_PY) out/pod_trace.tr bsg_tag_boot_rom > out/bsg_tag_boot_rom.v
 	@echo $(VCS_SOURCES)
@@ -99,13 +132,28 @@ out/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEAD
 out/simv-debug : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEADERS) 
 	mkdir -p out
 	cp Makefile.machine.include out/
-	$(call set_machine_variables,$<)
+	$(call set_machine_variables,$<,$(TOP_LEVEL))
 	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > out/pod_trace.tr
 	python $(ASCII_TO_ROM_PY) out/pod_trace.tr bsg_tag_boot_rom > out/bsg_tag_boot_rom.v
 	$(eval VCS_FLAGS += -debug_pp +vcs+vcdpluson) # Debug adds these two variables to generate waveforms
 	$(VCS) $(VCS_FLAGS) $(VCS_CFLAGS) -o $@ \
 		$(VCS_INCLUDES) $(VCS_DEFINES) $(CSOURCES) $(VCS_SOURCES) out/bsg_tag_boot_rom.v \
-		-l out/build-debug.log -Mdir=out/csrc-debug
+		-l out/build-debug.log -Mdir=out/csrc-debug 2>&1 | tee $@.vcs.log
+
+# build simv
+# without debug option for faster simulation.
+out/cuda/simv: $(BSG_BLADERUNNER_GENERATED)
+out/cuda/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEADERS) 
+	mkdir -p $(dir $@)
+	cp $< $(dir $@)/Makefile.machine.include
+	$(call set_machine_variables,$<,$(TOP_LEVEL))
+	@echo VCS_DEFINES: $(VCS_DEFINES) > $@.vcs_defines.log
+	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > $(dir $@)/pod_trace.tr
+	python $(ASCII_TO_ROM_PY) $(dir $@)/pod_trace.tr bsg_tag_boot_rom > $(dir $@)/bsg_tag_boot_rom.v
+	@echo $(VCS_SOURCES)
+	$(VCS) $(VCS_FLAGS) $(VCS_CFLAGS) -o $@ \
+		$(VCS_INCLUDES) $(VCS_DEFINES) $(CSOURCES) $(VHEADERS) $(VSOURCES) out/cuda/bsg_tag_boot_rom.v \
+		-l out/cuda/build.log -Mdir=out/cuda/csrc 2>&1 | tee $@.vcs.log
 
 clean:
 	rm -rf */csrc* out
