@@ -1,10 +1,11 @@
-all: | bsg_cadenv bsg_manycore basejump_stl bsg_14 bsg_replicant
+all: | bsg_cadenv bsg_manycore basejump_stl bsg_14 bsg_replicant hb_bigblade_netlists
 
 bsg_cadenv:    commit=master
 basejump_stl:  commit=master
 bsg_14:        commit=master
 bsg_manycore:  commit=ci_bigblade
 bsg_replicant: commit=bigblade-tapeout
+hb_bigblade_netlists: commit=interface
 
 bsg_cadenv:
 	git clone git@github.com:bespoke-silicon-group/bsg_cadenv.git $@
@@ -25,3 +26,8 @@ bsg_manycore:
 bsg_replicant:
 	git clone git@github.com:bespoke-silicon-group/bsg_replicant.git $@
 	cd $@ ; git checkout $(commit) ;
+
+hb_bigblade_netlists:
+	git clone git@github.com:bespoke-silicon-group/hb_bigblade_netlists.git $@
+	cd $@ ; git checkout $(commit)
+

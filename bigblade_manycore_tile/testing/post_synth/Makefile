@@ -8,9 +8,17 @@ HB_BIGBLADE_DIR := $(abspath ../../../)
 # Sets "VCS" variable
 include ../../bsg_cadenv/cadenv.mk
 
+hb_bigblade_netlists_dir = $(abspath ../../hb_bigblade_netlists)
+include $(hb_bigblade_netlists_dir)/interface.mk
+
 # Include source lists
 include arch_filelist.mk
 include sim_filelist.mk
+
+VSOURCES += $(bsg_manycore_tile-post-synth-filelist)
+#VSOURCES += $(bigblade_io_link_ddr-post-synth-filelist)
+#VSOURCES += $(bigblade_noc_io_link-post-synth-filelist)
+#VSOURCES += $(bigblade_noc_mem_link-post-synth-filelist)
 
 VCS_INCLUDES += $(foreach inc,$(VINCLUDES),+incdir+"$(inc)")
 VCS_DEFINES  += $(foreach def,$(VDEFINES),+define+"$(def)")
@@ -81,9 +89,10 @@ out/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEAD
 	$(call set_machine_variables,$<)
 	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > out/pod_trace.tr
 	python $(ASCII_TO_ROM_PY) out/pod_trace.tr bsg_tag_boot_rom > out/bsg_tag_boot_rom.v
+	@echo $(VCS_SOURCES)
 	$(VCS) $(VCS_FLAGS) $(VCS_CFLAGS) -o $@ \
 		$(VCS_INCLUDES) $(VCS_DEFINES) $(CSOURCES) $(VCS_SOURCES) out/bsg_tag_boot_rom.v \
-		-l out/build.log -Mdir=out/csrc
+		-l out/build.log -Mdir=out/csrc 2>&1 | tee $@.vcs.log
 
 # build simv-debug
 # with debug option for waveform generation.
