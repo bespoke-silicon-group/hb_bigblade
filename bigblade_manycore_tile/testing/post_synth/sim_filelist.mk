@@ -78,7 +78,7 @@ VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/bsg_manycore_link_to_crossb
 
 # replicant required
 VHEADERS += $(BSG_CUDA_OUT_DIR)/bsg_bladerunner_pkg.v
-VSOURCES += $(BSG_REPLICANT_DIR)/libraries/platforms/post-synth-vcs/hardware/dpi_top.sv
+VSOURCES += $(BSG_REPLICANT_DIR)/libraries/platforms/bsg-designs-vcs/hardware/dpi_top.sv
 VSOURCES += $(BSG_REPLICANT_DIR)/hardware/bsg_manycore_endpoint_to_fifos.v
 VHEADERS += $(BSG_REPLICANT_DIR)/hardware/bsg_manycore_endpoint_to_fifos_pkg.v
 VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/dpi/bsg_nonsynth_dpi_manycore.v

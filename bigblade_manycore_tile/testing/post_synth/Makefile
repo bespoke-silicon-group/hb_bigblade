@@ -112,8 +112,8 @@ endef
 define set_linker_flags
 	$(eval VCS_LDFLAGS += -lbsg_manycore_runtime)
 	$(eval VCS_LDFLAGS += -lbsg_manycore_regression)
-	#$(eval VCS_LDFLAGS += -L$(BSG_REPLICANT_DIR)/libraries/platforms/post-synth-vcs/)
-	$(eval VCS_LDFLAGS += -Wl,-rpath=$(BSG_REPLICANT_DIR)/libraries/platforms/post-synth-vcs/)
+	$(eval VCS_LDFLAGS += -L$(BSG_REPLICANT_DIR)/libraries/platforms/bsg-designs-vcs/)
+	$(eval VCS_LDFLAGS += -Wl,-rpath=$(BSG_REPLICANT_DIR)/libraries/platforms/bsg-designs-vcs/)
 	$(eval VCS_FLAGS += $(foreach ldflag,$(VCS_LDFLAGS),-LDFLAGS "$(ldflag)"))
 endef
 

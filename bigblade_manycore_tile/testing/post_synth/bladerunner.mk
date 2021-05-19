@@ -1,5 +1,5 @@
 BSG_MACHINE_NAME =post-synth
-BSG_PLATFORM     =post-synth-vcs
+BSG_PLATFORM     =bsg-designs-vcs
 CL_DIR           =$(BSG_F1_DIR)
 HARDWARE_PATH    =$(CL_DIR)/hardware
 LIBRARIES_PATH   =$(CL_DIR)/libraries
