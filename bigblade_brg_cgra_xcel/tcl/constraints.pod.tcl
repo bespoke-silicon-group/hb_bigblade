@@ -153,11 +153,13 @@ bsg_chip_derate_cells
 bsg_chip_derate_mems
 #report_timing_derate
 
+#set_app_var sh_continue_on_error false
+
 ########################################
 ## Ungrouping
 # PP: ungroup this data path module and hopefully DC will stop inserting buffers
 # to the is_calc control signal...
-set_ungroup [get_designs -filter "hdl_template==bsg_gf_14_reduce_and_b8" ] true
+set_ungroup [get_designs *bsg_gf_14_reduce_and_* ] true
 set_ungroup [get_designs -filter "hdl_template==CGRACoreCtrl__1736738b526e3fb9" ] true
 set_ungroup [get_designs -filter "hdl_template==CGRACoreDpath__1736738b526e3fb9" ] true
 set_ungroup [get_designs -filter "hdl_template==CGRACore__1736738b526e3fb9" ] true
