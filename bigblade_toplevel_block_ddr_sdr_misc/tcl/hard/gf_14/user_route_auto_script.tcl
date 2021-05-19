@@ -221,13 +221,15 @@ append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_1_i_int"]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_2_i_int"]]
 add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -respect_blockages $msc_nets $msc_buffer
 
-
+# Legalize buffer locations
 legalize_placement -cells [get_cells {bsg_ss* bsg_msc*}]
 check_legality -cells [get_cells {bsg_ss* bsg_msc*}]
 
-
+# Connect wires to inserted buffers
 route_eco
-update_timing -full
+
+# Redo extraction if needed
+update_timing
 
 
 # set ss_nets [list]

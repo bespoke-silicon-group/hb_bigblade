@@ -112,10 +112,10 @@ move_object       $WEST_cell -x [expr $noc_io_west_x-$noc_mem_width] -y [round_u
 set_attribute     $WEST_cell orientation R0
 set_fixed_objects $WEST_cell
 
-set                EAST_cell [get_cells "north_link"]
-move_object       $EAST_cell -x [expr 300*$grid_width] -y [round_up_to_nearest [expr $core_ury-$ver_gap+$grid_height] $grid_height]
-set_attribute     $EAST_cell orientation R0
-set_fixed_objects $EAST_cell
+set                NORTH_cell [get_cells "north_link"]
+move_object       $NORTH_cell -x [expr 300*$grid_width] -y [round_up_to_nearest [expr $core_ury-$ver_gap+$grid_height] $grid_height]
+set_attribute     $NORTH_cell orientation R0
+set_fixed_objects $NORTH_cell
 
 
 

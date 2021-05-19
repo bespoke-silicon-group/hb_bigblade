@@ -1,4 +1,10 @@
 
+# Speed up wires, runtime long but significantly improve timing
+add_redundant_vias
+
+# Fix DRCs
+route_eco
+
 if {[file exists [which $ROUTE_OPT_STARRC_CONFIG_FILE]]} {
 	set_app_options -name extract.starrc_mode -value true
 	set_starrc_in_design -config $ROUTE_OPT_STARRC_CONFIG_FILE ;# example: route_opt.starrc_config_example.txt
