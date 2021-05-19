@@ -66,7 +66,7 @@ VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/bsg_nonsynth_wormhole_test_
 VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/bsg_manycore_vcache_wh_to_cache_dma.v
 VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/bsg_nonsynth_manycore_testbench.v
 VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/vcache_dma_to_dram_channel_map.v
-#VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/spmd_testbench.v
+VSOURCES += $(BSG_MANYCORE_DIR)/testbenches/common/v/spmd_testbench.v
 
 
 VSOURCES += $(BASEJUMP_STL_DIR)/bsg_misc/bsg_crossbar_control_basic_o_by_i.v

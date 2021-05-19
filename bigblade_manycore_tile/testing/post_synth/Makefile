@@ -19,9 +19,6 @@ include sim_filelist.mk
 #include rtl_filelist.mk
 
 VSOURCES += $(bsg_manycore_tile-post-synth-filelist)
-#VSOURCES += $(bigblade_io_link_ddr-post-synth-filelist)
-#VSOURCES += $(bigblade_noc_io_link-post-synth-filelist)
-#VSOURCES += $(bigblade_noc_mem_link-post-synth-filelist)
 
 VCS_INCLUDES += $(foreach inc,$(VINCLUDES),+incdir+"$(inc)")
 VCS_DEFINES  += $(foreach def,$(VDEFINES),+define+"$(def)")
