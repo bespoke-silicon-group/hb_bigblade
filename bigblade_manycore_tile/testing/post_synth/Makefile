@@ -39,7 +39,7 @@ VCS_FLAGS    += -assert svaext  # needed for "assert final"
 ###############################################
 # Bladerunner generated libraries and sources #
 ###############################################
-BSG_CUDA_OUT_DIR = $(abspath .)/out/cuda
+BSG_CUDA_OUT_DIR = $(abspath .)/out
 BSG_BLADERUNNER_GENERATED_SOURCES   := $(BSG_CUDA_OUT_DIR)/bsg_bladerunner_pkg.v
 BSG_BLADERUNNER_GENERATED_SOURCES   += $(BSG_CUDA_OUT_DIR)/bsg_manycore_machine.h
 BSG_BLADERUNNER_GENERATED_LIBRARIES := $(BSG_CUDA_OUT_DIR)/libbsg_manycore_runtime.so
@@ -94,6 +94,9 @@ define set_machine_variables
 	$(eval VCS_DEFINES += +define+BSG_MACHINE_NUM_VCACHE_ROWS="${BSG_MACHINE_NUM_VCACHE_ROWS}")
 	$(eval VCS_DEFINES += +define+BSG_MACHINE_NUM_VCACHES_PER_CHANNEL="${BSG_MACHINE_NUM_VCACHES_PER_CHANNEL}")
 	$(eval VCS_DEFINES += +define+BSG_MACHINE_DRAMSIM3_PKG="${BSG_MACHINE_DRAMSIM3_PKG}")
+	$(eval VCS_DEFINES += +define+BSG_MACHINE_DISABLE_VCORE_PROFILING=1)
+	$(eval VCS_DEFINES += +define+BSG_MACHINE_DISABLE_ROUTER_PROFILING=1)
+	$(eval VCS_DEFINES += +define+BSG_MACHINE_DISABLE_CACHE_PROFILING=1)
 	# specify where the host module is instantiated for profiler trigger (print_stat).
 	# relative to $root
 	$(eval VCS_DEFINES += +define+HOST_MODULE_PATH=$2)
@@ -104,6 +107,14 @@ define set_machine_variables
 	# organization 	= x16
 	# allocation    = FULL_MEM
 	$(eval VCS_DEFINES += +define+den2048Mb+sg5+x16+FULL_MEM)
+endef
+
+define set_linker_flags
+	$(eval VCS_LDFLAGS += -lbsg_manycore_runtime)
+	$(eval VCS_LDFLAGS += -lbsg_manycore_regression)
+	#$(eval VCS_LDFLAGS += -L$(BSG_REPLICANT_DIR)/libraries/platforms/post-synth-vcs/)
+	$(eval VCS_LDFLAGS += -Wl,-rpath=$(BSG_REPLICANT_DIR)/libraries/platforms/post-synth-vcs/)
+	$(eval VCS_FLAGS += $(foreach ldflag,$(VCS_LDFLAGS),-LDFLAGS "$(ldflag)"))
 endef
 
 # boot tag rom gen
@@ -144,15 +155,18 @@ out/simv-debug : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $
 # without debug option for faster simulation.
 out/cuda/simv: $(BSG_BLADERUNNER_GENERATED)
 out/cuda/simv : Makefile.machine.include $(VSOURCES) $(CSOURCES) $(VINCLUDES) $(VHEADERS) 
-	mkdir -p $(dir $@)
-	cp $< $(dir $@)/Makefile.machine.include
+	mkdir -p out
+	mkdir -p out/cuda
+	cp $< out/Makefile.machine.include
 	$(call set_machine_variables,$<,$(TOP_LEVEL))
+	$(call set_linker_flags)
 	@echo VCS_DEFINES: $(VCS_DEFINES) > $@.vcs_defines.log
-	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > $(dir $@)/pod_trace.tr
-	python $(ASCII_TO_ROM_PY) $(dir $@)/pod_trace.tr bsg_tag_boot_rom > $(dir $@)/bsg_tag_boot_rom.v
+	@echo VCS_FLAGS:  $(VCS_FLAGS)  > $@.vcs_flags.log
+	python $(POD_TRACE_GEN_PY) $(BSG_MACHINE_PODS_X) $(BSG_MACHINE_PODS_Y) > out/pod_trace.tr
+	python $(ASCII_TO_ROM_PY) out/pod_trace.tr bsg_tag_boot_rom > out/bsg_tag_boot_rom.v
 	@echo $(VCS_SOURCES)
 	$(VCS) $(VCS_FLAGS) $(VCS_CFLAGS) -o $@ \
-		$(VCS_INCLUDES) $(VCS_DEFINES) $(CSOURCES) $(VHEADERS) $(VSOURCES) out/cuda/bsg_tag_boot_rom.v \
+		$(VCS_INCLUDES) $(VCS_DEFINES) $(CSOURCES) $(VHEADERS) $(VSOURCES) out/bsg_tag_boot_rom.v \
 		-l out/cuda/build.log -Mdir=out/cuda/csrc 2>&1 | tee $@.vcs.log
 
 clean:
