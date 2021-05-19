@@ -24,11 +24,12 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
   set                  misc_pins [get_ports -filter "name=~clk_i"]
   append_to_collection misc_pins [get_ports -filter "name=~reset_i"]
   append_to_collection misc_pins [get_ports -filter "name=~global_y_cord_i*"]
-  append_to_collection misc_pins [get_ports -filter "name=~async_*"]
+  append_to_collection misc_pins [get_ports -filter "name=~tag_*"]
   
   set misc_pins_len [expr [sizeof_collection $misc_pins]]
-  set start_x [expr ($core_width / 4)  - (2*$c_pitch*$misc_pins_len/2)]
-  set last_loc [bsg_pins_line_constraint $misc_pins "C5" top $start_x "self" {} 1 1 1]
+  #set start_y [expr ($core_height / 2)  - (2*$c_pitch*$misc_pins_len/2)]
+  set start_y 10
+  set last_loc [bsg_pins_line_constraint $misc_pins "C4" right $start_y "self" {} 1 1 1]
   
   # Read horizontal pins from csv file
   set fh [open $::env(BSG_DESIGNS_TARGET_DIR)/../common/sdr_pin_y.csv]

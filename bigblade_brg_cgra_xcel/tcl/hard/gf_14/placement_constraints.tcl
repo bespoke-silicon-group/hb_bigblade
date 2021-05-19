@@ -37,12 +37,12 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   
   set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
   set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
-  set pe_origin_x [expr $tile_width - $array_width - $keepout_margin_x]
+  set pe_origin_x [expr $tile_width - $array_width]
   set pe_origin_y 3.276
   
   set sp_lx [expr 5+$keepout_margin_x]
-  set sp_ly [expr $pe_origin_y + 1*$array_height/8]
-  set sp_ry [expr $pe_origin_y + 7*$array_height/8]
+  set sp_ly [expr $pe_origin_y + 2*$array_height/8]
+  set sp_ry [expr $pe_origin_y + 6*$array_height/8]
   
   set rf_width 54
   set rf_height 83
@@ -100,21 +100,21 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set prefix pod/hb_cgra_xcel/cgra_xcel/dpath/cgra_dpath
   foreach {idx_x} {0 1 2 3 4 5 6 7} {
     set id [expr 1+$pe_num_y*$idx_x]
-    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b0123_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8_b0123_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
     set_attribute $cell -name physical_status -value placed
 
     set id [expr 3+$pe_num_y*$idx_x]
-    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b01234567_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8_b01234567_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
     set_attribute $cell -name physical_status -value placed
 
     set id [expr 5+$pe_num_y*$idx_x]
-    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8/b4567_*"]
+    set cell [get_cells "${prefix}_row_reduce_${idx_x}__rb8_b4567_*"]
     set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_margin_x/2]
     set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
     move_objects $cell -x $x -y $y
@@ -122,25 +122,33 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   }
 
   set id 12
-  set cell [get_cells "${prefix}_col_rb8/b0123_*"]
+  set cell [get_cells "${prefix}_col_rb8_b0123_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
   set_attribute $cell -name physical_status -value placed
    
   set id 44
-  set cell [get_cells "${prefix}_col_rb8/b4567_*"]
+  set cell [get_cells "${prefix}_col_rb8_b4567_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
   set_attribute $cell -name physical_status -value placed
 
   set id 28
-  set cell [get_cells "${prefix}_col_rb8/b01234567_*"]
+  set cell [get_cells "${prefix}_col_rb8_b01234567_*"]
   set x [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_x] - $pe_width/2]
   set y [expr [get_attribute [get_cell -hier "cgra_dpath_PE_rc__${id}"] bounding_box.ll_y] - $pe_margin_y/2]
   move_objects $cell -x $x -y $y
   set_attribute $cell -name physical_status -value placed
+
+  ### Blockages
+  set llx [get_attribute [get_cell -hier "cgra_dpath_PE_rc__7" ] bounding_box.ll_x]
+  set lly [get_attribute [get_cell -hier "cgra_dpath_PE_rc__7" ] bounding_box.ll_y]
+  set urx [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_x]
+  set ury [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_y]
+
+  create_placement_blockage -type soft -boundary [list [list $llx $lly] [list $urx $ury]]
 
   ### Placement bounds
   #set osdr_bound [create_bound -name "osdr" -type soft -boundary {{0 0} {5 757.4}}]
