@@ -4,7 +4,7 @@ bsg_cadenv:    commit=master
 basejump_stl:  commit=master
 bsg_14:        commit=master
 bsg_manycore:  commit=ci_bigblade
-bsg_replicant: commit=bigblade-tapeout
+bsg_replicant: commit=bigblade-tapeout-post-synth
 hb_bigblade_netlists: commit=interface
 
 bsg_cadenv:
