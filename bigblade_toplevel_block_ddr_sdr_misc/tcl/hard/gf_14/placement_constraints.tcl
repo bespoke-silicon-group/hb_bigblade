@@ -7,161 +7,139 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 #set_fixed_objects -unfix [get_flat_cells]
 
 
-# grid_width  = 13.44
-# grid_height = 5.76
 
+# core area 
 set core_llx [get_attribute [get_core_area] bounding_box.ll_x]
 set core_lly [get_attribute [get_core_area] bounding_box.ll_y]
 set core_urx [get_attribute [get_core_area] bounding_box.ur_x]
 set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 
-set edge_offset          237
-set io_link_ch_len       1680
-
-set io_link_gap          [expr 10*$grid_width]
-set io_link_west_offset  $io_link_gap
-set io_link_south_offset $io_link_gap
-set io_link_east_offset  [expr $grid_width*(floor(($core_urx-$io_link_gap)/$grid_width-0.5)+0.5)]
-set io_link_north_offset [expr $grid_height*(floor(($core_ury-$io_link_gap)/$grid_height-0.5)+0.5)]
 
 
-# placement blockages
-create_placement_blockage -boundary {{369.63 512.44} {9938.87 8013.56}}
-create_placement_blockage -boundary {{87.13 657.88 } {369.63 2232.28}}
-create_placement_blockage -boundary {{87.13 2523.16} {369.63 4097.56}}
-create_placement_blockage -boundary {{87.13 4388.44} {369.63 5962.84}}
-create_placement_blockage -boundary {{87.13 6253.72} {369.63 7631.32}}
-create_placement_blockage -boundary {{9938.87 657.88 } {10438.87 2232.28}}
-create_placement_blockage -boundary {{9938.87 2523.16} {10438.87 4097.56}}
-create_placement_blockage -boundary {{9938.87 4388.44} {10438.87 5962.84}}
-create_placement_blockage -boundary {{9938.87 6253.72} {10438.87 7828.12}}
+# block dimensions
+set bp_width   295.68
+set cgra_width 510.72
+set pod_width  9612.46
+
+set pod_height 1865.28
+set pod_gap    134.72
+
+set noc_mem_width  107.52
+set noc_mem_height 155.52
+
+set hor_gap [expr ($core_urx-$bp_width-$cgra_width-$pod_width)/2]
+set ver_gap [expr ($core_ury-4*$pod_height-3*$pod_gap)/2]
 
 
-create_routing_blockage -layers [get_layers] -boundary {{369.63 512.44} {9938.87 8013.56}}
-create_routing_blockage -layers [get_layers] -boundary {{87.13 657.88 } {369.63 2232.28}}
-create_routing_blockage -layers [get_layers] -boundary {{87.13 2523.16} {369.63 4097.56}}
-create_routing_blockage -layers [get_layers] -boundary {{87.13 4388.44} {369.63 5962.84}}
-create_routing_blockage -layers [get_layers] -boundary {{87.13 6253.72} {369.63 7631.32}}
-create_routing_blockage -layers [get_layers] -boundary {{9938.87 657.88 } {10438.87 2232.28}}
-create_routing_blockage -layers [get_layers] -boundary {{9938.87 2523.16} {10438.87 4097.56}}
-create_routing_blockage -layers [get_layers] -boundary {{9938.87 4388.44} {10438.87 5962.84}}
-create_routing_blockage -layers [get_layers] -boundary {{9938.87 6253.72} {10438.87 7828.12}}
+
+# pod blockages
+set blockage_dim "{{[expr $hor_gap+$bp_width] $ver_gap} {[expr $core_urx-$hor_gap-$cgra_width] [expr $core_ury-$ver_gap]}}"
+create_placement_blockage -boundary $blockage_dim
+create_routing_blockage -layers [get_layers] -boundary $blockage_dim
+
+# bp blockages
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $ver_gap+$i*($pod_height+$pod_gap)+$vcache_height]
+  set ury [expr $ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$vcache_height-$tile_height]
+  set blockage_dim "{{$hor_gap $lly} {[expr $hor_gap+$bp_width] $ury}}"
+  create_placement_blockage -boundary $blockage_dim
+  create_routing_blockage -layers [get_layers] -boundary $blockage_dim
+}
+
+# cgra blockages
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $ver_gap+$i*($pod_height+$pod_gap)+$vcache_height]
+  set ury [expr $ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$vcache_height]
+  set blockage_dim "{{[expr $core_urx-$hor_gap-$cgra_width] $lly} {[expr $core_urx-$hor_gap] $ury}}"
+  create_placement_blockage -boundary $blockage_dim
+  create_routing_blockage -layers [get_layers] -boundary $blockage_dim
+}
 
 
-# FIXME: cell name is hardcoded
-set                TAG_AND_cell [get_cells -of_object [get_nets -of_object [get_ports "pad_ML0_1_i_int"]]]
-move_object       $TAG_AND_cell -x [round_down_to_nearest 1335.27 [unit_width]] -y [round_down_to_nearest [expr $core_ury-2*[unit_height]] [unit_height]]
-set_attribute     $TAG_AND_cell orientation R0
-set_fixed_objects $TAG_AND_cell
+
+# tag_cell placement
+set                TAG_cell [get_cells -of_object [get_nets -of_object [get_ports "pad_ML0_1_i_int"]]]
+set_attribute     $TAG_cell orientation R0
+move_object       $TAG_cell -x [round_down_to_nearest 1335.27 [unit_width]] -y [round_down_to_nearest [expr $core_ury-2*[unit_height]] [unit_height]]
+set_fixed_objects $TAG_cell
 
 
-set                DL01_cell [get_cells "mem_link_0__link"]
-move_object       $DL01_cell -x $io_link_west_offset -y [round_up_to_nearest [expr $core_ury-40*$grid_height] $grid_height]
-set_attribute     $DL01_cell orientation R0
-set_fixed_objects $DL01_cell
 
-set                DL23_cell [get_cells "mem_link_1__link"]
-move_object       $DL23_cell -x $io_link_west_offset -y [round_up_to_nearest [expr 4097.56+10*$grid_height] $grid_height]
-set_attribute     $DL23_cell orientation R0
-set_fixed_objects $DL23_cell
+# noc_mem placement
+set noc_mem_west_x [round_up_to_nearest $hor_gap $grid_width]
+set noc_mem_east_x [expr [round_down_to_nearest [expr $core_urx-$hor_gap] $grid_width]-0.5*$grid_width]
 
-set                DL45_cell [get_cells "mem_link_2__link"]
-move_object       $DL45_cell -x $io_link_west_offset -y [round_up_to_nearest [expr 2232.28+10*$grid_height] $grid_height]
-set_attribute     $DL45_cell orientation R0
-set_fixed_objects $DL45_cell
+for {set i 0} {$i < 2} {incr i} {
 
-set                DL67_cell [get_cells "mem_link_3__link"]
-move_object       $DL67_cell -x [expr 100.5*$grid_width] -y [expr 10*$grid_height]
-set_attribute     $DL67_cell orientation MY
-set_fixed_objects $DL67_cell
+  set offset_x [expr {$i == 0} ? {$noc_mem_west_x} : {$noc_mem_east_x}]
+  set ori [expr {$i == 0} ? {"R0"} : {"MY"}]
+  set                mem_cell [get_cells "mem_link_[expr 0+$i*4]__link"]
+  move_object       $mem_cell -x $offset_x -y [round_up_to_nearest [expr $core_ury-10*$grid_height-$noc_mem_height] $grid_height]
+  set_attribute     $mem_cell orientation $ori
+  set_fixed_objects $mem_cell
 
-set                DR01_cell [get_cells "mem_link_4__link"]
-move_object       $DR01_cell -x $io_link_east_offset -y [round_up_to_nearest [expr $core_ury-40*$grid_height] $grid_height]
-set_attribute     $DR01_cell orientation MY
-set_fixed_objects $DR01_cell
+  for {set j 1} {$j < 3} {incr j} {
+    set                mem_cell [get_cells "mem_link_[expr $j+$i*4]__link"]
+    move_object       $mem_cell -x $offset_x -y [round_up_to_nearest [expr $ver_gap+(3-$j)*($pod_height+$pod_gap)-0.5*$pod_gap-0.5*$noc_mem_height] $grid_height]
+    set_attribute     $mem_cell orientation $ori
+    set_fixed_objects $mem_cell
+  }
 
-set                DR23_cell [get_cells "mem_link_5__link"]
-move_object       $DR23_cell -x $io_link_east_offset -y [round_up_to_nearest [expr 4097.56+10*$grid_height] $grid_height]
-set_attribute     $DR23_cell orientation MY
-set_fixed_objects $DR23_cell
-
-set                DR45_cell [get_cells "mem_link_6__link"]
-move_object       $DR45_cell -x $io_link_east_offset -y [round_up_to_nearest [expr 2232.28+10*$grid_height] $grid_height]
-set_attribute     $DR45_cell orientation MY
-set_fixed_objects $DR45_cell
-
-set                DR67_cell [get_cells "mem_link_7__link"]
-move_object       $DR67_cell -x [expr 667*$grid_width] -y [expr 10*$grid_height]
-set_attribute     $DR67_cell orientation R0
-set_fixed_objects $DR67_cell
-
-set                IT01_cell [get_cells "io_link"]
-move_object       $IT01_cell -x [round_up_to_nearest 5000 $grid_width] -y [round_up_to_nearest 8250 $grid_height]
-set_attribute     $IT01_cell orientation R0
-set_fixed_objects $IT01_cell
+  set offset_x [expr {$i == 0} ? {[expr 100.5*$grid_width]} : {[expr 667*$grid_width]}]
+  set ori [expr {$i == 0} ? {"MY"} : {"R0"}]
+  set                mem_cell [get_cells "mem_link_[expr 3+$i*4]__link"]
+  move_object       $mem_cell -x $offset_x -y [expr 10*$grid_height]
+  set_attribute     $mem_cell orientation $ori
+  set_fixed_objects $mem_cell
+}
 
 
-set wh_link_west_offset  [expr $io_link_west_offset+8*$grid_width+16*$grid_width]
-set wh_link_east_offset  [expr $io_link_east_offset-8*$grid_width-20*$grid_width]
 
-set                WEST_wh_cell [get_cells "west_link"]
-move_object       $WEST_wh_cell -x [expr 23*$grid_width] -y [round_up_to_nearest [expr 7631.32+1*$grid_height] $grid_height]
-set_attribute     $WEST_wh_cell orientation R0
-set_fixed_objects $WEST_wh_cell
+# noc_io placement
+set                io_cell [get_cells "io_link"]
+move_object       $io_cell -x [round_up_to_nearest 5000 $grid_width] -y [round_up_to_nearest [expr $core_ury-160] $grid_height]
+set_attribute     $io_cell orientation R0
+set_fixed_objects $io_cell
 
-set                NORTH_wh_cell [get_cells "north_link"]
-move_object       $NORTH_wh_cell -x [expr 300*$grid_width] -y [round_up_to_nearest [expr 8013.56+1*$grid_height] $grid_height]
-set_attribute     $NORTH_wh_cell orientation R0
-set_fixed_objects $NORTH_wh_cell
 
-set                DL0_wh_cell [get_cells "wh_link_0__link"]
-move_object       $DL0_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 7828.12+10*$grid_height] $grid_height]
-set_attribute     $DL0_wh_cell orientation MY
-set_fixed_objects $DL0_wh_cell
 
-set                DL12_wh_cell [get_cells "wh_link_1__link"]
-move_object       $DL12_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 5962.84+10*$grid_height] $grid_height]
-set_attribute     $DL12_wh_cell orientation MY
-set_fixed_objects $DL12_wh_cell
+# sdr placement
+set noc_io_west_x  [round_down_to_nearest [expr $hor_gap+$bp_width+$noc_mem_width-$grid_width] $grid_width]
+set noc_io_east_x  [round_up_to_nearest [expr $core_urx-$hor_gap-$cgra_width-$noc_mem_width+$grid_width] $grid_width]
 
-set                DL34_wh_cell [get_cells "wh_link_2__link"]
-move_object       $DL34_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 4097.56+10*$grid_height] $grid_height]
-set_attribute     $DL34_wh_cell orientation MY
-set_fixed_objects $DL34_wh_cell
+set                WEST_cell [get_cells "west_link"]
+move_object       $WEST_cell -x [expr $noc_io_west_x-$noc_mem_width] -y [round_up_to_nearest [expr $core_ury-$ver_gap-$vcache_height-$tile_height+$grid_height] $grid_height]
+set_attribute     $WEST_cell orientation R0
+set_fixed_objects $WEST_cell
 
-set                DL56_wh_cell [get_cells "wh_link_3__link"]
-move_object       $DL56_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 2232.28+10*$grid_height] $grid_height]
-set_attribute     $DL56_wh_cell orientation MY
-set_fixed_objects $DL56_wh_cell
+set                EAST_cell [get_cells "north_link"]
+move_object       $EAST_cell -x [expr 300*$grid_width] -y [round_up_to_nearest [expr $core_ury-$ver_gap+$grid_height] $grid_height]
+set_attribute     $EAST_cell orientation R0
+set_fixed_objects $EAST_cell
 
-set                DL7_wh_cell [get_cells "wh_link_4__link"]
-move_object       $DL7_wh_cell -x $wh_link_west_offset -y [round_up_to_nearest [expr 367.00+10*$grid_height] $grid_height]
-set_attribute     $DL7_wh_cell orientation MY
-set_fixed_objects $DL7_wh_cell
 
-set                DR0_wh_cell [get_cells "wh_link_5__link"]
-move_object       $DR0_wh_cell -x $wh_link_east_offset -y [round_up_to_nearest [expr 7828.12+10*$grid_height] $grid_height]
-set_attribute     $DR0_wh_cell orientation R0
-set_fixed_objects $DR0_wh_cell
 
-set                DR12_wh_cell [get_cells "wh_link_6__link"]
-move_object       $DR12_wh_cell -x $wh_link_east_offset -y [round_up_to_nearest [expr 5962.84+10*$grid_height] $grid_height]
-set_attribute     $DR12_wh_cell orientation R0
-set_fixed_objects $DR12_wh_cell
+for {set i 0} {$i < 2} {incr i} {
 
-set                DR34_wh_cell [get_cells "wh_link_7__link"]
-move_object       $DR34_wh_cell -x $wh_link_east_offset -y [round_up_to_nearest [expr 4097.56+10*$grid_height] $grid_height]
-set_attribute     $DR34_wh_cell orientation R0
-set_fixed_objects $DR34_wh_cell
+  set offset_x [expr {$i == 0} ? {$noc_io_west_x} : {$noc_io_east_x}]
+  set ori [expr {$i == 0} ? {"MY"} : {"R0"}]
+  set                wh_cell [get_cells "wh_link_[expr 0+$i*5]__link"]
+  move_object       $wh_cell -x $offset_x -y [round_up_to_nearest [expr $core_ury-$ver_gap-$vcache_height+2*$grid_height] $grid_height]
+  set_attribute     $wh_cell orientation $ori
+  set_fixed_objects $wh_cell
 
-set                DR56_wh_cell [get_cells "wh_link_8__link"]
-move_object       $DR56_wh_cell -x $wh_link_east_offset -y [round_up_to_nearest [expr 2232.28+10*$grid_height] $grid_height]
-set_attribute     $DR56_wh_cell orientation R0
-set_fixed_objects $DR56_wh_cell
+  for {set j 1} {$j < 4} {incr j} {
+    set                wh_cell [get_cells "wh_link_[expr $j+$i*5]__link"]
+    move_object       $wh_cell -x $offset_x -y [round_up_to_nearest [expr $ver_gap+(4-$j)*($pod_height+$pod_gap)-0.5*$pod_gap-0.5*$noc_mem_height] $grid_height]
+    set_attribute     $wh_cell orientation $ori
+    set_fixed_objects $wh_cell
+  }
 
-set                DR7_wh_cell [get_cells "wh_link_9__link"]
-move_object       $DR7_wh_cell -x $wh_link_east_offset -y [round_up_to_nearest [expr 367.00+10*$grid_height] $grid_height]
-set_attribute     $DR7_wh_cell orientation R0
-set_fixed_objects $DR7_wh_cell
+  set                wh_cell [get_cells "wh_link_[expr 4+$i*5]__link"]
+  move_object       $wh_cell -x $offset_x -y [round_down_to_nearest [expr $ver_gap+$vcache_height-$noc_mem_height-$grid_height] $grid_height]
+  set_attribute     $wh_cell orientation $ori
+  set_fixed_objects $wh_cell
+}
+
 
 puts "BSG-info: Completed script [info script]\n"
