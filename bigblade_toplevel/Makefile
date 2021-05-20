@@ -13,6 +13,10 @@ else ifeq ($(GIT_CLONE_STYLE),https)
 
 endif
 
+hb_bigblade_netlists_dir    := $(THIS_DIR)/hb_bigblade_netlists
+hb_bigblade_netlists_url    := $(GITHUB)bespoke-silicon-group/hb_bigblade_netlists
+hb_bigblade_netlists_commit := main
+
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
 basejump_stl_commit  :=master
@@ -47,6 +51,7 @@ all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
 
 init_repos  = bsg_manycore.init
 init_repos += basejump_stl.init
+init_repos += hb_bigblade_netlists.init
 
 $(prep_dir): $(bsg_14.repo)
 	ln -nsf $(bsg_14_dir)/.pdk_prep $@
@@ -63,6 +68,9 @@ bsg_manycore.init: bsg_manycore.repo
 
 basejump_stl.init: basejump_stl.init
 	cd $(basejump_stl_dir) && git submodule update --init --recursive
+
+hb_bigblade_netlists.init: hb_bigblade_netlists.repo
+	$(MAKE) -C $(hb_bigblade_netlists_dir)
 
 summaries=$(subst .repo,.summary,$(all_repos))
 .PHONY: $(summaries)
