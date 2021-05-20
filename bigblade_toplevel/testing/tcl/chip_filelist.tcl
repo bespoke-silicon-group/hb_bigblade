@@ -177,10 +177,8 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_tile_vcache_array.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
   $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
   $bsg_manycore_dir/v/bsg_manycore_tile_compute_array_ruche.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
   $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
 
