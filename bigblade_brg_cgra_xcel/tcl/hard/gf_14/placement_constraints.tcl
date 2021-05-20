@@ -38,11 +38,11 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
   set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
   set pe_origin_x [expr $tile_width - $array_width]
-  set pe_origin_y 3.276
+  set pe_origin_y $keepout_margin_y
   
-  set sp_lx [expr 5+$keepout_margin_x]
-  set sp_ly [expr $pe_origin_y + 2*$array_height/8]
-  set sp_ry [expr $pe_origin_y + 6*$array_height/8]
+  set sp_lx [expr 10+$keepout_margin_x]
+  set sp_ly [expr $pe_origin_y + 1*$array_height/16]
+  set sp_ry [expr $pe_origin_y + 15*$array_height/16]
   
   set rf_width 54
   set rf_height 83
@@ -55,7 +55,7 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
     -align left \
     -horizontal_channel_height [expr $rf_margin_y] \
     -vertical_channel_width [expr $keepout_margin_x] \
-    -orientation FN \
+    -orientation N \
     $sram_mems
   ]
   create_keepout_margin -type hard -outer $keepout_margins $sram_mems
@@ -144,11 +144,18 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
 
   ### Blockages
   set llx [get_attribute [get_cell -hier "cgra_dpath_PE_rc__7" ] bounding_box.ll_x]
-  set lly [get_attribute [get_cell -hier "cgra_dpath_PE_rc__7" ] bounding_box.ll_y]
-  set urx [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_x]
+  #set lly [get_attribute [get_cell -hier "cgra_dpath_PE_rc__7" ] bounding_box.ll_y]
+  set lly 0
+  #set urx [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_x]
+  set urx $tile_width
   set ury [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_y]
 
-  create_placement_blockage -type soft -boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -type allow_buffer_only -blocked_percentage 100  -boundary [list [list $llx $lly] [list $urx $ury]]
+
+  set tag_bound [create_bound -name "btx" -type soft \
+	-boundary [list [list 0 [expr $tile_height - 100]] [list $llx $tile_height]]]
+  add_to_bound $tag_bound [get_cells btm]
+  add_to_bound $tag_bound [get_cells btc*]
 
   ### Placement bounds
   #set osdr_bound [create_bound -name "osdr" -type soft -boundary {{0 0} {5 757.4}}]
