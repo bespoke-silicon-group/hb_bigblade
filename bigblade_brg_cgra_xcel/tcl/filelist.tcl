@@ -169,7 +169,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
   $bigblade_dir/common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_east.v
   
-  $cgra_dir/v/bsg_chip_pkg.v
+  $bigblade_dir/common/v/bsg_chip_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
   $cgra_dir/v/hard/gf_14/sram/SramWrapper.v

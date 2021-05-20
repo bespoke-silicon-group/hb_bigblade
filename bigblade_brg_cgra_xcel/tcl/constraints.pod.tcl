@@ -29,6 +29,11 @@ set xcel_input_delay_min_ps [expr $xcel_clk_period_ps*$xcel_input_delay_min_per/
 set xcel_input_delay_max_per 70.0
 set xcel_input_delay_max_ps [expr $xcel_clk_period_ps*$xcel_input_delay_max_per/100.0]
 
+set xcel_output_delay_min_per 2.0
+set xcel_output_delay_min_ps [expr $xcel_clk_period_ps*$xcel_output_delay_min_per/100.0]
+set xcel_output_delay_max_per 20.0
+set xcel_output_delay_max_ps [expr $xcel_clk_period_ps*$xcel_output_delay_max_per/100.0]
+
 set link_clk_period_ps        1000
 set link_clk_uncertainty_per  3.0
 set link_clk_uncertainty_ps  [expr min([expr $link_clk_period_ps*($link_clk_uncertainty_per/100.0)], 20)]
@@ -58,7 +63,6 @@ set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 ########################################
 ## In2Reg
 set xcel_input_pins [get_ports reset_i]
-append_to_collection xcel_input_pins [get_ports global_y_cord_i[*]]
 append_to_collection xcel_input_pins [get_ports async_*_reset_i]
 set_input_delay -min $xcel_input_delay_min_ps -clock $xcel_clk_name $xcel_input_pins
 set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_pins
@@ -68,6 +72,14 @@ set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 set tag_in_ports [get_ports tag_data_i]
 append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
+
+########################################
+## Reg2Out
+set xcel_output_pins [get_ports sdr_disable_o]
+set_output_delay -min $xcel_output_delay_min_ps -clock $xcel_clk_name $xcel_output_pins
+set_output_delay -max $xcel_output_delay_max_ps -clock $xcel_clk_name $xcel_output_pins
+set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
+set_load -max [load_of [get_lib_pin */$LIB_CELLS(invx8,load_pin)]] [all_outputs]
 
 ########################################
 ## SDR constraints
@@ -109,8 +121,8 @@ for {set i 0} {$i < 4} {incr i} {
 
 ########################################
 ## False paths
-set_false_path -from [get_ports global_*_cord_i]
 set_false_path -from [get_ports tag_node_id_offset_i[*]]
+set_false_path -to   [get_ports sdr_disable_o]
 
 ########################################
 ## Disable timing
