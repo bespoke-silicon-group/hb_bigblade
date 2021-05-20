@@ -7,7 +7,7 @@ initialize_floorplan \
   -control_type core \
   -coincident_boundary true \
   -shape R \
-  -side_length [list $tile_width $tile_height]
+  -side_length [list [expr $tile_width + 1.344] $tile_height]
 
 
 

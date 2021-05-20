@@ -11,7 +11,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
   for {set x 0} {$x < $HB_SUBARRAY_NUM_TILES_X_P} {incr x} {
     set tile_cell [get_cells "y_${y}__x_${x}__tile"]
-    set llx [expr $x * ($tile_width + $tile_x_space)]
+    set llx [expr $x * ($tile_x_pitch)]
     set lly [expr ($HB_SUBARRAY_NUM_TILES_Y_P - $y - 1) * ($tile_height + $tile_y_space)]
     move_objects $tile_cell -x $llx -y $lly
     set_fixed_objects $tile_cell
@@ -48,7 +48,7 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
     set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
 
     set curr_y_track 56
-    set x_offset [expr $tile_urx + $RB_RP_X_OFFSET]
+    set x_offset [expr $tile_urx + 11*[unit_width]]
 
     # west side
     for {set b 0} {$b < $HB_RUCHE_LINK_WIDTH_P} {incr b} {

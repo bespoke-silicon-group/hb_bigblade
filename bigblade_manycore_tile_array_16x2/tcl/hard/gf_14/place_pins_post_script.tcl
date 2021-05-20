@@ -13,7 +13,7 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
     set tile_urx [get_attribute $tile_cell boundary_bounding_box.ur_x]
     set tile_lly [get_attribute $tile_cell boundary_bounding_box.ll_y]
     set tile_ury [get_attribute $tile_cell boundary_bounding_box.ur_y]
-    set rp_x [expr $tile_urx + $RB_RP_X_OFFSET]
+    set rp_x [expr $tile_urx + 0.924]
 
     for {set b 0} {$b < $HB_RUCHE_LINK_WIDTH_P} {incr b} {
       set rp_name "bsg_rp_rb_w_${y}_${x}_${b}"
@@ -34,9 +34,9 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
       set pin [get_pins -of $tile_cell -filter "name==link_i[294]"]
       set rp_y [round_down_to_nearest [get_attribute $pin bounding_box.ll_y] 0.48]
       set rp_y [expr $rp_y + 0.48*1]
-      set_rp_group_options $rp_name -x_offset [expr $tile_urx + $RB_RP_X_OFFSET] -y_offset $rp_y \
+      set_rp_group_options $rp_name -x_offset [expr $tile_urx + 0.924] -y_offset $rp_y \
                                     -optimization_restriction no_opt
-      move_objects $rp_group -x [expr $tile_urx + $RB_RP_X_OFFSET] -y $rp_y
+      move_objects $rp_group -x [expr $tile_urx + 0.924] -y $rp_y
       #puts "rp_y ${rp_y}"
     }
         
@@ -61,9 +61,9 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
       set pin [get_pins -of $tile_cell -filter "name==link_o[294]"]
       set rp_y [round_down_to_nearest [get_attribute $pin bounding_box.ll_y] 0.48]
       set rp_y [expr $rp_y + 0.48*1]
-      set_rp_group_options $rp_name -x_offset [expr $tile_urx + $RB_RP_X_OFFSET] -y_offset $rp_y \
+      set_rp_group_options $rp_name -x_offset [expr $tile_urx + 0.924] -y_offset $rp_y \
                                     -optimization_restriction no_opt
-      move_objects $rp_group -x [expr $tile_urx + $RB_RP_X_OFFSET] -y $rp_y
+      move_objects $rp_group -x [expr $tile_urx + 0.924] -y $rp_y
       #puts "rp_y ${rp_y}"
     }
 
