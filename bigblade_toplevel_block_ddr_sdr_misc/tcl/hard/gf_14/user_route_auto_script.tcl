@@ -228,6 +228,12 @@ check_legality -cells [get_cells {bsg_ss* bsg_msc*}]
 # Connect wires to inserted buffers
 route_eco
 
+# Speed up wires, runtime long but significantly improve timing
+add_redundant_vias
+
+# Fix DRCs
+route_eco
+
 # Redo extraction if needed
 update_timing
 

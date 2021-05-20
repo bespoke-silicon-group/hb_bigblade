@@ -25,19 +25,12 @@ proc get_propagated_nets {port cell} {
 
 proc insert_buffers_on_propagated_nets {port cell num prefix buffer} {
   set opt_nets [get_propagated_nets $port $cell]
-  for {set i 0} {$i < $num} {incr i} {
+  for {set i 1} {$i < [expr $num+1]} {incr i} {
     # FIXME: assume no overflow
     set curr_net [get_nets [index_collection $opt_nets $i]]
     add_buffer_on_route -net_prefix $prefix -cell_prefix $prefix -repeater_distance_length_ratio 0.5 -respect_blockages $curr_net $buffer
   }
 }
-
-
-# Speed up wires, runtime long but significantly improve timing
-add_redundant_vias
-
-# Fix DRCs
-route_eco
 
 
 # Enable StarRC extraction before route optimization
@@ -166,6 +159,7 @@ check_legality -cells [get_cells ${opt_prefix}*]
 
 # Step 4: Fix DRCs
 route_eco
+update_timing -full
 
 
 # Step 5: Report Timing
