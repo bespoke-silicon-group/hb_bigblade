@@ -11,23 +11,23 @@ module bp_cce_to_mc_bridge
    , parameter host_enable_p                   = 0
 
    , parameter mc_max_outstanding_p            = "inv"
-   , parameter mc_x_cord_width_p               = "inv"
-   , parameter mc_x_subcord_width_p            = "inv"
-   , parameter pod_x_cord_width_p              = "inv"
-   , parameter mc_y_cord_width_p               = "inv"
-   , parameter mc_y_subcord_width_p            = "inv"
-   , parameter pod_y_cord_width_p              = "inv"
-   , parameter mc_data_width_p                 = "inv"
-   , parameter mc_addr_width_p                 = "inv"
-   , parameter mc_num_vcache_rows_p            = "inv"
-   , parameter mc_vcache_block_size_in_words_p = "inv"
-   , parameter mc_vcache_size_p                = "inv"
-   , parameter mc_vcache_sets_p                = "inv"
-   , parameter mc_num_tiles_x_p                = "inv"
-   , parameter mc_num_tiles_y_p                = "inv"
+   , parameter hb_x_cord_width_p               = "inv"
+   , parameter hb_x_subcord_width_p            = "inv"
+   , parameter hb_pod_x_cord_width_p           = "inv"
+   , parameter hb_y_cord_width_p               = "inv"
+   , parameter hb_y_subcord_width_p            = "inv"
+   , parameter hb_pod_y_cord_width_p           = "inv"
+   , parameter hb_data_width_p                 = "inv"
+   , parameter hb_addr_width_p                 = "inv"
+   , parameter hb_num_vcache_rows_p            = "inv"
+   , parameter hb_vcache_block_size_in_words_p = "inv"
+   , parameter hb_vcache_size_p                = "inv"
+   , parameter hb_vcache_sets_p                = "inv"
+   , parameter hb_num_tiles_x_p                = "inv"
+   , parameter hb_num_tiles_y_p                = "inv"
 
-   , localparam mc_packet_width_lp      = `bsg_manycore_packet_width(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p)
-   , localparam mc_link_sif_width_lp    = `bsg_manycore_link_sif_width(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p)
+   , localparam mc_packet_width_lp      = `bsg_manycore_packet_width(hb_addr_width_p, hb_data_width_p, hb_x_cord_width_p, hb_y_cord_width_p)
+   , localparam mc_link_sif_width_lp    = `bsg_manycore_link_sif_width(hb_addr_width_p, hb_data_width_p, hb_x_cord_width_p, hb_y_cord_width_p)
    )
   (input                                      clk_i
    , input                                    reset_i
@@ -51,13 +51,13 @@ module bp_cce_to_mc_bridge
    , input [mc_link_sif_width_lp-1:0]         link_sif_i
    , output logic [mc_link_sif_width_lp-1:0]  link_sif_o
 
-   , input [mc_x_cord_width_p-1:0]            my_x_i
-   , input [mc_y_cord_width_p-1:0]            my_y_i
+   , input [hb_x_cord_width_p-1:0]            my_x_i
+   , input [hb_y_cord_width_p-1:0]            my_y_i
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, cce);
   `declare_bp_memory_map(paddr_width_p, caddr_width_p);
-  `declare_bsg_manycore_packet_s(mc_addr_width_p, mc_data_width_p, mc_x_cord_width_p, mc_y_cord_width_p);
+  `declare_bsg_manycore_packet_s(hb_addr_width_p, hb_data_width_p, hb_x_cord_width_p, hb_y_cord_width_p);
   `bp_cast_i(bp_bedrock_cce_mem_msg_s, io_cmd);
   `bp_cast_o(bp_bedrock_cce_mem_msg_s, io_resp);
   `bp_cast_o(bp_bedrock_cce_mem_msg_s, io_cmd);
@@ -124,23 +124,23 @@ module bp_cce_to_mc_bridge
   wire [paddr_width_p-1:0] io_cmd_addr_li = io_cmd_li.header.addr;
 
   logic                                    in_v_lo;
-  logic [mc_data_width_p-1:0]              in_data_lo;
-  logic [(mc_data_width_p>>3)-1:0]         in_mask_lo;
-  logic [mc_addr_width_p-1:0]              in_addr_lo;
+  logic [hb_data_width_p-1:0]              in_data_lo;
+  logic [(hb_data_width_p>>3)-1:0]         in_mask_lo;
+  logic [hb_addr_width_p-1:0]              in_addr_lo;
   logic                                    in_we_lo;
   bsg_manycore_load_info_s                 in_load_info_lo;
-  logic [mc_x_cord_width_p-1:0]            in_src_x_cord_lo;
-  logic [mc_y_cord_width_p-1:0]            in_src_y_cord_lo;
+  logic [hb_x_cord_width_p-1:0]            in_src_x_cord_lo;
+  logic [hb_y_cord_width_p-1:0]            in_src_y_cord_lo;
   logic                                    in_yumi_li;
 
-  logic [mc_data_width_p-1:0]              returning_data_li;
+  logic [hb_data_width_p-1:0]              returning_data_li;
   logic                                    returning_v_li;
 
   logic                                    out_v_li;
   bsg_manycore_packet_s                    out_packet_li;
   logic                                    out_ready_lo;
 
-  logic [mc_data_width_p-1:0]              returned_data_r_lo;
+  logic [hb_data_width_p-1:0]              returned_data_r_lo;
   logic [bsg_manycore_reg_id_width_gp-1:0] returned_reg_id_r_lo;
   logic                                    returned_v_r_lo, returned_yumi_li;
   bsg_manycore_return_packet_type_e        returned_pkt_type_r_lo;
@@ -151,10 +151,10 @@ module bp_cce_to_mc_bridge
   logic [3:0]                              out_credits_used_lo;
 
   bsg_manycore_endpoint_standard
-   #(.x_cord_width_p(mc_x_cord_width_p)
-     ,.y_cord_width_p(mc_y_cord_width_p)
-    ,.data_width_p(mc_data_width_p)
-    ,.addr_width_p(mc_addr_width_p)
+   #(.x_cord_width_p(hb_x_cord_width_p)
+     ,.y_cord_width_p(hb_y_cord_width_p)
+    ,.data_width_p(hb_data_width_p)
+    ,.addr_width_p(hb_addr_width_p)
     ,.credit_counter_width_p(`BSG_WIDTH(15))
     ,.fifo_els_p(2)
     )
@@ -211,25 +211,25 @@ module bp_cce_to_mc_bridge
     );
 
   // DRAM hash function
-  logic [mc_x_cord_width_p-1:0] dram_x_cord_lo;
-  logic [mc_y_cord_width_p-1:0] dram_y_cord_lo;
-  logic [mc_addr_width_p-1:0] dram_epa_lo;
+  logic [hb_x_cord_width_p-1:0] dram_x_cord_lo;
+  logic [hb_y_cord_width_p-1:0] dram_y_cord_lo;
+  logic [hb_addr_width_p-1:0] dram_epa_lo;
 
-  wire [mc_data_width_p-1:0]      dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:mc_data_width_p-1]};
+  wire [hb_data_width_p-1:0]         dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]};
   // Need to stripe across mc_compute pods, 4x4
-  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = 1'b1 + io_cmd_li.header.addr[0+mc_data_width_p+:2];
-  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = 1'b1 + io_cmd_li.header.addr[0+mc_data_width_p+2+:2];
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = 1'b1 + io_cmd_li.header.addr[0+hb_data_width_p+:2];
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = 1'b1 + io_cmd_li.header.addr[0+hb_data_width_p+2+:2];
   bsg_manycore_dram_hash_function
-   #(.data_width_p(mc_data_width_p)
-     ,.addr_width_p(mc_addr_width_p)
-     ,.x_cord_width_p(mc_x_cord_width_p)
-     ,.y_cord_width_p(mc_y_cord_width_p)
-     ,.pod_x_cord_width_p(pod_x_cord_width_p)
-     ,.pod_y_cord_width_p(pod_y_cord_width_p)
-     ,.x_subcord_width_p(mc_x_subcord_width_p)
-     ,.y_subcord_width_p(mc_y_subcord_width_p)
-     ,.num_vcache_rows_p(mc_num_vcache_rows_p)
-     ,.vcache_block_size_in_words_p(mc_vcache_block_size_in_words_p)
+   #(.data_width_p(hb_data_width_p)
+     ,.addr_width_p(hb_addr_width_p)
+     ,.x_cord_width_p(hb_x_cord_width_p)
+     ,.y_cord_width_p(hb_y_cord_width_p)
+     ,.pod_x_cord_width_p(hb_pod_x_cord_width_p)
+     ,.pod_y_cord_width_p(hb_pod_y_cord_width_p)
+     ,.x_subcord_width_p(hb_x_subcord_width_p)
+     ,.y_subcord_width_p(hb_y_subcord_width_p)
+     ,.num_vcache_rows_p(hb_num_vcache_rows_p)
+     ,.vcache_block_size_in_words_p(hb_vcache_block_size_in_words_p)
      )
    dram_hash
     (.eva_i(dram_eva_li)
@@ -243,17 +243,17 @@ module bp_cce_to_mc_bridge
 
   // Other MMIO
   localparam tile_addr_width_lp = 18;
-  wire [mc_addr_width_p-1:0]      mmio_tile_epa_lo = io_cmd_addr_li[2+:tile_addr_width_lp];
-  wire [mc_x_cord_width_p-1:0] mmio_tile_x_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+:mc_x_cord_width_p];
-  wire [mc_y_cord_width_p-1:0] mmio_tile_y_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+mc_x_cord_width_p+:mc_y_cord_width_p];
+  wire [hb_addr_width_p-1:0]      mmio_tile_epa_lo = io_cmd_addr_li[2+:tile_addr_width_lp];
+  wire [hb_x_cord_width_p-1:0] mmio_tile_x_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+:hb_x_cord_width_p];
+  wire [hb_y_cord_width_p-1:0] mmio_tile_y_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+hb_x_cord_width_p+:hb_y_cord_width_p];
 
-  wire [mc_addr_width_p-1:0]      mmio_vcache_epa_lo = io_cmd_addr_li[2+:mc_addr_width_p];
-  wire [mc_x_cord_width_p-1:0] mmio_vcache_x_cord_lo = io_cmd_addr_li[2+mc_addr_width_p+:mc_x_cord_width_p];
-  wire [pod_y_cord_width_p-1:0] mmio_vcache_y_pod_lo = io_cmd_addr_li[2+mc_addr_width_p+mc_x_cord_width_p+:pod_y_cord_width_p];
-  wire [mc_y_subcord_width_p-1:0] mmio_vcache_y_subcord_lo = (mmio_vcache_y_pod_lo == '0) ? '1 : '0;
-  wire [mc_y_cord_width_p-1:0] mmio_vcache_y_cord_lo = {mmio_vcache_y_pod_lo, mmio_vcache_y_subcord_lo};
+  wire [hb_addr_width_p-1:0]         mmio_vcache_epa_lo = io_cmd_addr_li[2+:hb_addr_width_p];
+  wire [hb_x_cord_width_p-1:0]    mmio_vcache_x_cord_lo = io_cmd_addr_li[2+hb_addr_width_p+:hb_x_cord_width_p];
+  wire [hb_pod_y_cord_width_p-1:0] mmio_vcache_y_pod_lo = io_cmd_addr_li[2+hb_addr_width_p+hb_x_cord_width_p+:hb_pod_y_cord_width_p];
+  wire [hb_y_subcord_width_p-1:0] mmio_vcache_y_subcord_lo = (mmio_vcache_y_pod_lo == '0) ? '1 : '0;
+  wire [hb_y_cord_width_p-1:0] mmio_vcache_y_cord_lo = {mmio_vcache_y_pod_lo, mmio_vcache_y_subcord_lo};
 
-  logic [(mc_data_width_p>>3)-1:0] store_mask;
+  logic [(hb_data_width_p>>3)-1:0] store_mask;
   always_comb
     case (io_cmd_li.header.size)
        e_bedrock_msg_size_1: store_mask = 4'h1 << io_cmd_eva_li.low_bits;
@@ -264,15 +264,15 @@ module bp_cce_to_mc_bridge
   localparam trans_id_width_lp = `BSG_SAFE_CLOG2(mc_max_outstanding_p);
   logic [trans_id_width_lp-1:0] trans_id_lo;
   logic trans_id_v_lo, trans_id_yumi_li;
-  logic [mc_data_width_p-1:0] mmio_resp_data_lo;
+  logic [hb_data_width_p-1:0] mmio_resp_data_lo;
   logic [trans_id_width_lp-1:0] mmio_resp_id_lo;
   logic mmio_resp_v_lo, mmio_resp_yumi_li;
   logic mmio_returned_v_li;
 
   wire [bsg_manycore_reg_id_width_gp-1:0] mmio_returned_reg_id_li = returned_reg_id_r_lo;
-  wire [mc_data_width_p-1:0] mmio_returned_data_li = returned_data_r_lo;
+  wire [hb_data_width_p-1:0] mmio_returned_data_li = returned_data_r_lo;
   bsg_fifo_reorder
-   #(.width_p(mc_data_width_p), .els_p(mc_max_outstanding_p))
+   #(.width_p(hb_data_width_p), .els_p(mc_max_outstanding_p))
    return_data_fifo
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
@@ -314,13 +314,13 @@ module bp_cce_to_mc_bridge
   bp_bedrock_cce_mem_msg_s mmio_resp_lo;
   assign mmio_resp_lo = '{header: mmio_header_lo, data: mmio_resp_data_lo};
 
-  logic [mc_data_width_p-1:0] store_payload;
+  logic [hb_data_width_p-1:0] store_payload;
   logic [bsg_manycore_reg_id_width_gp-1:0] store_reg_id;
   bsg_manycore_packet_op_e store_op;
   bsg_manycore_reg_id_encode
-   #(.data_width_p(mc_data_width_p))
+   #(.data_width_p(hb_data_width_p))
    reg_id_encode
-    (.data_i(io_cmd_li.data[0+:mc_data_width_p])
+    (.data_i(io_cmd_li.data[0+:hb_data_width_p])
      ,.mask_i(store_mask)
      ,.reg_id_i(bsg_manycore_reg_id_width_gp'(trans_id_lo))
 
@@ -422,7 +422,7 @@ module bp_cce_to_mc_bridge
          ,.yumi_i(bp_to_mc_yumi_li)
          );
       assign bp_to_mc_load_info = '{part_sel : io_cmd_li.header.addr[0+:2], default: '0};
-      assign bp_to_mc_out_packet_li = '{addr       : bp_to_mc_lo.addr[2+:mc_addr_width_p]
+      assign bp_to_mc_out_packet_li = '{addr       : bp_to_mc_lo.addr[2+:hb_addr_width_p]
                                         ,op_v2     : bsg_manycore_packet_op_e'(bp_to_mc_lo.op_v2)
                                         ,reg_id    : bp_to_mc_lo.reg_id
                                         ,payload   : (bp_to_mc_lo.op_v2 inside {e_remote_store, e_remote_sw, e_remote_amoswap, e_remote_amoadd, e_remote_amoor})

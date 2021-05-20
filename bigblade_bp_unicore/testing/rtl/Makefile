@@ -123,12 +123,14 @@ LINKER ?= $(SRC_DIR)/riscv.ld
 
 PYTHON ?= python
 PYTHONPATH +=:../../bsg_manycore/testbenches/py
-TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
+TRACE_GEN ?= $(abspath ../../../bigblade_toplevel/testing/py/bsg_tag_boot.py)
 NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
-%/trace.tr:
-	mkdir -p $(@D)
+$(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.tr:
 	$(PYTHON) $(TRACE_GEN) > $@
+
+$(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.v: $(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.tr
+	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< bsg_tag_boot_rom > $@
 
 %/prog.riscv:
 	mkdir -p $(@D)
@@ -161,7 +163,7 @@ PLUSARGS += +num_finish=1
 ## Run Targets
 ########################################
 
-run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr
+run: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf
 	cd $(BSG_OUT_DIR); $(BSG_OUT_SIM) $(PLUSARGS) | tee -i $(@D)/run.log
 
 run-no-tee: $(BSG_OUT_SIM) $(BSG_OUT_DIR)/prog.nbf $(BSG_OUT_DIR)/trace.tr

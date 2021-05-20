@@ -4,6 +4,7 @@
 
 module bsg_blackparrot_halfpod
  import bsg_chip_pkg::*;
+ import blackparrot_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
@@ -11,9 +12,9 @@ module bsg_blackparrot_halfpod
  import bp_common_pkg::*;
  import bp_me_pkg::*;
  #(localparam fwd_width_lp =
-       `bsg_manycore_packet_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
+       `bsg_manycore_packet_width(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp)
    , localparam rev_width_lp =
-       `bsg_manycore_return_packet_width(mc_x_cord_width_gp, mc_y_cord_width_gp, mc_data_width_gp)
+       `bsg_manycore_return_packet_width(hb_x_cord_width_gp, hb_y_cord_width_gp, hb_data_width_gp)
    )
   (
    input                                          clk_i
@@ -23,7 +24,7 @@ module bsg_blackparrot_halfpod
    , input                                        tag_data_i
    , input  [tag_lg_els_gp-1:0]                   tag_node_id_offset_i
 
-   , input [mc_y_cord_width_gp-1:0]               global_y_cord_i
+   , input [hb_y_cord_width_gp-1:0]               global_y_cord_i
 
    , output logic [2:0]                           io_fwd_link_clk_o
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o

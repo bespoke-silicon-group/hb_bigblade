@@ -328,8 +328,8 @@ set SVERILOG_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
 
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
+  $bsg_designs_target_dir/v/blackparrot_chip_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_sdr.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_halfpod.sv
 "]

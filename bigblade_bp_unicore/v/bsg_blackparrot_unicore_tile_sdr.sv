@@ -4,29 +4,30 @@
 
 module bsg_blackparrot_unicore_tile_sdr
  import bsg_chip_pkg::*;
+ import blackparrot_chip_pkg::*;
  import bsg_mesh_router_pkg::*;
  import bsg_noc_pkg::*;
  import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
  import bp_common_pkg::*;
  import bp_me_pkg::*;
- #(localparam bp_params_e bp_params_p = bp_cfg_gp
+ #(localparam bp_params_e bp_params_p = e_bp_bigblade_unicore_cfg
    `declare_bp_proc_params(bp_params_p)
 
    , localparam io_mem_payload_width_lp   = `bp_bedrock_mem_payload_width(lce_id_width_p, lce_assoc_p)
-   , localparam mc_mem_payload_width_lp   = `bp_bedrock_mem_payload_width(lce_id_width_p, lce_assoc_p)
+   , localparam hb_mem_payload_width_lp   = `bp_bedrock_mem_payload_width(lce_id_width_p, lce_assoc_p)
    , localparam uce_mem_payload_width_lp  = `bp_bedrock_mem_payload_width(lce_id_width_p, lce_assoc_p)
    , localparam dram_mem_payload_width_lp = `bp_bedrock_mem_payload_width(lce_id_width_p, lce_assoc_p)
 
    , localparam fwd_width_lp =
-       `bsg_manycore_packet_width(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp)
+       `bsg_manycore_packet_width(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp)
    , localparam rev_width_lp =
-       `bsg_manycore_return_packet_width(mc_x_cord_width_gp, mc_y_cord_width_gp, mc_data_width_gp)
+       `bsg_manycore_return_packet_width(hb_x_cord_width_gp, hb_y_cord_width_gp, hb_data_width_gp)
    )
   (input                                          clk_i
    , input                                        reset_i
 
-   , input [mc_y_cord_width_gp-1:0]               global_y_cord_i
+   , input [hb_y_cord_width_gp-1:0]               global_y_cord_i
 
    , input                                        async_uplink_reset_i
    , input                                        async_downlink_reset_i
@@ -58,7 +59,7 @@ module bsg_blackparrot_unicore_tile_sdr
   `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, uce);
   `declare_bp_bedrock_mem_if(paddr_width_p, word_width_gp, lce_id_width_p, lce_assoc_p, dram);
 
-  `declare_bsg_manycore_link_sif_s(mc_addr_width_gp, mc_data_width_gp, mc_x_cord_width_gp, mc_y_cord_width_gp);
+  `declare_bsg_manycore_link_sif_s(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp);
   bsg_manycore_link_sif_s [2:0] proc_link_sif_li, proc_link_sif_lo;
 
   // Latch reset to meet timing
@@ -159,31 +160,31 @@ module bsg_blackparrot_unicore_tile_sdr
      ,.io_resp_yumi_o(dram_resp_yumi_lo)
      );
 
-  bp_bedrock_io_mem_msg_s mc_cmd_lo;
-  logic mc_cmd_v_lo, mc_cmd_ready_li;
-  bp_bedrock_io_mem_msg_s mc_resp_li;
-  logic mc_resp_v_li, mc_resp_yumi_lo;
+  bp_bedrock_io_mem_msg_s hb_cmd_lo;
+  logic hb_cmd_v_lo, hb_cmd_ready_li;
+  bp_bedrock_io_mem_msg_s hb_resp_li;
+  logic hb_resp_v_li, hb_resp_yumi_lo;
 
-  assign mc_cmd_lo = io_cmd_lo;
-  assign mc_cmd_v_lo = io_cmd_v_lo;
-  assign io_cmd_ready_li = mc_cmd_ready_li;
+  assign hb_cmd_lo = io_cmd_lo;
+  assign hb_cmd_v_lo = io_cmd_v_lo;
+  assign io_cmd_ready_li = hb_cmd_ready_li;
 
-  assign io_resp_li = mc_resp_li;
-  assign io_resp_v_li = mc_resp_v_li;
-  assign mc_resp_yumi_lo = io_resp_yumi_lo;
+  assign io_resp_li = hb_resp_li;
+  assign io_resp_v_li = hb_resp_v_li;
+  assign hb_resp_yumi_lo = io_resp_yumi_lo;
 
-  bp_bedrock_io_mem_msg_s mc_cmd_li;
-  logic mc_cmd_v_li, mc_cmd_yumi_lo;
-  bp_bedrock_io_mem_msg_s mc_resp_lo;
-  logic mc_resp_v_lo, mc_resp_ready_li;
+  bp_bedrock_io_mem_msg_s hb_cmd_li;
+  logic hb_cmd_v_li, hb_cmd_yumi_lo;
+  bp_bedrock_io_mem_msg_s hb_resp_lo;
+  logic hb_resp_v_lo, hb_resp_ready_li;
 
-  assign io_cmd_li = mc_cmd_li;
-  assign io_cmd_v_li = mc_cmd_v_li;
-  assign mc_cmd_yumi_lo = io_cmd_yumi_lo;
+  assign io_cmd_li = hb_cmd_li;
+  assign io_cmd_v_li = hb_cmd_v_li;
+  assign hb_cmd_yumi_lo = io_cmd_yumi_lo;
 
-  assign mc_resp_lo = io_resp_lo;
-  assign mc_resp_v_lo = io_resp_v_lo;
-  assign io_resp_ready_li = mc_resp_ready_li;
+  assign hb_resp_lo = io_resp_lo;
+  assign hb_resp_v_lo = io_resp_v_lo;
+  assign io_resp_ready_li = hb_resp_ready_li;
 
   //bp_cce_serializer
   // #(.bp_params_p(bp_params_p))
@@ -199,57 +200,57 @@ module bsg_blackparrot_unicore_tile_sdr
   //   ,.io_resp_v_o(io_resp_v_li)
   //   ,.io_resp_ready_and_i(io_resp_yumi_lo)
 
-  //   ,.io_cmd_o(mc_cmd_lo)
-  //   ,.io_cmd_v_o(mc_cmd_v_lo)
-  //   ,.io_cmd_ready_and_i(mc_cmd_ready_li)
+  //   ,.io_cmd_o(hb_cmd_lo)
+  //   ,.io_cmd_v_o(hb_cmd_v_lo)
+  //   ,.io_cmd_ready_and_i(hb_cmd_ready_li)
 
-  //   ,.io_resp_i(mc_resp_li)
-  //   ,.io_resp_v_i(mc_resp_v_li)
-  //   ,.io_resp_ready_and_o(mc_resp_ready_and_lo)
+  //   ,.io_resp_i(hb_resp_li)
+  //   ,.io_resp_v_i(hb_resp_v_li)
+  //   ,.io_resp_ready_and_o(hb_resp_ready_and_lo)
   //   );
 
 
 
-  wire [mc_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
-  wire [mc_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i;
+  wire [hb_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
+  wire [hb_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i;
   bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
      ,.host_enable_p(1)
      ,.mc_max_outstanding_p(mc_max_outstanding_host_gp)
-     ,.mc_x_cord_width_p(mc_x_cord_width_gp)
-     ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
-     ,.pod_x_cord_width_p(pod_x_cord_width_gp)
-     ,.mc_y_cord_width_p(mc_y_cord_width_gp)
-     ,.mc_y_subcord_width_p(mc_y_subcord_width_gp)
-     ,.pod_y_cord_width_p(pod_y_cord_width_gp)
-     ,.mc_data_width_p(mc_data_width_gp)
-     ,.mc_addr_width_p(mc_addr_width_gp)
-     ,.mc_num_vcache_rows_p(mc_num_vcache_rows_gp)
-     ,.mc_vcache_block_size_in_words_p(mc_vcache_block_size_in_words_gp)
-     ,.mc_vcache_size_p(mc_vcache_size_gp)
-     ,.mc_vcache_sets_p(mc_vcache_sets_gp)
-     ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
-     ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
+     ,.hb_x_cord_width_p(hb_x_cord_width_gp)
+     ,.hb_x_subcord_width_p(hb_x_subcord_width_gp)
+     ,.hb_pod_x_cord_width_p(hb_pod_x_cord_width_gp)
+     ,.hb_y_cord_width_p(hb_y_cord_width_gp)
+     ,.hb_y_subcord_width_p(hb_y_subcord_width_gp)
+     ,.hb_pod_y_cord_width_p(hb_pod_y_cord_width_gp)
+     ,.hb_data_width_p(hb_data_width_gp)
+     ,.hb_addr_width_p(hb_addr_width_gp)
+     ,.hb_num_vcache_rows_p(num_vcache_rows_gp)
+     ,.hb_vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
+     ,.hb_vcache_size_p(vcache_size_gp)
+     ,.hb_vcache_sets_p(vcache_sets_gp)
+     ,.hb_num_tiles_x_p(hb_num_tiles_x_gp)
+     ,.hb_num_tiles_y_p(hb_num_tiles_y_gp)
      )
    host_link
     (.clk_i(clk_i)
      ,.reset_i(reset_r)
 
-     ,.io_cmd_i(mc_cmd_lo)
-     ,.io_cmd_v_i(mc_cmd_v_lo)
-     ,.io_cmd_ready_o(mc_cmd_ready_li)
+     ,.io_cmd_i(hb_cmd_lo)
+     ,.io_cmd_v_i(hb_cmd_v_lo)
+     ,.io_cmd_ready_o(hb_cmd_ready_li)
 
-     ,.io_resp_o(mc_resp_li)
-     ,.io_resp_v_o(mc_resp_v_li)
-     ,.io_resp_yumi_i(mc_resp_yumi_lo)
+     ,.io_resp_o(hb_resp_li)
+     ,.io_resp_v_o(hb_resp_v_li)
+     ,.io_resp_yumi_i(hb_resp_yumi_lo)
 
-     ,.io_cmd_o(mc_cmd_li)
-     ,.io_cmd_v_o(mc_cmd_v_li)
-     ,.io_cmd_yumi_i(mc_cmd_yumi_lo)
+     ,.io_cmd_o(hb_cmd_li)
+     ,.io_cmd_v_o(hb_cmd_v_li)
+     ,.io_cmd_yumi_i(hb_cmd_yumi_lo)
 
-     ,.io_resp_i(mc_resp_lo)
-     ,.io_resp_v_i(mc_resp_v_lo)
-     ,.io_resp_ready_o(mc_resp_ready_li)
+     ,.io_resp_i(hb_resp_lo)
+     ,.io_resp_v_i(hb_resp_v_lo)
+     ,.io_resp_ready_o(hb_resp_ready_li)
 
      ,.link_sif_i(proc_link_sif_li[0])
      ,.link_sif_o(proc_link_sif_lo[0])
@@ -260,26 +261,26 @@ module bsg_blackparrot_unicore_tile_sdr
 
   for (genvar i = 0; i < 2; i++)
     begin : d
-      wire [mc_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
-      wire [mc_y_cord_width_gp-1:0] host_dram_y_cord_li = global_y_cord_i + 1'b1 + i;
+      wire [hb_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
+      wire [hb_y_cord_width_gp-1:0] host_dram_y_cord_li = global_y_cord_i + 1'b1 + i;
       bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
          ,.host_enable_p(0)
-         ,.mc_max_outstanding_p(mc_max_outstanding_host_gp)
-         ,.mc_x_cord_width_p(mc_x_cord_width_gp)
-         ,.mc_x_subcord_width_p(mc_x_subcord_width_gp)
-         ,.pod_x_cord_width_p(pod_x_cord_width_gp)
-         ,.mc_y_cord_width_p(mc_y_cord_width_gp)
-         ,.mc_y_subcord_width_p(mc_y_subcord_width_gp)
-         ,.pod_y_cord_width_p(pod_y_cord_width_gp)
-         ,.mc_data_width_p(mc_data_width_gp)
-         ,.mc_addr_width_p(mc_addr_width_gp)
-         ,.mc_num_vcache_rows_p(mc_num_vcache_rows_gp)
-         ,.mc_vcache_block_size_in_words_p(mc_vcache_block_size_in_words_gp)
-         ,.mc_vcache_size_p(mc_vcache_size_gp)
-         ,.mc_vcache_sets_p(mc_vcache_sets_gp)
-         ,.mc_num_tiles_x_p(mc_num_tiles_x_gp)
-         ,.mc_num_tiles_y_p(mc_num_tiles_y_gp)
+         ,.mc_max_outstanding_p(mc_max_outstanding_dram_gp)
+         ,.hb_x_cord_width_p(hb_x_cord_width_gp)
+         ,.hb_x_subcord_width_p(hb_x_subcord_width_gp)
+         ,.hb_pod_x_cord_width_p(hb_pod_x_cord_width_gp)
+         ,.hb_y_cord_width_p(hb_y_cord_width_gp)
+         ,.hb_y_subcord_width_p(hb_y_subcord_width_gp)
+         ,.hb_pod_y_cord_width_p(hb_pod_y_cord_width_gp)
+         ,.hb_data_width_p(hb_data_width_gp)
+         ,.hb_addr_width_p(hb_addr_width_gp)
+         ,.hb_num_vcache_rows_p(num_vcache_rows_gp)
+         ,.hb_vcache_block_size_in_words_p(vcache_block_size_in_words_gp)
+         ,.hb_vcache_size_p(vcache_size_gp)
+         ,.hb_vcache_sets_p(vcache_sets_gp)
+         ,.hb_num_tiles_x_p(hb_num_tiles_x_gp)
+         ,.hb_num_tiles_y_p(hb_num_tiles_y_gp)
          )
        dram_link
         (.clk_i(clk_i)
@@ -314,10 +315,10 @@ module bsg_blackparrot_unicore_tile_sdr
     begin : links
       // Convert credit links to ready
       bsg_manycore_link_resp_credit_to_ready_and_handshake
-       #(.addr_width_p(mc_addr_width_gp)
-         ,.data_width_p(mc_data_width_gp)
-         ,.x_cord_width_p(mc_x_cord_width_gp)
-         ,.y_cord_width_p(mc_y_cord_width_gp)
+       #(.addr_width_p(hb_addr_width_gp)
+         ,.data_width_p(hb_data_width_gp)
+         ,.x_cord_width_p(hb_x_cord_width_gp)
+         ,.y_cord_width_p(hb_y_cord_width_gp)
          )
        rev_c2r
         (.clk_i(clk_i)

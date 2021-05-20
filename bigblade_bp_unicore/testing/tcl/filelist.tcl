@@ -34,7 +34,7 @@ set TESTING_SOURCE_FILES [join "
 
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
@@ -158,11 +158,13 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_mux_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
 
+  $bsg_designs_target_dir/v/blackparrot_chip_pkg.v
   $bp_top_dir/test/common/dromajo_cosim.cpp
   $bp_top_dir/test/common/bp_nonsynth_watchdog.sv
   $bsg_designs_target_dir/testing/v/bp_cce_to_mc_bridge_tracer.sv
   
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
+  $bsg_designs_target_dir/testing/v/bsg_tag_boot_rom.v
 "]
 
 #$bp_top_dir/test/common/bp_nonsynth_cosim.sv
