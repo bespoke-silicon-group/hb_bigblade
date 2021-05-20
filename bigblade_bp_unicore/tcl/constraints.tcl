@@ -40,22 +40,35 @@ set token_clk_uncertainty_ps  [expr min([expr $token_clk_period_ps*($token_clk_u
 set max_io_output_margin_ps   200
 set max_io_input_margin_ps    200
 
+set tag_clk_name "tag_clk"
+set tag_clk_period_ps      5000.0 ;# 200 MHz
+set tag_clk_uncertainty_ps 20
+
+set tag_input_delay_min_ps 100
+set tag_input_delay_max_ps 4000
+
 ########################################
 ## Reg2Reg
 create_clock -period $core_clk_period_ps -name $core_clk_name [get_ports clk_i]
 set_clock_uncertainty $core_clk_uncertainty_ps [get_clocks $core_clk_name]
 
+create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports tag_clk_i]
+set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
+
 ########################################
 ## In2Reg
-set core_input_pins [get_ports reset_i]
-append_to_collection core_input_pins [get_ports global_y_cord_i[*]]
-append_to_collection core_input_pins [get_ports async_*_reset_i]
+set core_input_pins [get_ports global_y_cord_i[*]]
+# TODO: Goes away with clk_gen
+append_to_collection input_pins [get_ports clk_i]
+append_to_collection input_pins [get_ports reset_i]
 set_input_delay -min $core_input_delay_min_ps -clock $core_clk_name $core_input_pins
 set_input_delay -max $core_input_delay_max_ps -clock $core_clk_name $core_input_pins
 set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
 set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
-set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports clk_i]
+set tag_in_ports [get_ports tag_data_i]
+append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
 ## SDR constraints
@@ -97,9 +110,8 @@ for {set i 0} {$i < 3} {incr i} {
 
 ########################################
 ## False paths
-set_false_path -from [get_ports global_*_cord_i]
-set_false_path -from [get_ports async_*_reset_i]
-set_false_path -to [get_ports async_*_reset_o]
+set_false_path -from [get_ports global_*_cord_i[*]]
+set_false_path -from [get_ports tag_node_id_offset_i[*]]
 
 ########################################
 ## Disable timing
@@ -114,18 +126,22 @@ bsg_link_sdr_dont_touch_constraints [get_ports {io_*_link_data_i[*] io_*_link_v_
 for {set i 0} {$i < 3} {incr i} {
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_in_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks fwd_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
   
   set cdc_clocks [get_clocks $core_clk_name]
   append_to_collection cdc_clocks [get_clocks rev_tkn_clk_${i}]
+  append_to_collection cdc_clocks [get_clocks tag_clk]
   bsg_async_icl $cdc_clocks
 }
 
@@ -150,7 +166,8 @@ set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"            
 
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_manycore_lock_ctrl"          ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_fc"        ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint_standard"  ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_dram_hash_function" ] true
 
 set_ungroup [get_designs -filter "hdl_template==bp_be_dcache"                    ] true
@@ -164,7 +181,6 @@ set_ungroup [get_designs -filter "hdl_template==bp_fe_instr_scan"               
 set_ungroup [get_designs -filter "hdl_template==bp_mmu"                          ] true
 set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                       ] true
 set_ungroup [get_designs -filter "hdl_template==bp_tlb"                          ] true
-#set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                    ] true
 
 set_ungroup [get_designs -filter "hdl_template==compareRecFN"                    ] true 
 set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"         ] true
@@ -198,6 +214,7 @@ set_ungroup [get_designs -filter "hdl_template==compressBy4"                    
 set_optimize_registers true -designs [get_designs bp_be_pipe_aux* ] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_pipe_fma* ] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_pipe_long*] -check_design -verbose
+set_optimize_registers true -designs [get_designs bp_be_dcache*   ] -check_design -verbose
 
 puts "BSG-info: Completed script [info script]\n"
 

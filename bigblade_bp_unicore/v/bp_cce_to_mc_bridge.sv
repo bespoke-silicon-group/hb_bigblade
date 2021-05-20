@@ -121,6 +121,7 @@ module bp_cce_to_mc_bridge
      );
   bsg_manycore_global_addr_s io_cmd_eva_li;
   assign io_cmd_eva_li = io_cmd_li.header.addr;
+  wire [paddr_width_p-1:0] io_cmd_addr_li = io_cmd_li.header.addr;
 
   logic                                    in_v_lo;
   logic [mc_data_width_p-1:0]              in_data_lo;
@@ -147,18 +148,15 @@ module bp_cce_to_mc_bridge
   logic                                    returned_credit_v_r_lo;
   logic [bsg_manycore_reg_id_width_gp-1:0] returned_credit_reg_id_r_lo;
 
-  logic [3:0]                              out_credits_lo;
+  logic [3:0]                              out_credits_used_lo;
 
   bsg_manycore_endpoint_standard
    #(.x_cord_width_p(mc_x_cord_width_p)
      ,.y_cord_width_p(mc_y_cord_width_p)
-    ,.fifo_els_p(2)
     ,.data_width_p(mc_data_width_p)
     ,.addr_width_p(mc_addr_width_p)
-
-    ,.max_out_credits_p(15)
-    ,.warn_out_of_credits_p(0)
-    ,.debug_p(0)
+    ,.credit_counter_width_p(`BSG_WIDTH(15))
+    ,.fifo_els_p(2)
     )
    blackparrot_endpoint
    (.clk_i(clk_i)
@@ -206,7 +204,7 @@ module bp_cce_to_mc_bridge
     ,.returned_credit_v_r_o(returned_credit_v_r_lo)
     ,.returned_credit_reg_id_r_o(returned_credit_reg_id_r_lo)
 
-    ,.out_credits_o(out_credits_lo)
+    ,.out_credits_used_o(out_credits_used_lo)
 
     ,.global_x_i(my_x_i)
     ,.global_y_i(my_y_i)
@@ -217,9 +215,10 @@ module bp_cce_to_mc_bridge
   logic [mc_y_cord_width_p-1:0] dram_y_cord_lo;
   logic [mc_addr_width_p-1:0] dram_epa_lo;
 
-  wire [mc_data_width_p-1:0]         dram_eva_li = {1'b1, io_cmd_li.header.addr[2+:mc_data_width_p-1]};
-  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[2+mc_data_width_p-1+:pod_x_cord_width_p];
-  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[2+mc_data_width_p-1+pod_x_cord_width_p+:pod_y_cord_width_p];
+  wire [mc_data_width_p-1:0]      dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:mc_data_width_p-1]};
+  // Need to stripe across mc_compute pods, 4x4
+  wire [pod_x_cord_width_p-1:0] dram_pod_x_li = 1'b1 + io_cmd_li.header.addr[0+mc_data_width_p+:2];
+  wire [pod_y_cord_width_p-1:0] dram_pod_y_li = 1'b1 + io_cmd_li.header.addr[0+mc_data_width_p+2+:2];
   bsg_manycore_dram_hash_function
    #(.data_width_p(mc_data_width_p)
      ,.addr_width_p(mc_addr_width_p)
@@ -243,12 +242,16 @@ module bp_cce_to_mc_bridge
      );
 
   // Other MMIO
-  wire [mc_data_width_p-1:0]           mmio_eva_li = {1'b0, io_cmd_li.header.addr[2+:mc_data_width_p-1]};
-  wire [pod_x_cord_width_p-1:0] mmio_pod_x_cord_lo = io_cmd_li.header.addr[2+mc_data_width_p+:pod_x_cord_width_p];
-  wire [pod_y_cord_width_p-1:0] mmio_pod_y_cord_lo = io_cmd_li.header.addr[2+mc_data_width_p+pod_x_cord_width_p+:pod_y_cord_width_p];
-  wire [mc_x_cord_width_p-1:0]         mmio_x_cord_lo = io_cmd_eva_li.x_cord;
-  wire [mc_y_cord_width_p-1:0]         mmio_y_cord_lo = io_cmd_eva_li.y_cord;
-  wire [mc_addr_width_p-1:0]              mmio_epa_lo = io_cmd_eva_li.addr;
+  localparam tile_addr_width_lp = 18;
+  wire [mc_addr_width_p-1:0]      mmio_tile_epa_lo = io_cmd_addr_li[2+:tile_addr_width_lp];
+  wire [mc_x_cord_width_p-1:0] mmio_tile_x_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+:mc_x_cord_width_p];
+  wire [mc_y_cord_width_p-1:0] mmio_tile_y_cord_lo = io_cmd_addr_li[2+tile_addr_width_lp+mc_x_cord_width_p+:mc_y_cord_width_p];
+
+  wire [mc_addr_width_p-1:0]      mmio_vcache_epa_lo = io_cmd_addr_li[2+:mc_addr_width_p];
+  wire [mc_x_cord_width_p-1:0] mmio_vcache_x_cord_lo = io_cmd_addr_li[2+mc_addr_width_p+:mc_x_cord_width_p];
+  wire [pod_y_cord_width_p-1:0] mmio_vcache_y_pod_lo = io_cmd_addr_li[2+mc_addr_width_p+mc_x_cord_width_p+:pod_y_cord_width_p];
+  wire [mc_y_subcord_width_p-1:0] mmio_vcache_y_subcord_lo = (mmio_vcache_y_pod_lo == '0) ? '1 : '0;
+  wire [mc_y_cord_width_p-1:0] mmio_vcache_y_cord_lo = {mmio_vcache_y_pod_lo, mmio_vcache_y_subcord_lo};
 
   logic [(mc_data_width_p>>3)-1:0] store_mask;
   always_comb
@@ -326,21 +329,30 @@ module bp_cce_to_mc_bridge
      ,.op_o(store_op)
      );
 
-  wire mc_not_bp_li = io_cmd_li.header.addr[paddr_width_p-1];
-  wire bp_dram_li = io_cmd_li.header.addr > dram_base_addr_gp;
+  wire is_mc_not_bp_li        = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:1] == 1'b1;
+  wire is_mc_tile_not_bp_li   = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:2] == 2'b11;
+  wire is_mc_vcache_not_bp_li = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:2] == 2'b11;
+  wire is_bridge_csr_li       = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:3] == 3'b111;
+  wire is_bp_dram_li          = io_cmd_v_li & ~is_mc_not_bp_li & (io_cmd_li.header.addr >= dram_base_addr_gp);
   bsg_manycore_packet_s mmio_out_packet_li;
   always_comb
     begin
       mmio_out_packet_li = '0;
       mmio_out_packet_li.src_y_cord = my_y_i;
       mmio_out_packet_li.src_x_cord = my_x_i;
-      if (mc_not_bp_li)
+      if (is_mc_tile_not_bp_li)
         begin
-          mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
-          mmio_out_packet_li.y_cord = io_cmd_eva_li.y_cord;
-          mmio_out_packet_li.x_cord = io_cmd_eva_li.x_cord;
+          mmio_out_packet_li.addr   = mmio_tile_epa_lo;
+          mmio_out_packet_li.y_cord = mmio_tile_y_cord_lo;
+          mmio_out_packet_li.x_cord = mmio_tile_x_cord_lo;
         end
-      else if (bp_dram_li)
+      else if (is_mc_vcache_not_bp_li)
+        begin
+          mmio_out_packet_li.addr   = mmio_vcache_epa_lo;
+          mmio_out_packet_li.y_cord = mmio_vcache_y_cord_lo;
+          mmio_out_packet_li.x_cord = mmio_vcache_x_cord_lo;
+        end
+      else if (is_bp_dram_li)
         begin
           mmio_out_packet_li.addr   = dram_epa_lo;
           mmio_out_packet_li.y_cord = dram_y_cord_lo;
@@ -348,9 +360,9 @@ module bp_cce_to_mc_bridge
         end
       else
         begin
-          // Hardcoded host at 0,0
+          // Hardcoded host at right above this link
           mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
-          mmio_out_packet_li.y_cord = '0;
+          mmio_out_packet_li.y_cord = my_y_i - 1'b1;
           mmio_out_packet_li.x_cord = '0;
         end
 
@@ -413,7 +425,7 @@ module bp_cce_to_mc_bridge
       assign bp_to_mc_out_packet_li = '{addr       : bp_to_mc_lo.addr[2+:mc_addr_width_p]
                                         ,op_v2     : bsg_manycore_packet_op_e'(bp_to_mc_lo.op_v2)
                                         ,reg_id    : bp_to_mc_lo.reg_id
-                                        ,payload   : (bp_to_mc_lo.op_v2 inside {e_remote_store, e_remote_sw})
+                                        ,payload   : (bp_to_mc_lo.op_v2 inside {e_remote_store, e_remote_sw, e_remote_amoswap, e_remote_amoadd, e_remote_amoor})
                                                      ? bp_to_mc_lo.payload
                                                      : bp_to_mc_load_info
                                         ,src_y_cord: bp_to_mc_lo.y_src
@@ -512,7 +524,7 @@ module bp_cce_to_mc_bridge
       returned_yumi_li = '0;
       mmio_resp_yumi_li = '0;
 
-      if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_req_fifo_addr_gp) & host_enable_p)
+      if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_bp_req_fifo_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: '0};
           io_resp_v_o    = bp_to_mc_ready_lo;
@@ -520,13 +532,13 @@ module bp_cce_to_mc_bridge
 
           bp_to_mc_v_li  = io_cmd_yumi_lo;
         end
-      else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_req_credits_addr_gp) & host_enable_p)
+      else if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_bp_req_credits_addr_gp) & host_enable_p)
         begin
-          io_resp_cast_o = '{header: io_cmd_li.header, data: out_credits_lo};
+          io_resp_cast_o = '{header: io_cmd_li.header, data: out_credits_used_lo};
           io_resp_v_o    = 1'b1;
           io_cmd_yumi_lo = io_resp_yumi_i;
         end
-      else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_resp_fifo_addr_gp) & host_enable_p)
+      else if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_bp_resp_fifo_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: mc_to_bp_response_data_lo};
           io_resp_v_o    = mc_to_bp_response_v_lo;
@@ -534,13 +546,13 @@ module bp_cce_to_mc_bridge
 
           mc_to_bp_response_yumi_li = io_cmd_yumi_lo;
         end
-      else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_bp_resp_entries_addr_gp) & host_enable_p)
+      else if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_bp_resp_entries_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: mc_to_bp_response_v_lo};
           io_resp_v_o    = 1'b1;
           io_cmd_yumi_lo = io_resp_yumi_i;
         end
-      else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_mc_req_fifo_addr_gp) & host_enable_p)
+      else if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_mc_req_fifo_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: mc_to_bp_request_data_lo};
           io_resp_v_o    = 1'b1;
@@ -548,7 +560,7 @@ module bp_cce_to_mc_bridge
 
           mc_to_bp_request_yumi_li = io_cmd_yumi_lo;
         end
-      else if (io_cmd_v_li & (io_cmd_eva_li == mc_link_mc_req_entries_addr_gp) & host_enable_p)
+      else if (is_bridge_csr_li & (io_cmd_eva_li == mc_link_mc_req_entries_addr_gp) & host_enable_p)
         begin
           io_resp_cast_o = '{header: io_cmd_li.header, data: mc_to_bp_request_v_lo};
           io_resp_v_o    = 1'b1;
@@ -564,7 +576,7 @@ module bp_cce_to_mc_bridge
               out_packet_li = mmio_out_packet_li;
             end
 
-          if ((returned_v_r_lo & (returned_credit_reg_id_r_lo > mc_max_outstanding_p)))
+          if ((returned_v_r_lo & (returned_credit_reg_id_r_lo >= mc_max_outstanding_p)))
             begin
               mc_to_bp_response_v_li = mc_to_bp_response_ready_lo;
               returned_yumi_li = mc_to_bp_response_v_li;
@@ -572,7 +584,7 @@ module bp_cce_to_mc_bridge
           else
             begin
               // We can always ack mmio requests, because we've allocated space in the reorder fifo
-              mmio_returned_v_li = returned_credit_v_r_lo;
+              mmio_returned_v_li = returned_credit_v_r_lo & (returned_credit_reg_id_r_lo < mc_max_outstanding_p);
               returned_yumi_li = returned_v_r_lo;
             end
         end

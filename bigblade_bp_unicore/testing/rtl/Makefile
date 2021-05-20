@@ -89,8 +89,8 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)
 ########################################
 ## Testbench options
 ########################################
-NO_BIND_P ?= 1
-CMT_TRACE_P ?= 0
+NO_BIND_P ?= 0
+CMT_TRACE_P ?= 1
 BRIDGE_TRACE_P ?= 0
 COSIM_P ?= 0
 USE_BIN_P ?= 0
@@ -155,7 +155,7 @@ endif
 
 PLUSARGS ?= +nbf_file=prog.nbf
 PLUSARGS += +max_cycle=1000000
-PLUSARGS += +num_pods=1
+PLUSARGS += +num_finish=1
 
 ########################################
 ## Run Targets

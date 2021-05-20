@@ -38,16 +38,16 @@ void main(uint64_t argc, char * argv[]) {
     // All addresses >= 0x80000000 live in the manycore. Therefore, enable all domains
     *did_mask_addr = 0xFFF;
     
-    uint64_t  bp_coproc_offset             = 2UL << 36UL;
+    uint64_t  mc_host_bit = 0b111000000000000000000000000000000000000000;
 
-    volatile uint32_t *mc_link_bp_req_fifo_addr     = (uint32_t *) (0x01000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_req_credits_addr  = (uint32_t *) (0x02000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_resp_fifo_addr    = (uint32_t *) (0x03000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_bp_resp_entries_addr = (uint32_t *) (0x04000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_mc_req_fifo_addr     = (uint32_t *) (0x05000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_mc_req_entries_addr  = (uint32_t *) (0x06000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_rom_start_addr       = (uint32_t *) (0x07000 + bp_coproc_offset);
-    volatile uint32_t *mc_link_rom_end_addr         = (uint32_t *) (0x07fff + bp_coproc_offset);
+    volatile uint64_t *mc_link_bp_req_fifo_addr     = (uint64_t *) (0x01000 | mc_host_bit );
+    volatile uint64_t *mc_link_bp_req_credits_addr  = (uint64_t *) (0x02000 | mc_host_bit );
+    volatile uint64_t *mc_link_bp_resp_fifo_addr    = (uint64_t *) (0x03000 | mc_host_bit );
+    volatile uint64_t *mc_link_bp_resp_entries_addr = (uint64_t *) (0x04000 | mc_host_bit );
+    volatile uint64_t *mc_link_mc_req_fifo_addr     = (uint64_t *) (0x05000 | mc_host_bit );
+    volatile uint64_t *mc_link_mc_req_entries_addr  = (uint64_t *) (0x06000 | mc_host_bit );
+    volatile uint64_t *mc_link_rom_start_addr       = (uint64_t *) (0x07000 | mc_host_bit );
+    volatile uint64_t *mc_link_rom_end_addr         = (uint64_t *) (0x07fff | mc_host_bit );
 
     // Set up EPA mapping according to vanilla core map
     // For now, store to some manycore V$ EVA
@@ -56,16 +56,16 @@ void main(uint64_t argc, char * argv[]) {
     hb_mc_packet_t req_packet;
 
     // Store deadbeef to manycore V$ at the right coordinates (based on data striping)
-    req_packet.request.x_dst    = 1;
-    req_packet.request.y_dst    = 0;
+    req_packet.request.x_dst    = (1 << 4) | 1;
+    req_packet.request.y_dst    = (0 << 3) | 7;
     // Unused
-    req_packet.request.x_src    = 0;
+    req_packet.request.x_src    = (0 << 0) | 0;
     // Unused
-    req_packet.request.y_src    = 1;
+    req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0xdeadbeef;
     // Store mask
-    req_packet.request.reg_id   = 0xf;
-    req_packet.request.op_v2    = 1; // Store
+    req_packet.request.reg_id   = 0xff;
+    req_packet.request.op_v2    = 2; // Store Word
     req_packet.request.addr     = some_mc_dram_eva;
 
     *mc_link_bp_req_fifo_addr = req_packet.words[0];
@@ -74,12 +74,12 @@ void main(uint64_t argc, char * argv[]) {
     *mc_link_bp_req_fifo_addr = req_packet.words[3];
 
     // Read deadbeef from manycore V$ at the right coordinates (based on data striping)
-    req_packet.request.x_dst    = 1;
-    req_packet.request.y_dst    = 0;
+    req_packet.request.x_dst    = (1 << 4) | 1;
+    req_packet.request.y_dst    = (0 << 3) | 7;
     // Unused
-    req_packet.request.x_src    = 0;
+    req_packet.request.x_src    = (0 << 0) | 0;
     // Unused
-    req_packet.request.y_src    = 1;
+    req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0;
     // Store mask
     req_packet.request.reg_id   = 0x10;

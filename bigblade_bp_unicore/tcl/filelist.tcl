@@ -240,6 +240,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
   $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
   $bp_common_dir/src/v/bsg_async_noc_link.sv
+  $bp_common_dir/src/v/bsg_dff_reset_half.v
   $bp_top_dir/src/v/bp_cacc_complex.sv
   $bp_top_dir/src/v/bp_cfg.sv
   $bp_top_dir/src/v/bp_clint_slice.sv
@@ -257,6 +258,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_tile.sv
   $bp_top_dir/src/v/bp_tile_node.sv
   $bp_top_dir/src/v/bp_unicore.sv
+  $bp_top_dir/src/v/bp_unicore_lite.sv
 
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
@@ -291,13 +293,13 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_strobe.v
   $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_encode.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
@@ -324,10 +326,11 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
 
+  $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
+
   $bsg_designs_target_dir/v/bsg_chip_pkg.v
-  $bsg_designs_target_dir/v/bp_unicore_lite.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile.sv
-  $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_small.sv
   $bsg_designs_target_dir/v/bsg_blackparrot_unicore_tile_sdr.sv
+  $bsg_designs_target_dir/v/bsg_blackparrot_halfpod.sv
 "]
 

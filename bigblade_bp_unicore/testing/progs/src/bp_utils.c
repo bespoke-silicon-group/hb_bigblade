@@ -5,7 +5,7 @@ void bp_finish(uint8_t code) {
   if (!code) {
     *mc_finish_epa_addr = 0;
   } else {
-    *mc_fail_epa_addr = 0;
+    *mc_fail_epa_addr = code;
   }
 }
 
