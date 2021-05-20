@@ -160,7 +160,7 @@ package bsg_chip_pkg;
   localparam tag_noc_local_els_gp = $bits(bsg_chip_noc_tag_lines_s)/$bits(bsg_tag_s);
 
   typedef struct packed {
-    bsg_tag_s sync_reset;
+    bsg_tag_s core_reset;
     bsg_tag_s sdr_disable;
     bsg_chip_sdr_tag_lines_s sdr;
   } bsg_chip_halfpod_tag_lines_s;
