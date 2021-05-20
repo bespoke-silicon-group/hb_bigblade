@@ -1,7 +1,12 @@
 module bigblade_clk_gen
+  import bsg_chip_pkg::*;
   import bsg_tag_pkg::bsg_tag_s;
 
-#( ds_width_p = 6, num_adgs_p = 1, tag_els_p = 512, tag_lg_width_p = 4 )
+#( ds_width_p     = bsg_link_clk_gen_ds_width_gp
+ , num_adgs_p     = bsg_link_clk_gen_num_adgs_gp
+ , tag_els_p      = tag_els_gp
+ , tag_lg_width_p = tag_lg_els_gp
+ )
 
 ( input                                  tag_clk_i
 , input                                  tag_data_i

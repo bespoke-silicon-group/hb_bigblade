@@ -16,6 +16,8 @@ set SVERILOG_INCLUDE_PATHS [join "
 
 set SVERILOG_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
+  $basejump_stl_dir/bsg_noc/bsg_noc_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 "]
 
 set SVERILOG_SOURCE_FILES [join "
