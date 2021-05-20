@@ -6,7 +6,7 @@ puts "BSG-info: Running script [info script]\n"
 
 set tap_cells [get_cells -filter ref_name=~*_TAP*]
 set_fixed_object -unfix $tap_cells
-move_object $tap_cells -x [expr $block_w - $decap_w -$tap_w]
+move_object $tap_cells -x $decap_w
 set_fixed_object $tap_cells
 
 # ==============================================================================
