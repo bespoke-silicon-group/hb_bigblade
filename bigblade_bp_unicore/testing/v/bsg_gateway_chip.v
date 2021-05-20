@@ -1,15 +1,15 @@
 `timescale 1ps/1ps
 
 `ifndef BLACKPARROT_CLK_PERIOD
-  `define BLACKPARROT_CLK_PERIOD 2200.0
+  `define BLACKPARROT_CLK_PERIOD 2000.0
 `endif
 
 `ifndef MANYCORE_CLK_PERIOD
-  `define MANYCORE_CLK_PERIOD 1000.0
+  `define MANYCORE_CLK_PERIOD 1500.0
 `endif
 
 `ifndef TAG_CLK_PERIOD
-  `define TAG_CLK_PERIOD 6000.0
+  `define TAG_CLK_PERIOD 20000.0
 `endif
 
 
@@ -90,7 +90,6 @@ module bsg_gateway_chip
 
   logic tag_clk_raw, tag_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
-
 
   //////////////////////////////////////////////////
   //
@@ -269,7 +268,7 @@ module bsg_gateway_chip
     (.clk_i(blackparrot_clk)
      ,.reset_i(blackparrot_reset | ~tag_trace_done_lo)
 
-     ,.tag_clk_i(tag_clk)
+     ,.tag_clk_i(~tag_clk)
      ,.tag_data_i(tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
      ,.tag_node_id_offset_i('0)
 

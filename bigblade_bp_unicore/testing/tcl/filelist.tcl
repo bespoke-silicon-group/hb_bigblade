@@ -106,6 +106,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
+
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
@@ -155,6 +158,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_misc/bsg_xor.v
+  $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
   $basejump_stl_dir/bsg_misc/bsg_mux_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
 
