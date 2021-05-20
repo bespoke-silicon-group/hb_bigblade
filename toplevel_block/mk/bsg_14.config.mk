@@ -70,7 +70,7 @@ export BSG_PADMAPPING := default
 # | default_wb (default) | Default wire-bond power grid implementation.                            |
 # +----------------------+-------------------------------------------------------------------------+
 
-export BSG_POWER_GRID := default_wb
+export BSG_POWER_GRID := bigblade_toplevel_block
 
 # Select the target power intent. The power intent contains the power ports and
 # nets that will be available as well as maps cells to power domains. Currently
@@ -173,4 +173,7 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=
 # from the testbench.
 
 export PTSI_FLOW_STRIP_PATH :=
+
+### UNDOCUMENTED SWITCHES
+export USE_ICC2_2020 := 1
 
