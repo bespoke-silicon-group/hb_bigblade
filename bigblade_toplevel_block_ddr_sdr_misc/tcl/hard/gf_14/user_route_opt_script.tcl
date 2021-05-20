@@ -23,9 +23,9 @@ proc get_propagated_nets {port cell} {
   return $result
 }
 
-proc insert_buffers_on_propagated_nets {port cell num prefix buffer} {
+proc insert_buffers_on_propagated_nets {port cell num start_num prefix buffer} {
   set opt_nets [get_propagated_nets $port $cell]
-  for {set i 1} {$i < [expr $num+1]} {incr i} {
+  for {set i $start_num} {$i < [expr $num+$start_num]} {incr i} {
     # FIXME: assume no overflow
     set curr_net [get_nets [index_collection $opt_nets $i]]
     add_buffer_on_route -net_prefix $prefix -cell_prefix $prefix -repeater_distance_length_ratio 0.5 -respect_blockages $curr_net $buffer
@@ -60,7 +60,57 @@ if {[file exists [which $ROUTE_OPT_STARRC_CONFIG_FILE]]} {
 }
 
 
-# Report Timing
+# Route optimization setup
+set opt_buffer "SC7P5T_CKBUFX8_SSC14R"
+set opt_prefix "bsg_opt"
+set opt_buffer_delay(i) 17.68 ;# Estimated value
+set opt_buffer_delay(o) 17.68 ;# Estimated value
+set channel_width 16
+set start_buffer_offset 1
+
+set calib_scenatio "sspg_0p72v_125c_sigcmax"
+set calib_num_buffers 5
+set calib_side "DR"
+set calib_ch 0
+set calib_bit 0
+
+
+# calibrate buffer delay
+create_undo_marker calib_undo_marker
+
+set calib_shift_list [list]
+foreach {dir} {"i" "o"} {
+  set calib_port  [get_ports "pad_${calib_side}${calib_ch}_${calib_bit}_${dir}_int"]
+  set calib_setup [get_attribute -name slack -object [get_timing_paths -scenario $calib_scenatio -through $calib_port -delay_type max]]
+  set calib_hold  [get_attribute -name slack -object [get_timing_paths -scenario $calib_scenatio -through $calib_port -delay_type min]]
+  set calib_shift [expr ($calib_hold-$calib_setup)/2.0]
+  lappend calib_shift_list $calib_shift
+}
+foreach {dir} {"i" "o"} {
+  set cell_num  [expr {$calib_side == "DR"} ? {$calib_ch/2+4} : {$calib_ch/2}]
+  set cell_name [expr {$calib_side == "IT"} ? {"io_link"} : {"mem_link_${cell_num}__link"}]
+  set calib_port  [get_ports "pad_${calib_side}${calib_ch}_clk_${dir}_int"]
+  set calib_cell  [get_cells $cell_name]
+  insert_buffers_on_propagated_nets $calib_port $calib_cell $calib_num_buffers $start_buffer_offset $opt_prefix $opt_buffer
+}
+set calib_idx 0
+foreach {dir} {"i" "o"} {
+  set calib_port  [get_ports "pad_${calib_side}${calib_ch}_${calib_bit}_${dir}_int"]
+  set calib_setup [get_attribute -name slack -object [get_timing_paths -scenario $calib_scenatio -through $calib_port -delay_type max]]
+  set calib_hold  [get_attribute -name slack -object [get_timing_paths -scenario $calib_scenatio -through $calib_port -delay_type min]]
+  set calib_shift_post [expr ($calib_hold-$calib_setup)/2.0]
+  set calib_shift_pre  [lindex $calib_shift_list $calib_idx]
+  set opt_buffer_delay($dir) [expr ($calib_shift_pre-$calib_shift_post)/$calib_num_buffers]
+  incr calib_idx
+}
+puts "Buffer delay for input has been calibrated to $opt_buffer_delay(i)"
+puts "Buffer delay for output has been calibrated to $opt_buffer_delay(o)"
+
+undo -marker calib_undo_marker
+update_timing -full ;# must update timing full after undo
+
+
+# Report Pre Timing
 set pre_in_setup  [get_attribute -name slack -object [get_timing_paths -group REGIN  -delay_type max]]
 set pre_in_hold   [get_attribute -name slack -object [get_timing_paths -group REGIN  -delay_type min]]
 set pre_out_setup [get_attribute -name slack -object [get_timing_paths -group REGOUT -delay_type max]]
@@ -69,17 +119,6 @@ puts "BSG-info: REGIN  group SETUP pre route_opt slack: ${pre_in_setup}"
 puts "BSG-info: REGIN  group HOLD  pre route_opt slack: ${pre_in_hold}"
 puts "BSG-info: REGOUT group SETUP pre route_opt slack: ${pre_out_setup}"
 puts "BSG-info: REGOUT group HOLD  pre route_opt slack: ${pre_out_hold}"
-
-
-
-
-# Route optimization
-set opt_buffer "SC7P5T_CKBUFX8_SSC14R"
-set opt_prefix "bsg_opt"
-set opt_buffer_delay 17.68 ;# Estimated value
-set channel_width 16
-
-# Step 0: detect buffer delay
 
 
 # Step 1: fix setup by inserting buffers to clock line
@@ -94,7 +133,7 @@ foreach {side} {"DL" "DR" "IT"} {
       set clk_setup [get_attribute -name slack -object [get_timing_paths -through $wns_port -delay_type max]]
       set clk_hold  [get_attribute -name slack -object [get_timing_paths -through $wns_port -delay_type min]]
       set clk_shift [expr ($clk_hold-$clk_setup)/2.0]
-      lappend clk_num_buffers_list [expr max(0, round($clk_shift/$opt_buffer_delay))]
+      lappend clk_num_buffers_list [expr max(0, round($clk_shift/$opt_buffer_delay($dir)))]
     }
   }
 }
@@ -108,7 +147,7 @@ foreach {side} {"DL" "DR" "IT"} {
       set clk_port  [get_ports "pad_${side}${i}_clk_${dir}_int"]
       set clk_cell  [get_cells $cell_name]
       set clk_num_buffers [lindex $clk_num_buffers_list $clk_idx]
-      insert_buffers_on_propagated_nets $clk_port $clk_cell $clk_num_buffers $opt_prefix $opt_buffer
+      insert_buffers_on_propagated_nets $clk_port $clk_cell $clk_num_buffers $start_buffer_offset $opt_prefix $opt_buffer
       incr clk_idx
     }
   }
@@ -127,7 +166,7 @@ foreach {side} {"DL" "DR" "IT"} {
         set data_setup [get_attribute -name slack -object [get_timing_paths -through $data_port -delay_type max]]
         set data_hold  [get_attribute -name slack -object [get_timing_paths -through $data_port -delay_type min]]
         set data_shift [expr ($data_setup-$data_hold)/2.0]
-        lappend data_num_buffers_list [expr max(0, round($data_shift/$opt_buffer_delay))]
+        lappend data_num_buffers_list [expr max(0, round($data_shift/$opt_buffer_delay($dir)))]
       }
     }
   }
@@ -144,7 +183,7 @@ foreach {side} {"DL" "DR" "IT"} {
         set data_port [get_ports "pad_${side}${i}_${dv}_${dir}_int"]
         set data_cell [get_cells $cell_name]
         set data_num  [lindex $data_num_buffers_list $data_idx]
-        insert_buffers_on_propagated_nets $data_port $data_cell $data_num $opt_prefix $opt_buffer
+        insert_buffers_on_propagated_nets $data_port $data_cell $data_num $start_buffer_offset $opt_prefix $opt_buffer
         incr data_idx
       }
     }
@@ -159,10 +198,10 @@ check_legality -cells [get_cells ${opt_prefix}*]
 
 # Step 4: Fix DRCs
 route_eco
-update_timing -full
+update_timing -full ;# Extract design again before report timing
 
 
-# Step 5: Report Timing
+# Report Post Timing
 set post_in_setup  [get_attribute -name slack -object [get_timing_paths -group REGIN  -delay_type max]]
 set post_in_hold   [get_attribute -name slack -object [get_timing_paths -group REGIN  -delay_type min]]
 set post_out_setup [get_attribute -name slack -object [get_timing_paths -group REGOUT -delay_type max]]
