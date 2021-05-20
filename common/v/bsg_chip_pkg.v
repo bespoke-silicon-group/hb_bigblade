@@ -165,7 +165,7 @@ package bsg_chip_pkg;
     bsg_tag_s sdr_disable;
     bsg_chip_sdr_tag_lines_s sdr;
   } bsg_chip_halfpod_tag_lines_s;
-  localparam tag_halfpod_els_gp = $bits(bsg_chip_halfpod_tag_lines_s)/$bits(bsg_tag_s);
+  localparam tag_halfpod_local_els_gp = $bits(bsg_chip_halfpod_tag_lines_s)/$bits(bsg_tag_s);
 
   // Warning: Dander Zone
   // Setting parameters below incorrectly may result in chip failure
@@ -191,6 +191,6 @@ package bsg_chip_pkg;
   localparam tag_bp_clk_offset_gp   = tag_mc_clk_offset_gp   + (4)  *(tag_clk_gen_local_els_gp);
   localparam tag_cgra_clk_offset_gp = tag_bp_clk_offset_gp   + (8)  *(tag_clk_gen_local_els_gp);
   localparam tag_bp_hp_offset_gp    = tag_cgra_clk_offset_gp + (8)  *(tag_clk_gen_local_els_gp);
-  localparam tag_cgra_hp_offset_gp  = tag_bp_hp_offset_gp    + (8)  *(tag_halfpod_els_gp);
+  localparam tag_cgra_hp_offset_gp  = tag_bp_hp_offset_gp    + (8)  *(tag_halfpod_local_els_gp);
 
 endpackage
