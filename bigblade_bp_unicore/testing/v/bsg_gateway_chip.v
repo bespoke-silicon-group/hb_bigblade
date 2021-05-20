@@ -96,12 +96,7 @@ module bsg_gateway_chip
   // Nonsynth Reset Generator(s)
   //
 
-  logic blackparrot_reset;
-  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
-    blackparrot_reset_gen
-      (.clk_i(blackparrot_clk)
-      ,.async_reset_o(blackparrot_reset)
-      );
+  logic reset_done;
 
   logic manycore_reset;
   bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
@@ -137,7 +132,7 @@ module bsg_gateway_chip
     begin
       $assertoff();
       @(posedge blackparrot_clk);
-      @(negedge blackparrot_reset);
+      @(posedge reset_done);
       @(posedge blackparrot_clk);
       $asserton();
     end
@@ -148,7 +143,7 @@ module bsg_gateway_chip
       $set_gate_level_monitoring("rtl_on");
       $set_toggle_region(DUT);
       @(posedge blackparrot_clk);
-      @(negedge blackparrot_reset);
+      @(posedge reset_done);
       @(posedge trigger_saif);
       $toggle_start();
     end
@@ -211,6 +206,7 @@ module bsg_gateway_chip
       ,.done_o  ( tag_trace_done_lo )
       ,.error_o ()
       ) ;
+  assign reset_done = tag_trace_done_lo;
 
   assign p_tag_en_lo = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
 
@@ -218,10 +214,10 @@ module bsg_gateway_chip
 
   // Emulate TAG behavior from inside BP
   // tag master instance
-  bsg_chip_noc_tag_lines_s tag_lines_lo;
+  bsg_chip_halfpod_tag_lines_s tag_lines_lo;
   bsg_tag_master_decentralized
  #(.els_p      (tag_els_gp)
-  ,.local_els_p(tag_noc_local_els_gp)
+  ,.local_els_p(tag_halfpod_local_els_gp)
   ,.lg_width_p (tag_lg_width_gp)
   ) btm
   (.clk_i           (tag_clk)
@@ -260,7 +256,6 @@ module bsg_gateway_chip
   logic [3:1][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_li;
   logic [3:1] io_rev_link_clk_li, io_rev_link_v_li, io_rev_link_token_lo;
   logic [3:1][$bits(bsg_manycore_rev_link_sif_s)-3:0] io_rev_link_data_li;
-  //bsg_blackparrot_halfpod_bsg_blackparrot_unicore_tile_sdr_0
   bsg_blackparrot_halfpod
    DUT
     (.clk_i(blackparrot_clk)

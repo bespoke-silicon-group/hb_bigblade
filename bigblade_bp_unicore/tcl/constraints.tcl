@@ -76,7 +76,7 @@ append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
-## Out2Reg
+## Reg2Out
 set core_output_pins [get_ports sdr_disable_o]
 set_output_delay -min $core_output_delay_min_ps -clock $core_clk_name $core_output_pins
 set_output_delay -max $core_output_delay_max_ps -clock $core_clk_name $core_output_pins
@@ -124,9 +124,6 @@ for {set i 0} {$i < 3} {incr i} {
 ########################################
 ## False paths
 set_false_path -from [get_ports tag_node_id_offset_i[*]]
-set_app_var sh_continue_on_error true
-error
-set_false_path -through [get_ports tag_node_id_offset_i[*]]
 set_false_path -to   [get_ports sdr_disable_o]
 
 ########################################

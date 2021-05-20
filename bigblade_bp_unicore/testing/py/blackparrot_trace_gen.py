@@ -29,7 +29,7 @@ if __name__ == "__main__":
   # reset sdr disable
   tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
   # reset cord
-  tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
+  tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b0000000)
   # reset core reset
   tg.send(masters=0b11, client_id=6+offset, data_not_reset=0, length=1, data=0b1)
 
@@ -40,9 +40,9 @@ if __name__ == "__main__":
   tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
   tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b1)
   # init sdr disable
-  tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b0)
+  tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
   # init cord
-  tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b0001001)
+  tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=0b0001001)
   # init core reset
   tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b1)
 
