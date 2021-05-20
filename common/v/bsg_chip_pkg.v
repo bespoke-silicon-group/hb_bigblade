@@ -159,11 +159,23 @@ package bsg_chip_pkg;
   } bsg_chip_noc_tag_lines_s;
   localparam tag_noc_local_els_gp = $bits(bsg_chip_noc_tag_lines_s)/$bits(bsg_tag_s);
 
+  typedef struct packed {
+    bsg_tag_s core_reset;
+    bsg_tag_s global_y_cord;
+    bsg_tag_s sdr_disable;
+    bsg_chip_sdr_tag_lines_s sdr;
+  } bsg_chip_halfpod_tag_lines_s;
+  localparam tag_halfpod_local_els_gp = $bits(bsg_chip_halfpod_tag_lines_s)/$bits(bsg_tag_s);
+
   // Warning: Dander Zone
   // Setting parameters below incorrectly may result in chip failure
   //
   // // Struct for reference only
   // typedef struct packed {
+  //   bsg_chip_halfpod_tag_lines_s       [7:0] cgra_hp;
+  //   bsg_chip_halfpod_tag_lines_s       [7:0] bp_hp;
+  //   bsg_chip_clk_gen_tag_lines_s       [7:0] cgra_clk;
+  //   bsg_chip_clk_gen_tag_lines_s       [7:0] bp_clk;
   //   bsg_chip_clk_gen_tag_lines_s       [3:0] mc_clk;
   //   bsg_tag_s                     [3:0][3:0] mc_reset;
   //   bsg_chip_sdr_tag_lines_s      [3:0][7:0] mc_sdr;
@@ -176,6 +188,9 @@ package bsg_chip_pkg;
   localparam tag_mc_sdr_offset_gp   = tag_io_link_offset_gp  + (1)  *tag_noc_local_els_gp;
   localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*(2*tag_sdr_local_els_gp);
   localparam tag_mc_clk_offset_gp   = tag_mc_reset_offset_gp + (4*4)*1;
-
+  localparam tag_bp_clk_offset_gp   = tag_mc_clk_offset_gp   + (4)  *(tag_clk_gen_local_els_gp);
+  localparam tag_cgra_clk_offset_gp = tag_bp_clk_offset_gp   + (8)  *(tag_clk_gen_local_els_gp);
+  localparam tag_bp_hp_offset_gp    = tag_cgra_clk_offset_gp + (8)  *(tag_clk_gen_local_els_gp);
+  localparam tag_cgra_hp_offset_gp  = tag_bp_hp_offset_gp    + (8)  *(tag_halfpod_local_els_gp);
 
 endpackage
