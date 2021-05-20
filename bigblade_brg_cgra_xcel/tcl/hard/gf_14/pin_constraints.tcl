@@ -6,8 +6,8 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
 
   remove_individual_pin_constraints
   remove_block_pin_constraints
-  remove_placement_blockages -all
-  remove_routing_blockages -all
+  #remove_placement_blockages -all
+  #remove_routing_blockages -all
 
   # Useful numbers for the master tile
   set core_width [core_width]
