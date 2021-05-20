@@ -1,4 +1,4 @@
-module bigblade_clk_gen_rc0
+module bigblade_clk_gen
   import bsg_tag_pkg::bsg_tag_s;
 
 #( ds_width_p = 6, num_adgs_p = 1, tag_els_p = 512, tag_lg_width_p = 4 )
@@ -63,4 +63,4 @@ module bigblade_clk_gen_rc0
       ,.clk_o(clk_o)
       );
 
-endmodule // bigblade_clk_gen_rc0
+endmodule // bigblade_clk_gen

@@ -1,7 +1,7 @@
 
 # Top hierarchical block design name. This variable is not a list and should be just a single design
 # name. Used in both flat and hierarchical design flows.
-export TOP_HIER_BLOCK := bigblade_clk_gen_rc0
+export TOP_HIER_BLOCK := bigblade_clk_gen
 
 # Intermediate hierarchical blocks. This is a list of all non-toplevel blocks that have sub-block
 # dependancies. Only used in hierarchical design flows.

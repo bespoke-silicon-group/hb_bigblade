@@ -40,6 +40,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
-  $bsg_designs_target_dir/v/bigblade_clk_gen_rc0.v
+  $bsg_designs_target_dir/v/bigblade_clk_gen.v
 "]
 
