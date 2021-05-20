@@ -161,6 +161,7 @@ package bsg_chip_pkg;
 
   typedef struct packed {
     bsg_tag_s core_reset;
+    bsg_tag_s global_y_cord;
     bsg_tag_s sdr_disable;
     bsg_chip_sdr_tag_lines_s sdr;
   } bsg_chip_halfpod_tag_lines_s;
