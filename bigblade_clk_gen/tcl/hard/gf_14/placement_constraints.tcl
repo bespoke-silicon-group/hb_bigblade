@@ -3,21 +3,6 @@ puts "BSG-info: Running script [info script]\n"
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/fp_common.tcl
 
 # ==============================================================================
-# Surround the block with DECAP
-# ==============================================================================
-
-create_boundary_cells \
-  -left_boundary_cell               $decap_boundary_cell \
-  -right_boundary_cell              $decap_boundary_cell \
-  -top_boundary_cells               [list $decap_boundary_cell $filler_x3_cell $filler_x2_cell] \
-  -bottom_boundary_cells            [list $decap_boundary_cell $filler_x3_cell $filler_x2_cell] \
-  -top_right_outside_corner_cell    $decap_boundary_cell \
-  -top_left_outside_corner_cell     $decap_boundary_cell \
-  -bottom_right_outside_corner_cell $decap_boundary_cell \
-  -bottom_left_outside_corner_cell  $decap_boundary_cell \
-  -no_1x
-
-# ==============================================================================
 # ADT RP Groups
 # ==============================================================================
 
