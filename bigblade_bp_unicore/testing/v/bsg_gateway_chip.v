@@ -88,7 +88,7 @@ module bsg_gateway_chip
   logic manycore_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`MANYCORE_CLK_PERIOD)) manycore_clk_gen (.o(manycore_clk));
 
-  logic tag_clk_raw;
+  logic tag_clk_raw, tag_clk;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
 
 
@@ -163,34 +163,6 @@ module bsg_gateway_chip
 
   //////////////////////////////////////////////////
   //
-  // Reset trigger
-  //
-  logic async_uplink_reset, async_downlink_reset, async_downstream_reset, async_token_reset;
-  logic reset_done;
-  initial
-    begin
-      async_uplink_reset     = 1;
-      async_downlink_reset   = 1;
-      async_downstream_reset = 1;
-      async_token_reset      = 0;
-      reset_done             = 0;
-
-      #100000;
-      async_token_reset = 1;
-      #100000;
-      async_token_reset = 0;
-      #100000;
-      async_uplink_reset = 0;
-      #100000;
-      async_downlink_reset = 0;
-      #100000;
-      async_downstream_reset = 0;
-      #100000;
-      reset_done = 1;
-    end
-
-  //////////////////////////////////////////////////
-  //
   // BSG Tag Track Replay
   //
 
@@ -245,6 +217,34 @@ module bsg_gateway_chip
 
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
+  // Emulate TAG behavior from inside BP
+  // tag master instance
+  bsg_chip_noc_tag_lines_s tag_lines_lo;
+  bsg_tag_master_decentralized
+ #(.els_p      (tag_els_gp)
+  ,.local_els_p(tag_noc_local_els_gp)
+  ,.lg_width_p (tag_lg_width_gp)
+  ) btm
+  (.clk_i           (tag_clk)
+  ,.data_i          (tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
+  ,.node_id_offset_i('0)
+  ,.clients_o       (tag_lines_lo)
+  );
+
+  logic async_uplink_reset, async_downlink_reset, async_downstream_reset, async_token_reset;
+  bsg_tag_client_unsync #(.width_p(1)) btc0
+  (.bsg_tag_i     (tag_lines_lo.sdr.token_reset)
+  ,.data_async_r_o(async_token_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc1
+  (.bsg_tag_i     (tag_lines_lo.sdr.downstream_reset)
+  ,.data_async_r_o(async_downstream_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc2
+  (.bsg_tag_i     (tag_lines_lo.sdr.downlink_reset)
+  ,.data_async_r_o(async_downlink_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc3
+  (.bsg_tag_i     (tag_lines_lo.sdr.uplink_reset)
+  ,.data_async_r_o(async_uplink_reset));
+
   //////////////////////////////////////////////////
   //
   // DUT
@@ -267,7 +267,7 @@ module bsg_gateway_chip
   bsg_blackparrot_halfpod
    DUT
     (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset | ~reset_done)
+     ,.reset_i(blackparrot_reset | ~tag_trace_done_lo)
 
      ,.tag_clk_i(tag_clk)
      ,.tag_data_i(tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
@@ -390,7 +390,7 @@ module bsg_gateway_chip
      )
     rtr00
     (.clk_i(manycore_clk)
-    ,.reset_i(manycore_reset | ~reset_done)
+    ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
     ,.links_sif_i(link_in[0][0])
     ,.links_sif_o(link_out[0][0])
@@ -413,7 +413,7 @@ module bsg_gateway_chip
      )
     rtr02
     (.clk_i(manycore_clk)
-    ,.reset_i(manycore_reset | ~reset_done)
+    ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
     ,.links_sif_i(link_in[num_links_y_lp-1][0])
     ,.links_sif_o(link_out[num_links_y_lp-1][0])
@@ -442,7 +442,7 @@ module bsg_gateway_chip
       )
       rtr
       (.clk_i(manycore_clk)
-      ,.reset_i(manycore_reset | ~reset_done)
+      ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
       ,.links_sif_i(link_in[i][0])
       ,.links_sif_o(link_out[i][0])
@@ -468,7 +468,7 @@ module bsg_gateway_chip
       )
       rtr
       (.clk_i(manycore_clk)
-      ,.reset_i(manycore_reset | ~reset_done)
+      ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
       ,.links_sif_i(link_in[0][i])
       ,.links_sif_o(link_out[0][i])
@@ -493,7 +493,7 @@ module bsg_gateway_chip
       )
       rtr
       (.clk_i(manycore_clk)
-      ,.reset_i(manycore_reset | ~reset_done)
+      ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
       ,.links_sif_i(link_in[num_links_y_lp-1][i])
       ,.links_sif_o(link_out[num_links_y_lp-1][i])
@@ -524,7 +524,7 @@ module bsg_gateway_chip
           )
           rtr
           (.clk_i(manycore_clk)
-          ,.reset_i(manycore_reset | ~reset_done)
+          ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
           ,.links_sif_i(link_in[j][i])
           ,.links_sif_o(link_out[j][i])
@@ -573,7 +573,7 @@ module bsg_gateway_chip
      )
    io
     (.clk_i(manycore_clk)
-     ,.reset_i(manycore_reset | ~reset_done)
+     ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
      ,.io_link_sif_i(proc_link_out[1][0])
      ,.io_link_sif_o(proc_link_in[1][0])
@@ -629,7 +629,7 @@ module bsg_gateway_chip
              )
            mem_inf
             (.clk_i(manycore_clk)
-             ,.reset_i(manycore_reset | ~reset_done)
+             ,.reset_i(manycore_reset | ~tag_trace_done_lo)
 
              ,.link_sif_i(proc_link_out[y_idx_lp][x_idx_lp])
              ,.link_sif_o(proc_link_in[y_idx_lp][x_idx_lp])

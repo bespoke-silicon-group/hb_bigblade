@@ -15,7 +15,7 @@ endif
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
-basejump_stl_commit  :=5bd0ecc7e0e481c7afba68d5a05181b36bcf25c4
+basejump_stl_commit  :=e9a502b30da83457fcee0af7b2ce147b7899012f
 #dev-bsg_link_sdr
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
@@ -36,7 +36,7 @@ bsg_packaging_commit :=e2128cf2b172d28cc27c7c7ca9a92b74fbbef480
 
 blackparrot_dir      :=$(THIS_DIR)/black-parrot
 blackparrot_url      :=$(GITHUB)black-parrot/black-parrot
-blackparrot_commit   :=tapeout_bigblade_rc0
+blackparrot_commit   :=tapeout_bigblade_rc1
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
