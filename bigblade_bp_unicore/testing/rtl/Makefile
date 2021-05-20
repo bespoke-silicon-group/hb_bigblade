@@ -123,13 +123,13 @@ LINKER ?= $(SRC_DIR)/riscv.ld
 
 PYTHON ?= python
 PYTHONPATH +=:../../bsg_manycore/testbenches/py
-TRACE_GEN ?= $(abspath ../../../bigblade_toplevel/testing/py/bsg_tag_boot.py)
+TRACE_GEN ?= $(abspath ../py/blackparrot_trace_gen.py)
 NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 
-$(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.tr:
+%/bsg_tag_boot_rom.tr:
 	$(PYTHON) $(TRACE_GEN) > $@
 
-$(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.v: $(BSG_DESIGNS_TARGET_DIR)/bsg_tag_boot_rom.tr
+%/bsg_tag_boot_rom.v: %/bsg_tag_boot_rom.tr
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< bsg_tag_boot_rom > $@
 
 %/prog.riscv:

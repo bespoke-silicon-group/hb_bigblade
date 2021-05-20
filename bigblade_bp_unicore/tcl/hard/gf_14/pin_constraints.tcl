@@ -20,7 +20,6 @@ set k_pitch 0.128
 set c_pitch 0.160
 
 set                  misc_pins [get_ports -filter "name=~clk_i"]
-append_to_collection misc_pins [get_ports -filter "name=~reset_i"]
 append_to_collection misc_pins [get_ports -filter "name=~global_y_cord_i*"]
 append_to_collection misc_pins [get_ports -filter "name=~tag_*"]
 

@@ -29,6 +29,11 @@ set core_input_delay_min_ps [expr $core_clk_period_ps*$core_input_delay_min_per/
 set core_input_delay_max_per 70.0
 set core_input_delay_max_ps [expr $core_clk_period_ps*$core_input_delay_max_per/100.0]
 
+set core_output_delay_min_per 2.0
+set core_output_delay_min_ps [expr $core_clk_period_ps*$core_output_delay_min_per/100.0]
+set core_output_delay_max_per 20.0
+set core_output_delay_max_ps [expr $core_clk_period_ps*$core_output_delay_max_per/100.0]
+
 set link_clk_period_ps        1000
 set link_clk_uncertainty_per  3.0
 set link_clk_uncertainty_ps  [expr min([expr $link_clk_period_ps*($link_clk_uncertainty_per/100.0)], 20)]
@@ -71,6 +76,14 @@ append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
+## Out2Reg
+set core_output_pins [get_ports sdr_disable_o]
+set_output_delay -min $core_output_delay_min_ps -clock $core_clk_name $core_output_pins
+set_output_delay -max $core_output_delay_max_ps -clock $core_clk_name $core_output_pins
+set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
+set_load -max [load_of [get_lib_pin */$LIB_CELLS(invx8,load_pin)]] [all_outputs]
+
+########################################
 ## SDR constraints
 for {set i 0} {$i < 3} {incr i} {
   bsg_link_sdr_constraints                                         \
@@ -110,8 +123,11 @@ for {set i 0} {$i < 3} {incr i} {
 
 ########################################
 ## False paths
-set_false_path -from [get_ports global_*_cord_i[*]]
 set_false_path -from [get_ports tag_node_id_offset_i[*]]
+set_app_var sh_continue_on_error true
+error
+set_false_path -through [get_ports tag_node_id_offset_i[*]]
+set_false_path -to   [get_ports sdr_disable_o]
 
 ########################################
 ## Disable timing

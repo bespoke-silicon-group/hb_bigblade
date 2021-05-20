@@ -252,8 +252,6 @@ module bsg_gateway_chip
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp);
   bsg_manycore_link_sif_s [3:1][P:P] mc_proc_links_li, mc_proc_links_lo;
 
-  wire [hb_y_cord_width_gp-1:0] global_y_cord_li = {hb_pod_y_cord_width_gp'(1'b1), hb_y_subcord_width_gp'(1'b1)};
-
   logic [3:1] io_fwd_link_clk_lo, io_fwd_link_v_lo, io_fwd_link_token_li;
   logic [3:1][$bits(bsg_manycore_fwd_link_sif_s)-3:0] io_fwd_link_data_lo;
   logic [3:1] io_rev_link_clk_lo, io_rev_link_v_lo, io_rev_link_token_li;
@@ -266,13 +264,12 @@ module bsg_gateway_chip
   bsg_blackparrot_halfpod
    DUT
     (.clk_i(blackparrot_clk)
-     ,.reset_i(blackparrot_reset | ~tag_trace_done_lo)
 
      ,.tag_clk_i(~tag_clk)
      ,.tag_data_i(tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
      ,.tag_node_id_offset_i('0)
 
-     ,.global_y_cord_i(global_y_cord_li)
+     ,.sdr_disable_o()
 
      ,.io_fwd_link_clk_o(io_fwd_link_clk_lo)
      ,.io_fwd_link_data_o(io_fwd_link_data_lo)

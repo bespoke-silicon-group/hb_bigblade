@@ -25,8 +25,7 @@ module bsg_blackparrot_unicore_tile_sdr
        `bsg_manycore_return_packet_width(hb_x_cord_width_gp, hb_y_cord_width_gp, hb_data_width_gp)
    )
   (input                                          clk_i
-   , input                                        reset_i
-
+   , input                                        async_reset_i
    , input [hb_y_cord_width_gp-1:0]               global_y_cord_i
 
    , input                                        async_uplink_reset_i
@@ -62,14 +61,13 @@ module bsg_blackparrot_unicore_tile_sdr
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp);
   bsg_manycore_link_sif_s [2:0] proc_link_sif_li, proc_link_sif_lo;
 
-  // Latch reset to meet timing
-  logic reset_r;
-  bsg_dff
+  logic reset_sync;
+  bsg_sync_sync
    #(.width_p(1))
-   reset_reg
-    (.clk_i(clk_i)
-     ,.data_i(reset_i)
-     ,.data_o(reset_r)
+   reset_bss
+    (.oclk_i(clk_i)
+     ,.iclk_data_i(async_reset_i)
+     ,.oclk_data_o(reset_sync)
      );
 
   logic uplink_reset_sync;
@@ -106,7 +104,7 @@ module bsg_blackparrot_unicore_tile_sdr
    #(.bp_params_p(bp_params_p))
    blackparrot
     (.clk_i(clk_i)
-     ,.reset_i(reset_r)
+     ,.reset_i(reset_sync)
 
      ,.io_cmd_o(io_cmd_lo)
      ,.io_cmd_v_o(io_cmd_v_lo)
@@ -141,7 +139,7 @@ module bsg_blackparrot_unicore_tile_sdr
    #(.bp_params_p(bp_params_p))
    dram_splitter
     (.clk_i(clk_i)
-     ,.reset_i(reset_r)
+     ,.reset_i(reset_sync)
 
      ,.io_cmd_i(mem_cmd_lo)
      ,.io_cmd_v_i(mem_cmd_v_lo)
@@ -190,7 +188,7 @@ module bsg_blackparrot_unicore_tile_sdr
   // #(.bp_params_p(bp_params_p))
   // io_serializer
   //  (.clk_i(clk_i)
-  //   ,.reset_i(reset_r)
+  //   ,.reset_i(reset_sync)
 
   //   ,.io_cmd_i(io_cmd_lo)
   //   ,.io_cmd_v_i(io_cmd_v_lo)
@@ -234,7 +232,7 @@ module bsg_blackparrot_unicore_tile_sdr
      )
    host_link
     (.clk_i(clk_i)
-     ,.reset_i(reset_r)
+     ,.reset_i(reset_sync)
 
      ,.io_cmd_i(hb_cmd_lo)
      ,.io_cmd_v_i(hb_cmd_v_lo)
@@ -284,7 +282,7 @@ module bsg_blackparrot_unicore_tile_sdr
          )
        dram_link
         (.clk_i(clk_i)
-         ,.reset_i(reset_r)
+         ,.reset_i(reset_sync)
 
          ,.io_cmd_i(dram_cmd_lo[i])
          ,.io_cmd_v_i(dram_cmd_v_lo[i])
@@ -322,7 +320,7 @@ module bsg_blackparrot_unicore_tile_sdr
          )
        rev_c2r
         (.clk_i(clk_i)
-         ,.reset_i(reset_i)
+         ,.reset_i(reset_sync)
 
          ,.credit_link_sif_i(proc_link_sif_lo[i])
          ,.credit_link_sif_o(proc_link_sif_li[i])

@@ -18,13 +18,11 @@ module bsg_blackparrot_halfpod
    )
   (
    input                                          clk_i
-   , input                                        reset_i
 
    , input                                        tag_clk_i
    , input                                        tag_data_i
    , input  [tag_lg_els_gp-1:0]                   tag_node_id_offset_i
-
-   , input [hb_y_cord_width_gp-1:0]               global_y_cord_i
+   , output logic                                 sdr_disable_o
 
    , output logic [2:0]                           io_fwd_link_clk_o
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o
@@ -48,10 +46,10 @@ module bsg_blackparrot_halfpod
    );
 
   // tag master instance
-  bsg_chip_noc_tag_lines_s tag_lines_lo;
+  bsg_chip_halfpod_tag_lines_s tag_lines_lo;
   bsg_tag_master_decentralized
  #(.els_p      (tag_els_gp)
-  ,.local_els_p(tag_noc_local_els_gp)
+  ,.local_els_p(tag_halfpod_local_els_gp)
   ,.lg_width_p (tag_lg_width_gp)
   ) btm
   (.clk_i           (tag_clk_i)
@@ -61,6 +59,8 @@ module bsg_blackparrot_halfpod
   );
 
   logic sdr_uplink_reset, sdr_downlink_reset, sdr_downstream_reset, sdr_token_reset;
+  logic [hb_y_cord_width_gp-1:0] async_global_y_cord; 
+  logic async_core_reset;
 
   bsg_tag_client_unsync #(.width_p(1)) btc0
   (.bsg_tag_i     (tag_lines_lo.sdr.token_reset)
@@ -74,13 +74,26 @@ module bsg_blackparrot_halfpod
   bsg_tag_client_unsync #(.width_p(1)) btc3
   (.bsg_tag_i     (tag_lines_lo.sdr.uplink_reset)
   ,.data_async_r_o(sdr_uplink_reset));
+  bsg_tag_client_unsync #(.width_p(1)) btc4
+  (.bsg_tag_i     (tag_lines_lo.sdr_disable)
+  ,.data_async_r_o(sdr_disable_o));
+  bsg_tag_client_unsync #(.width_p(hb_y_cord_width_gp)) btc5
+  (.bsg_tag_i     (tag_lines_lo.global_y_cord)
+  ,.data_async_r_o(async_global_y_cord));
+  bsg_tag_client_unsync #(.width_p(1)) btc6
+  (.bsg_tag_i     (tag_lines_lo.core_reset)
+  ,.data_async_r_o(async_core_reset));
 
   bsg_blackparrot_unicore_tile_sdr
-   DUT
+   tile
     (.async_uplink_reset_i(sdr_uplink_reset)
      ,.async_downlink_reset_i(sdr_downlink_reset)
      ,.async_downstream_reset_i(sdr_downstream_reset)
      ,.async_token_reset_i(sdr_token_reset)
+
+     ,.clk_i(clk_i)
+     ,.async_reset_i(async_core_reset)
+     ,.global_y_cord_i(async_global_y_cord)
 
      ,.*
      );
