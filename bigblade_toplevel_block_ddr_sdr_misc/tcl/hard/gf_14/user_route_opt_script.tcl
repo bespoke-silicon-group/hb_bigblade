@@ -71,7 +71,7 @@ set start_buffer_offset 1
 set calib_scenatio "sspg_0p72v_125c_sigcmax"
 set calib_num_buffers 5
 set calib_side "DR"
-set calib_ch 0
+set calib_ch 5
 set calib_bit 0
 
 
