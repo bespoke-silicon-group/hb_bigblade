@@ -62,22 +62,20 @@ set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
 ########################################
 ## In2Reg
-set core_input_pins [get_ports global_y_cord_i[*]]
-# TODO: Goes away with clk_gen
-append_to_collection input_pins [get_ports clk_i]
-append_to_collection input_pins [get_ports reset_i]
-set_input_delay -min $core_input_delay_min_ps -clock $core_clk_name $core_input_pins
-set_input_delay -max $core_input_delay_max_ps -clock $core_clk_name $core_input_pins
+#set core_input_pins input_pins [get_ports reset_i]
+#set_input_delay -min $core_input_delay_min_ps -clock $core_clk_name $core_input_pins
+#set_input_delay -max $core_input_delay_max_ps -clock $core_clk_name $core_input_pins
 set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
 set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 set tag_in_ports [get_ports tag_data_i]
 append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set_input_delay -min $tag_input_delay_min_ps -clock $tag_clk_name $tag_in_ports
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
 ########################################
 ## Reg2Out
-set core_output_pins [get_ports sdr_disable_o]
+set core_output_pins [get_ports *link*disable*]
 set_output_delay -min $core_output_delay_min_ps -clock $core_clk_name $core_output_pins
 set_output_delay -max $core_output_delay_max_ps -clock $core_clk_name $core_output_pins
 set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
@@ -164,6 +162,8 @@ bsg_chip_derate_cells
 bsg_chip_derate_mems
 #report_timing_derate
 
+#set_app_var sh_continue_on_error false
+
 ########################################
 ## Disabled or false paths
 bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
@@ -228,6 +228,7 @@ set_optimize_registers true -designs [get_designs bp_be_pipe_aux* ] -check_desig
 set_optimize_registers true -designs [get_designs bp_be_pipe_fma* ] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_pipe_long*] -check_design -verbose
 set_optimize_registers true -designs [get_designs bp_be_dcache*   ] -check_design -verbose
+set_optimize_registers false -designs [get_designs *sdr*          ] -check_design -verbose
 
 puts "BSG-info: Completed script [info script]\n"
 

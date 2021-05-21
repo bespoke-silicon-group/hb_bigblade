@@ -22,27 +22,30 @@ module bsg_blackparrot_halfpod
    , input                                        tag_clk_i
    , input                                        tag_data_i
    , input  [tag_lg_els_gp-1:0]                   tag_node_id_offset_i
-   , output logic                                 sdr_disable_o
 
    , output logic [2:0]                           io_fwd_link_clk_o
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o
    , output logic [2:0]                           io_fwd_link_v_o
    , input [2:0]                                  io_fwd_link_token_i
+   , output logic                                 io_fwd_link_o_disable_o
 
    , input [2:0]                                  io_fwd_link_clk_i
    , input [2:0][fwd_width_lp-1:0]                io_fwd_link_data_i
    , input [2:0]                                  io_fwd_link_v_i
    , output logic [2:0]                           io_fwd_link_token_o
+   , output logic                                 io_fwd_link_i_disable_o
 
    , output logic [2:0]                           io_rev_link_clk_o
    , output logic [2:0][rev_width_lp-1:0]         io_rev_link_data_o
    , output logic [2:0]                           io_rev_link_v_o
    , input [2:0]                                  io_rev_link_token_i
+   , output logic                                 io_rev_link_o_disable_o
 
    , input [2:0]                                  io_rev_link_clk_i
    , input [2:0][rev_width_lp-1:0]                io_rev_link_data_i
    , input [2:0]                                  io_rev_link_v_i
    , output logic [2:0]                           io_rev_link_token_o
+   , output logic                                 io_rev_link_i_disable_o
    );
 
   // tag master instance
@@ -60,7 +63,7 @@ module bsg_blackparrot_halfpod
 
   logic sdr_uplink_reset, sdr_downlink_reset, sdr_downstream_reset, sdr_token_reset;
   logic [hb_y_cord_width_gp-1:0] async_global_y_cord; 
-  logic async_core_reset;
+  logic async_core_reset, sdr_disable_lo;
 
   bsg_tag_client_unsync #(.width_p(1)) btc0
   (.bsg_tag_i     (tag_lines_lo.sdr.token_reset)
@@ -76,13 +79,18 @@ module bsg_blackparrot_halfpod
   ,.data_async_r_o(sdr_uplink_reset));
   bsg_tag_client_unsync #(.width_p(1)) btc4
   (.bsg_tag_i     (tag_lines_lo.sdr_disable)
-  ,.data_async_r_o(sdr_disable_o));
+  ,.data_async_r_o(sdr_disable_lo));
   bsg_tag_client_unsync #(.width_p(hb_y_cord_width_gp)) btc5
   (.bsg_tag_i     (tag_lines_lo.global_y_cord)
   ,.data_async_r_o(async_global_y_cord));
   bsg_tag_client_unsync #(.width_p(1)) btc6
   (.bsg_tag_i     (tag_lines_lo.core_reset)
   ,.data_async_r_o(async_core_reset));
+
+  assign io_fwd_link_i_disable_o = sdr_disable_lo;
+  assign io_fwd_link_o_disable_o = sdr_disable_lo;
+  assign io_rev_link_i_disable_o = sdr_disable_lo;
+  assign io_rev_link_o_disable_o = sdr_disable_lo;
 
   bsg_blackparrot_unicore_tile_sdr
    tile

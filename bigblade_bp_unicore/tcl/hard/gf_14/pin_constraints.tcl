@@ -20,12 +20,11 @@ set k_pitch 0.128
 set c_pitch 0.160
 
 set                  misc_pins [get_ports -filter "name=~clk_i"]
-append_to_collection misc_pins [get_ports -filter "name=~global_y_cord_i*"]
 append_to_collection misc_pins [get_ports -filter "name=~tag_*"]
 
 set misc_pins_len [expr [sizeof_collection $misc_pins]]
-set start_x [expr ($core_width / 2)  - (2*$c_pitch*$misc_pins_len/2)]
-set last_loc [bsg_pins_line_constraint $misc_pins "C5" top $start_x "self" {} 2 0]
+set start_y [expr ($core_height / 2)  - (4*$c_pitch*$misc_pins_len/2)]
+set last_loc [bsg_pins_line_constraint $misc_pins "C4" left $start_y "self" {} 4 0]
 
 # Read horizontal pins from csv file
 set fh [open $::env(BSG_DESIGNS_TARGET_DIR)/../common/sdr_pin_y.csv]
@@ -38,8 +37,12 @@ for {set i 0} {$i < 3} {incr i} {
     foreach line [split $contents] {
       if {$line  == ""} break
       set pin [lindex [split $line ,] 0]
-      set pin_base [regsub -all {\[.*\]} $pin {}]
-      if {$pin != $pin_base} {
+      set pin_base $pin
+      set pin_base [regsub -all {\[.*\]} $pin_base {}     ]
+      set pin_base [regsub -all {_o$}    $pin_base {_itmp}]
+      set pin_base [regsub -all {_i$}    $pin_base {_o}   ]
+      set pin_base [regsub -all {_itmp$} $pin_base {_i}   ]
+      if {[string length $pin] != [string length $pin_base]} {
         set pin_index [lindex [split $pin {\[.*\]}] 1]
         set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 3]
         set true_pin_index [expr $i*$pin_len + $pin_index]
