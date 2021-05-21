@@ -13,6 +13,6 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set BIGBLADE_NOC_IO_LINK_SOURCE_FILES [join "
-  $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_chip_noc_io_link.v
+set BIGBLADE_NOC_MEM_LINK_SOURCE_FILES [join "
+  $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_chip_noc_mem_link.v
 "]

@@ -56,6 +56,17 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_io_link-rtl_filel
 
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_IO_LINK_SOURCE_FILES]
 
+
+######################################
+# bigblade_noc_mem_link source files #
+######################################
+# comment this out to use post_synth netlist
+#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_mem_link-post-synth_filelist.tcl
+# comment this out to use rtl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_mem_link-rtl_filelist.tcl
+
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES]
+
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES
