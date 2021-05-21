@@ -1,7 +1,4 @@
-
 source ../tcl/bsg_config_util.tcl
-
-
 
 # scripts for creating filelist and library
 #source $::env(BSG_TESTING_COMMON_DIR)/bsg_vcs_create_filelist_library.tcl
@@ -16,11 +13,27 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
-set OBSVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
 
-# bsg_manycore_tile source files
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_tile-post-synth_filelist.tcl
+##################################
+# bsg_manycore_tile source files #
+##################################
+# comment this out to use post_synth netlist
+#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_tile-post-synth_filelist.tcl
+# comment this out to use rtl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_tile-rtl_filelist.tcl
+
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_TILE_SOURCE_FILES]
+
+######################################
+# bsg_manycore_link_sdr source files #
+######################################
+# comment this out to use post_synth netlist
+#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_link_sdr-post-synth_filelist.tcl
+# comment this out to use rtl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_link_sdr-rtl_filelist.tcl
+
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_LINK_SDR_SOURCE_FILES]
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \

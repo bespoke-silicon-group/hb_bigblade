@@ -18,6 +18,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_tile-rtl_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_TILE_SOURCE_FILES]
 
+# comment this out to use rtl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_link_sdr-rtl_filelist.tcl
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_LINK_SDR_SOURCE_FILES]
+
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES

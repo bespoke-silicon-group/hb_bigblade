@@ -249,14 +249,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
-  $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_west.v
-  $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_east.v
-  $bsg_designs_target_dir/../common/sdr/sdr_vertical/v/bsg_manycore_link_to_sdr_north.v
-  $bsg_designs_target_dir/../common/sdr/sdr_vertical/v/bsg_manycore_link_to_sdr_south.v
-  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_nw.v
-  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_ne.v
-  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_sw.v
-  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_se.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_north_row/v/bsg_manycore_link_to_sdr_north_row.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_south_row/v/bsg_manycore_link_to_sdr_south_row.v
 "]
