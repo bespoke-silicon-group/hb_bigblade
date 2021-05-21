@@ -58,12 +58,9 @@ void main(uint64_t argc, char * argv[]) {
     // Store deadbeef to manycore V$ at the right coordinates (based on data striping)
     req_packet.request.x_dst    = (1 << 4) | 1;
     req_packet.request.y_dst    = (0 << 3) | 7;
-    // Unused
-    req_packet.request.x_src    = (0 << 0) | 0;
-    // Unused
+    req_packet.request.x_src    = (0 << 4) | 0;
     req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0xdeadbeef;
-    // Store mask
     req_packet.request.reg_id   = 0xff;
     req_packet.request.op_v2    = 2; // Store Word
     req_packet.request.addr     = some_mc_dram_eva;
@@ -76,12 +73,9 @@ void main(uint64_t argc, char * argv[]) {
     // Read deadbeef from manycore V$ at the right coordinates (based on data striping)
     req_packet.request.x_dst    = (1 << 4) | 1;
     req_packet.request.y_dst    = (0 << 3) | 7;
-    // Unused
-    req_packet.request.x_src    = (0 << 0) | 0;
-    // Unused
+    req_packet.request.x_src    = (0 << 4) | 0;
     req_packet.request.y_src    = (1 << 3) | 1;
     req_packet.request.data     = 0;
-    // Store mask
     req_packet.request.reg_id   = 0x10;
     req_packet.request.op_v2    = 0; // Load
     req_packet.request.addr     = some_mc_dram_eva;
