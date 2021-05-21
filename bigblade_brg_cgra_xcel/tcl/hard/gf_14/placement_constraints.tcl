@@ -37,10 +37,10 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   
   set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
   set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
-  set pe_origin_x [expr $tile_width - $array_width]
+  set pe_origin_x [expr $tile_width - $array_width - 3.276]
   set pe_origin_y $keepout_margin_y
   
-  set sp_lx [expr 10+$keepout_margin_x]
+  set sp_lx [expr 15+$keepout_margin_x]
   set sp_ly [expr $pe_origin_y + 1*$array_height/16]
   set sp_ry [expr $pe_origin_y + 15*$array_height/16]
   
@@ -55,7 +55,7 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
     -align left \
     -horizontal_channel_height [expr $rf_margin_y] \
     -vertical_channel_width [expr $keepout_margin_x] \
-    -orientation N \
+    -orientation FN \
     $sram_mems
   ]
   create_keepout_margin -type hard -outer $keepout_margins $sram_mems

@@ -62,16 +62,17 @@ set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
 ########################################
 ## In2Reg
-set xcel_input_pins [get_ports reset_i]
-append_to_collection xcel_input_pins [get_ports async_*_reset_i]
-set_input_delay -min $xcel_input_delay_min_ps -clock $xcel_clk_name $xcel_input_pins
-set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_pins
-set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+#set xcel_input_pins [get_ports reset_i]
+#set_input_delay -min $xcel_input_delay_min_ps -clock $xcel_clk_name $xcel_input_pins
+#set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_pins
 
 set tag_in_ports [get_ports tag_data_i]
 append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set_input_delay -min $tag_input_delay_min_ps -clock $tag_clk_name $tag_in_ports
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
+
+set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 ########################################
 ## Reg2Out
@@ -181,5 +182,6 @@ set_ungroup [get_designs -filter "hdl_template==CGRACore__1736738b526e3fb9" ] tr
 
 ########################################
 ## Retiming
+set_optimize_registers false -designs [get_designs *sdr*          ] -check_design -verbose
 
 puts "BSG-info: Completed script [info script]\n"
