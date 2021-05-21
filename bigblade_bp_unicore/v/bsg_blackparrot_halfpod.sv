@@ -27,25 +27,25 @@ module bsg_blackparrot_halfpod
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o
    , output logic [2:0]                           io_fwd_link_v_o
    , input [2:0]                                  io_fwd_link_token_i
-   , output logic                                 io_fwd_link_o_disable_o
+   , output logic [0:0]                           io_fwd_link_o_disable_o
 
    , input [2:0]                                  io_fwd_link_clk_i
    , input [2:0][fwd_width_lp-1:0]                io_fwd_link_data_i
    , input [2:0]                                  io_fwd_link_v_i
    , output logic [2:0]                           io_fwd_link_token_o
-   , output logic                                 io_fwd_link_i_disable_o
+   , output logic [0:0]                           io_fwd_link_i_disable_o
 
    , output logic [2:0]                           io_rev_link_clk_o
    , output logic [2:0][rev_width_lp-1:0]         io_rev_link_data_o
    , output logic [2:0]                           io_rev_link_v_o
    , input [2:0]                                  io_rev_link_token_i
-   , output logic                                 io_rev_link_o_disable_o
+   , output logic [0:0]                           io_rev_link_o_disable_o
 
    , input [2:0]                                  io_rev_link_clk_i
    , input [2:0][rev_width_lp-1:0]                io_rev_link_data_i
    , input [2:0]                                  io_rev_link_v_i
    , output logic [2:0]                           io_rev_link_token_o
-   , output logic                                 io_rev_link_i_disable_o
+   , output logic [0:0]                           io_rev_link_i_disable_o
    );
 
   // tag master instance
