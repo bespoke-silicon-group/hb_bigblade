@@ -11,6 +11,7 @@ package bsg_chip_pkg;
 
   localparam bsg_link_clk_gen_ds_width_gp      = 6;
   localparam bsg_link_clk_gen_num_adgs_gp      = 1;
+  localparam bsg_link_clk_gen_lg_monitor_ds_gp = 5;
 
 
   //////////////////////////////////////////////////
