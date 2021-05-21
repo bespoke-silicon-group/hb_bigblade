@@ -43,24 +43,21 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
         if {$line  == ""} break
         set pin [lindex [split $line ,] 0]
         set pin_base $pin
-	puts $pin_base
         set pin_base [regsub -all {\[.*\]} $pin_base {}     ]
-	puts $pin_base
         set pin_base [regsub -all {_o$}    $pin_base {_itmp}]
-	puts $pin_base
         set pin_base [regsub -all {_i$}    $pin_base {_o}   ]
-	puts $pin_base
         set pin_base [regsub -all {_itmp$} $pin_base {_i}   ]
-	puts $pin_base
 
         if {[string length $pin] != [string length $pin_base]} {
           set pin_index [lindex [split $pin {\[.*\]}] 1]
           set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 4]
           set true_pin_index [expr $i*$pin_len + $pin_index]
           set true_pin ${pin_base}[$true_pin_index]
-        } else {
+        } elseif {[string first "disable" $pin_base] == -1 || [expr $i == 0]} {
           set true_pin_index [expr $i]
           set true_pin ${pin_base}[$i]
+        } else {
+          continue
         }
         set pos [lindex [split $line ,] 1]
         set true_pos [expr $block_offset + $i*$mc_tile_pitch + $pos]
