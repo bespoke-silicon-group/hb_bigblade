@@ -12,6 +12,7 @@ export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
 
 # TODO: change to default_wb for actual chip
 export BSG_POWER_GRID := default_wb
+#export BSG_POWER_GRID := bigblade_toplevel_block
 export BSG_CAD_SETUP := default
 export BSG_POWER_INTENT := sv_standard
 
@@ -29,3 +30,6 @@ export DC_FLOW_INCREMENTAL_COMPILE_DISABLE_RETIMING := false
 export PTSI_FLOW_ACTIVITY_FILE :=
 export PTSI_FLOW_ACTIVITY_WEIGHTS :=
 export PTSI_FLOW_STRIP_PATH :=
+
+
+#export USE_ICC2_2020 := 1

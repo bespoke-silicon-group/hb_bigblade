@@ -14,7 +14,7 @@ module bsg_chip_block
  import bsg_tag_pkg::*;
  import bsg_manycore_pkg::*;
 
-`include "bsg_chip_block_pinout.v"
+`include "bsg_chip_block_pinout_new.v"
 
   //////////////////////////////////////////////////
   //

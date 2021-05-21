@@ -60,7 +60,7 @@ for {set i 0} {$i < 4} {incr i} {
 # tag_cell placement
 set                TAG_cell [get_cells -of_object [get_nets -of_object [get_ports "pad_ML0_1_i_int"]]]
 set_attribute     $TAG_cell orientation R0
-move_object       $TAG_cell -x [round_down_to_nearest 1335.27 [unit_width]] -y [round_down_to_nearest [expr $core_ury-2*[unit_height]] [unit_height]]
+move_object       $TAG_cell -x [round_down_to_nearest 1404.742 [unit_width]] -y [round_down_to_nearest [expr $core_ury-2*[unit_height]] [unit_height]]
 set_fixed_objects $TAG_cell
 
 
