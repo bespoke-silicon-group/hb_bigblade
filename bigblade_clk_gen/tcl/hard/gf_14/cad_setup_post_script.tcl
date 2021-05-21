@@ -1,0 +1,6 @@
+set MIN_ROUTING_LAYER              "M2"
+set MAX_ROUTING_LAYER              "C4"
+set CTS_MIN_ROUTING_LAYER          "M2"
+set CTS_MAX_ROUTING_LAYER          "C4"
+set PLACEMENT_PIN_CONSTRAINT_AWARE "false"
+set TIMING_PIN_PLACEMENT           "false"
