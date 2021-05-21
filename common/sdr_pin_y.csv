@@ -1,3 +1,7 @@
+async_fwd_link_i_disable_i,5.248,K3
+async_fwd_link_o_disable_i,3.712,K3
+async_rev_link_i_disable_i,4.736,K3
+async_rev_link_o_disable_i,3.2,K3
 io_fwd_link_clk_o,66.944,K3
 io_fwd_link_data_o[96],91.776,K3
 io_fwd_link_data_o[95],91.648,K1

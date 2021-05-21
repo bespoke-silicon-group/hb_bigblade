@@ -7,6 +7,8 @@ set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name clock_opt.flow.enable_ccd -value false
 set_app_options -name cts.common.enable_auto_skew_target_for_local_skew -value false
 
+set REPORT_QOR_REPORT_CONGESTION 0
+set REPORT_QOR 0
 
 create_routing_rule "bsg_cts_2w2s"  \
   -default_reference_rule       \
@@ -42,7 +44,7 @@ set_clock_routing_rules         \
   -min_routing_layer "K1"       \
   -max_routing_layer "K4"
 
-source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree3.tcl
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14/create_clock_tree4.tcl
 
 
 puts "BSG-info: Completed script [info script]\n"

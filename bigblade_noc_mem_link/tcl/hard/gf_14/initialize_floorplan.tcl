@@ -7,7 +7,7 @@ initialize_floorplan \
   -control_type core \
   -coincident_boundary true \
   -shape R \
-  -side_length [list 134.4 149.76]
+  -side_length [list 107.52 155.52]
 
 
 

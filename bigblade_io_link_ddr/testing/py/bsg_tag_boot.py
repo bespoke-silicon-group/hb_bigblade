@@ -1,5 +1,6 @@
 import sys
-sys.path.append("../../../common/util")
+import os
+sys.path.append(os.environ.get("BSG_DESIGNS_TARGET_DIR")+"/../common/util")
 from bsg_tag_trace_gen import *
 
 if __name__ == "__main__":

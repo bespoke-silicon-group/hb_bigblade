@@ -9,7 +9,6 @@
 ########################################
 WAVE       ?= 0
 
-
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
 BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
@@ -17,16 +16,22 @@ BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 ifeq ($(WAVE),1)
-  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv-debug
+  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv-debug
 else
-  BSG_OUT_SIM  := $(BSG_OUT_DIR)/simv
+  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv
 endif
+
+BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
+BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
+BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BSG_REPLICANT_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_replicant
+export BSG_F1_DIR             ?= $(BSG_REPLICANT_DIR)
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -34,8 +39,10 @@ export TESTING_BSG_DESIGNS_DIR        ?= $(BSG_OUT_DIR)/root/$(notdir $(BSG_DESI
 export TESTING_BSG_DESIGNS_TARGET_DIR ?= $(TESTING_BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
 export TESTING_BASEJUMP_STL_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export TESTING_BSG_MANYCORE_DIR       ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export TESTING_BSG_REPLICANT_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export TESTING_BSG_PACKAGING_DIR      ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export TESTING_BOARD_DIR              ?= $(TESTING_BSG_DESIGNS_TARGET_DIR)/board
+export TESTING_BSG_OUT_DIR            ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
@@ -62,7 +69,6 @@ VCS_OPTIONS += +vc
 VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
 VCS_OPTIONS += -diag timescale 
-VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)
 VCS_OPTIONS += -top bsg_config bsg_config.v
 
 ########################################
@@ -100,7 +106,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 ########################################
 ## Trace Replay Roms
 ########################################
-  
+
 BSG_TRACE_NAME  := bsg_tag_boot
 BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
@@ -118,9 +124,19 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
 
-
 VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
+###############################################
+# Bladerunner generated libraries and sources #
+###############################################
+BSG_BLADERUNNER_GENERATED_SOURCES   := $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+BSG_BLADERUNNER_GENERATED_SOURCES   += $(BSG_OUT_DIR)/bsg_manycore_machine.h
+BSG_BLADERUNNER_GENERATED_LIBRARIES := $(BSG_OUT_DIR)/libbsg_manycore_runtime.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libbsg_manycore_regression.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libbsgmc_cuda_legacy_pod_repl.so
+BSG_BLADERUNNER_GENERATED_LIBRARIES += $(BSG_OUT_DIR)/libdmamem.so
+BSG_BLADERUNNER_GENERATED           := $(BSG_BLADERUNNER_GENERATED_SOURCES)
+BSG_BLADERUNNER_GENERATED           += $(BSG_BLADERUNNER_GENERATED_LIBRARIES)
 
 ########################################
 ## Toplevel Parameters
@@ -134,7 +150,6 @@ OVERRIDE_PODS_Y ?= 4
 VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(OVERRIDE_PODS_X)
 VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 
-
 ########################################
 ## DRAM Definitions
 ########################################
@@ -145,18 +160,42 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ## Run Targets
 ########################################
 
-build: $(BSG_OUT_SIM)
-$(BSG_OUT_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS)
-	$(VCS) $(VCS_OPTIONS) -o $(BSG_OUT_SIM) | tee -i $(BSG_OUT_DIR)/build.log
-	cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
+build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
+debug: $(BSG_CUDA_DBG)
+$(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
+$(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
+
+$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
+$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
+
+$(BSG_CUDA_DBG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
+
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
 
-$(BSG_OUT_DIR):
-	mkdir -p $@
+$(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
+	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
+
+$(BSG_OUT_DIR) $(BSG_CUDA_PATH):
+	@mkdir -p $@
+
+BSG_MACHINE_PATH := $(BSG_OUT_DIR)
+$(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
+	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
 clean:
+	$(MAKE) -f bladerunner.mk libraries.clean BSG_MACHINE_PATH=$(BSG_WORK_DIR)/../machine/
 	rm -rf $(BSG_OUT_DIR)
 	rm -rf DVEfiles
 	rm -rf stack.info.*
@@ -164,4 +203,3 @@ clean:
 	rm -f  vcdplus.vpd
 	rm -f  inter.vpd
 	rm -f  ucli.key
-

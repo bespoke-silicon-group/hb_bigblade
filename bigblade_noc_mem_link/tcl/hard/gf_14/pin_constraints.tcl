@@ -102,7 +102,7 @@ set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
 set clk_reset_tag_ports [list]
 append_to_collection clk_reset_tag_ports [get_ports "tag_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "tag_data_i"]
-for {set i 0} {$i < 9} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_node_id_offset_i[$i]"]}
+for {set i 0} {$i < 10} {incr i} {append_to_collection clk_reset_tag_ports [get_ports "tag_node_id_offset_i[$i]"]}
 # clock reset
 append_to_collection clk_reset_tag_ports [get_ports "ext_io_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "ext_noc_clk_i"]
@@ -124,8 +124,8 @@ for {set i 0} {$i < 2}  {incr i} {append_to_collection io_wh_output_ports [get_p
 for {set i 0} {$i < 2}  {incr i} {append_to_collection io_wh_output_ports [get_ports "io_wh_link_token_i[$i]"]}
 
 # io (east)
-place_wh_pins_k1_k3 $io_wh_input_ports   [expr 202*0.128] $core_urx
-place_wh_pins_k1_k3 $io_wh_output_ports  [expr 402*0.128] $core_urx
+place_wh_pins_k1_k3 $io_wh_input_ports   [expr 650*0.128] $core_urx
+place_wh_pins_k1_k3 $io_wh_output_ports  [expr 850*0.128] $core_urx
 
 
 set io_wh_input_ports [list]
@@ -140,8 +140,8 @@ for {set i 2}  {$i < 4}   {incr i} {append_to_collection io_wh_output_ports [get
 for {set i 2}  {$i < 4}   {incr i} {append_to_collection io_wh_output_ports [get_ports "io_wh_link_token_i[$i]"]}
 
 # io (east)
-place_wh_pins_k1_k3 $io_wh_input_ports   [expr 602*0.128] $core_urx
-place_wh_pins_k1_k3 $io_wh_output_ports  [expr 802*0.128] $core_urx
+place_wh_pins_k1_k3 $io_wh_input_ports   [expr 150*0.128] $core_urx
+place_wh_pins_k1_k3 $io_wh_output_ports  [expr 350*0.128] $core_urx
 
 
 set matching_ports [list]

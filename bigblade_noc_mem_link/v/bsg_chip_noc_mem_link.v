@@ -57,8 +57,23 @@ module bsg_chip_noc_mem_link
   `declare_bsg_ready_and_link_sif_s(bsg_link_width_gp, core_link_sif_s);
   core_link_sif_s [1:0] core_links_li, core_links_lo;
 
+  wire [1:0] io_link_clk_li, io_link_v_li, io_link_clk_lo, io_link_v_lo;
+  wire [1:0][bsg_link_channel_width_gp-1:0] io_link_data_li, io_link_data_lo;
+
   for (genvar i = 0; i < 2; i++)
   begin: ddr_link
+    bsg_link_delay_line idelay
+    (.tag_clk_i(tag_clk_i)
+    ,.tag_lines_i(tag_lines_lo.ddr[i].idelay)
+    ,.i({io_link_clk_i [i], io_link_v_i [i], io_link_data_i [i]})
+    ,.o({io_link_clk_li[i], io_link_v_li[i], io_link_data_li[i]}));
+
+    bsg_link_delay_line odelay
+    (.tag_clk_i(tag_clk_i)
+    ,.tag_lines_i(tag_lines_lo.ddr[i].odelay)
+    ,.i({io_link_clk_lo[i], io_link_v_lo[i], io_link_data_lo[i]})
+    ,.o({io_link_clk_o [i], io_link_v_o [i], io_link_data_o [i]}));
+
     bsg_chip_io_link_ddr link
     (.core_clk_i                     (noc_clk_lo            )
     ,.ext_io_clk_i                   (ext_io_clk_i          )
@@ -67,7 +82,7 @@ module bsg_chip_noc_mem_link
     ,.noc_clk_o                      (noc_clk_raw_lo[i]     )
 
     ,.tag_clk_i                      (tag_clk_i          )
-    ,.tag_lines_i                    (tag_lines_lo.ddr[i])
+    ,.tag_lines_i                    (tag_lines_lo.ddr[i].main)
 
     ,.core_v_i                       (core_links_li[i].v                                 )
     ,.core_data_i                    (core_links_li[i].data                              )
@@ -77,14 +92,14 @@ module bsg_chip_noc_mem_link
     ,.core_data_o                    (core_links_lo[i].data                              )
     ,.core_yumi_i                    (core_links_lo[i].v & core_links_li[i].ready_and_rev)
 
-    ,.io_link_clk_o                  (io_link_clk_o  [i])
-    ,.io_link_data_o                 (io_link_data_o [i])
-    ,.io_link_v_o                    (io_link_v_o    [i])
+    ,.io_link_clk_o                  (io_link_clk_lo [i])
+    ,.io_link_data_o                 (io_link_data_lo[i])
+    ,.io_link_v_o                    (io_link_v_lo   [i])
     ,.io_link_token_i                (io_link_token_i[i])
 
-    ,.io_link_clk_i                  (io_link_clk_i  [i])
-    ,.io_link_data_i                 (io_link_data_i [i])
-    ,.io_link_v_i                    (io_link_v_i    [i])
+    ,.io_link_clk_i                  (io_link_clk_li [i])
+    ,.io_link_data_i                 (io_link_data_li[i])
+    ,.io_link_v_i                    (io_link_v_li   [i])
     ,.io_link_token_o                (io_link_token_o[i])
     );
   end

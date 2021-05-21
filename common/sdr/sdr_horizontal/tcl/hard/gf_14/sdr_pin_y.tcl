@@ -5,6 +5,8 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
 
 set sdr_pins [list]
+append_to_collection sdr_pins [get_ports "async_*_link_*_disable_i"]
+
 append_to_collection sdr_pins [get_ports "io_fwd_link_clk_o"]
 append_to_collection sdr_pins [get_ports "io_fwd_link_data_o*"]
 append_to_collection sdr_pins [get_ports "io_fwd_link_v_o"]

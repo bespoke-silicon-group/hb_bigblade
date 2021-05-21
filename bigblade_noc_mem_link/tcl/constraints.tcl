@@ -107,8 +107,8 @@ set io_clk_period_ps              800.0 ;# 1.25 GHz
 set io_clk_uncertainty_ps         20
 set ddr_link_clk_period_ps        [expr $io_clk_period_ps*2.0]
 set ddr_link_clk_uncertainty_ps   20
-set ddr_max_io_output_margin_ps   80
-set ddr_max_io_input_margin_ps    80
+set ddr_max_io_output_margin_ps   100
+set ddr_max_io_input_margin_ps    100
 
 for {set i 0} {$i < 2} {incr i} {
   set io_clk_name   "io_link_${i}_io_clk"
@@ -131,6 +131,19 @@ for {set i 0} {$i < 2} {incr i} {
     [get_ports "io_link_token_i[$i]"]                   \
     $ddr_link_clk_uncertainty_ps
 }
+
+# exclude delay cells and sel signals from timing analysis
+#set_disable_timing [get_flat_cells -filter "full_name=~*delay/sig*dly*_BSG_DONT_TOUCH"]
+#set_false_path -through [get_flat_pins -filter "full_name=~*delay/sig*mux_BSG_DONT_TOUCH/S*"]
+set_case_analysis 0 [get_flat_pins -filter "full_name=~*delay/sig*mux_BSG_DONT_TOUCH/S*"]
+
+# set dont touch on all delay lines
+set_dont_touch_network [get_pins "ddr_link*link/io_link_clk_o*"]
+set_dont_touch_network [get_pins "ddr_link*link/io_link_v_o*"]
+set_dont_touch_network [get_pins "ddr_link*link/io_link_data_o*"]
+set_dont_touch_network [get_ports "io_link_clk_i*"]
+set_dont_touch_network [get_ports "io_link_v_i*"]
+set_dont_touch_network [get_ports "io_link_data_i*"]
 
 
 # CDC

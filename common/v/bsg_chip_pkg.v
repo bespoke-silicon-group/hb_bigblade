@@ -112,7 +112,7 @@ package bsg_chip_pkg;
   localparam tag_lg_els_gp = `BSG_SAFE_CLOG2(tag_els_gp);
 
   // maximum payload width in the whole design
-  localparam tag_max_payload_width_gp = 9;
+  localparam tag_max_payload_width_gp = 12;
 
   // The number of bits required to represent the max payload width
   localparam tag_lg_width_gp = `BSG_SAFE_CLOG2(tag_max_payload_width_gp + 1);
@@ -142,20 +142,43 @@ package bsg_chip_pkg;
   } bsg_chip_io_link_ddr_tag_lines_s;
 
   typedef struct packed {
+    bsg_tag_s clk;
+    bsg_tag_s [2:0] data;
+  } bsg_chip_delay_tag_lines_s;
+
+  typedef struct packed {
+    bsg_chip_delay_tag_lines_s odelay;
+    bsg_chip_delay_tag_lines_s idelay;
+    bsg_chip_io_link_ddr_tag_lines_s main;
+  } bsg_chip_ddr_tag_lines_s;
+
+  typedef struct packed {
     bsg_chip_sdr_tag_lines_s sdr;
     bsg_tag_s noc_reset;
-    bsg_chip_io_link_ddr_tag_lines_s [mem_link_rr_ratio_gp-1:0] ddr;
+    bsg_chip_ddr_tag_lines_s [mem_link_rr_ratio_gp-1:0] ddr;
   } bsg_chip_noc_tag_lines_s;
   localparam tag_noc_local_els_gp = $bits(bsg_chip_noc_tag_lines_s)/$bits(bsg_tag_s);
+
+  typedef struct packed {
+    bsg_tag_s core_reset;
+    bsg_tag_s global_y_cord;
+    bsg_tag_s sdr_disable;
+    bsg_chip_sdr_tag_lines_s sdr;
+  } bsg_chip_halfpod_tag_lines_s;
+  localparam tag_halfpod_local_els_gp = $bits(bsg_chip_halfpod_tag_lines_s)/$bits(bsg_tag_s);
 
   // Warning: Dander Zone
   // Setting parameters below incorrectly may result in chip failure
   //
   // // Struct for reference only
   // typedef struct packed {
+  //   bsg_chip_halfpod_tag_lines_s       [7:0] cgra_hp;
+  //   bsg_chip_halfpod_tag_lines_s       [7:0] bp_hp;
+  //   bsg_chip_clk_gen_tag_lines_s       [7:0] cgra_clk;
+  //   bsg_chip_clk_gen_tag_lines_s       [7:0] bp_clk;
   //   bsg_chip_clk_gen_tag_lines_s       [3:0] mc_clk;
   //   bsg_tag_s                     [3:0][3:0] mc_reset;
-  //   bsg_chip_sdr_tag_lines_s      [3:0][3:0] mc_sdr;
+  //   bsg_chip_sdr_tag_lines_s      [3:0][7:0] mc_sdr;
   //   bsg_chip_noc_tag_lines_s                 io_link;
   //   bsg_chip_noc_tag_lines_s           [7:0] mem_link;
   // } bsg_chip_tag_lines_s;
@@ -163,8 +186,11 @@ package bsg_chip_pkg;
   localparam tag_mem_link_offset_gp = 0;
   localparam tag_io_link_offset_gp  = tag_mem_link_offset_gp + (8)  *tag_noc_local_els_gp;
   localparam tag_mc_sdr_offset_gp   = tag_io_link_offset_gp  + (1)  *tag_noc_local_els_gp;
-  localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*tag_sdr_local_els_gp;
+  localparam tag_mc_reset_offset_gp = tag_mc_sdr_offset_gp   + (4*4)*(2*tag_sdr_local_els_gp);
   localparam tag_mc_clk_offset_gp   = tag_mc_reset_offset_gp + (4*4)*1;
-
+  localparam tag_bp_clk_offset_gp   = tag_mc_clk_offset_gp   + (4)  *(tag_clk_gen_local_els_gp);
+  localparam tag_cgra_clk_offset_gp = tag_bp_clk_offset_gp   + (8)  *(tag_clk_gen_local_els_gp);
+  localparam tag_bp_hp_offset_gp    = tag_cgra_clk_offset_gp + (8)  *(tag_clk_gen_local_els_gp);
+  localparam tag_cgra_hp_offset_gp  = tag_bp_hp_offset_gp    + (8)  *(tag_halfpod_local_els_gp);
 
 endpackage

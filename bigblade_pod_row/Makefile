@@ -1,7 +1,7 @@
 all: | bsg_cadenv bsg_manycore basejump_stl bsg_14
 
 bsg_cadenv:    commit=master
-basejump_stl:  commit=dev-bsg_link_sdr
+basejump_stl:  commit=master
 bsg_14:        commit=master
 bsg_manycore:  commit=ci_bigblade
 

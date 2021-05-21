@@ -263,7 +263,8 @@ module bsg_gateway_chip
   `declare_bsg_ready_and_link_sif_s(wh_flit_width_gp, wh_link_sif_s);
   wh_link_sif_s [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0] wh_links_li, wh_links_lo;
 
-  for (genvar i = 0; i < mem_link_conc_num_gp; i++)
+  // Support variable number of pods when debugging for faster iteration
+  for (genvar i = 0; i < hb_num_pods_y_gp*2; i++)
   begin: mem_link
 
     localparam idx1 = i*mem_link_rr_ratio_gp+1;

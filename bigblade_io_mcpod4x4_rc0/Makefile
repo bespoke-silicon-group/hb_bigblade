@@ -3,7 +3,7 @@ all: | bsg_cadenv bsg_packaging basejump_stl bsg_14 bsg_manycore board
 
 bsg_cadenv:    commit=master
 bsg_packaging: commit=basejump_fcbga_785
-basejump_stl:  commit=dev-bsg_link_ddr_encode
+basejump_stl:  commit=master
 bsg_14:        commit=master
 bsg_manycore:  commit=ci_bigblade
 board:         commit=master

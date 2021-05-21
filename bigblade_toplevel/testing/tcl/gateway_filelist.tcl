@@ -5,10 +5,12 @@
 
 set basejump_stl_dir       $::env(TESTING_BASEJUMP_STL_DIR)
 set bsg_manycore_dir       $::env(TESTING_BSG_MANYCORE_DIR)
+set bsg_replicant_dir      $::env(TESTING_BSG_REPLICANT_DIR)
 set bsg_designs_dir        $::env(TESTING_BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(TESTING_BSG_DESIGNS_TARGET_DIR)
 set board_dir              $::env(TESTING_BOARD_DIR)
 set bsg_packaging_dir      $::env(TESTING_BSG_PACKAGING_DIR)
+set bsg_out_dir            $::env(TESTING_BSG_OUT_DIR)
 
 set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
@@ -23,6 +25,10 @@ set TESTING_PACKAGE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
   $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_network_cfg_pkg.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_manycore_mem_cfg_pkg.v
+  $bsg_out_dir/bsg_bladerunner_pkg.v
+  $bsg_replicant_dir/hardware/bsg_manycore_endpoint_to_fifos_pkg.v
 "]
 
 set TESTING_SOURCE_FILES [join "
@@ -137,6 +143,23 @@ set TESTING_SOURCE_FILES [join "
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_monitor.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_manycore_spmd_loader.v
   $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem.v
+  $bsg_manycore_dir/testbenches/common/v/bsg_nonsynth_wormhole_test_mem_with_dma.v
+  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1rw_sync_mask_write_byte_dma.v
+  $basejump_stl_dir/bsg_mem/bsg_nonsynth_mem_1r1w_sync_mask_write_byte_dma.v
+  $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_passthrough.v
+  $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_passthrough.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up_one_hot.v
+
+  $bsg_manycore_dir/testbenches/dpi/bsg_nonsynth_dpi_manycore.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_clock_gen.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_gpio.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_from_fifo.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_to_fifo.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_rom.v
+  $basejump_stl_dir/bsg_test/bsg_nonsynth_dpi_cycle_counter.v
+  $bsg_replicant_dir/hardware/bsg_manycore_endpoint_to_fifos.v
+
+  $basejump_stl_dir/testing/bsg_link/bsg_link_ddr_downstream_encode.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
@@ -165,6 +188,7 @@ set TESTING_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_core_complex.v
+  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_dpi_manycore.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v

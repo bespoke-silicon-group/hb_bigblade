@@ -23,6 +23,7 @@ set vcache_height     [expr $grid_height*25.50]
 
 
 # spacing between tiles
+set tile_x_pitch        [expr $grid_width*11]
 set tile_x_space        [expr $grid_width*0.5-0.672]
 set tile_y_space        [expr $grid_height*0.5]
 set vcache_x_space      [expr $grid_width*0.5-0.672]

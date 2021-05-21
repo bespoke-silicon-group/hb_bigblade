@@ -1,5 +1,5 @@
-puts "BSG-info: Running script [info script]\n"
 
-set_app_option -name route_opt.flow.enable_clock_power_recovery -value none
+set TCL_USER_ROUTE_OPT_SCRIPT "$::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/user_route_opt_script.tcl"
+#set REDUNDANT_VIA_INSERTION 0
+set ROUTE_OPT_RESHIELD "none"
 
-puts "BSG-info: Completed script [info script]\n"
