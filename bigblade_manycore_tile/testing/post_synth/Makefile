@@ -10,8 +10,8 @@ export HB_BIGBLADE_DIR := $(abspath ../../../)
 # Sets "VCS" variable
 include ../../bsg_cadenv/cadenv.mk
 
-hb_bigblade_netlists_dir = $(abspath ../../hb_bigblade_netlists)
-include $(hb_bigblade_netlists_dir)/interface.mk
+HB_BIGBLADE_NETLISTS_DIR = $(abspath ../../hb_bigblade_netlists)
+include $(HB_BIGBLADE_NETLISTS_DIR)/interface.mk
 
 # Include source lists
 include arch_filelist.mk
