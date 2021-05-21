@@ -67,10 +67,15 @@ VCS_OPTIONS += +v2k
 VCS_OPTIONS += -sverilog -assert svaext
 VCS_OPTIONS += +noportcoerce
 VCS_OPTIONS += +vc
-VCS_OPTIONS += +vcs+loopreport
+#VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
-VCS_OPTIONS += -diag timescale 
+#VCS_OPTIONS += -diag timescale 
 VCS_OPTIONS += -top bsg_config bsg_config.v
+VCS_OPTIONS += -licqueue
+VCS_OPTIONS += +notimingcheck
+VCS_OPTIONS += +nospecify
+VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
+VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
 ########################################
 ## Chip and Testing Filelists and Liblists
