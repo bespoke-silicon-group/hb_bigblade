@@ -237,11 +237,8 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_chip_noc_mem_link.v
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
 
-  $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_chip_noc_io_link.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_then_ready_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_wide_link_to_then_ready_link.v
-
-  $bsg_designs_target_dir/../bigblade_io_link_ddr/v/bsg_chip_io_link_ddr.v
 
   $bsg_designs_target_dir/../bigblade_pod_row/v/bsg_manycore_pod_row_sdr.v
 
