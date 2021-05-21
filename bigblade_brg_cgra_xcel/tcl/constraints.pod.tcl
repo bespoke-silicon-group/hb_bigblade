@@ -76,7 +76,7 @@ set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 ########################################
 ## Reg2Out
-set xcel_output_pins [get_ports sdr_disable_o]
+set xcel_output_pins [get_ports *link*disable*]
 set_output_delay -min $xcel_output_delay_min_ps -clock $xcel_clk_name $xcel_output_pins
 set_output_delay -max $xcel_output_delay_max_ps -clock $xcel_clk_name $xcel_output_pins
 set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
@@ -123,7 +123,7 @@ for {set i 0} {$i < 4} {incr i} {
 ########################################
 ## False paths
 set_false_path -from [get_ports tag_node_id_offset_i[*]]
-set_false_path -to   [get_ports sdr_disable_o]
+set_false_path -to   [get_ports *disable*]
 
 ########################################
 ## Disable timing
