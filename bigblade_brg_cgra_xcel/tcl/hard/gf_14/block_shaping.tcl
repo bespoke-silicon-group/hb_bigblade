@@ -26,7 +26,7 @@ set pe_margin_y 9.12
 set array_height [expr ($pe_margin_y + $pe_height) * $pe_num_y - $pe_margin_y]
 set array_width  [expr ($pe_margin_x + $pe_width) * $pe_num_x - $pe_margin_x]
 set pe_origin_y 3.276
-set pe_origin_x [expr $tile_width - $array_width - 15]
+set pe_origin_x [expr $tile_width - $array_width - 5]
 
 foreach {idx_x} {7 6 5 4 3 2 1 0} {
   foreach {idx_y} {0 1 2 3 4 5 6 7} {
