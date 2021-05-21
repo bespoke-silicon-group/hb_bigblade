@@ -1,1 +1,0 @@
-set ROUTE_AUTO_CREATE_SHIELDS "after_route_auto"

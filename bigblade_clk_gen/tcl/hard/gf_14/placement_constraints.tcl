@@ -150,9 +150,9 @@ remove_bounds -all
 
 set my_bounds [list]
 
-append_to_collection my_bounds [create_bound -name adt_cdt_fdt_bound -type hard -boundary {{6.5520 0.0000} {6.5520 3.3600} {16.4640 3.3600} {16.4640 0.0000}}]
-append_to_collection my_bounds [create_bound -name mux_out_bound -type hard -boundary {{16.4640 0.0000} {16.4640 0.9600} {21.5040 0.9600} {21.5040 0.0000}}]
-append_to_collection my_bounds [create_bound -name other_bound -type hard -boundary {{6.5520 0.0000} {6.5520 3.3600} {16.4640 3.3600} {16.4640 0.9600} {21.5040 0.9600} {21.5040 9.6000} {0.0000 9.6000} {0.0000 0.0000}}]
+append_to_collection my_bounds [create_bound -name adt_cdt_fdt_bound -type hard -boundary {{7.8960 0.0000} {7.8960 3.3600} {17.8080 3.3600} {17.8080 0.0000}}]
+append_to_collection my_bounds [create_bound -name mux_out_bound -type hard -boundary {{17.8080 0.0000} {17.8080 0.9600} {24.1920 0.9600} {24.1920 0.0000}}]
+append_to_collection my_bounds [create_bound -name other_bound -type hard -boundary {{7.8960 0.0000} {7.8960 3.3600} {17.8080 3.3600} {17.8080 0.9600} {24.1920 0.9600} {24.1920 9.6000} {0.0000 9.6000} {0.0000 0.0000}}]
 
 move_objects -delta "$decap_w [unit_height]" $my_bounds
 
