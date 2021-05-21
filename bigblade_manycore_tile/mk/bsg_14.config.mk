@@ -1,3 +1,6 @@
+export USE_ICC2_2020=1
+export CALIBRE_DRC_USE_SHELL=1
+
 export BSG_TOPLEVEL_DESIGN_TYPE :=block
 export BSG_FLOW_STYLE           :=flat
 export BSG_FLOW_USE_DP          :=true
