@@ -42,8 +42,18 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
       foreach line [split $contents] {
         if {$line  == ""} break
         set pin [lindex [split $line ,] 0]
-        set pin_base [regsub -all {\[.*\]} $pin {}]
-        if {$pin != $pin_base} {
+        set pin_base $pin
+	puts $pin_base
+        set pin_base [regsub -all {\[.*\]} $pin_base {}     ]
+	puts $pin_base
+        set pin_base [regsub -all {_o$}    $pin_base {_itmp}]
+	puts $pin_base
+        set pin_base [regsub -all {_i$}    $pin_base {_o}   ]
+	puts $pin_base
+        set pin_base [regsub -all {_itmp$} $pin_base {_i}   ]
+	puts $pin_base
+
+        if {[string length $pin] != [string length $pin_base]} {
           set pin_index [lindex [split $pin {\[.*\]}] 1]
           set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 4]
           set true_pin_index [expr $i*$pin_len + $pin_index]
