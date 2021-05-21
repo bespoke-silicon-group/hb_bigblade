@@ -15,7 +15,7 @@
 
   //////////////////////////////////////////////////
   // This testbench is structured like this, with the overlying network being
-  //   a giant crossbar and infinite memories instead of vcaches
+  //   a 2-D mesh of routers and infinite memories instead of vcaches
   //       PX=0                                       PX=1
   // PY=0 [ 00 ]  [ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ][ M ]
   //

@@ -36,7 +36,7 @@ int main(uint64_t argc, char *argv[]) {
   volatile uint64_t *sac_mask_addr = (uint64_t *) (bp_cfg_offset + 0x000a);
   *did_mask_addr = 0xFFF;
 
-  uint64_t  mc_hi_bit = 1 << 41;
+  uint64_t  mc_hi_bit = 0b111000000000000000000000000000000000000000;
 
   volatile uint64_t *mc_link_bp_req_fifo_addr     = (uint64_t *) (0x01000 | mc_hi_bit);
   volatile uint64_t *mc_link_bp_req_credits_addr  = (uint64_t *) (0x02000 | mc_hi_bit);
