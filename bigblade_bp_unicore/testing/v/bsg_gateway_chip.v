@@ -264,27 +264,30 @@ module bsg_gateway_chip
      ,.tag_data_i(tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
      ,.tag_node_id_offset_i('0)
 
-     ,.sdr_disable_o()
 
      ,.io_fwd_link_clk_o(io_fwd_link_clk_lo)
      ,.io_fwd_link_data_o(io_fwd_link_data_lo)
      ,.io_fwd_link_v_o(io_fwd_link_v_lo)
      ,.io_fwd_link_token_i(io_fwd_link_token_li)
+     ,.async_fwd_link_o_disable_o()
 
      ,.io_rev_link_clk_o(io_rev_link_clk_lo)
      ,.io_rev_link_data_o(io_rev_link_data_lo)
      ,.io_rev_link_v_o(io_rev_link_v_lo)
      ,.io_rev_link_token_i(io_rev_link_token_li)
+     ,.async_rev_link_o_disable_o()
 
      ,.io_fwd_link_clk_i(io_fwd_link_clk_li)
      ,.io_fwd_link_data_i(io_fwd_link_data_li)
      ,.io_fwd_link_v_i(io_fwd_link_v_li)
      ,.io_fwd_link_token_o(io_fwd_link_token_lo)
+     ,.async_fwd_link_i_disable_o()
 
      ,.io_rev_link_clk_i(io_rev_link_clk_li)
      ,.io_rev_link_data_i(io_rev_link_data_li)
      ,.io_rev_link_v_i(io_rev_link_v_li)
      ,.io_rev_link_token_o(io_rev_link_token_lo)
+     ,.async_rev_link_i_disable_o()
      );
 
   for (genvar i = 1; i < 4; i++)
