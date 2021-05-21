@@ -14,6 +14,14 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/chip_include.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
+# pdk source files
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
+set OBSVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
+
+# bsg_manycore_tile source files
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_tile-post-synth_filelist.tcl
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_TILE_SOURCE_FILES]
+
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES
