@@ -1,0 +1,41 @@
+VSOURCES += $(BSG_MANYCORE_DIR)/v/bsg_manycore_tile_vcache.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/bsg_manycore_tile_compute_ruche.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/bsg_manycore_hetero_socket.v
+
+
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/fNToRecFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/compareRecFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/divSqrtRecFN_small.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/iNToRecFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/mulAddRecFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/recFNToFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/HardFloat_rawFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/HardFloat_primitives.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/isSigNaNRecFN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/recFNToIN.v
+VSOURCES += $(BSG_MANYCORE_DIR)/imports/HardFloat/source/RISCV/HardFloat_specialize.v
+
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/bsg_manycore_proc_vanilla.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/network_rx.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/network_tx.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/vanilla_core.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/alu.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/cl_decode.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_float.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_float_fma.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_float_fma_round.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_float_aux.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_int.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_int_fclass.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fcsr.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/mcsr.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_fdiv_fsqrt.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/fpu_fmin_fmax.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/icache.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/idiv.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/load_packer.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/lsu.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/regfile.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/regfile_synth.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/regfile_hard.v
+VSOURCES += $(BSG_MANYCORE_DIR)/v/vanilla_bean/scoreboard.v
