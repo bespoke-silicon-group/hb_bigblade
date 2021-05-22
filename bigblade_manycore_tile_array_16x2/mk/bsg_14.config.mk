@@ -13,6 +13,8 @@
 
 export BSG_TOPLEVEL_DESIGN_TYPE := block
 
+export CALIBRE_DRC_USE_SHELL=1
+
 # Select the backend flow style (either hier or flat). This determines if ICC2 is going to perform a
 # hierarchical or flat physical implementation of the chip. When set to flat, you may still
 # synthesize hierarchically. To synthesize flat, setup your design's hier.mk such that there is only
