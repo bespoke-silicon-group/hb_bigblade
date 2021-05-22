@@ -30,6 +30,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_counter_clock_downsample.v
   $basejump_stl_dir/bsg_misc/bsg_dff.v
   $basejump_stl_dir/bsg_misc/bsg_dff_reset_en.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_async_reset.v
   $basejump_stl_dir/bsg_misc/bsg_mux.v
   $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
   $basejump_stl_dir/bsg_misc/bsg_muxi2_gatestack.v
