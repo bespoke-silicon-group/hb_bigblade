@@ -75,7 +75,7 @@ module bigblade_clk_gen
       bsg_dff_async_reset #(.width_p(1))
         dff
           (.clk_i(monitor_ds_r[i])
-          ,.async_reset_i(async_reset_lo)
+          ,.async_reset_i(async_output_disable_i)
           ,.data_i(~monitor_ds_r[i+1])
           ,.data_o(monitor_ds_r[i+1])
           );

@@ -25,7 +25,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/bsg_async/bsg_sync_sync.v
   $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen.v
-  $basejump_stl_dir/bsg_clk_gen/bsg_clk_gen_osc.v
+  $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
   $basejump_stl_dir/bsg_misc/bsg_buf.v
   $basejump_stl_dir/bsg_misc/bsg_counter_clock_downsample.v
   $basejump_stl_dir/bsg_misc/bsg_dff.v
