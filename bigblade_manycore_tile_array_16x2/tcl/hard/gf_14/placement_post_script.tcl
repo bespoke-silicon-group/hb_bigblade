@@ -58,8 +58,8 @@ for {set y 0} {$y < $HB_SUBARRAY_NUM_TILES_Y_P} {incr y} {
       set urx [expr $tile_array_width]
       set llx [expr $urx - (0.084*25)]
     } else {
-      set urx [expr $llx+4.704]
-      set llx [expr $urx-1.176]
+      set urx [expr $llx+(0.084*58)]
+      set llx [expr $urx-(0.084*16)]
     }
     set boundary [list [list $llx $lly] [list $urx $ury]]
     create_placement_blockage -boundary $boundary -type hard -name "tile_rp_${x}_${y}_right"
