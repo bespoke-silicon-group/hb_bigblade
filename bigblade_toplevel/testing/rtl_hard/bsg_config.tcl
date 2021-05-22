@@ -68,10 +68,18 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_mem_link-rtl_file
 
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES]
 
-# swap in hardend modulesO
+#########################
+# list of hardened rams #
+#########################
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
+
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAM_FILES]
+
+# swap in hardend modules
 source $::env(BSG_CHIP_DIR)/cad/flow/dc/bsg_dc_scripts/target_design.filelist.tcl
 
-puts $SVERILOG_SOURCE_FILES
+set SVERILOG_SOURCE_FILES $sverilog_source_files
+set SVERILOG_INCLUDE_PATHS $final_sverilog_include_paths
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
