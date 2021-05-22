@@ -4,6 +4,9 @@
 `define NOC_CLK_PERIOD 10000
 `define MC_CLK_PERIOD  10000
 `define TAG_CLK_PERIOD 20000
+`define IO_SLOWDOWN_RATIO  8
+`define NOC_SLOWDOWN_RATIO 16
+`define MC_SLOWDOWN_RATIO  16
 
 module bsg_gateway_chip
 
@@ -41,14 +44,17 @@ module bsg_gateway_chip
   // Nonsynth Clock Generator(s)
   //
   
-  logic io_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD)) io_clk_gen (.o(io_clk));
+  logic io_clk, io_clk_fast, io_clk_slow;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD)) io_clk_gen (.o(io_clk_fast));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD*`IO_SLOWDOWN_RATIO)) io_clk_slow_gen (.o(io_clk_slow));
   
-  logic noc_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD)) noc_clk_gen (.o(noc_clk));
+  logic noc_clk, noc_clk_fast, noc_clk_slow;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD)) noc_clk_gen (.o(noc_clk_fast));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD*`NOC_SLOWDOWN_RATIO)) noc_clk_slow_gen (.o(noc_clk_slow));
 
-  logic mc_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD)) mc_clk_gen (.o(mc_clk));
+  logic mc_clk, mc_clk_fast, mc_clk_slow;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD)) mc_clk_gen (.o(mc_clk_fast));
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD*`MC_SLOWDOWN_RATIO)) mc_clk_slow_gen (.o(mc_clk_slow));
 
   logic tag_clk, tag_clk_raw;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
@@ -135,27 +141,9 @@ module bsg_gateway_chip
 
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
-
-  //////////////////////////////////////////////////
-  //
-  // BSG Tag Master Instance
-  //
-
-  //// All tag lines from the btm
-  //bsg_tag_s [tag_els_gp-1:0] tag_lines_raw_lo;
-  //wire bsg_chip_tag_lines_s tag_lines_lo = tag_lines_raw_lo;
-  //
-  //// BSG tag master instance
-  //bsg_tag_master #(.els_p( tag_els_gp )
-  //                ,.lg_width_p( tag_lg_width_gp )
-  //                )
-  //  btm
-  //    (.clk_i      ( tag_clk )
-  //    ,.data_i     ( tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_bsg_tag_data_o : 1'b0 )
-  //    ,.en_i       ( 1'b1 )
-  //    ,.clients_r_o( tag_lines_raw_lo )
-  //    );
-
+  assign io_clk = (tag_trace_done_lo)? io_clk_fast : io_clk_slow;
+  assign noc_clk = (tag_trace_done_lo)? noc_clk_fast : noc_clk_slow;
+  assign mc_clk = (tag_trace_done_lo)? mc_clk_fast : mc_clk_slow;
 
   //////////////////////////////////////////////////
   //
