@@ -123,7 +123,7 @@ for {set i 0} {$i < 4} {incr i} {
 ########################################
 ## False paths
 set_false_path -from [get_ports tag_node_id_offset_i[*]]
-set_false_path -to   [get_ports *disable*]
+set_false_path -to   [get_ports *link*disable*]
 
 ########################################
 ## Disable timing

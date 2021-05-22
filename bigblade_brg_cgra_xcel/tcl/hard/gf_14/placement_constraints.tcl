@@ -150,12 +150,13 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set urx $tile_width
   set ury [get_attribute [get_cell -hier "cgra_dpath_PE_rc__56"] bounding_box.ur_y]
 
-  create_placement_blockage -type allow_buffer_only -blocked_percentage 100  -boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -name "cgra_blockage" -type allow_buffer_only -blocked_percentage 80  -boundary [list [list $llx $lly] [list $urx $ury]]
+  #create_placement_blockage -name "cgra_blockage" -type hard -boundary [list [list $llx $lly] [list $urx $ury]]
 
-  set tag_bound [create_bound -name "btx" -type soft \
-	-boundary [list [list 0 [expr $tile_height - 100]] [list $llx $tile_height]]]
-  add_to_bound $tag_bound [get_cells btm]
-  add_to_bound $tag_bound [get_cells btc*]
+  #set tag_bound [create_bound -name "btx" -type soft \
+  #      -boundary [list [list 0 [expr $tile_height - 100]] [list $llx $tile_height]]]
+  #add_to_bound $tag_bound [get_cells btm]
+  #add_to_bound $tag_bound [get_cells btc*]
 
   ### Placement bounds
   #set osdr_bound [create_bound -name "osdr" -type soft -boundary {{0 0} {5 757.4}}]
