@@ -74,6 +74,11 @@ for {set i 0} {$i < 2} {incr i} {
   }
 }
 
+create_rp_group -name "RP_clk_ds" -rows 5
+for {set i 0} {$i < 5} {incr i} {
+  add_to_rp_group "RP_clk_ds" -cells [get_flat_cells -filter "full_name=~ds_${i}__dff_BSG_UNGROUP*"] -row $i
+}
+
 #set clk_gen_noc_bound [create_bound -name "clk_gen_noc" -type soft -boundary {{26.32 64.88} {40.32 74.88}}]
 #set clk_gen_io_bound  [create_bound -name "clk_gen_io"  -type soft -boundary {{26.32 54.88} {40.32 64.88}}]
 #add_to_bound ${clk_gen_noc_bound} [get_cells -hier -filter "full_name=~clk_gen_noc/*"]

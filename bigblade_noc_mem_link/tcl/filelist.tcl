@@ -112,6 +112,7 @@ set SVERILOG_SOURCE_FILES [join "
 
     $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
     $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
+    $bsg_designs_target_dir/../common/v/bsg_dff_async_reset.v
     $bsg_designs_target_dir/v/bsg_chip_noc_mem_link.v
     $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v
 

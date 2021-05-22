@@ -224,6 +224,7 @@ module bsg_chip_block
   (.ext_io_clk_i                   (ext_io_clk_i          )
   ,.ext_noc_clk_i                  (ext_noc_clk_i         )
   ,.async_output_disable_i         (async_output_disable_i)
+  ,.noc_clk_o                      (                      )
  
   ,.tag_clk_i                      (tag_clk_lo            )
   ,.tag_data_i                     (tag_data_lo           )
@@ -281,6 +282,7 @@ module bsg_chip_block
     (.ext_io_clk_i                   (ext_io_clk_i          )
     ,.ext_noc_clk_i                  (ext_noc_clk_i         )
     ,.async_output_disable_i         (async_output_disable_i)
+    ,.noc_clk_o                      (                      )
    
     ,.tag_clk_i                      (tag_clk_lo            )
     ,.tag_data_i                     (tag_data_lo           )

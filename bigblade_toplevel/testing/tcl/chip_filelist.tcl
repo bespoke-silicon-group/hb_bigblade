@@ -247,6 +247,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
+  $bsg_designs_target_dir/../common/v/bsg_dff_async_reset.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_north_row/v/bsg_manycore_link_to_sdr_north_row.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_south_row/v/bsg_manycore_link_to_sdr_south_row.v
 "]
