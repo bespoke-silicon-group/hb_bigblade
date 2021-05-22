@@ -18,7 +18,7 @@ module bsg_chip_noc_io_link
   (input                              ext_io_clk_i
   ,input                              ext_noc_clk_i
   ,input                              async_output_disable_i
-  ,output                             noc_clk_o
+  ,output                             noc_clk_monitor_o
 
   ,input                              tag_clk_i
   ,input                              tag_data_i
@@ -75,7 +75,7 @@ module bsg_chip_noc_io_link
   // clock monitoring downsampler
   wire [bsg_link_clk_gen_lg_monitor_ds_gp+1-1:0] ds_lines_lo;
   assign ds_lines_lo[0] = noc_clk_lo;
-  assign noc_clk_o = ds_lines_lo[bsg_link_clk_gen_lg_monitor_ds_gp];
+  assign noc_clk_monitor_o = ds_lines_lo[bsg_link_clk_gen_lg_monitor_ds_gp];
 
   for (genvar i = 0; i < bsg_link_clk_gen_lg_monitor_ds_gp; i++)
   begin: ds

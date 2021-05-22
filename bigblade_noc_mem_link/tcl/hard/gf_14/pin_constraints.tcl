@@ -107,7 +107,7 @@ for {set i 0} {$i < 10} {incr i} {append_to_collection clk_reset_tag_ports [get_
 append_to_collection clk_reset_tag_ports [get_ports "ext_io_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "ext_noc_clk_i"]
 append_to_collection clk_reset_tag_ports [get_ports "async_output_disable_i"]
-append_to_collection clk_reset_tag_ports [get_ports "noc_clk_o"]
+append_to_collection clk_reset_tag_ports [get_ports "noc_clk_monitor_o"]
 
 place_pins_k1_k3 $clk_reset_tag_ports [expr $core_lly+(0.128*50)] $core_urx
 
