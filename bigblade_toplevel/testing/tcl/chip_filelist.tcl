@@ -161,6 +161,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_dff_reset_en_bypass.v
   $basejump_stl_dir/bsg_misc/bsg_tiehi.v
   $basejump_stl_dir/bsg_misc/bsg_tielo.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_async_reset.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v
@@ -247,7 +248,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
-  $bsg_designs_target_dir/../common/v/bsg_dff_async_reset.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_north_row/v/bsg_manycore_link_to_sdr_north_row.v
   $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_south_row/v/bsg_manycore_link_to_sdr_south_row.v
 "]
