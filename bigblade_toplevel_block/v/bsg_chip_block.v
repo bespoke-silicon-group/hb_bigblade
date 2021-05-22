@@ -317,9 +317,13 @@ module bsg_chip_block
   //
 
   bsg_chip_block_core_complex core_complex
-  (.mc_clk_i               (mc_clk_lo           )
-  ,.tag_clk_i              (tag_clk_lo          )
-  ,.tag_data_i             (tag_data_lo         )
+  (.tag_clk_i              (tag_clk_lo            )
+  ,.tag_data_i             (tag_data_lo           )
+  ,.async_output_disable_i (async_output_disable_i)
+
+  ,.mc_ext_clk_i           (mc_clk_lo           )
+
+  ,.mc_monitor_clk_o       (                    )
                            
   ,.mc_fwd_link_clk_o      (mc_fwd_link_clk_li  )
   ,.mc_fwd_link_data_o     (mc_fwd_link_data_li )

@@ -44,6 +44,14 @@ if __name__ == "__main__":
         tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b1111111)
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=0, length=2, data=0b11)
 
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+    tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
+    tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+    tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
+    tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+
 
 
   # config clk_gen output
@@ -90,6 +98,17 @@ if __name__ == "__main__":
 
           # select ext output clk
           tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=2, data=0b10)
+
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    # select ext output clk
+    tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+
+    # reset oscillator and trigger flops
+    tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
+
+    # take oscillator and trigger flops out of reset
+    tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
 
 
   # reset noc blocks
