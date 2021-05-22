@@ -14,6 +14,7 @@ set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
 
 set HARD_INCLUDE_PATHS [join "
   $basejump_stl_dir/hard/gf_14/bsg_mem/
+  $basejump_stl_dir/hard/gf_14/bsg_clk_gen/
 "]
 
 # bsg_manycore_tile
@@ -39,4 +40,7 @@ set NETLIST_SOURCE_FILES [join "
 "]
 
 set NEW_SVERILOG_SOURCE_FILES [join "
+  $basejump_stl_dir/hard/gf_14/bsg_clk_gen/bsg_rp_clk_gen_atomic_delay_tuner.v
+  $basejump_stl_dir/hard/gf_14/bsg_clk_gen/bsg_rp_clk_gen_coarse_delay_tuner.v
+  $basejump_stl_dir/hard/gf_14/bsg_clk_gen/bsg_rp_clk_gen_fine_delay_tuner.v
 "]
