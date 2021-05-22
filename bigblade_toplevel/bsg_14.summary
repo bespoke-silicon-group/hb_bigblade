@@ -1,8 +1,8 @@
 Summary for repository bsg_14:
     EXPECTED COMMIT/BRANCH: master
-    CURRENT COMMIT: 78d697e
+    CURRENT COMMIT: dec9770
     PASS: NO Uncommitted Files
-    PASS: commit 78d697e is in remote
+    PASS: commit dec9770 is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
     PASS: No Untracked Files

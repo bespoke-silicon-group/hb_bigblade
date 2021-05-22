@@ -7,6 +7,9 @@
 // inside bsg_packaging/basejump_fcbga_785.
 //
 
+`include "bsg_padmapping.v"
+`include "bsg_iopad_macros.v"
+
 module bsg_chip_block
 
  import bsg_chip_pkg::*;
@@ -15,6 +18,7 @@ module bsg_chip_block
  import bsg_manycore_pkg::*;
 
 `include "bsg_chip_block_pinout.v"
+`include "bsg_iopads_tie_cells.v"
 
   //////////////////////////////////////////////////
   //
