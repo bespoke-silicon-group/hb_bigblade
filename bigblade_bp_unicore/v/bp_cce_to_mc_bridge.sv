@@ -249,7 +249,8 @@ module bp_cce_to_mc_bridge
 
   wire [hb_addr_width_p-1:0]         mmio_vcache_epa_lo = io_cmd_addr_li[2+:hb_addr_width_p];
   wire [hb_x_cord_width_p-1:0]    mmio_vcache_x_cord_lo = io_cmd_addr_li[2+hb_addr_width_p+:hb_x_cord_width_p];
-  wire [hb_pod_y_cord_width_p-1:0] mmio_vcache_y_pod_lo = io_cmd_addr_li[2+hb_addr_width_p+hb_x_cord_width_p+:hb_pod_y_cord_width_p];
+  // V$ always occupy pods with even y-coordinates
+  wire [hb_pod_y_cord_width_p-1:0] mmio_vcache_y_pod_lo = (io_cmd_addr_li[2+hb_addr_width_p+hb_x_cord_width_p+:hb_pod_y_cord_width_p-1] << 1);
   wire [hb_y_subcord_width_p-1:0] mmio_vcache_y_subcord_lo = (mmio_vcache_y_pod_lo == '0) ? '1 : '0;
   wire [hb_y_cord_width_p-1:0] mmio_vcache_y_cord_lo = {mmio_vcache_y_pod_lo, mmio_vcache_y_subcord_lo};
 
@@ -331,7 +332,7 @@ module bp_cce_to_mc_bridge
 
   wire is_mc_not_bp_li        = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:1] == 1'b1;
   wire is_mc_tile_not_bp_li   = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:2] == 2'b11;
-  wire is_mc_vcache_not_bp_li = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:2] == 2'b11;
+  wire is_mc_vcache_not_bp_li = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:2] == 2'b10;
   wire is_bridge_csr_li       = io_cmd_v_li & io_cmd_li.header.addr[paddr_width_p-1-:3] == 3'b111;
   wire is_bp_dram_li          = io_cmd_v_li & ~is_mc_not_bp_li & (io_cmd_li.header.addr >= dram_base_addr_gp);
   bsg_manycore_packet_s mmio_out_packet_li;
