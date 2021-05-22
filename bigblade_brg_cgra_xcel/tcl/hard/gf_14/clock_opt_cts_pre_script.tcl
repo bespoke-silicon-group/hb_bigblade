@@ -1,0 +1,1 @@
+remove_placement_blockages "cgra_blockage"
