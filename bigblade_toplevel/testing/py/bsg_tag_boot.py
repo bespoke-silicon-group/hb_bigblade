@@ -104,12 +104,6 @@ if __name__ == "__main__":
     # select ext output clk
     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
 
-    # reset oscillator and trigger flops
-    tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
-
-    # take oscillator and trigger flops out of reset
-    tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
-
 
   # reset noc blocks
   for noc in range(9):
