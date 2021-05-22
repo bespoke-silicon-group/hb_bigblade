@@ -10,6 +10,7 @@ const uint64_t mc_host_x_coord = ((0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0) << (HB_
 const uint64_t mc_host_y_coord = ((1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 0) << (HB_MC_X_COORD_WIDTH + HB_MC_TILE_EPA_WIDTH + 2);
 
 // Using the tile MMIO interface to communicate with the host as though it was a compute tile
+// We don't have to shift the EPA by 2 bits since, the monitor logic takes care of that
 uint64_t *mc_finish_addr          = (uint64_t *) (mc_tile_mmio | mc_host_y_coord | mc_host_x_coord | (HB_MC_HOST_FINISH_EPA));
 uint64_t *mc_time_addr            = (uint64_t *) (mc_tile_mmio | mc_host_y_coord | mc_host_x_coord | (HB_MC_HOST_TIME_EPA));
 uint64_t *mc_fail_addr            = (uint64_t *) (mc_tile_mmio | mc_host_y_coord | mc_host_x_coord | (HB_MC_HOST_FAIL_EPA));
