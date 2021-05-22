@@ -104,12 +104,12 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 #     Runtime exploration is designed to be quick and used for early experiments
 #export DC_FLOW_RMPLUS_FLOW :=hplp
 #export DC_FLOW_RMPLUS_FLOW :=hc
-export DC_FLOW_RMPLUS_FLOW :=hc
+#export DC_FLOW_RMPLUS_FLOW :=hc
 #export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 #export DC_FLOW_RMPLUS_FLOW :=hc
 #export DC_FLOW_RMPLUS_FLOW :=
 #export DC_FLOW_RMPLUS_FLOW :=hc
-#export DC_FLOW_RMPLUS_FLOW :=
+export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
 # delay. This will increase runtime significantly and if the constraints are
@@ -153,4 +153,6 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=$(foreach _,$(PTSI_FLOW_ACTIVITY_FILE), 1.0)
 # The module hierarchy to strip from the SAIF file.
 # Most often this is the path to the DUT starting from the testbench.
 export PTSI_FLOW_STRIP_PATH       :=bsg_gateway_chip/DUT
+
+export USE_ICC2_2020 := 0
 
