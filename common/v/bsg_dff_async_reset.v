@@ -2,7 +2,7 @@
 module bsg_dff_async_reset
 
  #(parameter width_p     = -1
-  ,parameter reset_val_p = -1
+  ,parameter reset_val_p = 0
   )
 
   (input                clk_i
