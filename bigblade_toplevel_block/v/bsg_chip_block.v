@@ -25,19 +25,23 @@ module bsg_chip_block
   // Control Wires Hub
   //
 
-  wire tag_clk_i              = pad_ML0_0_i_int;
-  wire tag_data_i             = pad_ML0_1_i_int;
-  wire tag_en_i               = pad_ML0_2_i_int;
-  
   wire async_output_disable_i = pad_CT0_v_i_int;
-  wire ext_io_clk_i           = pad_CT0_0_i_int;
-  wire ext_noc_clk_i          = pad_CT0_1_i_int;
-  wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_CT0_5_i_int, pad_CT0_4_i_int, pad_CT0_3_i_int, pad_CT0_2_i_int};
+  wire tag_clk_i              = pad_CT0_0_i_int;
+  wire tag_data_i             = pad_CT0_1_i_int;
+  wire tag_en_i               = pad_CT0_2_i_int;
+
+  wire ext_io_clk_i           = pad_CT0_clk_i_int;
+  wire ext_noc_clk_i          = pad_CT0_tkn_i_int;
+  wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_ML0_3_i_int, pad_ML0_2_i_int, pad_ML0_1_i_int, pad_ML0_0_i_int};
   //wire ext_bp_clk_i           = pad_CT0_6_i_int;
   //wire ext_cgra_clk_i         = pad_CT0_7_i_int;
 
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
+  wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
+  wire noc_io_clk_monitor_o;
+
   assign {pad_CT0_3_o_int, pad_CT0_2_o_int, pad_CT0_1_o_int, pad_CT0_0_o_int} = mc_clk_monitor_o;
+  assign pad_CT0_4_o_int = noc_io_clk_monitor_o;
 
 
   //////////////////////////////////////////////////
