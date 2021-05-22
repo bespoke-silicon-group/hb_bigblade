@@ -18,6 +18,7 @@ module bsg_chip_noc_io_link
   (input                              ext_io_clk_i
   ,input                              ext_noc_clk_i
   ,input                              async_output_disable_i
+  ,output                             noc_clk_monitor_o
 
   ,input                              tag_clk_i
   ,input                              tag_data_i
@@ -70,6 +71,24 @@ module bsg_chip_noc_io_link
   // noc clock, only one in use
   wire [1:0] noc_clk_raw_lo;
   wire noc_clk_lo = noc_clk_raw_lo[0];
+
+  // clock monitoring downsampler
+  wire [bsg_link_clk_gen_lg_monitor_ds_gp+1-1:0] ds_lines_lo;
+  assign ds_lines_lo[0] = noc_clk_lo;
+  assign noc_clk_monitor_o = ds_lines_lo[bsg_link_clk_gen_lg_monitor_ds_gp];
+
+  for (genvar i = 0; i < bsg_link_clk_gen_lg_monitor_ds_gp; i++)
+  begin: ds
+    bsg_dff_async_reset
+   #(.width_p      (1)
+    ,.reset_val_p  (0)
+    ) dff_BSG_UNGROUP
+    (.clk_i        (ds_lines_lo [i]       )
+    ,.async_reset_i(async_output_disable_i)
+    ,.data_i       (~ds_lines_lo[i+1]     )
+    ,.data_o       (ds_lines_lo [i+1]     )
+    );
+  end
 
   `declare_bsg_then_ready_link_sif_s(bsg_link_width_gp, core_link_sif_s);
   core_link_sif_s [1:0] core_links_li, core_links_lo;

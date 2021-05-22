@@ -161,6 +161,7 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_dff_reset_en_bypass.v
   $basejump_stl_dir/bsg_misc/bsg_tiehi.v
   $basejump_stl_dir/bsg_misc/bsg_tielo.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_async_reset.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
   $basejump_stl_dir/bsg_link/bsg_link_sdr_downstream.v

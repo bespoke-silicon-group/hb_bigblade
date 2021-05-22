@@ -97,6 +97,13 @@ set_macro_relative_location \
 create_keepout_margin -type hard -outer $keepout_margins $harden_fifo_mem1
 
 
+create_rp_group -name "RP_clk_ds" -rows 5
+for {set i 0} {$i < 5} {incr i} {
+  add_to_rp_group "RP_clk_ds" -cells [get_flat_cells -filter "full_name=~ds_${i}__dff_BSG_UNGROUP*"] -row $i
+}
+set clk_ds_bound [create_bound -name "clk_ds" -type soft -boundary {{0.00 0.00} {20.00 20.00}}]
+add_to_bound ${clk_ds_bound} [get_cells -of_objects [get_rp_groups "RP_clk_ds"]]
+
 #set clk_gen_noc_bound [create_bound -name "clk_gen_noc" -type soft -boundary {{26.32 64.88} {40.32 74.88}}]
 #set clk_gen_io_bound  [create_bound -name "clk_gen_io"  -type soft -boundary {{26.32 54.88} {40.32 64.88}}]
 #add_to_bound ${clk_gen_noc_bound} [get_cells -hier -filter "full_name=~clk_gen_noc/*"]
