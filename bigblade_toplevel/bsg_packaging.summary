@@ -1,8 +1,8 @@
 Summary for repository bsg_packaging:
     EXPECTED COMMIT/BRANCH: basejump_fcbga_785
-    CURRENT COMMIT: dcacd77
+    CURRENT COMMIT: b1ce6a0
     PASS: NO Uncommitted Files
-    PASS: commit dcacd77 is in remote
+    PASS: commit b1ce6a0 is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
     PASS: No Untracked Files
