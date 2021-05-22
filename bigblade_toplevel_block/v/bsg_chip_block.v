@@ -32,18 +32,12 @@ module bsg_chip_block
   wire async_output_disable_i = pad_CT0_v_i_int;
   wire ext_io_clk_i           = pad_CT0_0_i_int;
   wire ext_noc_clk_i          = pad_CT0_1_i_int;
-  wire ext_mc_clk_i           = pad_CT0_2_i_int;
-  //wire ext_bp_clk_i           = pad_CT0_3_i_int;
-  //wire ext_cgra_clk_i         = pad_CT0_4_i_int;
+  wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_CT0_5_i_int, pad_CT0_4_i_int, pad_CT0_3_i_int, pad_CT0_2_i_int};
+  //wire ext_bp_clk_i           = pad_CT0_6_i_int;
+  //wire ext_cgra_clk_i         = pad_CT0_7_i_int;
 
-  //wire sel_0_i_int            = pad_CT0_6_i_int;
-  //wire sel_1_i_int            = pad_CT0_7_i_int;
-  //wire clk_o_reset_int        = pad_CT0_clk_i_int;
-
-  //wire clk_o_int, clk_div_pos_o_int, clk_div_neg_o_int;
-  //assign pad_CT0_0_o_int  = clk_o_int;
-  //assign pad_CT0_1_o_int  = clk_div_pos_o_int;
-  //assign pad_CT0_2_o_int  = clk_div_neg_o_int;
+  wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
+  assign {pad_CT0_3_o_int, pad_CT0_2_o_int, pad_CT0_1_o_int, pad_CT0_0_o_int} = mc_clk_monitor_o;
 
 
   //////////////////////////////////////////////////
@@ -53,87 +47,6 @@ module bsg_chip_block
 
   wire tag_clk_lo  = tag_clk_i;
   wire tag_data_lo = tag_en_i & tag_data_i;
-
-
-  //////////////////////////////////////////////////
-  //
-  // BSG Clock Generator
-  //
-
-  logic [hb_num_pods_y_gp-1:0] mc_clk_lo;
-  for (genvar i = 0; i < hb_num_pods_y_gp; i++)
-    assign mc_clk_lo[i] = ext_mc_clk_i;
-
-  //logic hb_clk_lo;
-  //logic bp_clk_lo; // not used
-  //logic router_clk_lo;
-  //
-  //logic [clk_gen_num_endpoints_gp-1:0] main_ext_clk_li, main_clk_lo;
-  //assign main_ext_clk_li = { clk_C_i_int, clk_B_i_int, clk_A_i_int };
-  //assign { router_clk_lo, bp_clk_lo, hb_clk_lo } = main_clk_lo;
-  //
-  //for (genvar i = 0; i < clk_gen_num_endpoints_gp; i++)
-  //begin: top_clk_gen
-  //  bsg_chip_clk_gen 
-  // #(.ds_width_p              ( clk_gen_ds_width_gp )
-  //  ,.num_adgs_p              ( clk_gen_num_adgs_gp )
-  //  ) clk_gen
-  //  (.async_reset_tag_lines_i ( tag_lines_lo.clk_gen_async_reset[i] )
-  //  ,.osc_tag_lines_i         ( tag_lines_lo.clk_gen_osc        [i] )
-  //  ,.osc_trigger_tag_lines_i ( tag_lines_lo.clk_gen_osc_trigger[i] )
-  //  ,.ds_tag_lines_i          ( tag_lines_lo.clk_gen_ds         [i] )
-  //  ,.sel_tag_lines_i         ( tag_lines_lo.clk_gen_sel        [i] )
-  //  ,.async_output_disable_i  ( clk_output_disable_int              )
-  //  ,.ext_clk_i               ( main_ext_clk_li                 [i] )
-  //  ,.clk_o                   ( main_clk_lo                     [i] )
-  //  );
-  //end
-
-  // Route the clock signals off chip
-  //logic [1:0]  clk_out_sel;
-  //logic        clk_out;
-  //logic [1:0]  clk_out_div_pos, clk_out_div_neg;
-  //
-  //assign clk_out_sel[0] = sel_0_i_int;
-  //assign clk_out_sel[1] = sel_1_i_int;
-  //assign clk_o_int      = clk_out;
-  //assign clk_div_pos_o_int = clk_out_div_pos[1];
-  //assign clk_div_neg_o_int = clk_out_div_neg[1];
-  //
-  //bsg_mux #(.width_p   ( 1 )
-  //         ,.els_p     ( 4 )
-  //         ,.balanced_p( 1 )
-  //         ,.harden_p  ( 1 )
-  //         ) 
-  //  clk_out_mux
-  //    (.data_i( {1'b0, hb_clk_lo, bp_clk_lo, router_clk_lo} )
-  //    ,.sel_i ( clk_out_sel )
-  //    ,.data_o( clk_out )
-  //    );
-
-  // clk_o signal is connected directly to the outside world. This will prevent user 
-  // from visualizing the clock when clock frequency is high (the upper limit will be
-  // around 1GHz). Dividing the frequency by 4 can resolve this.
-  //
-  // In order to preserve information about duty cycle, both posedge and negedge 
-  // waveforms are transmitted off-chip. Refer to Github issue #6 for more info.
-  //
-  //bsg_dff_reset #(.width_p(2)) dff_clk_o_pos
-  //(.clk_i  ( clk_out )
-  //,.reset_i( clk_o_reset_int )
-  //,.data_i ( clk_out_div_pos + 2'b01 )
-  //,.data_o ( clk_out_div_pos )
-  //);
-  //
-  //bsg_dff_reset #(.width_p(2)) dff_clk_o_neg
-  //(.clk_i  ( ~clk_out )
-  //,.reset_i( clk_o_reset_int )
-  //,.data_i ( clk_out_div_neg + 2'b01 )
-  //,.data_o ( clk_out_div_neg )
-  //);
-  //
-  //// FIXME: Change to appropriate external clock
-  //wire bsg_link_clk_gen_ext_clk_lo = clk_C_i_int;
 
 
   //////////////////////////////////////////////////
@@ -321,9 +234,9 @@ module bsg_chip_block
   ,.tag_data_i             (tag_data_lo           )
   ,.async_output_disable_i (async_output_disable_i)
 
-  ,.mc_ext_clk_i           (mc_clk_lo           )
+  ,.mc_ext_clk_i           (mc_ext_clk_i        )
 
-  ,.mc_monitor_clk_o       (                    )
+  ,.mc_clk_monitor_o       (mc_clk_monitor_o    )
                            
   ,.mc_fwd_link_clk_o      (mc_fwd_link_clk_li  )
   ,.mc_fwd_link_data_o     (mc_fwd_link_data_li )

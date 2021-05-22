@@ -19,7 +19,7 @@ module bsg_chip_block_core_complex
 
   ,input  [hb_num_pods_y_gp-1:0]   mc_ext_clk_i
 
-  ,output [hb_num_pods_y_gp-1:0]   mc_monitor_clk_o
+  ,output [hb_num_pods_y_gp-1:0]   mc_clk_monitor_o
 
   ,output                          mc_fwd_link_clk_o
   ,output [mc_fwd_width_lp-1:0]    mc_fwd_link_data_o
@@ -98,7 +98,7 @@ module bsg_chip_block_core_complex
     ,.ext_clk_i             (mc_ext_clk_i                [i])
     ,.async_output_disable_i(async_output_disable_i         )
     ,.clk_o                 (mc_clk_lo                   [i])
-    ,.clk_monitor_o         (mc_monitor_clk_o            [i])
+    ,.clk_monitor_o         (mc_clk_monitor_o            [i])
     );
 
 

@@ -133,7 +133,7 @@ module bsg_gateway_chip_core_complex
     #(.width_p(cycle_counter_width_lp))
   ctr
     (
-     .clk_i($root.bsg_bigblade_pcb.IC.ASIC.block.core_complex.mc_ext_clk_i[0])
+     .clk_i(mc_clk_i)
      ,.reset_i(~tag_trace_done_i)
      ,.ctr_r_o(cycle_counter)
      );
