@@ -4,6 +4,17 @@
 `define NOC_CLK_PERIOD 10000
 `define MC_CLK_PERIOD  10000
 `define TAG_CLK_PERIOD 20000
+
+// Slow down core clocks when tag is programming, divide clock speed by the given ratio
+//
+// We cannot slow down the clock too much, since we'll need time for reset signals to
+// go through the synchronizers. Shortest tag packet can be 16-bits long, which takes
+// 16 cycles to be sent out. Since the synchronizer we use takes 2 cycles to sync, the
+// maximum possible slowdown ratio is (16*TAG_CLK_PERIOD)/(2*CLK_PERIOD).
+//
+// Note that we use DDR clock for off-chip links, so the maximum ratio for IO is
+// (16*TAG_CLK_PERIOD)/(2*2*IO_CLK_PERIOD).
+//
 `define IO_SLOWDOWN_RATIO  8
 `define NOC_SLOWDOWN_RATIO 16
 `define MC_SLOWDOWN_RATIO  16
@@ -43,6 +54,10 @@ module bsg_gateway_chip
   //////////////////////////////////////////////////
   //
   // Nonsynth Clock Generator(s)
+  //
+  // Both fast and slow clocks are generated
+  // Select slow clock when tag is programming
+  // Switch back to fast clock when tag programming is done
   //
   
   logic io_clk, io_clk_fast, io_clk_slow;
@@ -140,8 +155,10 @@ module bsg_gateway_chip
 
   assign p_tag_en_lo = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
 
+  // Shutdown tag clk after programming to speedup simulation
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
+  // When tag is programming, slow down other clocks to speed up simulation
   assign io_clk = (tag_trace_done_lo)? io_clk_fast : io_clk_slow;
   assign noc_clk = (tag_trace_done_lo)? noc_clk_fast : noc_clk_slow;
   assign mc_clk = (tag_trace_done_lo)? mc_clk_fast : mc_clk_slow;
