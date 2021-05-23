@@ -159,9 +159,14 @@ module bsg_gateway_chip
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
   // When tag is programming, slow down other clocks to speed up simulation
-  assign io_clk = (tag_trace_done_lo)? io_clk_fast : io_clk_slow;
-  assign noc_clk = (tag_trace_done_lo)? noc_clk_fast : noc_clk_slow;
-  assign mc_clk = (tag_trace_done_lo)? mc_clk_fast : mc_clk_slow;
+  wire io_tag_done, noc_tag_done, nc_tag_done;
+  bsg_sync_sync #(.width_p(1)) io_bss (.oclk_i(io_clk_fast),.iclk_data_i(tag_trace_done_lo),.oclk_data_o(io_tag_done));
+  bsg_sync_sync #(.width_p(1)) noc_bss (.oclk_i(noc_clk_fast),.iclk_data_i(tag_trace_done_lo),.oclk_data_o(noc_tag_done));
+  bsg_sync_sync #(.width_p(1)) mc_bss (.oclk_i(mc_clk_fast),.iclk_data_i(tag_trace_done_lo),.oclk_data_o(mc_tag_done));
+
+  assign io_clk = (io_tag_done)? io_clk_fast : io_clk_slow;
+  assign noc_clk = (noc_tag_done)? noc_clk_fast : noc_clk_slow;
+  assign mc_clk = (mc_tag_done)? mc_clk_fast : mc_clk_slow;
 
   //////////////////////////////////////////////////
   //
