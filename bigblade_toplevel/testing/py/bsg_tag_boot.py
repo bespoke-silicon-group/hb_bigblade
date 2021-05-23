@@ -44,6 +44,33 @@ if __name__ == "__main__":
         tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b1111111)
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=0, length=2, data=0b11)
 
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+    tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
+    tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+    tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
+    tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+
+
+  # assert output_disable signal
+  tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b1)
+
+
+  # all clk_gen select zero output
+  for noc in range(9):
+    for link in range(2):
+      for clk in range(2):
+        offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)+(clk*clk_num_clients_p)
+        tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b11)
+
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
+
+
+  # de-assert output_disable signal
+  tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b0)
 
 
   # config clk_gen output
@@ -52,44 +79,48 @@ if __name__ == "__main__":
       for clk in range(2):
         offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)+(clk*clk_num_clients_p)
         if len(sys.argv) == 2 and (sys.argv[1] == 'use_clk_gen'):
-
-          # select zero output clk
-          tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=2, data=0b11)
           
           # reset oscillator and trigger flops
-          tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
+          tg.send(masters=0b10, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
           
           # init trigger to low, init oscillator to zero
           # OSC INIT VALUE MUST BE ZERO TO AVOID X IN SIMULATION
-          tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
-          tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=5, data=0b00000)
+          tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
+          tg.send(masters=0b10, client_id=3+offset, data_not_reset=1, length=5, data=0b00000)
           
           # take oscillator and trigger flops out of reset
-          tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
+          tg.send(masters=0b10, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
           
           # trigger oscillator value
-          tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
-          tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
+          tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+          tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
           
           # reset ds, then set ds value
-          tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=0b0000001)
-          tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=0b0000000)
+          tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=7, data=0b0000001)
+          tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=7, data=0b0000000)
           
           # select ds output clk
-          tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=2, data=0b01)
+          tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b01)
 
           # set ds value
-          tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=0b0000010)
+          tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=7, data=0b0000010)
           
           # set oscillator value, then trigger
-          tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=5, data=0b11000)
-          tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
-          tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
+          tg.send(masters=0b10, client_id=3+offset, data_not_reset=1, length=5, data=0b11000)
+          tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+          tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
 
         else:
 
           # select ext output clk
-          tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=2, data=0b10)
+          tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b10)
+
+
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    # select ext output clk
+    tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+
 
 
   # reset noc blocks

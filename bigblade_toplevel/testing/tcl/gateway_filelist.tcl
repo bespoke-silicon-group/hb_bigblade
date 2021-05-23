@@ -131,7 +131,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v
@@ -160,6 +162,11 @@ set TESTING_SOURCE_FILES [join "
   $bsg_replicant_dir/hardware/bsg_manycore_endpoint_to_fifos.v
 
   $basejump_stl_dir/testing/bsg_link/bsg_link_ddr_downstream_encode.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clock_downsample.v
+  $basejump_stl_dir/bsg_misc/bsg_strobe.v
+  $basejump_stl_dir/bsg_misc/bsg_muxi2_gatestack.v
+  $basejump_stl_dir/bsg_misc/bsg_nand.v
+  $basejump_stl_dir/bsg_misc/bsg_nor3.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
