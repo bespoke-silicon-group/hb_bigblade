@@ -36,14 +36,25 @@ module bsg_chip_block
   //wire ext_bp_clk_i           = pad_CT0_6_i_int;
   //wire ext_cgra_clk_i         = pad_CT0_7_i_int;
 
+  wire [1:0] mc_clk_monitor_sel_i      = {pad_CT0_4_i_int, pad_CT0_3_i_int};
+  wire [2:0] noc_mem_clk_monitor_sel_i = {pad_CT0_7_i_int, pad_CT0_6_i_int, pad_CT0_5_i_int};
+
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
 
-  assign {pad_CT0_3_o_int, pad_CT0_2_o_int, pad_CT0_1_o_int, pad_CT0_0_o_int} = mc_clk_monitor_o;
-  assign pad_CT0_v_o_int = noc_io_clk_monitor_o;
-  // FIXME: Should output all of the clocks
-  assign {pad_CT0_7_o_int, pad_CT0_6_o_int, pad_CT0_5_o_int, pad_CT0_4_o_int} = noc_mem_clk_monitor_o[mem_link_conc_num_gp/2-1:0];
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) mc_mux
+  (.data_i(mc_clk_monitor_o),.sel_i(mc_clk_monitor_sel_i),.data_o(pad_CT0_0_o_int));
+
+  assign pad_CT0_1_o_int = noc_io_clk_monitor_o;
+
+  wire [1:0] noc_mem_clk_monitor_mid;
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) noc_mem_mux0
+  (.data_i(noc_mem_clk_monitor_o[3:0]),.sel_i(noc_mem_clk_monitor_sel_i[1:0]),.data_o(noc_mem_clk_monitor_mid[0]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) noc_mem_mux1
+  (.data_i(noc_mem_clk_monitor_o[7:4]),.sel_i(noc_mem_clk_monitor_sel_i[1:0]),.data_o(noc_mem_clk_monitor_mid[1]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) noc_mem_mux2
+  (.data_i({2'b00, noc_mem_clk_monitor_mid}),.sel_i({1'b0, noc_mem_clk_monitor_sel_i[2]}),.data_o(pad_CT0_2_o_int));
 
 
   //////////////////////////////////////////////////

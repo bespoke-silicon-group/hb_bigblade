@@ -46,10 +46,12 @@ module bsg_gateway_chip
   assign p_pad_CT0_tkn_o = p_noc_clk_lo;
   assign {p_pad_ML0_3_o, p_pad_ML0_2_o, p_pad_ML0_1_o, p_pad_ML0_0_o} = {(hb_num_pods_y_gp){p_mc_clk_lo}};
 
-  wire [hb_num_pods_y_gp-1:0] p_mc_clk_monitor_li = {p_pad_CT0_3_i, p_pad_CT0_2_i, p_pad_CT0_1_i, p_pad_CT0_0_i};
-  wire p_noc_io_clk_monitor_li = p_pad_CT0_v_i;
-  wire [mem_link_conc_num_gp/2-1:0] p_noc_mem_clk_monitor_li = {p_pad_CT0_7_i, p_pad_CT0_6_i, p_pad_CT0_5_i, p_pad_CT0_4_i};
+  wire p_mc_clk_monitor_li = p_pad_CT0_0_i;
+  wire p_noc_io_clk_monitor_li = p_pad_CT0_1_i;
+  wire p_noc_mem_clk_monitor_li = p_pad_CT0_2_i;
 
+  assign {p_pad_CT0_4_o, p_pad_CT0_3_o} = 2'b00; // mc clk sel
+  assign {p_pad_CT0_7_o, p_pad_CT0_6_o, p_pad_CT0_5_o} = 3'b000; // noc mem clk sel
 
   //////////////////////////////////////////////////
   //
