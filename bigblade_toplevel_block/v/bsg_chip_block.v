@@ -25,30 +25,43 @@ module bsg_chip_block
   // Control Wires Hub
   //
 
+  // Asynchronous output disable for all clock generators
   wire async_output_disable_i = pad_CT0_v_i_int;
+
+  // bsg_tag wires
   wire tag_clk_i              = pad_CT0_0_i_int;
   wire tag_data_i             = pad_CT0_1_i_int;
   wire tag_en_i               = pad_CT0_2_i_int;
 
+  // External bypass clocks
   wire ext_io_clk_i           = pad_CT0_clk_i_int;
   wire ext_noc_clk_i          = pad_CT0_tkn_i_int;
   wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_ML0_3_i_int, pad_ML0_2_i_int, pad_ML0_1_i_int, pad_ML0_0_i_int};
-  //wire ext_bp_clk_i           = pad_CT0_6_i_int;
-  //wire ext_cgra_clk_i         = pad_CT0_7_i_int;
+  //wire ext_bp_clk_i           = pad_ML0_4_i_int;
+  //wire ext_cgra_clk_i         = pad_MR0_0_i_int;
 
+  // There are 4 manycore clocks and 8 noc_mem clocks to monitor
+  // Wires below select which clock to monitor
   wire [1:0] mc_clk_monitor_sel_i      = {pad_CT0_4_i_int, pad_CT0_3_i_int};
   wire [2:0] noc_mem_clk_monitor_sel_i = {pad_CT0_7_i_int, pad_CT0_6_i_int, pad_CT0_5_i_int};
 
+  // Generated clocks to be monitored
+  // They are (2^bsg_link_clk_gen_lg_monitor_ds_gp) times slower compared to the actual clocks
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
+  // wire [2*hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
+  // wire [2*hb_num_pods_y_gp-1:0] cgra_clk_monitor_o;
 
+  // mux for manycore monitor clock
   wire [3:0] mc_mux_data_li = {'0, mc_clk_monitor_o};
   bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) mc_mux
   (.data_i(mc_mux_data_li),.sel_i(mc_clk_monitor_sel_i),.data_o(pad_CT0_0_o_int));
 
+  // output noc_io monitor clock
   assign pad_CT0_1_o_int = noc_io_clk_monitor_o;
 
+  // mux for noc_mem monitor clock
   wire [1:0] noc_mem_clk_monitor_mid;
   bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) noc_mem_mux0
   (.data_i(noc_mem_clk_monitor_o[3:0]),.sel_i(noc_mem_clk_monitor_sel_i[1:0]),.data_o(noc_mem_clk_monitor_mid[0]));

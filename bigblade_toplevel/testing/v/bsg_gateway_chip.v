@@ -15,6 +15,8 @@
 // Note that we use DDR clock for off-chip links, so the maximum ratio for IO is
 // (16*TAG_CLK_PERIOD)/(2*2*IO_CLK_PERIOD).
 //
+// The downsampler in this testbench supports slowdown ratio up to 1024
+//
 `define IO_SLOWDOWN_RATIO  8
 `define NOC_SLOWDOWN_RATIO 16
 `define MC_SLOWDOWN_RATIO  16
@@ -50,8 +52,8 @@ module bsg_gateway_chip
   wire p_noc_io_clk_monitor_li = p_pad_CT0_1_i;
   wire p_noc_mem_clk_monitor_li = p_pad_CT0_2_i;
 
-  assign {p_pad_CT0_4_o, p_pad_CT0_3_o} = 2'b00; // mc clk sel
-  assign {p_pad_CT0_7_o, p_pad_CT0_6_o, p_pad_CT0_5_o} = 3'b000; // noc mem clk sel
+  assign {p_pad_CT0_4_o, p_pad_CT0_3_o} = 2'b00; // mc clk monitor sel
+  assign {p_pad_CT0_7_o, p_pad_CT0_6_o, p_pad_CT0_5_o} = 3'b000; // noc mem clk monitor sel
 
   //////////////////////////////////////////////////
   //
@@ -151,7 +153,11 @@ module bsg_gateway_chip
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
   // When tag is programming, slow down other clocks to speed up simulation
+  // With dynamic downsampler, there will be no glitch and no double-edges
+  // problem in simulation
+  //
   // output_freq = input_freq/((ds_val+1)*2)
+  //
   wire [9:0] io_ds_val, noc_ds_val, mc_ds_val;
   assign io_ds_val  = (tag_trace_done_lo)? 0 : `IO_SLOWDOWN_RATIO-1;
   assign noc_ds_val = (tag_trace_done_lo)? 0 : `NOC_SLOWDOWN_RATIO-1;
