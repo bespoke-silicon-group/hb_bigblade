@@ -131,7 +131,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_ready_and_link_async_to_wormhole.v
   $basejump_stl_dir/bsg_tag/bsg_tag_client.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
   $basejump_stl_dir/bsg_tag/bsg_tag_trace_replay.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_clock_gen.v
   $basejump_stl_dir/bsg_test/bsg_nonsynth_reset_gen.v

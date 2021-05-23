@@ -43,8 +43,9 @@ module bsg_chip_block
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
 
+  wire [3:0] mc_mux_data_li = {'0, mc_clk_monitor_o};
   bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) mc_mux
-  (.data_i(mc_clk_monitor_o),.sel_i(mc_clk_monitor_sel_i),.data_o(pad_CT0_0_o_int));
+  (.data_i(mc_mux_data_li),.sel_i(mc_clk_monitor_sel_i),.data_o(pad_CT0_0_o_int));
 
   assign pad_CT0_1_o_int = noc_io_clk_monitor_o;
 

@@ -92,11 +92,6 @@ module bsg_gateway_chip
       ,.async_reset_o(tag_reset)
       );
 
-  bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
-    output_disable_gen
-      (.clk_i(tag_clk)
-      ,.async_reset_o(p_async_output_disable_lo)
-      );
 
   //////////////////////////////////////////////////
   //
@@ -157,17 +152,39 @@ module bsg_gateway_chip
 
   // When tag is programming, slow down other clocks to speed up simulation
   // output_freq = input_freq/((ds_val+1)*2)
-  wire [7:0] io_ds_val, noc_ds_val, mc_ds_val;
+  wire [9:0] io_ds_val, noc_ds_val, mc_ds_val;
   assign io_ds_val  = (tag_trace_done_lo)? 0 : `IO_SLOWDOWN_RATIO-1;
   assign noc_ds_val = (tag_trace_done_lo)? 0 : `NOC_SLOWDOWN_RATIO-1;
   assign mc_ds_val  = (tag_trace_done_lo)? 0 : `MC_SLOWDOWN_RATIO-1;
 
-  bsg_counter_clock_downsample #(.width_p(8)) io_ds
+  bsg_counter_clock_downsample #(.width_p(10)) io_ds
   (.clk_i(io_clk_2x),.reset_i(tag_reset),.val_i(io_ds_val),.clk_r_o(io_clk));
-  bsg_counter_clock_downsample #(.width_p(8)) noc_ds
+  bsg_counter_clock_downsample #(.width_p(10)) noc_ds
   (.clk_i(noc_clk_2x),.reset_i(tag_reset),.val_i(noc_ds_val),.clk_r_o(noc_clk));
-  bsg_counter_clock_downsample #(.width_p(8)) mc_ds
+  bsg_counter_clock_downsample #(.width_p(10)) mc_ds
   (.clk_i(mc_clk_2x),.reset_i(tag_reset),.val_i(mc_ds_val),.clk_r_o(mc_clk));
+
+
+  //////////////////////////////////////////////////
+  //
+  // BSG Tag Master Instance
+  //
+
+  bsg_tag_s tag_lines_lo;
+  bsg_tag_master_decentralized
+ #(.els_p      (tag_els_gp)
+  ,.local_els_p(1)
+  ,.lg_width_p (tag_lg_width_gp)
+  ) btm
+  (.clk_i           (tag_clk)
+  ,.data_i          (tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
+  ,.node_id_offset_i((tag_lg_els_gp)'(2))
+  ,.clients_o       (tag_lines_lo)
+  );
+
+  bsg_tag_client_unsync #(.width_p(1)) btc
+  (.bsg_tag_i     (tag_lines_lo)
+  ,.data_async_r_o(p_async_output_disable_lo));
 
 
   //////////////////////////////////////////////////
