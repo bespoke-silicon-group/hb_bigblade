@@ -11,6 +11,8 @@
 #		2. chip_3x3    - 3mm by 3mm die size
 #		3. chip_11x9   - 11mm by 9mm die size
 
+export CALIBRE_DRC_USE_SHELL=1
+
 export BSG_TOPLEVEL_DESIGN_TYPE := block
 
 # Select the backend flow style (either hier or flat). This determines if ICC2 is going to perform a

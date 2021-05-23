@@ -30,8 +30,8 @@ export PTSI_FLOW_ACTIVITY_FILE :=
 export PTSI_FLOW_ACTIVITY_WEIGHTS :=
 export PTSI_FLOW_STRIP_PATH :=
 
-
-
+export USE_ICC2_2020=1
+export CALIBRE_DRC_USE_SHELL=1
 
 
 time.pnr:
