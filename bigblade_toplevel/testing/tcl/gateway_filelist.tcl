@@ -192,6 +192,7 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v
+  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_clk_switch.v
 
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
