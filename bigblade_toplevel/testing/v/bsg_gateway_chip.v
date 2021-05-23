@@ -57,22 +57,17 @@ module bsg_gateway_chip
   //
   // Nonsynth Clock Generator(s)
   //
-  // Both fast and slow clocks are generated
-  // Select slow clock when tag is programming
-  // Switch back to fast clock when tag programming is done
+  // 2x clocks generated for downsamplers
   //
   
-  logic io_clk, io_clk_fast, io_clk_slow;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD)) io_clk_gen (.o(io_clk_fast));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD*`IO_SLOWDOWN_RATIO)) io_clk_slow_gen (.o(io_clk_slow));
+  logic io_clk, io_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD/2)) io_clk_gen (.o(io_clk_2x));
   
-  logic noc_clk, noc_clk_fast, noc_clk_slow;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD)) noc_clk_gen (.o(noc_clk_fast));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD*`NOC_SLOWDOWN_RATIO)) noc_clk_slow_gen (.o(noc_clk_slow));
+  logic noc_clk, noc_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD/2)) noc_clk_gen (.o(noc_clk_2x));
 
-  logic mc_clk, mc_clk_fast, mc_clk_slow;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD)) mc_clk_gen (.o(mc_clk_fast));
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD*`MC_SLOWDOWN_RATIO)) mc_clk_slow_gen (.o(mc_clk_slow));
+  logic mc_clk, mc_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD/2)) mc_clk_gen (.o(mc_clk_2x));
 
   logic tag_clk, tag_clk_raw;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
@@ -161,12 +156,18 @@ module bsg_gateway_chip
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
 
   // When tag is programming, slow down other clocks to speed up simulation
-  bsg_gateway_chip_clk_switch #(.num_in_p(2),.fast_clk_idx_p(1)) io_switch
-  (.clk_i({io_clk_fast, io_clk_slow}),.sel_i(tag_trace_done_lo),.clk_o(io_clk));
-  bsg_gateway_chip_clk_switch #(.num_in_p(2),.fast_clk_idx_p(1)) noc_switch
-  (.clk_i({noc_clk_fast, noc_clk_slow}),.sel_i(tag_trace_done_lo),.clk_o(noc_clk));
-  bsg_gateway_chip_clk_switch #(.num_in_p(2),.fast_clk_idx_p(1)) mc_switch
-  (.clk_i({mc_clk_fast, mc_clk_slow}),.sel_i(tag_trace_done_lo),.clk_o(mc_clk));
+  // output_freq = input_freq/((ds_val+1)*2)
+  wire [7:0] io_ds_val, noc_ds_val, mc_ds_val;
+  assign io_ds_val  = (tag_trace_done_lo)? 0 : `IO_SLOWDOWN_RATIO-1;
+  assign noc_ds_val = (tag_trace_done_lo)? 0 : `NOC_SLOWDOWN_RATIO-1;
+  assign mc_ds_val  = (tag_trace_done_lo)? 0 : `MC_SLOWDOWN_RATIO-1;
+
+  bsg_counter_clock_downsample #(.width_p(8)) io_ds
+  (.clk_i(io_clk_2x),.reset_i(tag_reset),.val_i(io_ds_val),.clk_r_o(io_clk));
+  bsg_counter_clock_downsample #(.width_p(8)) noc_ds
+  (.clk_i(noc_clk_2x),.reset_i(tag_reset),.val_i(noc_ds_val),.clk_r_o(noc_clk));
+  bsg_counter_clock_downsample #(.width_p(8)) mc_ds
+  (.clk_i(mc_clk_2x),.reset_i(tag_reset),.val_i(mc_ds_val),.clk_r_o(mc_clk));
 
 
   //////////////////////////////////////////////////

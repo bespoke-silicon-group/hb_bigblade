@@ -160,6 +160,11 @@ set TESTING_SOURCE_FILES [join "
   $bsg_replicant_dir/hardware/bsg_manycore_endpoint_to_fifos.v
 
   $basejump_stl_dir/testing/bsg_link/bsg_link_ddr_downstream_encode.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clock_downsample.v
+  $basejump_stl_dir/bsg_misc/bsg_strobe.v
+  $basejump_stl_dir/bsg_misc/bsg_muxi2_gatestack.v
+  $basejump_stl_dir/bsg_misc/bsg_nand.v
+  $basejump_stl_dir/bsg_misc/bsg_nor3.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
@@ -192,7 +197,6 @@ set TESTING_SOURCE_FILES [join "
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v
-  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_clk_switch.v
 
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
