@@ -56,22 +56,23 @@ module bsg_chip_noc_mem_link
   wire noc_clk_lo = noc_clk_raw_lo[0];
   
   // clock monitoring downsampler
-  wire [bsg_link_clk_gen_lg_monitor_ds_gp+1-1:0] ds_lines_lo;
-  assign ds_lines_lo[0] = noc_clk_lo;
-  assign noc_clk_monitor_o = ds_lines_lo[bsg_link_clk_gen_lg_monitor_ds_gp];
+  wire async_ds_reset_lo, noc_ds_reset_lo;
+  bsg_tag_client_unsync #(.width_p(1)) btc_ds
+  (.bsg_tag_i     (tag_lines_lo.ddr[0].main.noc_clk.monitor_reset)
+  ,.data_async_r_o(async_ds_reset_lo)
+  );
 
-  for (genvar i = 0; i < bsg_link_clk_gen_lg_monitor_ds_gp; i++)
-  begin: ds
-    bsg_dff_async_reset
-   #(.width_p      (1)
-    ,.reset_val_p  (0)
-    ) dff_BSG_UNGROUP
-    (.clk_i        (ds_lines_lo [i]       )
-    ,.async_reset_i(async_output_disable_i)
-    ,.data_i       (~ds_lines_lo[i+1]     )
-    ,.data_o       (ds_lines_lo [i+1]     )
-    );
-  end
+  bsg_sync_sync #(.width_p(1)) bss_ds
+  (.oclk_i     (noc_clk_lo)
+  ,.iclk_data_i(async_ds_reset_lo)
+  ,.oclk_data_o(noc_ds_reset_lo)
+  );
+
+  bsg_lfsr_div30 noc_ds
+  (.clk_i    (noc_clk_lo)
+  ,.reset_i  (noc_ds_reset_lo)
+  ,.clk_div_o(noc_clk_monitor_o)
+  );
 
   `declare_bsg_ready_and_link_sif_s(bsg_link_width_gp, core_link_sif_s);
   core_link_sif_s [1:0] core_links_li, core_links_lo;
