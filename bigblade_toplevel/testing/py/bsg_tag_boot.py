@@ -12,7 +12,7 @@ if __name__ == "__main__":
   tg = TagTraceGen(num_masters_p, num_clients_p, max_payload_width_p)
 
   # parameters
-  clk_num_clients_p  = 5
+  clk_num_clients_p  = 6
   sdr_num_clients_p  = 4
   dly_num_clients_p  = 4
   link_num_clients_p = 2+2*clk_num_clients_p+2*dly_num_clients_p
@@ -24,6 +24,7 @@ if __name__ == "__main__":
   clk_gen_offset = row_pod_offset+4*1*4
 
   noc_local_offset = 2*link_num_clients_p
+  dly_local_offset = 2+2*clk_num_clients_p
 
   # reset all bsg_tag_master
   tg.send(masters=0b11, client_id=0, data_not_reset=0, length=0, data=0)
@@ -43,6 +44,7 @@ if __name__ == "__main__":
         tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
         tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b1111111)
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=0, length=2, data=0b11)
+        tg.send(masters=0b11, client_id=7+offset, data_not_reset=0, length=1, data=0b1)
 
   for row in range(4):
     offset = clk_gen_offset+(row*clk_num_clients_p)
@@ -51,22 +53,25 @@ if __name__ == "__main__":
     tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
     tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+    tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
 
 
   # assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b1)
 
 
-  # all clk_gen select zero output
+  # all clk_gen select zero output, reset monotor ds
   for noc in range(9):
     for link in range(2):
       for clk in range(2):
         offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)+(clk*clk_num_clients_p)
         tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b11)
+        tg.send(masters=0b10, client_id=7+offset, data_not_reset=1, length=1, data=0b1)
 
   for row in range(4):
     offset = clk_gen_offset+(row*clk_num_clients_p)
     tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
+    tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
 
 
   # de-assert output_disable signal
@@ -102,6 +107,9 @@ if __name__ == "__main__":
           # select ds output clk
           tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b01)
 
+          # de-assert monitor ds reset
+          tg.send(masters=0b10, client_id=7+offset, data_not_reset=1, length=1, data=0b0)
+
           # set ds value
           tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=7, data=0b0000010)
           
@@ -115,12 +123,15 @@ if __name__ == "__main__":
           # select ext output clk
           tg.send(masters=0b10, client_id=6+offset, data_not_reset=1, length=2, data=0b10)
 
+          # de-assert monitor ds reset
+          tg.send(masters=0b10, client_id=7+offset, data_not_reset=1, length=1, data=0b0)
 
   for row in range(4):
     offset = clk_gen_offset+(row*clk_num_clients_p)
     # select ext output clk
     tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
-
+    # de-assert monitor ds reset
+    tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
 
 
   # reset noc blocks
@@ -141,10 +152,10 @@ if __name__ == "__main__":
       # reset iodelay clients
       for dly in range(2):
         offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)+(dly*dly_num_clients_p)
-        tg.send(masters=0b11, client_id=12+offset, data_not_reset=0, length=12, data=0b111111111111)
-        tg.send(masters=0b11, client_id=13+offset, data_not_reset=0, length=12, data=0b111111111111)
-        tg.send(masters=0b11, client_id=14+offset, data_not_reset=0, length=10, data=0b1111111111)
-        tg.send(masters=0b11, client_id=15+offset, data_not_reset=0, length=2, data=0b11)
+        tg.send(masters=0b11, client_id=0+dly_local_offset+offset, data_not_reset=0, length=12, data=0b111111111111)
+        tg.send(masters=0b11, client_id=1+dly_local_offset+offset, data_not_reset=0, length=12, data=0b111111111111)
+        tg.send(masters=0b11, client_id=2+dly_local_offset+offset, data_not_reset=0, length=10, data=0b1111111111)
+        tg.send(masters=0b11, client_id=3+dly_local_offset+offset, data_not_reset=0, length=2, data=0b11)
 
   # reset pod rows
   for row in range(4):
@@ -183,10 +194,10 @@ if __name__ == "__main__":
       # reset iodelay clients
       for dly in range(2):
         offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)+(dly*dly_num_clients_p)
-        tg.send(masters=0b11, client_id=12+offset, data_not_reset=1, length=12, data=0b000000000000)
-        tg.send(masters=0b11, client_id=13+offset, data_not_reset=1, length=12, data=0b000000000000)
-        tg.send(masters=0b11, client_id=14+offset, data_not_reset=1, length=10, data=0b0000000000)
-        tg.send(masters=0b11, client_id=15+offset, data_not_reset=1, length=2, data=0b00)
+        tg.send(masters=0b11, client_id=0+dly_local_offset+offset, data_not_reset=1, length=12, data=0b000000000000)
+        tg.send(masters=0b11, client_id=1+dly_local_offset+offset, data_not_reset=1, length=12, data=0b000000000000)
+        tg.send(masters=0b11, client_id=2+dly_local_offset+offset, data_not_reset=1, length=10, data=0b0000000000)
+        tg.send(masters=0b11, client_id=3+dly_local_offset+offset, data_not_reset=1, length=2, data=0b00)
 
   for row in range(4):
     for corner in range(4):
