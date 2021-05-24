@@ -1,5 +1,5 @@
 
-module bsg_chip_lfsr_div30
+module bsg_lfsr_div30
 
   (input  clk_i
   ,input  reset_i
