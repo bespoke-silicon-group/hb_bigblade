@@ -1,10 +1,9 @@
 Summary for repository basejump_stl:
-    EXPECTED COMMIT/BRANCH: master
+    EXPECTED COMMIT/BRANCH: dcdf7d4
     CURRENT COMMIT: dcdf7d4
     PASS: NO Uncommitted Files
     PASS: commit dcdf7d4 is in remote
-    PASS: Expected branch found match in remote
-    PASS: Head of remote branch matches current commit
+    PASS: Expected commit matches current commit
     PASS: No Untracked Files
 Summary for basejump_stl finished
 

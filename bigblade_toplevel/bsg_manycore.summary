@@ -1,9 +1,17 @@
 Summary for repository bsg_manycore:
-    EXPECTED COMMIT/BRANCH: 29a0c4c1
+    EXPECTED COMMIT/BRANCH: ci_bigblade
     CURRENT COMMIT: 29a0c4c1
     PASS: NO Uncommitted Files
     PASS: commit 29a0c4c1 is in remote
-    PASS: Expected commit matches current commit
-    PASS: No Untracked Files
+    PASS: Expected branch found match in remote
+    PASS: Head of remote branch matches current commit
+    WARN: UNTRACKED FILES EXIST
+    Untracked Files:
+        software/spmd/beebs/cycles.txt
+        software/spmd/beebs/elapsed.txt
+        software/spmd/beebs/ps.txt
+        software/spmd/cycles.txt
+        software/spmd/elapsed.txt
+        software/spmd/ps.txt
 Summary for bsg_manycore finished
 

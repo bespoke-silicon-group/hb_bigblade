@@ -19,18 +19,15 @@ hb_bigblade_netlists_commit := main
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
-# Commit from master on 5/23/21
-basejump_stl_commit  :=dcdf7d4
+basejump_stl_commit  :=master
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
-# Commit from ci_bigblade on 5/23/21
-bsg_manycore_commit  :=29a0c4c1
+bsg_manycore_commit  :=ci_bigblade
 
 bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
 bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
-# Commit from bigblade-tapeout on 5/23/21
-bsg_replicant_commit :=b3ee644
+bsg_replicant_commit :=bigblade-tapeout
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
@@ -38,8 +35,7 @@ bsg_14_commit        :=master
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
-# Commit from master on 5/23/21
-bsg_cadenv_commit    :=7860120
+bsg_cadenv_commit    :=master
 
 board_dir            :=$(THIS_DIR)/board
 board_url            :=$(BITBUCKET)taylor-bsg/board
@@ -47,8 +43,7 @@ board_commit         :=e2fec32
 
 bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(GITHUB)bespoke-silicon-group/bsg_packaging
-# Commit from basejump_fcbga_785 on 5/23/21
-bsg_packaging_commit :=b1ce6a0
+bsg_packaging_commit :=basejump_fcbga_785
 
 prep_dir := .pdk_prep
 
