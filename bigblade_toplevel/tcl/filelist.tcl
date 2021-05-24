@@ -194,7 +194,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router.v
   $bsg_manycore_dir/v/bsg_manycore_dram_hash_function.v
 
-
   $bsg_manycore_dir/imports/HardFloat/source/compareRecFN.v
   $bsg_manycore_dir/imports/HardFloat/source/divSqrtRecFN_small.v
   $bsg_manycore_dir/imports/HardFloat/source/fNToRecFN.v
@@ -206,7 +205,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/imports/HardFloat/source/recFNToFN.v
   $bsg_manycore_dir/imports/HardFloat/source/recFNToIN.v
   $bsg_manycore_dir/imports/HardFloat/source/RISCV/HardFloat_specialize.v
-
 
   $bsg_manycore_dir/v/vanilla_bean/bsg_manycore_proc_vanilla.v
   $bsg_manycore_dir/v/vanilla_bean/network_rx.v
@@ -247,6 +245,8 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_chip_noc_io_link.v
 
   $bsg_designs_target_dir/../bigblade_pod_row/v/bsg_manycore_pod_row_sdr.v
+
+  $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen.v
 
   $bsg_designs_target_dir/../common/v/bsg_chip_clk_gen.v
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
