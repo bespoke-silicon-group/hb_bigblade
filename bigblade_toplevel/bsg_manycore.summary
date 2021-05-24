@@ -5,13 +5,6 @@ Summary for repository bsg_manycore:
     PASS: commit 29a0c4c1 is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
-    WARN: UNTRACKED FILES EXIST
-    Untracked Files:
-        software/spmd/beebs/cycles.txt
-        software/spmd/beebs/elapsed.txt
-        software/spmd/beebs/ps.txt
-        software/spmd/cycles.txt
-        software/spmd/elapsed.txt
-        software/spmd/ps.txt
+    PASS: No Untracked Files
 Summary for bsg_manycore finished
 
