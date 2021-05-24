@@ -32,10 +32,16 @@ proc insert_buffers_on_propagated_nets {port cell num start_num prefix buffer} {
   }
 }
 
+# BSG-STD: In R-2020.09*, extract.starrc_mode attribute type changed from bool to string
+if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
+  set BSG_STARRC_MODE_TRUE "in_design"
+} else {
+  set BSG_STARRC_MODE_TRUE "true"
+}
 
 # Enable StarRC extraction before route optimization
 if {[file exists [which $ROUTE_OPT_STARRC_CONFIG_FILE]]} {
-	set_app_options -name extract.starrc_mode -value true
+	set_app_options -name extract.starrc_mode -value $BSG_STARRC_MODE_TRUE
 	set_starrc_in_design -config $ROUTE_OPT_STARRC_CONFIG_FILE ;# example: route_opt.starrc_config_example.txt
 	
 	## Update timing with StarRC extraction
