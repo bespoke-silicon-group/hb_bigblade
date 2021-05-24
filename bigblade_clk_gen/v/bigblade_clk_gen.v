@@ -6,7 +6,6 @@ module bigblade_clk_gen
  , num_adgs_p         = bsg_link_clk_gen_num_adgs_gp
  , tag_els_p          = tag_els_gp
  , tag_lg_width_p     = tag_lg_width_gp
- , monitor_ds_width_p = bsg_link_clk_gen_lg_monitor_ds_gp
  )
 
 ( input                                  tag_clk_i
@@ -23,7 +22,7 @@ module bigblade_clk_gen
   bsg_chip_clk_gen_tag_lines_s tag_lines;
 
   bsg_tag_master_decentralized #(.els_p(tag_els_p)
-                                ,.local_els_p(5)
+                                ,.local_els_p(6)
                                 ,.lg_width_p(tag_lg_width_p)
                                 )
     btm
@@ -65,20 +64,12 @@ module bigblade_clk_gen
       ,.clk_o(clk_o)
       );
 
-  logic [monitor_ds_width_p:0] monitor_ds_r;
-
-  assign monitor_ds_r[0] = clk_o;
-  assign clk_monitor_o = monitor_ds_r[monitor_ds_width_p];
-
-  for (genvar i = 0; i < monitor_ds_width_p; i++)
-    begin: monitor_ds
-      bsg_dff_async_reset #(.width_p(1))
-        dff
-          (.clk_i(monitor_ds_r[i])
-          ,.async_reset_i(async_output_disable_i)
-          ,.data_i(~monitor_ds_r[i+1])
-          ,.data_o(monitor_ds_r[i+1])
-          );
-    end: monitor_ds
+  bigblade_clk_gen_monitor
+    monitor
+      (.monitor_reset_tag_line_i(tag_lines.monitor_reset)
+      ,.clk_i(clk_o)
+      ,.clk_monitor_o(clk_monitor_o)
+      );
 
 endmodule // bigblade_clk_gen
+
