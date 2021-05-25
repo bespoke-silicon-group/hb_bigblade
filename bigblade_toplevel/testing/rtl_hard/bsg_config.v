@@ -12,13 +12,13 @@ config bsg_config;
   cell bsg_chip_noc_mem_link liblist `BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
   // currently empty libs - no hardening
-  // cell bsg_manycore_link_ruche_to_sdr_east `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_ruche_to_sdr_west `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_to_sdr_north `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_to_sdr_south `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_wh_to_sdr_ne `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_wh_to_sdr_nw `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_wh_to_sdr_se `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // cell bsg_manycore_link_wh_to_sdr_sw `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_ruche_to_sdr_east liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_ruche_to_sdr_west liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_to_sdr_north liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_to_sdr_south liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_wh_to_sdr_ne liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_wh_to_sdr_nw liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_wh_to_sdr_se liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // cell bsg_manycore_link_wh_to_sdr_sw liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
 endconfig
