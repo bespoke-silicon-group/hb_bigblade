@@ -11,7 +11,7 @@ WAVE       ?= 0
 
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
-BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
+export BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
@@ -112,13 +112,86 @@ VCS_OPTIONS += +define+BSG_DESIGNS_TESTING_LIBRARY_NAME=$(BSG_DESIGNS_TESTING_LI
 VCS_OPTIONS += -f $(BSG_DESIGNS_TESTING_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 
-export BIGBLADE_MANYCORE_TILE_LIBRARY_NAME = bsg_manycore_tile
-export BIGBLADE_MANYCORE_TILE_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_MANYCORE_TILE_LIBRARY_NAME).filelist
-export BIGBLADE_MANYCORE_TILE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_MANYCORE_TILE_LIBRARY_NAME).library
+###################################
+# Manycore Filelists and Liblists #
+###################################
 
-VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BIGBLADE_MANYCORE_TILE_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_MANYCORE_TILE_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_MANYCORE_TILE_LIBRARY)
+export BSG_MANYCORE_TILE_LIBRARY_NAME = bigblade_manycore_tile
+export BSG_MANYCORE_TILE_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NAME).filelist
+export BSG_MANYCORE_TILE_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BSG_MANYCORE_TILE_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_LIBRARY)
+
+###########################################
+# Bigblade clk_gen filelists and liblists #
+###########################################
+export BIGBLADE_CLK_GEN_LIBRARY_NAME = bigblade_clk_gen
+export BIGBLADE_CLK_GEN_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_CLK_GEN_LIBRARY_NAME).filelist
+export BIGBLADE_CLK_GEN_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_CLK_GEN_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_CLK_GEN_LIBRARY_NAME=$(BIGBLADE_CLK_GEN_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_CLK_GEN_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_CLK_GEN_LIBRARY)
+
+#################################################
+# Bigblade IO link DDR filelists and liblists # #
+#################################################
+
+export BIGBLADE_IO_LINK_DDR_LIBRARY_NAME = bigblade_io_link_ddr
+export BIGBLADE_IO_LINK_DDR_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME).filelist
+export BIGBLADE_IO_LINK_DDR_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_IO_LINK_DDR_LIBRARY_NAME=$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_IO_LINK_DDR_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_IO_LINK_DDR_LIBRARY)
+
+
+###############################################
+# Bigblade NOC IO link filelists and liblists #
+###############################################
+
+export BIGBLADE_NOC_IO_LINK_LIBRARY_NAME = bigblade_noc_io_link
+export BIGBLADE_NOC_IO_LINK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME).filelist
+export BIGBLADE_NOC_IO_LINK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_NOC_IO_LINK_LIBRARY_NAME=$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_NOC_IO_LINK_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_NOC_IO_LINK_LIBRARY)
+
+################################################
+# Bigblade NOC MEM link filelists and liblists #
+################################################
+
+export BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME = bigblade_noc_mem_link
+export BIGBLADE_NOC_MEM_LINK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME).filelist
+export BIGBLADE_NOC_MEM_LINK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME=$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_NOC_MEM_LINK_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_NOC_MEM_LINK_LIBRARY)
+
+
+#################################################
+# BSG Manycore SDR links filelists and liblists #
+#################################################
+export BSG_MANYCORE_LINK_SDR_LIBRARY_NAME = bsg_manycore_link_sdr
+export BSG_MANYCORE_LINK_SDR_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).filelist
+export BSG_MANYCORE_LINK_SDR_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).library
+
+# Currently empty library, uncomment if populated
+# VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
+# VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
+# VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
+
+
+##################################
+# Create filelists and libraries #
+##################################
+.PHONY: library
+library: $(BSG_DESIGNS_TESTING_LIBRARY)
+
 $(BSG_CHIP_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_CHIP_LIBRARY): $(BSG_DESIGNS_TESTING_LIBRARY)
 $(BSG_DESIGNS_TESTING_FILELIST): $(BSG_DESIGNS_TESTING_LIBRARY)
@@ -182,6 +255,19 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ## Run Targets
 ########################################
 
+# create symlinks foreach ip block
+
+IP_BLOCKS  = bigblade_clk_gen
+IP_BLOCKS += bigblade_noc_io_link
+IP_BLOCKS += bigblade_noc_mem_link
+IP_BLOCKS += bsg_manycore_tile
+IP_BLOCKS += bigblade_io_link_ddr
+IP_BLOCKS += bsg_manycore_link_sdr
+
+IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
+$(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
+	ln -s $(BSG_DESIGNS_DIR) $@
+
 build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
 debug: $(BSG_CUDA_DBG)
 $(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
@@ -200,7 +286,7 @@ $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
 
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)

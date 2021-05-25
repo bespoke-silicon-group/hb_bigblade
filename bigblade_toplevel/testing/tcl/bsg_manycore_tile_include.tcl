@@ -13,7 +13,7 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set BIGBLADE_MANYCORE_TILE_SOURCE_FILES [join "
-    $bsg_designs_target_dir/../bigblade_manycore_tile/v/hard/gf_14/bsg_mem_1rw_sync_mask_write_byte.v
-    $bsg_designs_target_dir/../bigblade_manycore_tile/v/hard/gf_14/bsg_mem_1rw_sync.v
+set BSG_MANYCORE_TILE_INCLUDE_PATHS [ join "
+  $basejump_stl_dir/hard/gf_14/bsg_mem/
 "]
+
