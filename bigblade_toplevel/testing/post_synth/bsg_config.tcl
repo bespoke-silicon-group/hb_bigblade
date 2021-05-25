@@ -11,73 +11,40 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/chip_include.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
+# bsg_manycore_tile source files
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_tile_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_tile_include.tcl
+
+# clk_gen
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_include.tcl
+
+# io link ddr
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_include.tcl
+
+# noc io link
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_io_link_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_io_link_include.tcl
+
+# noc mem link
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_link_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_link_include.tcl
+
+# sdr link
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_include.tcl
+
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
 
-##################################
-# bsg_manycore_tile source files #
-##################################
-# comment this out to use post_synth netlist
-# WARNING: THIS IS REALLY SLOW
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_tile-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_tile-rtl_filelist.tcl
+#########################
+# list of hardened rams #
+#########################
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_TILE_SOURCE_FILES]
-
-######################################
-# bsg_manycore_link_sdr source files #
-######################################
-# comment this out to use post_synth netlist
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_link_sdr-post-synth_filelist.tcl
-# comment this out to use rtl
-#source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_link_sdr-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_LINK_SDR_SOURCE_FILES]
-
-
-#####################################
-# bigblade_io_link_ddr source files #
-#####################################
-# comment this out to use post_synth netlist
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_io_link_ddr-post-synth_filelist.tcl
-# comment this out to use rtl
-#source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_io_link_ddr-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_IO_LINK_DDR_SOURCE_FILES]
-
-#####################################
-# bigblade_noc_io_link source files #
-#####################################
-# comment this out to use post_synth netlist
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_io_link-post-synth_filelist.tcl
-# comment this out to use rtl
-#source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_io_link-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_IO_LINK_SOURCE_FILES]
-
-
-######################################
-# bigblade_noc_mem_link source files #
-######################################
-# comment this out to use post_synth netlist
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_mem_link-post-synth_filelist.tcl
-# comment this out to use rtl
-#source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_mem_link-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES]
-
-######################################
-# bigblade_clk_gen source files      #
-######################################
-# comment this out to use post_synth netlist
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_clk_gen-post-synth_filelist.tcl
-# comment this out to use rtl
-#source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_clk_gen-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES]
-
+#set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAM_FILES]
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
@@ -88,6 +55,69 @@ bsg_create_library $::env(BSG_CHIP_LIBRARY_NAME) \
                    $::env(BSG_CHIP_LIBRARY)      \
                    $SVERILOG_SOURCE_FILES        \
                    $SVERILOG_INCLUDE_PATHS
+
+# tile filelist
+bsg_create_filelist $::env(BSG_MANYCORE_TILE_FILELIST) \
+                    $BSG_MANYCORE_TILE_SOURCE_FILES
+
+# tile library
+bsg_create_library $::env(BSG_MANYCORE_TILE_LIBRARY_NAME) \
+    $::env(BSG_MANYCORE_TILE_LIBRARY) \
+    $BSG_MANYCORE_TILE_SOURCE_FILES \
+    $BSG_MANYCORE_TILE_INCLUDE_PATHS
+
+# clk_gen filelist
+bsg_create_filelist $::env(BIGBLADE_CLK_GEN_FILELIST) \
+    $BIGBLADE_CLK_GEN_SOURCE_FILES
+
+# clk_gen library
+bsg_create_library $::env(BIGBLADE_CLK_GEN_LIBRARY_NAME) \
+    $::env(BIGBLADE_CLK_GEN_LIBRARY) \
+    $BIGBLADE_CLK_GEN_SOURCE_FILES \
+    $BIGBLADE_CLK_GEN_INCLUDE_PATHS
+
+# io_link_ddr filelist
+bsg_create_filelist $::env(BIGBLADE_IO_LINK_DDR_FILELIST) \
+    $BIGBLADE_IO_LINK_DDR_SOURCE_FILES
+
+# io_link_ddr library
+bsg_create_library $::env(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME)\
+    $::env(BIGBLADE_IO_LINK_DDR_LIBRARY) \
+    $BIGBLADE_IO_LINK_DDR_SOURCE_FILES \
+    $BIGBLADE_IO_LINK_DDR_INCLUDE_PATHS
+
+
+# noc_io_link filelist
+bsg_create_filelist $::env(BIGBLADE_NOC_IO_LINK_FILELIST) \
+    $BIGBLADE_NOC_IO_LINK_SOURCE_FILES
+
+# noc_io_link library
+bsg_create_library $::env(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME)\
+    $::env(BIGBLADE_NOC_IO_LINK_LIBRARY) \
+    $BIGBLADE_NOC_IO_LINK_SOURCE_FILES \
+    $BIGBLADE_NOC_IO_LINK_INCLUDE_PATHS
+
+
+# noc_io_link filelist
+bsg_create_filelist $::env(BIGBLADE_NOC_MEM_LINK_FILELIST) \
+    $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES
+
+# noc_io_link library
+bsg_create_library $::env(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME)\
+    $::env(BIGBLADE_NOC_MEM_LINK_LIBRARY) \
+    $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES \
+    $BIGBLADE_NOC_MEM_LINK_INCLUDE_PATHS
+
+
+# sdr_link filelist
+bsg_create_filelist $::env(BSG_MANYCORE_LINK_SDR_FILELIST) \
+    $BSG_MANYCORE_LINK_SDR_SOURCE_FILES
+
+# sdr_link library
+bsg_create_library $::env(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)\
+    $::env(BSG_MANYCORE_LINK_SDR_LIBRARY) \
+    $BSG_MANYCORE_LINK_SDR_SOURCE_FILES \
+    $BSG_MANYCORE_LINK_SDR_INCLUDE_PATHS
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \
