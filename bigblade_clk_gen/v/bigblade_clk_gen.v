@@ -6,6 +6,7 @@ module bigblade_clk_gen
  , num_adgs_p         = bsg_link_clk_gen_num_adgs_gp
  , tag_els_p          = tag_els_gp
  , tag_lg_width_p     = tag_lg_width_gp
+ , tag_local_els_p    = tag_clk_gen_local_els_gp
  )
 
 ( input                                  tag_clk_i
@@ -22,7 +23,7 @@ module bigblade_clk_gen
   bsg_chip_clk_gen_tag_lines_s tag_lines;
 
   bsg_tag_master_decentralized #(.els_p(tag_els_p)
-                                ,.local_els_p(6)
+                                ,.local_els_p(tag_local_els_p)
                                 ,.lg_width_p(tag_lg_width_p)
                                 )
     btm
