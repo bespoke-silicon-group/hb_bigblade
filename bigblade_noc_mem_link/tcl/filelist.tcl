@@ -104,7 +104,6 @@ set SVERILOG_SOURCE_FILES [join "
     $basejump_stl_dir/bsg_misc/bsg_nor3.v
     $basejump_stl_dir/bsg_misc/bsg_reduce.v
     $basejump_stl_dir/bsg_misc/bsg_buf.v
-    $basejump_stl_dir/bsg_misc/bsg_dff_async_reset.v
     $basejump_stl_dir/bsg_tag/bsg_tag_pkg.v
     $basejump_stl_dir/bsg_tag/bsg_tag_client.v
     $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
@@ -113,6 +112,7 @@ set SVERILOG_SOURCE_FILES [join "
 
     $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
     $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
+    $bsg_designs_target_dir/../common/v/bsg_lfsr_div30.v
     $bsg_designs_target_dir/v/bsg_chip_noc_mem_link.v
     $bsg_designs_target_dir/v/bsg_ready_and_link_round_robin_static.v
 
