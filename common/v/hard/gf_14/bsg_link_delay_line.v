@@ -17,9 +17,9 @@ module bsg_link_delay_line
 
   for (genvar k = 0; k < width_lp; k++)
   begin: sig
-    SC7P5T_DLYX50_SSC14SL dly0_BSG_DONT_TOUCH (.A(i   [k]),.Z(dly0[k]));
-    SC7P5T_DLYX50_SSC14SL dly1_BSG_DONT_TOUCH (.A(dly0[k]),.Z(dly1[k]));
-    SC7P5T_DLYX50_SSC14SL dly2_BSG_DONT_TOUCH (.A(dly1[k]),.Z(dly2[k]));
+    SC7P5T_DLYX50_SSC14L dly0_BSG_DONT_TOUCH (.A(i   [k]),.Z(dly0[k]));
+    SC7P5T_DLYX50_SSC14L dly1_BSG_DONT_TOUCH (.A(dly0[k]),.Z(dly1[k]));
+    SC7P5T_DLYX50_SSC14L dly2_BSG_DONT_TOUCH (.A(dly1[k]),.Z(dly2[k]));
 
     SC7P5T_MUX4X4_SSC16L mux_BSG_DONT_TOUCH
     (.D0(i[k]),.D1(dly0[k]),.D2(dly1[k]),.D3(dly2[k])
