@@ -66,6 +66,17 @@ if {[file exists [which $ROUTE_OPT_STARRC_CONFIG_FILE]]} {
 }
 
 
+if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
+  remove_routing_rules [get_routing_rules {ss_*_ndr}]
+  create_routing_rule opt_x2_ndr -multiplier_spacing 2
+
+  set ss_nets  [get_nets bsg_ss*]
+  append_to_collection ss_nets [get_nets {wh_link_*_l* mc_*_link_*_l*}]
+  append_to_collection ss_nets [get_nets {pad_D*_*_*_int pad_IT*_*_*_int}]
+  set_routing_rule -rule opt_x2_ndr -min_routing_layer M2 -max_routing_layer K4 $ss_nets
+}
+
+
 # Route optimization setup
 set opt_buffer "SC7P5T_CKBUFX8_SSC14R"
 set opt_prefix "bsg_opt"

@@ -59,8 +59,13 @@ foreach {side} {"DL" "DR" "IT"} {
 #set_app_options -name route.detail.timing_driven -value false
 
 # disable crosstalk driven to avoid zigzag shaped routing
-set_app_options -name route.global.crosstalk_driven -value false
-set_app_options -name route.track.crosstalk_driven -value false
+if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
+  set_app_options -name route.global.crosstalk_driven -value true
+  set_app_options -name route.track.crosstalk_driven -value true
+} else {
+  set_app_options -name route.global.crosstalk_driven -value false
+  set_app_options -name route.track.crosstalk_driven -value false
+}
 
 # This option takes effect only if timing-driven routing is enabled
 #set_app_options -name route.common.rc_driven_setup_effort_level -value high
