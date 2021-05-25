@@ -46,14 +46,6 @@ source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAM_FILES]
 
-# swap in hardend modules
-source $::env(BSG_CHIP_DIR)/cad/flow/dc/bsg_dc_scripts/target_design.filelist.tcl
-
-set SVERILOG_SOURCE_FILES $final_sverilog_source_files
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAM_FILES]
-set SVERILOG_INCLUDE_PATHS $final_sverilog_include_paths
-
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES
