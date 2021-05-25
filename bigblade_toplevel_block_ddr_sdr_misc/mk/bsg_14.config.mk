@@ -11,8 +11,8 @@ export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json
 export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
 
 # TODO: change to default_wb for actual chip
-export BSG_POWER_GRID := default_wb
-#export BSG_POWER_GRID := bigblade_toplevel_block
+#export BSG_POWER_GRID := default_wb
+export BSG_POWER_GRID := bigblade_toplevel_block
 export BSG_CAD_SETUP := default
 export BSG_POWER_INTENT := sv_standard
 
