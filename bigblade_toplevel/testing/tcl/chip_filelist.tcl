@@ -244,6 +244,9 @@ set SVERILOG_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/../bigblade_pod_row/v/bsg_manycore_pod_row_sdr.v
 
+  $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor.v
+  $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor_clk_buf.v
+
   $bsg_designs_target_dir/../common/v/bsg_chip_clk_gen.v
   $bsg_designs_target_dir/../common/v/bsg_clk_gen_osc.v
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
