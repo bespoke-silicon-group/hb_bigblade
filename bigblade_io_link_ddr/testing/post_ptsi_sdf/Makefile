@@ -33,6 +33,7 @@ export BSG_TOPLEVEL_DESIGN_TYPE ?=chip_3x3
 export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
+include $(BSG_CHIP_DIR)/Makefile.include
 include $(BSG_CHIP_DIR)/cad/setup/Makefile.include
 
 ########################################

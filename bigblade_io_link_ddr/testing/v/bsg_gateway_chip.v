@@ -109,7 +109,7 @@ module bsg_gateway_chip
   //
 
   localparam tag_num_masters_lp          = 1;
-  localparam tag_num_clients_lp          = 14;
+  localparam tag_num_clients_lp          = 16;
   localparam tag_max_payload_width_lp    = 7;
   localparam tag_lg_max_payload_width_lp = `BSG_SAFE_CLOG2(tag_max_payload_width_lp+1);
 
@@ -188,7 +188,7 @@ module bsg_gateway_chip
   //
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_m_core
-      (.bsg_tag_i     ( tag_lines[12] )
+      (.bsg_tag_i     ( tag_lines[14] )
       ,.recv_clk_i    ( m_core_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -197,7 +197,7 @@ module bsg_gateway_chip
 
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_s_core
-      (.bsg_tag_i     ( tag_lines[12] )
+      (.bsg_tag_i     ( tag_lines[14] )
       ,.recv_clk_i    ( s_core_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -206,7 +206,7 @@ module bsg_gateway_chip
 
   bsg_tag_client #(.width_p( 1 ), .default_p( 0 ))
     btc_node
-      (.bsg_tag_i     ( tag_lines[13] )
+      (.bsg_tag_i     ( tag_lines[15] )
       ,.recv_clk_i    ( node_clk )
       ,.recv_reset_i  ( 1'b0 )
       ,.recv_new_r_o  (  )
@@ -266,7 +266,7 @@ module bsg_gateway_chip
   ,.noc_clk_o                  (noc_clk)
 
   ,.tag_clk_i                  (tag_clk)
-  ,.tag_lines_i                (tag_lines_dly[11:0])
+  ,.tag_lines_i                (tag_lines_dly[13:0])
 
   ,.core_v_i                   (m_core_v_li_dly)
   ,.core_data_i                (m_core_data_li_dly)
