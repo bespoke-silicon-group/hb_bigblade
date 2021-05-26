@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, os, glob, subprocess
+import sys, os, glob, subprocess, datetime
 from subprocess import run
 
 BUILD_DIR = sys.argv[1]
@@ -12,12 +12,12 @@ project_name = os.getcwd().split(os.sep)[-1]
 print(f'Packaging design "{project_name}", build at "{BUILD_DIR}"')
 print()
 
-repos = {}
-
 olddir = os.getcwd()
 print('Searching for repositories...')
-for d in glob.glob("./*/.git"):
-  os.chdir(os.sep.join([d, '../']))
+
+def get_git_commit_branch(path):
+  old_dir = os.getcwd()
+  os.chdir(path)
   repo_name = os.getcwd().split(os.sep)[-1]
   results = run(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   commit = results.stdout.decode('utf-8').strip()
@@ -27,9 +27,19 @@ for d in glob.glob("./*/.git"):
   else:
     results = run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     branch = results.stdout.decode('utf-8').strip()
-  print(f'\t{repo_name} ({commit}) ({branch})')
+  os.chdir(old_dir)
+  return (repo_name, commit, branch)
+
+repos = {}
+  
+name,commit,branch = get_git_commit_branch('./')
+repos['hb_bigblade'] = {'commit': commit, 'branch': branch}
+for d in glob.glob("./*/.git"):
+  repo_name,commit,branch = get_git_commit_branch(d + '/..')
   repos[repo_name] = {'commit': commit, 'branch': branch}
-  os.chdir(olddir)
+
+for k,v in repos.items():
+  print(f'\t{k} ({v["commit"]}) ({v["branch"]})')
 print()
 
 print(f'Searching for release "{RELEASE}" in directory "{RELEASE_DIR}"')
@@ -153,7 +163,14 @@ if user_input.lower() != 'y':
   print('Export canceled, exiting.')
   sys.exit()
 
+
 subprocess.run(['mkdir', '-p', result_dir])
+
+with open(os.sep.join([result_dir,'COMMIT']), 'w') as fid:
+  fid.write(f'Export Date: {datetime.datetime.now()}\n')
+  for k,v in repos.items():
+    fid.write(f'{k}: {v["commit"]} ({v["branch"]})\n')
+
 cmd = ['rsync', '-Rtrav'] + all_files + [result_dir]
 print(f'Running command: {" ".join(cmd)}')
 subprocess.run(cmd)
