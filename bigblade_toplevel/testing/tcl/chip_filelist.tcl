@@ -179,9 +179,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_ruche_x_link_sif_tieoff.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_vcache_array.v
   $bsg_manycore_dir/v/bsg_cache_dma_to_wormhole.v
-  $bsg_manycore_dir/v/bsg_manycore_tile_compute_array_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_hetero_socket.v
   $bsg_manycore_dir/v/bsg_manycore_link_to_cache.v
 
@@ -242,7 +240,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_then_ready_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_wide_link_to_then_ready_link.v
 
-  $bsg_designs_target_dir/../bigblade_pod_row/v/bsg_manycore_pod_row_sdr.v
 
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor.v
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor_clk_buf.v
@@ -252,7 +249,5 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
   $bsg_designs_target_dir/../common/v/bsg_lfsr_div30.v
-  $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_north_row/v/bsg_manycore_link_to_sdr_north_row.v
-  $bsg_designs_target_dir/../bsg_manycore_link_to_sdr_south_row/v/bsg_manycore_link_to_sdr_south_row.v
 "]
 
