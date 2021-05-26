@@ -35,7 +35,7 @@ board_commit         :=master
 
 bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(GITHUB)bespoke-silicon-group/bsg_packaging
-bsg_packaging_commit :=master
+bsg_packaging_commit :=basejump_fcbga_785
 
 prep_dir := .pdk_prep
 
