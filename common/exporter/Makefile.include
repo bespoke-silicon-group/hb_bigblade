@@ -1,0 +1,4 @@
+
+export_build:
+	python3 `git rev-parse --show-toplevel`/common/exporter/export_build.py bsg_14/current_build | tee -i $@.log
+

@@ -22,3 +22,5 @@ bsg_manycore:
 	cd $@ ; git checkout $(commit) ;
 	cd $@ ; git submodule update --init imports/HardFloat
 
+include ../common/exporter/Makefile.include
+

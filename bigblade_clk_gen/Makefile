@@ -17,3 +17,5 @@ bsg_14:
 	git clone git@github.com:bespoke-silicon-group/bsg_14.git $@
 	cd $@ ; git checkout $(commit) ; git checkout -b dev_$(commit)
 
+include ../common/exporter/Makefile.include
+

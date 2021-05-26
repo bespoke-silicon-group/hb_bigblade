@@ -30,3 +30,6 @@ bsg_replicant:
 hb_bigblade_netlists:
 	git clone git@github.com:bespoke-silicon-group/hb_bigblade_netlists.git $@
 	cd $@ ; git checkout $(commit); $(MAKE)
+
+include ../common/exporter/Makefile.include
+

@@ -58,3 +58,5 @@ DISABLE_SAFETY_PROMPT ?= false
 are_you_sure:
 	@$(DISABLE_SAFETY_PROMPT) || (echo -n "Are you sure [Y/n]? " && read ans && ([ "$$ans" == "Y" ] || [ "$$ans" == "y" ]))
 
+include ../common/exporter/Makefile.include
+
