@@ -17,7 +17,7 @@ export BSG_CAD_SETUP := default
 export BSG_POWER_INTENT := sv_standard
 
 
-export DC_FLOW_RMPLUS_FLOW :=
+export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE := false
 export DC_FLOW_COMPILE_DISABLE_CLOCK_GATING := false
 export DC_FLOW_COMPILE_FLATTEN_DESIGN := false
