@@ -49,7 +49,7 @@ for {set i 0} {$i < 4} {incr i} {
 
 
 # clk gen placement
-set clk_gen_start_x [expr $pod_row_start_x+[round_up_to_nearest [expr $pod_width/2.0] $grid_width]]
+set clk_gen_start_x [expr $pod_row_start_x+[round_down_to_nearest [expr $pod_width/2.0] $grid_width]-2*$grid_width]
 set clk_gen_start_y [expr $pod_row_start_y+$pod_height+0.5*$grid_height]
 
 for {set i 0} {$i < 4} {incr i} {
