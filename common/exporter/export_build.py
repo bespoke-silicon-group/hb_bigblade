@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, os, glob, subprocess, datetime
+import sys, os, glob, subprocess, datetime, socket
 from subprocess import run
 
 # The build dir to export (comes from command line, should be something like
@@ -30,6 +30,14 @@ elif NETLIST_EXPORT_MODE == 1 or NETLIST_EXPORT_MODE == 2:
     print('ERROR: please clone hb_bigblade_netlists before proceeding!')
     print('\tgit clone git@github.com:bespoke-silicon-group/hb_bigblade_netlists.git')
     sys.exit(0)
+
+# Print some system information and current directory
+print('System Information:')
+print(f'\tDate:     {datetime.datetime.now()}')
+print(f'\tUsername: {os.environ["USER"]}')
+print(f'\tHostname: {socket.gethostname()}')
+print(f'\tExec Dir: {os.getcwd()}')
+print()
 
 # Grab the name of the current directory which is the project name (or design
 # name). This will be the directory name in the release dir where the build is
