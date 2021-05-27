@@ -15,6 +15,7 @@ set tile_width  [core_width]
 set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
+set keepout_margins_double [list [expr 2*$keepout_margin_x] $keepout_margin_y [expr 2*$keepout_margin_x] $keepout_margin_y]
 set io_link_gap_x 0
 
 set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
@@ -72,7 +73,7 @@ set icache_data_ma_west [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 8*$keepout_margin_x] \
+  -vertical_channel_width [expr 2*$keepout_margin_x] \
   -orientation FN \
   $icache_data_mems_west]
 
@@ -91,7 +92,7 @@ set icache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 8*$keepout_margin_x] \
+  -vertical_channel_width [expr 2*$keepout_margin_x] \
   -orientation N \
   $icache_data_mems_east]
 
@@ -154,7 +155,7 @@ set dcache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 4*$keepout_margin_x] \
+  -vertical_channel_width [expr 2*$keepout_margin_x] \
   -orientation [list N N N N] \
   $dcache_data_mems_east]
 

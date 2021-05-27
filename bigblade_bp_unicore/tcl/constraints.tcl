@@ -171,11 +171,22 @@ bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
 ########################################
 ## Ungrouping
+set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"    ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"          ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_decode"                      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_dff_chain"                   ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_encode_one_hot"              ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_expand_bitmask"              ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_mux"                         ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_mux_one_hot"                 ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_scan"                        ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_mux_segmented"               ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode_one_hot_out" ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"             ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_rotate_left"                 ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_rotate_right"                ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_scan"                        ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_transpose"                   ] true
+set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"        ] true
 
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
