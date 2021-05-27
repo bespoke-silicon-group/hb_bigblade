@@ -376,6 +376,18 @@ module bp_cce_to_mc_bridge
             mmio_out_packet_li.payload.load_info_s.load_info.part_sel   = io_cmd_eva_li.low_bits;
             mmio_out_packet_li.reg_id                                   = bsg_manycore_reg_id_width_gp'(trans_id_lo);
           end
+        e_bedrock_mem_amo:
+          begin
+            mmio_out_packet_li.payload.data = io_cmd_li.data;
+            mmio_out_packet_li.reg_id = bsg_manycore_reg_id_width_gp'(trans_id_lo);
+            unique case (io_cmd_li.header.subop)
+              e_bedrock_amoadd:  mmio_out_packet_li.op_v2 = e_remote_amoadd;
+              e_bedrock_amoor:   mmio_out_packet_li.op_v2 = e_remote_amoor;
+              e_bedrock_amoswap: mmio_out_packet_li.op_v2 = e_remote_amoswap;
+              default: mmio_out_packet_li.op_v2 = e_remote_amoswap; // Must never come here
+              
+            endcase
+          end
         default: // e_bedrock_mem_uc_wr, e_bedrock_mem_wr:
           begin
             mmio_out_packet_li.op_v2                                    = store_op;
