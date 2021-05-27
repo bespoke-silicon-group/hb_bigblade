@@ -43,10 +43,10 @@ set_attribute     $ddr_link_1_cell orientation R0
 set_fixed_objects $ddr_link_1_cell
 
 # placement boundaries next to hardened blocks
-create_placement_blockage -boundary {{13.104 80.64} {13.44 155.52}}
-create_placement_blockage -boundary {{53.76 80.64} {54.096 155.52}}
-create_placement_blockage -boundary {{13.104 0} {13.44 74.88}}
-create_placement_blockage -boundary {{53.76 0} {54.096 74.88}}
+create_placement_blockage -name pb_ddr_link_0 -boundary {{13.104 80.64} {13.44 155.52}}
+create_placement_blockage -name pb_ddr_link_1 -boundary {{53.76 80.64} {54.096 155.52}}
+create_placement_blockage -name pb_ddr_link_2 -boundary {{13.104 0} {13.44 74.88}}
+create_placement_blockage -name pb_ddr_link_3 -boundary {{53.76 0} {54.096 74.88}}
 
 for {set i 0} {$i < 2} {incr i} {
   foreach {dir} {"in" "out"} {
