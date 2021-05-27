@@ -36,7 +36,9 @@ proc insert_buffers_on_propagated_nets {port cell num start_num prefix buffer} {
 if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
   set BSG_STARRC_MODE_TRUE "in_design"
 } else {
-  set BSG_STARRC_MODE_TRUE "true"
+  #set BSG_STARRC_MODE_TRUE "true"
+  # For this specific design, use StarRC 2020
+  set BSG_STARRC_MODE_TRUE "in_design"
 }
 
 # Enable StarRC extraction before route optimization
