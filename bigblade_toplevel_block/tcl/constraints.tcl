@@ -45,6 +45,7 @@ for {set i 0} {$i < 4} {incr i} {
 # tag constraints
 set tag_in_ports [get_ports {pad_CT0_1_i_int pad_CT0_2_i_int}]
 set_input_delay [expr $tag_clk_period_ps/2] -clock $tag_clk_name -source_latency_included -network_latency_included $tag_in_ports
+set_dont_touch_network $tag_in_ports
 
 
 # false path
