@@ -44,7 +44,7 @@ set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
 #########################
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 
-#set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAM_FILES]
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAMS_SOURCE_FILES]
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
