@@ -4,7 +4,7 @@ from subprocess import run
 
 BUILD_DIR = sys.argv[1]
 
-RELEASE     = 'rtl-alpha-freeze'
+RELEASE     = 'rc-alpha-freeze'
 RELEASE_DIR = '/nbu/spin/share/gf14/bigblade_exports'
 #RELEASE_DIR = './release'
 
