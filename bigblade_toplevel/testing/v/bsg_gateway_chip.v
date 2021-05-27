@@ -339,4 +339,30 @@ module bsg_gateway_chip
   ,.wh_links_o      ( wh_links_li       )
   );
 
+
+`define clock_printer(clk)                                     \
+  always @(posedge clk) begin                                  \
+    int fd;                                                    \
+    reg [63:0] t;                                              \
+    t = 0;                                                     \
+    $system("date +%s%3N > date.txt");                         \
+    fd=$fopen("date.txt","r");                                 \
+    $fscanf(fd, "%d", t);                                      \
+    $fclose(fd);                                               \
+    $display("%-10s: tick: time (ms) = %d, ps = %t", `BSG_STRINGIFY(`clk), t, $time); \
+  end
+
+  `ifdef PRINT_MC_CLK
+  `clock_printer(mc_clk);
+  `endif
+  `ifdef PRINT_IO_CLK
+  `clock_printer(io_clk);
+  `endif
+  `ifdef PRINT_NOC_CLK
+  `clock_printer(noc_clk);
+  `endif
+  `ifdef PRINT_TAG_CLK
+  `clock_printer(tag_clk);
+  `endif
+  
 endmodule
