@@ -16,7 +16,6 @@ set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
 set keepout_margins_wide [list [expr 2*$keepout_margin_x] $keepout_margin_y [expr 2*$keepout_margin_x] $keepout_margin_y]
-set io_link_gap_x 0
 
 set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
 set icache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 0 3]
@@ -85,7 +84,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner tr \
   -anchor_object $icache_tag_ma \
-  -offset [list [expr 2*$keepout_margin_x] 0]
+  -offset [list [expr 0] 0]
 
 set icache_data_ma_east [create_macro_array \
   -num_rows 2 \
@@ -103,7 +102,7 @@ set_macro_relative_location \
   -target_corner tr \
   -target_orientation R0 \
   -anchor_corner tr \
-  -offset [list [expr -$io_link_gap_x-2*$keepout_margin_x] 0]
+  -offset [list 0 0]
 
 #####################################
 ### D CACHE TAG
@@ -166,7 +165,7 @@ set_macro_relative_location \
   -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
-  -offset [list [expr -$io_link_gap_x-2*$keepout_margin_x] 0]
+  -offset [list [expr -2*$keepout_margin_x] 0]
 
 #####################################
 ### BTB Memory
