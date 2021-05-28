@@ -3,12 +3,11 @@ import math
 import sys
 
 cfg_base_addr          = 0x2000000
-cfg_reg_reset          = 0x01
-cfg_reg_freeze         = 0x02
-cfg_domain_mask        = 0x09
-cfg_sac_mask           = 0x0a
-cfg_reg_icache_mode    = 0x22
-cfg_reg_dcache_mode    = 0x43
+cfg_reg_reset          = 0x004
+cfg_reg_freeze         = 0x008
+cfg_hio_mask        = 0x01c
+cfg_reg_icache_mode    = 0x204
+cfg_reg_dcache_mode    = 0x404
 
 class NBF:
     # Initialize
@@ -152,8 +151,7 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_domain_mask, 1)
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_sac_mask, 1)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_hio_mask, 0xfffffff)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
 

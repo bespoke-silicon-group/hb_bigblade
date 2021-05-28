@@ -23,8 +23,8 @@ bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
 bsg_14_commit        :=dec9770529ca82e0e79857eb73201cd0bdcce161
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
-bsg_cadenv_url       :=$(BITBUCKET)taylor-bsg/bsg_cadenv
-bsg_cadenv_commit    :=8f87a0589fcde7390d8e701d36757d33dfeefb71
+bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
+bsg_cadenv_commit    :=master
 
 board_dir            :=$(THIS_DIR)/board
 board_url            :=$(BITBUCKET)taylor-bsg/board

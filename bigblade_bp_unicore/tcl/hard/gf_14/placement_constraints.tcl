@@ -31,6 +31,7 @@ set dcache_stat_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dc
 set btb_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*btb*tag_mem*"]
 set dcache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*dcache*tag_mem*"]
 set tag_mem_width     [lindex [get_attribute [get_cell -hier $dcache_tag_mems] width ] 0]
+set bht_mem [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*bht*mem*"]
 
 set ireg_mem_height   [lindex [get_attribute [get_cell -hier $int_regfile_mems] height ] 0]
 set ireg_mem_width    [lindex [get_attribute [get_cell -hier $int_regfile_mems] width ] 0]
@@ -84,7 +85,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner tr \
   -anchor_object $icache_tag_ma \
-  -offset [list [expr 0] 0]
+  -offset [list 0 0]
 
 set icache_data_ma_east [create_macro_array \
   -num_rows 2 \
@@ -147,7 +148,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner br \
   -anchor_object $dcache_tag_ma \
-  -offset [list [expr 2*$keepout_margin_x] 0]
+  -offset [list 0 0]
 
 set dcache_data_ma_east [create_macro_array \
   -num_rows 2 \
@@ -165,7 +166,7 @@ set_macro_relative_location \
   -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
-  -offset [list [expr -2*$keepout_margin_x] 0]
+  -offset [list 0 0]
 
 #####################################
 ### BTB Memory
@@ -251,13 +252,26 @@ set_macro_relative_location \
 
 create_keepout_margin -type hard -outer $keepout_margins $dcache_stat_mem
 
+##################################
+### BHT
+###
+
+set_macro_relative_location \
+  -target_object $bht_mem \
+  -target_corner tr \
+  -target_orientation N \
+  -anchor_object $icache_data_ma_east \
+  -anchor_corner br \
+  -offset [list 0 0]
+
+create_keepout_margin -type hard -outer $keepout_margins $bht_mem
 
 # create temporary placement blockages for I/O
-create_placement_blockage -name sdr_place_blockage_0 -boundary {{155.98 167.04} {240.408 169.54}}
-create_placement_blockage -name sdr_place_blockage_1 -boundary {{240.408 246.24} {282.24 248.74}}
-create_placement_blockage -name sdr_place_blockage_2 -boundary {{155.98 397.34} {282.24 399.84}}
-create_placement_blockage -name sdr_place_blockage_3 -boundary {{237.908 167.04} {240.408 246.24}}
-create_placement_blockage -name sdr_place_blockage_4 -boundary {{279.74 246.24} {282.24 399.84}}
+#create_placement_blockage -name sdr_place_blockage_0 -boundary {{155.98 167.04} {240.408 169.54}}
+#create_placement_blockage -name sdr_place_blockage_1 -boundary {{240.408 246.24} {282.24 248.74}}
+#create_placement_blockage -name sdr_place_blockage_2 -boundary {{155.98 397.34} {282.24 399.84}}
+#create_placement_blockage -name sdr_place_blockage_3 -boundary {{237.908 167.04} {240.408 246.24}}
+#create_placement_blockage -name sdr_place_blockage_4 -boundary {{279.74 246.24} {282.24 399.84}}
 
 
 #####################################
