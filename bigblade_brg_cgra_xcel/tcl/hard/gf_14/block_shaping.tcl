@@ -32,7 +32,7 @@ set pe_origin_x 100.16
 foreach {idx_x} {7 6 5 4 3 2 1 0} {
   foreach {idx_y} {0 1 2 3 4 5 6 7} {
     set id [expr $idx_x+$idx_y*$pe_num_x]
-    append_to_collection pe_cells [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/cgra_dpath_PE_rc__$id]
+    append_to_collection pe_cells [get_cells pod/hb_cgra_xcel/cgra_xcel/dpath/cgra/dpath/PE_rc__$id]
   }
 }
 

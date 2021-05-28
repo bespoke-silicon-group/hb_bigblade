@@ -72,7 +72,7 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
   #-------------------------------------------------------------------------
   # MISC pins
   #-------------------------------------------------------------------------
-  set master_pe "cgra_dpath_PE_rc__0"
+  set master_pe "PE_rc__0"
 
   set pe_llx [lindex [get_attribute [get_cell -hier $master_pe] boundary_bbox] 0 0]
   set pe_lly [lindex [get_attribute [get_cell -hier $master_pe] boundary_bbox] 0 1]
