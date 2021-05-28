@@ -5,14 +5,13 @@ derive_pin_access_routing_guides -cells [get_cells "mem_link_*__link"] -layers {
 #derive_pin_access_routing_guides -cells [get_cells "io_link"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
 #derive_pin_access_routing_guides -cells [get_cells "io_link"] -layers {K2 K4} -x_width 0.001 -y_width [expr 0.084*4]
 
-#derive_pin_access_routing_guides -cells [get_cells "core_complex_core_*__podrow"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
-#derive_pin_access_routing_guides -cells [get_cells "core_complex_core_*__podrow"] -layers {K2 K4} -x_width 0.001 -y_width [expr 0.084*4]
+derive_pin_access_routing_guides -cells [get_cells "core_complex_core_0__podrow"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
 
 
 
 
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
-#set_app_options -name plan.place.auto_generate_blockages -value false
+set_app_options -name plan.place.auto_generate_blockages -value false
 
 # Uncomment if you are sourcing this file many times interactively.
 #set_fixed_objects -unfix [get_flat_cells]
@@ -50,21 +49,22 @@ set bottom_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2-$ver_shift]
 set pod_row_start_x [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_width] $grid_width]]
 set pod_row_start_y [expr $core_lly+[round_down_to_nearest $bottom_ver_gap $grid_height]]
 
-#for {set i 1} {$i < 4} {incr i} {
-#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
-#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
-#  # gap routing blockages
-#  create_routing_blockage -name rb_pod_gap -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{$pod_row_start_x $lly} {[expr $pod_row_start_x+0.5*$pod_width-200] $ury}}"
-#  # gap placement blockages
-#  create_placement_blockage -name "pb_pod_gap_${i}_start" -boundary "{{$pod_row_start_x $lly} {[expr $pod_row_start_x+39] $ury}}"
-#  set curr_llx [expr $pod_row_start_x+95]
-#  for {set j 0} {$j < 64} {incr j} {
-#    create_placement_blockage -name "pb_pod_gap_${i}_${j}" -boundary "{{$curr_llx $lly} {[expr $curr_llx+60] $ury}}"
-#    set curr_llx [expr $curr_llx+11*$grid_width]
-#    if {[expr $j%16] == 15} { set curr_llx [expr $curr_llx+$grid_width] }
-#  }
-#  create_placement_blockage -name "pb_pod_gap_${i}_end" -boundary "{{[expr $pod_row_start_x+$pod_width-42] $lly} {[expr $pod_row_start_x+$pod_width] $ury}}"
-#}
+for {set i 1} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+  # gap routing blockages
+  #create_routing_blockage -name rb_pod_gap -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{$pod_row_start_x $lly} {[expr $pod_row_start_x+0.5*$pod_width-200] $ury}}"
+  # gap placement blockages
+  create_placement_blockage -name "pb_pod_gap_${i}_start" -boundary "{{$pod_row_start_x $lly} {[expr $pod_row_start_x+39] $ury}}"
+  set curr_llx [expr $pod_row_start_x+95]
+  for {set j 0} {$j < 64} {incr j} {
+    create_placement_blockage -name "pb_pod_gap_${i}_${j}" -boundary "{{$curr_llx $lly} {[expr $curr_llx+60] $ury}}"
+    set curr_llx [expr $curr_llx+11*$grid_width]
+    if {[expr $j%16] == 15} { set curr_llx [expr $curr_llx+$grid_width] }
+  }
+  create_placement_blockage -name "pb_pod_gap_${i}_end" -boundary "{{[expr $pod_row_start_x+$pod_width-42] $lly} {[expr $pod_row_start_x+$pod_width] $ury}}"
+  #create_routing_blockage -name rb_clk_gen -layers [get_layers] -boundary "{{5225 $lly} {5269 $ury}}"
+}
 
 
 # bp blockages

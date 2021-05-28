@@ -27,7 +27,6 @@ proc get_propagated_nets {port cell} {
 
 reset_app_options custom.route.*
 
-
 create_routing_rule ss_x2_ndr -multiplier_spacing 2
 create_routing_rule ss_x4_ndr -multiplier_spacing 4
 create_routing_rule ss_x8_ndr -multiplier_spacing 8
@@ -53,10 +52,23 @@ foreach {side} {"DL" "DR" "IT"} {
 }
 
 
-# flow default timing_driven true
+
 #set_app_options -name route.global.timing_driven -value false
 #set_app_options -name route.track.timing_driven -value false
 #set_app_options -name route.detail.timing_driven -value false
+#set_app_options -name route.global.crosstalk_driven -value false
+#set_app_options -name route.track.crosstalk_driven -value false
+
+# First, route vertical links and lock
+#set ver_nets [get_nets *ver_io_*_link_*_lo*]
+#route_group -nets $ver_nets
+
+
+
+# flow default timing_driven true
+#set_app_options -name route.global.timing_driven -value true
+#set_app_options -name route.track.timing_driven -value true
+#set_app_options -name route.detail.timing_driven -value true
 
 # disable crosstalk driven to avoid zigzag shaped routing
 if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
