@@ -31,3 +31,6 @@ bsg_manycore:
 board:
 	git clone git@bitbucket.org:taylor-bsg/board.git $@
 	cd $@ ; git checkout $(commit) ; git checkout -b dev_$(commit)
+
+include ../common/exporter/Makefile.include
+
