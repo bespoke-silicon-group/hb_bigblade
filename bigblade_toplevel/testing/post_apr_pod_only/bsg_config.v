@@ -15,6 +15,9 @@ config bsg_config;
   //cell bsg_chip_noc_io_link liblist `BIGBLADE_NOC_IO_LINK_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
   //cell bsg_chip_noc_mem_link liblist `BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
 
+  cell bsg_manycore_link_pod_row_sdr liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
+  cell bsg_manycore_link_to_sdr_north_row liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
+  cell bsg_manycore_link_to_sdr_south_row liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
   cell bsg_manycore_link_ruche_to_sdr_east liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
   cell bsg_manycore_link_ruche_to_sdr_west liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
   cell bsg_manycore_link_to_sdr_north liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_PDK_LIBRARY_NAME;
