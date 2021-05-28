@@ -71,7 +71,7 @@ VCS_OPTIONS += -timescale=1ps/1ps
 #VCS_OPTIONS += -diag timescale 
 VCS_OPTIONS += -top bsg_config bsg_config.v
 VCS_OPTIONS += -licqueue
-VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
+VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS,noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 
 ########################################
@@ -493,7 +493,7 @@ $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.mac
 $(BSG_OUT_DIR) $(BSG_CUDA_PATH):
 	@mkdir -p $@
 
-BSG_MACHINE_PATH := $(BSG_OUT_DIR)
+export BSG_MACHINE_PATH := $(BSG_OUT_DIR)
 $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
 	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
