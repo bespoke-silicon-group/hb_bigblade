@@ -29,7 +29,7 @@ elif NETLIST_EXPORT_MODE == 1 or NETLIST_EXPORT_MODE == 2:
   if not os.path.exists(RELEASE_DIR):
     print('ERROR: please clone hb_bigblade_netlists before proceeding!')
     print('\tgit clone git@github.com:bespoke-silicon-group/hb_bigblade_netlists.git')
-    sys.exit(0)
+    sys.exit(1)
 
 # Print some system information and current directory
 print('System Information:')
@@ -127,6 +127,7 @@ elif NETLIST_EXPORT_MODE == 2:
 # Begin checking for all the files to export and adding them to the all_files list
 print('Checking for files to export...')
 all_files = []
+status_flag = 0
 
 # Utility function. Returns if the path globed any files, the list of files it
 # globed, and a list of sizes for each globed file.
@@ -150,6 +151,8 @@ if NETLIST_EXPORT_MODE == 0:
   (synth_run_found, synth_run_files, synth_run_size) = check_for_file(synth_run_path)
   all_files.extend(synth_run_files)
   print(f'FOUND!' if synth_run_found else f'NOT FOUND!')
+  if not synth_run_found:
+    status_flag = 2
   if synth_run_found:
     for f,s in zip(synth_run_files,synth_run_size):
       print(f'\t\t{f} ({s})')
@@ -161,6 +164,8 @@ if NETLIST_EXPORT_MODE == 0:
   (pnr_run_found, pnr_run_files, pnr_run_size) = check_for_file(pnr_run_path)
   all_files.extend(pnr_run_files)
   print(f'FOUND!' if pnr_run_found else f'NOT FOUND!')
+  if not pnr_run_found:
+    status_flag = 2
   if pnr_run_found:
     for f,s in zip(pnr_run_files,pnr_run_size):
       print(f'\t\t{f} ({s})')
@@ -172,6 +177,8 @@ if NETLIST_EXPORT_MODE == 0:
   (export_etm_found, export_etm_files, export_etm_size) = check_for_file(export_etm_path)
   all_files.extend(export_etm_files)
   print(f'FOUND!' if export_etm_found else f'NOT FOUND!')
+  if not export_etm_found:
+    status_flag = 2
   if export_etm_found:
     for f,s in zip(export_etm_files,export_etm_size):
       print(f'\t\t{f} ({s})')
@@ -182,7 +189,12 @@ if NETLIST_EXPORT_MODE == 0:
   spef_path = os.sep.join([BUILD_DIR, 'pex_xray_gate/*/results/*'])
   (spef_found, spef_files, spef_size) = check_for_file(spef_path)
   all_files.extend(spef_files)
-  print(f'FOUND! ({spef_size[0]})' if spef_found else f'NOT FOUND!')
+  if spef_found:
+    print(f'FOUND! ({spef_size[0]})')
+  else:
+    print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    if status_flag == 0:
+      status_flag = 1
   if spef_found:
     for f,s in zip(spef_files,spef_size):
       print(f'\t\t{f} ({s})')
@@ -194,6 +206,8 @@ if NETLIST_EXPORT_MODE == 0:
     (spef_found, spef_files, spef_size) = check_for_file(spef_path)
     all_files.extend(spef_files)
     print(f'FOUND!' if spef_found else f'NOT FOUND!')
+    if not spef_found:
+      status_flag = 2
     if spef_found:
       for f,s in zip(spef_files,spef_size):
         print(f'\t\t{f} ({s})')
@@ -204,7 +218,12 @@ if NETLIST_EXPORT_MODE == 0:
   sdf_path = os.sep.join([BUILD_DIR, 'ptsi_xray/*/*/results/*.sdf.gz'])
   (sdf_found, sdf_files, sdf_size) = check_for_file(sdf_path)
   all_files.extend(sdf_files)
-  print(f'FOUND! ({sdf_size[0]})' if sdf_found else f'NOT FOUND!')
+  if sdf_found:
+    print(f'FOUND! ({sdf_size[0]})')
+  else:
+    print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    if status_flag == 0:
+      status_flag = 1
   if sdf_found:
     for f,s in zip(sdf_files,sdf_size):
       print(f'\t\t{f} ({s})')
@@ -216,6 +235,8 @@ if NETLIST_EXPORT_MODE == 0:
     (sdf_found, sdf_files, sdf_size) = check_for_file(sdf_path)
     all_files.extend(sdf_files)
     print(f'FOUND!' if sdf_found else f'NOT FOUND!')
+    if not sdf_found:
+      status_flag = 2
     if sdf_found:
       for f,s in zip(sdf_files,sdf_size):
         print(f'\t\t{f} ({s})')
@@ -227,6 +248,8 @@ if NETLIST_EXPORT_MODE == 0:
   (fill_gds_found, fill_gds_files, fill_gds_size) = check_for_file(fill_gds_path)
   all_files.extend(fill_gds_files)
   print(f'FOUND!' if fill_gds_found else f'NOT FOUND!')
+  if not fill_gds_found:
+    status_flag = 2
   if fill_gds_found:
     for f,s in zip(fill_gds_files,fill_gds_size):
       print(f'\t\t{f} ({s})')
@@ -238,6 +261,8 @@ if NETLIST_EXPORT_MODE == 1:
   (synth_netlist_found, synth_netlist_files, synth_netlist_size) = check_for_file(synth_netlist_path)
   all_files.extend(synth_netlist_files)
   print(f'FOUND!' if synth_netlist_found else f'NOT FOUND!')
+  if not synth_netlist_found:
+    status_flag = 2
   if synth_netlist_found:
     for f,s in zip(synth_netlist_files,synth_netlist_size):
       print(f'\t\t{f} ({s})')
@@ -249,21 +274,55 @@ if NETLIST_EXPORT_MODE == 2:
   (pnr_netlist_found, pnr_netlist_files, pnr_netlist_size) = check_for_file(pnr_netlist_path)
   all_files.extend(pnr_netlist_files)
   print(f'FOUND!' if pnr_netlist_found else f'NOT FOUND!')
+  if not pnr_netlist_found:
+    status_flag = 2
   if pnr_netlist_found:
     for f,s in zip(pnr_netlist_files,pnr_netlist_size):
       print(f'\t\t{f} ({s})')
 
 print()
 
+# Print files left behind for a bulid export
+if NETLIST_EXPORT_MODE == 0:
+  print(f'The following directories are not being exported:')
+  dirs_exported = ['synth', 'pnr', 'export_etm', 'fill']
+  for d in glob.glob(os.sep.join([BUILD_DIR,'*'])):
+    if os.path.basename(d) not in dirs_exported:
+      print(f'\t{d}')
+print()
+
 # Re-print right before confirm, this is pretty important info
 print(f'Resulting export directory: {result_dir}')
 print()
+
+# Status flag check
+if status_flag == 2:
+  print('''
+    ERROR: There are files missing that we expected to find. Please check the
+    logs above to see what is missing. This release should only be confirmed if
+    you really know what you are doing...
+  ''')
+
+elif status_flag == 1:
+  print('''
+    WARNING: There are missing xray files, this should only be the case for
+    leaf level blocks. If this is a leaf block, then you can ignore this
+    warning. Otherwise, you should only confirm this release if you really know
+    what you are doing...
+  ''')
 
 # User confirm
 user_input = input("Confirm? [y/n] ")
 if user_input.lower() != 'y':
   print('Export canceled, exiting.')
-  sys.exit()
+  sys.exit(1)
+
+# User confirm again if status is dirty
+if status_flag == 2:
+  user_input = input("Are you really sure? there are missing files...? [y/n] ")
+  if user_input.lower() != 'y':
+    print('Export canceled, exiting.')
+    sys.exit(1)
 
 # Make the result dir (using subprocess because I want to make sure the unix
 # g+s permissions are used... not sure if I use they python API from shutils if

@@ -1,6 +1,9 @@
 
+.SHELLFLAGS = -o pipefail -c
+
 export_build:
 	python3 `git rev-parse --show-toplevel`/common/exporter/export_build.py bsg_14/current_build 2>&1 | tee -i $@.log
+	cp $@.log `cat $@.log | grep "^Export complete" | awk '{print $$3}'`
 
 export_netlist_post_synth:
 	python3 `git rev-parse --show-toplevel`/common/exporter/export_build.py bsg_14/current_build --netlist-post-synth 2>&1 | tee -i $@.log
