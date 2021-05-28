@@ -20,4 +20,4 @@ set bsg_out_dir $::env(TESTING_BSG_OUT_DIR)
 set bsg_designs_target_dir "$bsg_out_dir/bigblade_io_link_ddr/$bsg_designs_target"
 set basejump_stl_dir       "$bsg_designs_target_dir/basejump_stl"
 
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_io_link_ddr-post-synth_filelist.tcl
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_io_link_ddr-post-apr_filelist.tcl

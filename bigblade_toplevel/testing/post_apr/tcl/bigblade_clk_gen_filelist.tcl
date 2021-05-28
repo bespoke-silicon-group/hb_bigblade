@@ -20,5 +20,5 @@ set bsg_out_dir $::env(TESTING_BSG_OUT_DIR)
 set bsg_designs_target_dir "$bsg_out_dir/bigblade_clk_gen/$bsg_designs_target"
 set basejump_stl_dir       "$bsg_designs_target_dir/basejump_stl"
 
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_clk_gen-post-synth_filelist.tcl
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_clk_gen-post-apr_filelist.tcl
 

@@ -20,4 +20,4 @@ set bsg_out_dir $::env(TESTING_BSG_OUT_DIR)
 set basejump_stl_dir "$bsg_out_dir/bigblade_noc_mem_link/$bsg_designs_target/basejump_stl"
 set common_dir       "$bsg_out_dir/bigblade_noc_mem_link/$bsg_designs_target/../common"
 
-source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_mem_link-post-synth_filelist.tcl
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_mem_link-post-apr_filelist.tcl
