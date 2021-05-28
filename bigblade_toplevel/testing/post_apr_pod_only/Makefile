@@ -112,6 +112,15 @@ VCS_OPTIONS += +define+BSG_DESIGNS_TESTING_LIBRARY_NAME=$(BSG_DESIGNS_TESTING_LI
 VCS_OPTIONS += -f $(BSG_DESIGNS_TESTING_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 
+# Library for PDK files
+export BSG_PDK_LIBRARY_NAME = bsg_pdk
+export BSG_PDK_LIBRARY_FILELIST = $(BSG_OUT_DIR)/$(BSG_PDK_LIBRARY_NAME).filelist
+export BSG_PDK_LIBRARY = $(BSG_OUT_DIR)/$(BSG_PDK_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_PDK_LIBRARY_NAME=$(BSG_PDK_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_PDK_LIBRARY_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_PDK_LIBRARY)
+
 ###################################
 # Manycore Filelists and Liblists #
 ###################################

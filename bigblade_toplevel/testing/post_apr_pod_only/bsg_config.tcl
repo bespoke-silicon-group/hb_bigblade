@@ -37,14 +37,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_link_sdr
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
-
-#########################
 # list of hardened rams #
-#########################
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAMS_SOURCE_FILES]
+set PDK_SOURCE_FILES [concat $PDK_SOURCE_FILES $HARDENED_RAMS_SOURCE_FILES]
 
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
@@ -55,6 +51,15 @@ bsg_create_library $::env(BSG_CHIP_LIBRARY_NAME) \
                    $::env(BSG_CHIP_LIBRARY)      \
                    $SVERILOG_SOURCE_FILES        \
                    $SVERILOG_INCLUDE_PATHS
+
+# PDK & Hardened Rams library filelist
+bsg_create_filelist $::env(BSG_PDK_LIBRARY_FILELIST) \
+                   $PDK_SOURCE_FILES
+
+# PDK library
+bsg_create_library $::env(BSG_PDK_LIBRARY_NAME) \
+                   $::env(BSG_PDK_LIBRARY)      \
+                   $PDK_SOURCE_FILES []
 
 # tile filelist
 bsg_create_filelist $::env(BSG_MANYCORE_TILE_FILELIST) \
