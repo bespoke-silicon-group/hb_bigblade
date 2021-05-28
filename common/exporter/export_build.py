@@ -186,7 +186,7 @@ if NETLIST_EXPORT_MODE == 0:
 # Search for the xray parasitic files (spef)
 if NETLIST_EXPORT_MODE == 0:
   print('\tChecking for xray pex spef files... ', end='')
-  spef_path = os.sep.join([BUILD_DIR, 'pex_xray_gate/*/results/*'])
+  spef_path = os.sep.join([BUILD_DIR, 'pex_gate_xray/*/results/*'])
   (spef_found, spef_files, spef_size) = check_for_file(spef_path)
   all_files.extend(spef_files)
   if spef_found:
