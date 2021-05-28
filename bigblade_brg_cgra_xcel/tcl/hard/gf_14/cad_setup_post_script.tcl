@@ -1,0 +1,1 @@
+set CTS_MIN_ROUTING_LAYER "M2"
