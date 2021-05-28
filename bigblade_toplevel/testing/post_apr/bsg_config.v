@@ -7,7 +7,7 @@ config bsg_config;
   cell bsg_manycore_tile_compute_ruche liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_manycore_tile_vcache liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_manycore_tile_compute_array_ruche liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  cell bsg_manycore_tile_vcache_arrary liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  cell bsg_manycore_tile_vcache_array liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
   //cell bigblade_clk_gen liblist `BIGBLADE_CLK_GEN_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   //cell bsg_chip_io_link_ddr liblist `BIGBLADE_IO_LINK_DDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
