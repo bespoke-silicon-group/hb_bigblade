@@ -53,6 +53,18 @@ foreach {side} {"DL" "DR" "IT"} {
 }
 
 
+#set_app_options -name route.global.timing_driven -value false
+#set_app_options -name route.track.timing_driven -value false
+#set_app_options -name route.detail.timing_driven -value false
+#set_app_options -name route.global.crosstalk_driven -value false
+#set_app_options -name route.track.crosstalk_driven -value false
+
+# First, route vertical links and lock
+#set ver_nets [get_nets *ver_io_*_link_*_lo*]
+#route_group -nets $ver_nets
+
+
+
 # flow default timing_driven true
 #set_app_options -name route.global.timing_driven -value false
 #set_app_options -name route.track.timing_driven -value false
