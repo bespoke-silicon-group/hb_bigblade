@@ -22,7 +22,7 @@ set cgra_width 510.72
 set pod_width  $pod_row_width
 
 set pod_height $pod_row_height
-set pod_gap    [expr 11.5*$grid_height]
+set pod_gap    [expr 13.5*$grid_height]
 
 set noc_mem_width  [expr 8*$grid_width]
 set noc_mem_height [expr 27*$grid_height]
