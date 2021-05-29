@@ -21,7 +21,7 @@ source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAMS_SOURCE_FILES]
 
 # chip filelist
-bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
+bsg_create_filelist $::env(BSG_CHIP_FILELIST)    \
                     $SVERILOG_SOURCE_FILES
 
 # chip library
@@ -32,7 +32,7 @@ bsg_create_library $::env(BSG_CHIP_LIBRARY_NAME) \
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \
-                   [bsg_list_diff $TESTING_SOURCE_FILES $SVERILOG_SOURCE_FILES] \
+                   [bsg_list_diff $TESTING_SOURCE_FILES $SVERILOG_SOURCE_FILES]
 
 # testing library
 bsg_create_library $::env(BSG_DESIGNS_TESTING_LIBRARY_NAME) \

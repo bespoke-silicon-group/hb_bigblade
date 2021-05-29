@@ -100,78 +100,6 @@ VCS_OPTIONS += +define+BSG_DESIGNS_TESTING_LIBRARY_NAME=$(BSG_DESIGNS_TESTING_LI
 VCS_OPTIONS += -f $(BSG_DESIGNS_TESTING_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_DESIGNS_TESTING_LIBRARY)
 
-###################################
-# Manycore Filelists and Liblists #
-###################################
-
-export BSG_MANYCORE_TILE_LIBRARY_NAME = bigblade_manycore_tile
-export BSG_MANYCORE_TILE_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NAME).filelist
-export BSG_MANYCORE_TILE_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BSG_MANYCORE_TILE_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_FILELIST)
-VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_LIBRARY)
-
-###########################################
-# Bigblade clk_gen filelists and liblists #
-###########################################
-export BIGBLADE_CLK_GEN_LIBRARY_NAME = bigblade_clk_gen
-export BIGBLADE_CLK_GEN_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_CLK_GEN_LIBRARY_NAME).filelist
-export BIGBLADE_CLK_GEN_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_CLK_GEN_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BIGBLADE_CLK_GEN_LIBRARY_NAME=$(BIGBLADE_CLK_GEN_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_CLK_GEN_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_CLK_GEN_LIBRARY)
-
-#################################################
-# Bigblade IO link DDR filelists and liblists # #
-#################################################
-
-export BIGBLADE_IO_LINK_DDR_LIBRARY_NAME = bigblade_io_link_ddr
-export BIGBLADE_IO_LINK_DDR_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME).filelist
-export BIGBLADE_IO_LINK_DDR_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BIGBLADE_IO_LINK_DDR_LIBRARY_NAME=$(BIGBLADE_IO_LINK_DDR_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_IO_LINK_DDR_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_IO_LINK_DDR_LIBRARY)
-
-
-###############################################
-# Bigblade NOC IO link filelists and liblists #
-###############################################
-
-export BIGBLADE_NOC_IO_LINK_LIBRARY_NAME = bigblade_noc_io_link
-export BIGBLADE_NOC_IO_LINK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME).filelist
-export BIGBLADE_NOC_IO_LINK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BIGBLADE_NOC_IO_LINK_LIBRARY_NAME=$(BIGBLADE_NOC_IO_LINK_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_NOC_IO_LINK_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_NOC_IO_LINK_LIBRARY)
-
-################################################
-# Bigblade NOC MEM link filelists and liblists #
-################################################
-
-export BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME = bigblade_noc_mem_link
-export BIGBLADE_NOC_MEM_LINK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME).filelist
-export BIGBLADE_NOC_MEM_LINK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME=$(BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_NOC_MEM_LINK_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_NOC_MEM_LINK_LIBRARY)
-
-
-#################################################
-# BSG Manycore SDR links filelists and liblists #
-#################################################
-export BSG_MANYCORE_LINK_SDR_LIBRARY_NAME = bsg_manycore_link_sdr
-export BSG_MANYCORE_LINK_SDR_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).filelist
-export BSG_MANYCORE_LINK_SDR_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
-VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
-
 
 ##################################
 # Create filelists and libraries #
@@ -189,10 +117,10 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 ## Trace Replay Roms
 ########################################
 
-BSG_TRACE_NAME  := bsg_tag_boot
+BSG_TRACE_NAME  := bsg_tag_boot_single_pod
 BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
-BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
+BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
 
 ifeq ($(USE_CLK_GEN),1)
   BSG_TRACE_PY_OPTION := use_clk_gen
@@ -204,7 +132,7 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 	python $< $(BSG_TRACE_PY_OPTION) > $@
 
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
-	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
+	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< bsg_tag_boot_rom > $@
 
 VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
@@ -321,7 +249,7 @@ BSG_SDR_SOUTH_V       = out/bsg_manycore_link_to_sdr_south_chip_finish.v
 #BSG_SDR_NORTH_ROW_V   = out/bsg_manycore_link_to_sdr_north_row_chip_finish.v
 #BSG_SDR_SOUTH_ROW_V   = out/bsg_manycore_link_to_sdr_south_row_chip_finish.v
 
-VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays +sdfretain
+VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
 VCS_OPTIONS += +optconfigfile+$(CDC_INSTANCE_LIST_V)
 
@@ -498,7 +426,7 @@ $(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
 
 clean:
 	$(MAKE) -f bladerunner.mk libraries.clean BSG_MACHINE_PATH=$(BSG_WORK_DIR)/../machine/
-	rm -rf $(BSG_OUT_DIR)
+	rm -rf $(BSG_OUT_DIR) sdfAnnotateInfo
 	rm -rf DVEfiles
 	rm -rf stack.info.*
 	rm -f  vc_hdrs.h
