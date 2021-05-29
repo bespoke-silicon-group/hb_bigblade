@@ -35,8 +35,7 @@
 
 // Config bus addresses
 #define BP_CFG_OFFSET 0x200000
-extern volatile uint64_t *did_mask_addr;
-extern volatile uint64_t *sac_mask_addr;
+extern volatile uint64_t *hio_mask_addr;
 
 // Address declarations
 extern const uint64_t mc_vcache_mmio;
@@ -48,13 +47,13 @@ extern const uint64_t mc_host_fifo;
 extern const uint64_t mc_host_x_coord;
 extern const uint64_t mc_host_y_coord;
 
-extern uint32_t *mc_finish_addr;
-extern uint32_t *mc_time_addr;
-extern uint32_t *mc_fail_addr;
-extern uint32_t *mc_stdout_addr;
-extern uint32_t *mc_stderr_addr;
-extern uint32_t *mc_branch_trace_addr;
-extern uint32_t *mc_print_stat_addr;
+extern uint64_t *mc_finish_addr;
+extern uint64_t *mc_time_addr;
+extern uint64_t *mc_fail_addr;
+extern uint64_t *mc_stdout_addr;
+extern uint64_t *mc_stderr_addr;
+extern uint64_t *mc_branch_trace_addr;
+extern uint64_t *mc_print_stat_addr;
 
 // Bridge CSR addresses
 extern volatile uint64_t *mc_link_bp_req_fifo_addr;

@@ -3,7 +3,7 @@
 
 int main(uint64_t argc, char *argv[]) {
   // Enable all domains for the manycore
-  *did_mask_addr = 0xFFF;
+  *hio_mask_addr = 0xFFF;
 
   uint32_t some_mc_epa = (uint32_t) 0x00100000;
   uint32_t vcache_block_offset = (uint32_t) 0x10000;
