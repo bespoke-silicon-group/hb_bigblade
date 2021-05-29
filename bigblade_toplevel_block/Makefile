@@ -23,7 +23,7 @@ bsg_manycore_commit  :=ci_bigblade
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
-bsg_14_commit        :=master
+bsg_14_commit        :=toplevel-runtime-experiment
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
