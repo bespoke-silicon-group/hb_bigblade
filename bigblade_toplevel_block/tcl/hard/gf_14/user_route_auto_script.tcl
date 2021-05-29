@@ -400,8 +400,8 @@ add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 
 
 
 # Legalize buffer locations
-legalize_placement -cells [get_cells {bsg_ss* bsg_msc*}]
-check_legality -cells [get_cells {bsg_ss* bsg_msc*}]
+legalize_placement
+check_legality
 
 # Connect wires to inserted buffers
 route_eco
