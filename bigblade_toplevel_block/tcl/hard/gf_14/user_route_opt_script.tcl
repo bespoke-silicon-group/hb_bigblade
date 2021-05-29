@@ -215,6 +215,29 @@ check_legality -cells [get_cells ${opt_prefix}*]
 
 # Step 4: Fix DRCs
 route_eco
+
+
+# create vertical link clocks
+set num_ver_links [expr 64+2]
+for {set i 0} {$i < 4} {incr i} {
+  set wh_master_clk_name   "pod_row_${i}_master_clk"
+  set start_idx [expr {$i == 0} ? {$num_ver_links} : {0}]
+  set end_idx   [expr {$i == 3} ? {$num_ver_links} : {2*$num_ver_links}]
+  for {set j $start_idx} {$j < $end_idx} {incr j} {
+    foreach {k} {"fwd" "rev"} {
+      create_generated_clock \
+          -divide_by 1 \
+          -invert \
+          -master_clock $wh_master_clk_name \
+          -add \
+          -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+          -name "ver_link_${i}_${j}_${k}_clk" \
+          [get_pins "core_complex_core_${i}__podrow/ver_io_${k}_link_clk_o[${j}]"]
+      set_propagated_clock [get_clocks "ver_link_${i}_${j}_${k}_clk"] 
+    }
+  }
+}
+
 update_timing -full ;# Extract design again before report timing
 
 
