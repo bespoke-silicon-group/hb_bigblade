@@ -41,7 +41,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor.v
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor_clk_buf.v
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
-  $bsg_designs_target_dir/../common/v/bsg_link_delay_line.v
   $bsg_designs_target_dir/../common/v/bsg_lfsr_div30.v
 
   $bsg_designs_dir/bigblade_toplevel/v/hard/gf_14/bsg_mem_1r1w_sync.v
@@ -129,7 +128,6 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_ddr_upstream.v
   $basejump_stl_dir/bsg_link/bsg_link_iddr_phy.v
   $basejump_stl_dir/bsg_link/bsg_link_oddr_phy.v
-  $basejump_stl_dir/bsg_link/bsg_link_source_sync_downstream.v
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream.v
 
   $basejump_stl_dir/bsg_link/bsg_link_sdr.v
