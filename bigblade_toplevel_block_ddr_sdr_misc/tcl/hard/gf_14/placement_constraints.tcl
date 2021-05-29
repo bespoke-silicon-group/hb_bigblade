@@ -194,7 +194,7 @@ set esd_height 53.00
 
 set esd_start_x    [expr $pod_row_start_x + 162.3]
 set esd_step_x     147.84
-set esd_start_y    [expr $pod_row_start_y - ($pod_gap+$esd_height)/2]
+set esd_start_y    [expr $pod_row_start_y - $esd_height - 2*[unit_height]]
 set esd_step_y     [expr $pod_height+$pod_gap]
 
 set esd_curr_y $esd_start_y
