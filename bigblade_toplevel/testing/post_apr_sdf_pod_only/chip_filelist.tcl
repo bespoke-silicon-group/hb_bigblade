@@ -43,7 +43,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_manycore_link_resp_credit_to_ready_and_handshake.v
   $bsg_designs_target_dir/../common/v/bsg_lfsr_div30.v
 
-  $bsg_designs_dir/bigblade_toplevel/v/hard/gf_14/bsg_mem_1r1w_sync.v
   $bsg_designs_dir/bigblade_toplevel/v/hard/gf_14/bsg_mem_1rw_sync_mask_write_bit.v
   $bsg_designs_dir/bigblade_toplevel/v/hard/gf_14/bsg_mem_1rw_sync_mask_write_byte.v
   $bsg_designs_dir/bigblade_toplevel/v/hard/gf_14/bsg_mem_1rw_sync.v
@@ -101,6 +100,8 @@ set SVERILOG_SOURCE_FILES [join "
 
   $basejump_stl_dir/bsg_mem/bsg_mem_1r1w.v
   $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_synth.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_sync.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_sync_synth.v
 
   $basejump_stl_dir/bsg_async/bsg_async_credit_counter.v
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v

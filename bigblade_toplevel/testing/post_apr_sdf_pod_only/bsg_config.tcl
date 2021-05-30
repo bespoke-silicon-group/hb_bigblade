@@ -1,12 +1,12 @@
 source ../tcl/bsg_config_util.tcl
 
 # chip source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_pod_only/chip_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_pod_only/chip_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_pod_only/chip_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_pod_only/chip_include.tcl
 
 # testing source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_pod_only/gateway_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_pod_only/gateway_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_pod_only/gateway_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_pod_only/gateway_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
