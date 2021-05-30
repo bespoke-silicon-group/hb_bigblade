@@ -210,8 +210,8 @@ foreach {side} {"DL" "DR" "IT"} {
 
 
 # Step 3: Legalize buffer locations
-legalize_placement
-check_legality
+legalize_placement -cells [get_cells ${opt_prefix}*]
+check_legality -cells [get_cells ${opt_prefix}*]
 
 
 # Step 4: Fix DRCs
