@@ -64,7 +64,7 @@ export BSG_PADMAPPING :=default
 
 # Select the target power grid. We have multiple power grid implementations
 # that can be used. Currently available power grids include none, default_wb
-export BSG_POWER_GRID :=none
+export BSG_POWER_GRID :=default_wb
 
 # Select the target power intent. The power intent contains the power ports
 # and nets that will be available as well as maps cells to power domains.
@@ -155,4 +155,5 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=$(foreach _,$(PTSI_FLOW_ACTIVITY_FILE), 1.0)
 export PTSI_FLOW_STRIP_PATH       :=bsg_gateway_chip/DUT
 
 export USE_ICC2_2020 := 1
+export CALIBRE_DRC_USE_SHELL := 1
 

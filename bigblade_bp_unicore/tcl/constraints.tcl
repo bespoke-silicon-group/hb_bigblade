@@ -162,8 +162,6 @@ bsg_chip_derate_cells
 bsg_chip_derate_mems
 #report_timing_derate
 
-#set_app_var sh_continue_on_error false
-
 ########################################
 ## Disabled or false paths
 bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
@@ -171,8 +169,6 @@ bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
 
 ########################################
 ## Ungrouping
-set_ungroup [get_designs -filter "hdl_template==bsg_array_concentrate_static"    ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_concentrate_static"          ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_decode"                      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_dff_chain"                   ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_encode_one_hot"              ] true
@@ -185,8 +181,6 @@ set_ungroup [get_designs -filter "hdl_template==bsg_priority_encode"            
 set_ungroup [get_designs -filter "hdl_template==bsg_rotate_left"                 ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_rotate_right"                ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_scan"                        ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_transpose"                   ] true
-set_ungroup [get_designs -filter "hdl_template==bsg_unconcentrate_static"        ] true
 
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_reg_id_decode"      ] true
 set_ungroup [get_designs -filter "hdl_template==bsg_manycore_endpoint"           ] true
@@ -225,6 +219,9 @@ set_ungroup [get_designs -filter "hdl_template==lowMaskLoHi"                    
 set_ungroup [get_designs -filter "hdl_template==countLeadingZeros"               ] true
 set_ungroup [get_designs -filter "hdl_template==compressBy2"                     ] true
 set_ungroup [get_designs -filter "hdl_template==compressBy4"                     ] true
+
+# Ungroup specific instance
+set_ungroup [get_designs -hier bsg_mem_1r1w_width_p66_els_p8 ] true
 
 ########################################
 ## Flattening
