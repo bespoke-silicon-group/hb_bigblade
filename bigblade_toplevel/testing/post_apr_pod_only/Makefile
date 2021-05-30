@@ -81,6 +81,7 @@ VCS_OPTIONS += +notimingcheck
 VCS_OPTIONS += +nospecify
 VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
 
+VCS_OPTIONS += +define+SPMD_VERBOSE=1
 ########################################
 ## Chip and Testing Filelists and Liblists
 ########################################

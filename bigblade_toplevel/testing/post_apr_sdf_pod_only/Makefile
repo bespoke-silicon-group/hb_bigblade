@@ -73,6 +73,7 @@ VCS_OPTIONS += -top bsg_config bsg_config.v
 VCS_OPTIONS += -licqueue
 VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC,noIWNF,noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 
+VCS_OPTIONS += +define+SPMD_VERBOSE=1
 ########################################
 ## Chip and Testing Filelists and Liblists
 ########################################
@@ -327,7 +328,7 @@ out/%_max/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TES
 
 
 # RUN COMMANDS
-SPMD ?= finish_asm
+SPMD ?= quicktouch
 MAX_CYCLES ?= 100000000
 NBF_FILE = $(BSG_MANYCORE_DIR)/software/spmd/$(SPMD)/main.nbf
 MIN_RUN = $(addsuffix .min.run, $(SDF_CORNERS))
