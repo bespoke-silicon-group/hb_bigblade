@@ -49,12 +49,15 @@ set bottom_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2-$ver_shift]
 set pod_row_start_x [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_width] $grid_width]]
 set pod_row_start_y [expr $core_lly+[round_down_to_nearest $bottom_ver_gap $grid_height]]
 
-create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $core_lly} {5269 $pod_row_start_y}}"
-for {set i 1} {$i < 4} {incr i} {
-  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
-  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
-  create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5265 $lly} {5305 $ury}}"
-}
+#create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $core_lly} {5269 $pod_row_start_y}}"
+#for {set i 1} {$i < 4} {incr i} {
+#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
+#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+#  create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
+#}
+set lly $core_lly
+set ury [expr $pod_row_start_y+4*$pod_height+3*$pod_gap]
+create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
 
 
 # bp blockages

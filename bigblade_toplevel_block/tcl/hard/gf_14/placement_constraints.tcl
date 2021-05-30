@@ -63,24 +63,24 @@ for {set i 0} {$i < 4} {incr i} {
 
 # bp blockages
 set bp_start_x [expr $core_llx+[round_down_to_nearest $hor_gap $grid_width]]
-for {set i 0} {$i < 4} {incr i} {
-  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
-  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
-  set blockage_dim "{{$bp_start_x $lly} {[expr $pod_row_start_x-0.5*$grid_width] $ury}}"
-  create_placement_blockage -name "pb_bp_block_${i}" -boundary $blockage_dim
-  create_routing_blockage -name rb_bp_block -net_types signal -layers [get_layers] -boundary $blockage_dim
-}
+#for {set i 0} {$i < 4} {incr i} {
+#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
+#  set blockage_dim "{{$bp_start_x $lly} {[expr $pod_row_start_x-0.5*$grid_width] $ury}}"
+#  create_placement_blockage -name "pb_bp_block_${i}" -boundary $blockage_dim
+#  create_routing_blockage -name rb_bp_block -net_types signal -layers [get_layers] -boundary $blockage_dim
+#}
 
 
 # cgra blockages
 set cgra_start_x [expr $pod_row_start_x+$pod_width+0.5*$grid_width]
-for {set i 0} {$i < 4} {incr i} {
-  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
-  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
-  set blockage_dim "{{$cgra_start_x $lly} {[expr $core_urx-$hor_gap] $ury}}"
-  create_placement_blockage -name "pb_cgra_block_${i}" -boundary $blockage_dim
-  create_routing_blockage -name rb_cgra_block -net_types signal -layers [get_layers] -boundary $blockage_dim
-}
+#for {set i 0} {$i < 4} {incr i} {
+#  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+#  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
+#  set blockage_dim "{{$cgra_start_x $lly} {[expr $core_urx-$hor_gap] $ury}}"
+#  create_placement_blockage -name "pb_cgra_block_${i}" -boundary $blockage_dim
+#  create_routing_blockage -name rb_cgra_block -net_types signal -layers [get_layers] -boundary $blockage_dim
+#}
 
 
 

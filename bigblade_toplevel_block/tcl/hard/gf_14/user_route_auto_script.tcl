@@ -50,13 +50,15 @@ set bottom_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2-$ver_shift]
 set pod_row_start_x [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_width] $grid_width]]
 set pod_row_start_y [expr $core_lly+[round_down_to_nearest $bottom_ver_gap $grid_height]]
 
-create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $core_lly} {5269 $pod_row_start_y}}"
-for {set i 1} {$i < 4} {incr i} {
-  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
-  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
-  create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
-}
-
+#create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $core_lly} {5269 $pod_row_start_y}}"
+#for {set i 1} {$i < 4} {incr i} {
+#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
+#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+#  create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
+#}
+set lly $core_lly
+set ury [expr $pod_row_start_y+4*$pod_height+3*$pod_gap]
+create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
 
 # bp blockages
 set bp_start_x [expr $core_llx+[round_down_to_nearest $hor_gap $grid_width]]
@@ -65,6 +67,14 @@ for {set i 0} {$i < 4} {incr i} {
   set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
   # gap routing blockages
   create_routing_blockage -name rb_bp_gap -layers [get_layers {M3 C5 K2 K4 H2 G2}] -boundary "{{[expr $pod_row_start_x-0.5*$grid_width] $lly} {$pod_row_start_x $ury}}"
+}
+# FIXME: remove for loop below when real accelerator is added
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
+  set blockage_dim "{{$bp_start_x $lly} {[expr $pod_row_start_x-0.5*$grid_width] $ury}}"
+  create_placement_blockage -name "pb_bp_block_${i}" -boundary $blockage_dim
+  create_routing_blockage -name rb_bp_block -net_types signal -layers [get_layers] -boundary $blockage_dim
 }
 
 
@@ -75,6 +85,14 @@ for {set i 0} {$i < 4} {incr i} {
   set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
   # gap routing blockages
   create_routing_blockage -name rb_cgra_gap -layers [get_layers {M3 C5 K2 K4 H2 G2}] -boundary "{{[expr $cgra_start_x-0.5*$grid_width] $lly} {$cgra_start_x $ury}}"
+}
+# FIXME: remove for loop below when real accelerator is added
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
+  set blockage_dim "{{$cgra_start_x $lly} {[expr $core_urx-$hor_gap] $ury}}"
+  create_placement_blockage -name "pb_cgra_block_${i}" -boundary $blockage_dim
+  create_routing_blockage -name rb_cgra_block -net_types signal -layers [get_layers] -boundary $blockage_dim
 }
 
 
