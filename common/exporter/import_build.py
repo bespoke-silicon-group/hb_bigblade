@@ -21,7 +21,7 @@ print()
 # (alphabetical and dictionary order so the newest version should be list in
 # the list).
 print(f'Searching for release "{RELEASE}" in directory "{RELEASE_DIR}":')
-release_dirs = [d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')]
+release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
 for d in release_dirs:
   print(f'\t{d}')
 print()
