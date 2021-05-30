@@ -27,7 +27,6 @@ set TESTING_PACKAGE_FILES [join "
   $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
   $bsg_manycore_dir/testbenches/common/v/bsg_manycore_network_cfg_pkg.v
   $bsg_manycore_dir/testbenches/common/v/bsg_manycore_mem_cfg_pkg.v
-  $bsg_out_dir/bsg_bladerunner_pkg.v
   $bsg_replicant_dir/hardware/bsg_manycore_endpoint_to_fifos_pkg.v
 "]
 
@@ -187,7 +186,6 @@ set TESTING_SOURCE_FILES [join "
 
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_core_complex.v
-  $bsg_designs_target_dir/testing/v/bsg_gateway_chip_dpi_manycore.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_io_link_ddr.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_mem_link.v
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip_noc_io_link.v
