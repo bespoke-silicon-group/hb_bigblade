@@ -200,7 +200,6 @@ $(BSG_OUT_DIR):
 
 
 clean:
-	$(MAKE) -f bladerunner.mk libraries.clean BSG_MACHINE_PATH=$(BSG_WORK_DIR)/../machine/
 	rm -rf $(BSG_OUT_DIR)
 	rm -rf DVEfiles
 	rm -rf stack.info.*
