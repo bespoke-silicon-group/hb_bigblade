@@ -1,3 +1,7 @@
+`ifndef SPMD_VERBOSE
+  `define SPMD_VERBOSE 0
+`endif
+
 
 module bsg_gateway_chip_core_complex
 
@@ -19,7 +23,7 @@ module bsg_gateway_chip_core_complex
   ,output [bsg_manycore_link_sif_width_lp-1:0] mc_links_sif_o
 
   ,input  [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] wh_links_i
-  ,output [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] wh_links_o
+  ,output logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] wh_links_o
   );
 
   //////////////////////////////////////////////////
@@ -70,7 +74,7 @@ module bsg_gateway_chip_core_complex
     ,.y_cord_width_p(hb_y_cord_width_gp)
     ,.io_x_cord_p(7'b0001111)
     ,.io_y_cord_p(7'b0001000)
-    ,.verbose_p(0)
+    ,.verbose_p(`SPMD_VERBOSE)
   ) host (
     .clk_i(mc_clk_i)
     ,.reset_i(~tag_trace_done_i)
@@ -88,12 +92,18 @@ module bsg_gateway_chip_core_complex
   localparam longint unsigned mem_size_lp = (2**30)*hb_num_pods_x_gp/wh_ruche_factor_gp/2;
   localparam num_vcaches_per_test_mem_lp = (hb_num_tiles_x_gp*hb_num_pods_x_gp)/wh_ruche_factor_gp/2;
 
+  logic [mem_link_conc_num_gp-1:0][S:N][wh_ruche_factor_gp-1:0][wh_link_sif_width_lp-1:0] wh_links_tmp;
+
   for (genvar i = 0; i < mem_link_conc_num_gp; i++)
   begin: link
     for (genvar j = N; j <= S; j++)
       begin: ver
         for (genvar r = 0; r < wh_ruche_factor_gp; r++)
           begin: ruche
+
+
+
+
             `ifdef REPLICANT
             bsg_nonsynth_wormhole_test_mem_with_dma #(
             `else
@@ -119,8 +129,20 @@ module bsg_gateway_chip_core_complex
               .clk_i(mc_clk_i)
               ,.reset_i(~tag_trace_done_i)
               ,.wh_link_sif_i(wh_links_i[i][j][r])
-              ,.wh_link_sif_o(wh_links_o[i][j][r])
+              ,.wh_link_sif_o(wh_links_tmp[i][j][r])
             );
+            
+            always_comb begin
+              for (integer b = 0; b < wh_link_sif_width_lp; b++) begin
+                if (wh_links_tmp[i][j][r][b] === 1'bX) begin
+                  wh_links_o[i][j][r][b] = 1'b0;
+                end
+                else begin
+                  wh_links_o[i][j][r][b] = wh_links_tmp[i][j][r][b];
+                end
+              end
+            end
+
           end
       end
   end
