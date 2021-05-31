@@ -10,6 +10,7 @@ for {set i 0} {$i < 2} {incr i} {
   set io_clk_name   "io_link_${i}_io_clk"
   create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "ddr_link*${i}*link/clk_gen_io/clk_gen_inst/mux_inst/*/Z"]
   set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
+  set_propagated_clock [get_clocks $io_clk_name]
 }
 
 bsg_chip_derate_cells
