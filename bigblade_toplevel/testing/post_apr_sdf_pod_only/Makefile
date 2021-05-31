@@ -389,6 +389,9 @@ $(BSG_OUT_DIR):
 
 export BSG_MACHINE_PATH := $(BSG_OUT_DIR)
 
+summary:
+	grep -R out/*/$(SPMD)/run.log --color -e "BSG_FINISH" -e "BSG_FAIL" -e "BSG_TIMEOUT" -e "Error"
+
 clean:
 	rm -rf $(BSG_OUT_DIR) sdfAnnotateInfo
 	rm -rf DVEfiles
