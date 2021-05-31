@@ -102,7 +102,7 @@ TB_PARAMS = -pvalue+commit_trace_p=$(CMT_TRACE_P) \
 						-pvalue+no_bind_p=$(NO_BIND_P)
 
 VCS_OPTIONS += -CFLAGS "-I$(BLACKPARROT_SDK_DIR)/include -std=c++14"
-VCS_OPTIONS += $(BLACKPARROT_SDK_DIR)/lib/libdromajo_cosim.a
+#VCS_OPTIONS += $(BLACKPARROT_SDK_DIR)/lib/libdromajo_cosim.a
 
 ########################################
 ## BlackParrot test junk

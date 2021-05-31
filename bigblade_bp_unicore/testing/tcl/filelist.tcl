@@ -163,7 +163,7 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
 
   $bsg_designs_target_dir/v/blackparrot_chip_pkg.v
-  $bp_top_dir/test/common/dromajo_cosim.cpp
+  #$bp_top_dir/test/common/dromajo_cosim.cpp
   $bp_top_dir/test/common/bp_nonsynth_watchdog.sv
   $bsg_designs_target_dir/testing/v/bp_cce_to_mc_bridge_tracer.sv
   
