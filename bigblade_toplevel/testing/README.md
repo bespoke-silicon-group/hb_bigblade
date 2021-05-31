@@ -3,8 +3,8 @@
 Each folder contains a specific configuration of the top-level chip TB.
 
 There are four "main" testbenches:
- - rtl: Un-synthesized Chip RTL
- - rtl_hard: Chip RTL with hardened macros swapped out on a per-module basis
+ - rtl: Un-synthesized chip RTL
+ - rtl_hard: Unsynthesized chip RTL with hardened macros swapped out on a per-module basis
  - post_synth: All modules are swappwed with their synthesized netlists
  - post_apr: All modules are swapped with their post-apr netlists
 
@@ -44,7 +44,7 @@ the module.
 The same declaration is made for post synth:
 
 ```
- # Swap the clock generator Chip RTL for RTL Hard.
+ # Swap the clock generator Chip RTL for Post-Synthesis.
  source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_filelist.tcl
  source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_include.tcl
 ```
