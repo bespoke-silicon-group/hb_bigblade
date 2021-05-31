@@ -68,5 +68,5 @@ There are two ways to confirm that the swap has happened correctly, AND BOTH SHO
 
 io_post_synth: Post-Synthesis IO Link Netlists, RTL Hard for remaining modules
 sdr_post_synth: Post-Synthesis SDR Link Netlists, RTL Hard for remaining modules
-io+sdr_post_synth: Post-Synthesis IO and SDR Link Netlists, RTL Hard for remaining modules
+io_sdr_post_synth: Post-Synthesis IO and SDR Link Netlists, RTL Hard for remaining modules
 pod_post_apr: Post APR pod netlists (SDR included), RTL Hard for remaining modules
