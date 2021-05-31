@@ -3,11 +3,13 @@ import math
 import sys
 
 cfg_base_addr          = 0x2000000
-cfg_reg_reset          = 0x004
-cfg_reg_freeze         = 0x008
-cfg_hio_mask        = 0x01c
-cfg_reg_icache_mode    = 0x204
-cfg_reg_dcache_mode    = 0x404
+cfg_reg_unused         = 0x0004
+cfg_reg_freeze         = 0x0008
+cfg_reg_hio_mask       = 0x001c
+cfg_reg_icache_id      = 0x0200
+cfg_reg_icache_mode    = 0x0204
+cfg_reg_dcache_id      = 0x0400
+cfg_reg_dcache_mode    = 0x0404
 
 class NBF:
     # Initialize
@@ -151,7 +153,7 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_hio_mask, 0xfffffff)
+        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_hio_mask, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
 
@@ -166,9 +168,7 @@ class NBF:
     # Dump the nbf
     def dump(self):
         # Freeze BP
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_reset, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 1)
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_reset, 0)
         # Initialize BP configuration registers
         self.init_config()
         self.fence()

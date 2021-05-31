@@ -21,8 +21,8 @@ void main(uint64_t argc, char * argv[]) {
     srand(0);
 
     uint64_t x_coord, y_pod_coord, y_coord;
-    uint64_t *mmio_addr[32];
-    uint64_t i;
+    uint32_t *mmio_addr[32];
+    uint32_t i;
 
     for (i = 0;i < 32; i++) {
         x_coord = ((1 << HB_MC_POD_X_SUBCOORD_WIDTH) | (uint64_t)((rand() % 16) + 1)) << (2 + HB_MC_TILE_EPA_WIDTH);
@@ -35,7 +35,7 @@ void main(uint64_t argc, char * argv[]) {
             y_coord = ((2 << HB_MC_POD_Y_SUBCOORD_WIDTH) | (uint64_t) 0) << (2 + HB_MC_TILE_EPA_WIDTH + HB_MC_X_COORD_WIDTH);
         }
 
-        mmio_addr[i] = (uint64_t *) (mc_tile_mmio | y_coord | x_coord | (addr << 2));
+        mmio_addr[i] = (uint32_t *) (mc_tile_mmio | y_coord | x_coord | (addr << 2));
         addr++;
     }
 

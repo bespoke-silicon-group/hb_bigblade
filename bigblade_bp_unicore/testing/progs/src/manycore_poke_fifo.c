@@ -3,7 +3,7 @@
 
 void main(uint64_t argc, char * argv[]) {
     // All addresses >= 0x80000000 live in the manycore. Therefore, enable all domains
-    *did_mask_addr = 0xFFF;
+    *hio_mask_addr = 0xFFF;
 
     // Set up EPA mapping according to vanilla core map
     // For now, store to some EPA in the infinite mem

@@ -18,6 +18,7 @@ include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
+export BLACKPARROT_SDK_DIR    ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot-sdk
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
 
@@ -100,17 +101,17 @@ TB_PARAMS = -pvalue+commit_trace_p=$(CMT_TRACE_P) \
 						-pvalue+cosim_p=$(COSIM_P) \
 						-pvalue+no_bind_p=$(NO_BIND_P)
 
-VCS_OPTIONS += -CFLAGS "-I$(BLACKPARROT_DIR)/external/include -std=c++14"
-VCS_OPTIONS += $(BLACKPARROT_DIR)/external/lib/libdromajo_cosim.a
+VCS_OPTIONS += -CFLAGS "-I$(BLACKPARROT_SDK_DIR)/include -std=c++14"
+VCS_OPTIONS += $(BLACKPARROT_SDK_DIR)/lib/libdromajo_cosim.a
 
 ########################################
 ## BlackParrot test junk
 ########################################
 ## TODO: Port to blackparrot itself
 
-RISCV_GCC ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-gcc -mcmodel=medany
-RISCV_OBJDUMP ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objdump -D
-RISCV_OBJCOPY ?= $(BLACKPARROT_DIR)/external/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
+RISCV_GCC ?= $(BLACKPARROT_SDK_DIR)/install/bin/riscv64-unknown-elf-dramfs-gcc -mcmodel=medany
+RISCV_OBJDUMP ?= $(BLACKPARROT_SDK_DIR)/install/bin/riscv64-unknown-elf-dramfs-objdump -D
+RISCV_OBJCOPY ?= $(BLACKPARROT_SDK_DIR)/install/bin/riscv64-unknown-elf-dramfs-objcopy -O verilog --verilog-data-width 4
 
 PROGS_DIR = $(abspath ../progs/)
 SRC_DIR = $(PROGS_DIR)/src
@@ -137,7 +138,7 @@ NBF_GEN ?= $(abspath ../py/blackparrot_nbf_gen.py)
 ifneq ($(USE_BIN_P), 0)
 	cp $(BIN_DIR)/$(PROG).riscv $@
 else
-	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles -nostdlib $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG).c -o $@
+	$(RISCV_GCC) $(RISCV_LINK) -I$(INC_DIR) -T$(LINKER) -nostartfiles $(CRT) $(BP_UTILS) $(SRC_DIR)/$(PROG).c -o $@
 endif
 
 %/prog.elf: %/prog.riscv
@@ -187,5 +188,6 @@ $(BSG_OUT_DIR):
 
 clean:
 	rm -rf $(BSG_OUT_DIR)
-	rm -rf DVEFiles/
+	rm -rf DVEfiles/
+	rm -rf vc_hdrs.h
 
