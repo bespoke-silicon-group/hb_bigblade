@@ -32,8 +32,8 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_li
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_link_include.tcl
 
 # sdr link
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_link_sdr_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_link_sdr_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
