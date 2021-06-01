@@ -84,7 +84,7 @@ print()
 # (alphabetical and dictionary order so the newest version should be list in
 # the list).
 print(f'Searching for release "{RELEASE}" in directory "{RELEASE_DIR}"')
-release_dirs = [d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')]
+release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
 for d in release_dirs:
   print(f'\t{d}')
 print()
@@ -186,31 +186,33 @@ if NETLIST_EXPORT_MODE == 0:
 # Search for the xray parasitic files (spef)
 if NETLIST_EXPORT_MODE == 0:
   print('\tChecking for xray pex spef files... ', end='')
-  spef_path = os.sep.join([BUILD_DIR, 'pex_xray_gate/*/results/*'])
+  spef_path = os.sep.join([BUILD_DIR, 'pex_gate_xray/*/results/*'])
   (spef_found, spef_files, spef_size) = check_for_file(spef_path)
   all_files.extend(spef_files)
   if spef_found:
     print(f'FOUND! ({spef_size[0]})')
   else:
-    print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    #print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    print('NOT FOUND!')
     if status_flag == 0:
-      status_flag = 1
+      #status_flag = 1
+      status_flag = 2
   if spef_found:
     for f,s in zip(spef_files,spef_size):
       print(f'\t\t{f} ({s})')
 
-  # If no xray parasitics were found, look for normal parasitics (spef)
-  if not spef_found:
-    print('\tChecking for pex spef files... ', end='')
-    spef_path = os.sep.join([BUILD_DIR, 'pex_gate/*/results/*'])
-    (spef_found, spef_files, spef_size) = check_for_file(spef_path)
-    all_files.extend(spef_files)
-    print(f'FOUND!' if spef_found else f'NOT FOUND!')
-    if not spef_found:
-      status_flag = 2
-    if spef_found:
-      for f,s in zip(spef_files,spef_size):
-        print(f'\t\t{f} ({s})')
+  ## If no xray parasitics were found, look for normal parasitics (spef)
+  #if not spef_found:
+  #  print('\tChecking for pex spef files... ', end='')
+  #  spef_path = os.sep.join([BUILD_DIR, 'pex_gate/*/results/*'])
+  #  (spef_found, spef_files, spef_size) = check_for_file(spef_path)
+  #  all_files.extend(spef_files)
+  #  print(f'FOUND!' if spef_found else f'NOT FOUND!')
+  #  if not spef_found:
+  #    status_flag = 2
+  #  if spef_found:
+  #    for f,s in zip(spef_files,spef_size):
+  #      print(f'\t\t{f} ({s})')
 
 # Search for xray delay annotation files (sdf)
 if NETLIST_EXPORT_MODE == 0:
@@ -221,25 +223,27 @@ if NETLIST_EXPORT_MODE == 0:
   if sdf_found:
     print(f'FOUND! ({sdf_size[0]})')
   else:
-    print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    #print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    print('NOT FOUND!')
     if status_flag == 0:
-      status_flag = 1
+      #status_flag = 1
+      status_flag = 2
   if sdf_found:
     for f,s in zip(sdf_files,sdf_size):
       print(f'\t\t{f} ({s})')
 
-  # If no xray delay annotation files were found, look for normal ones (sdf)
-  if not sdf_found:
-    print('\tChecking for ptsi sdf files... ', end='')
-    sdf_path = os.sep.join([BUILD_DIR, 'ptsi/*/*/results/*.sdf.gz'])
-    (sdf_found, sdf_files, sdf_size) = check_for_file(sdf_path)
-    all_files.extend(sdf_files)
-    print(f'FOUND!' if sdf_found else f'NOT FOUND!')
-    if not sdf_found:
-      status_flag = 2
-    if sdf_found:
-      for f,s in zip(sdf_files,sdf_size):
-        print(f'\t\t{f} ({s})')
+  ## If no xray delay annotation files were found, look for normal ones (sdf)
+  #if not sdf_found:
+  #  print('\tChecking for ptsi sdf files... ', end='')
+  #  sdf_path = os.sep.join([BUILD_DIR, 'ptsi/*/*/results/*.sdf.gz'])
+  #  (sdf_found, sdf_files, sdf_size) = check_for_file(sdf_path)
+  #  all_files.extend(sdf_files)
+  #  print(f'FOUND!' if sdf_found else f'NOT FOUND!')
+  #  if not sdf_found:
+  #    status_flag = 2
+  #  if sdf_found:
+  #    for f,s in zip(sdf_files,sdf_size):
+  #      print(f'\t\t{f} ({s})')
 
 # Search for the fill/ directory
 if NETLIST_EXPORT_MODE == 0:
