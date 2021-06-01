@@ -145,7 +145,7 @@ rc_corner  ?= nominal
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays
 VCS_OPTIONS += -negdelay
 #VCS_OPTIONS += +notimingchk
-VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi/$(TOP_HIER_BLOCK)/$(corner)_$(rc_corner)/results/$(TOP_HIER_BLOCK).sdf.gz
+VCS_OPTIONS += -sdf $(sdf_corner):$(BSG_CHIP_INSTANCE_PATH):$(BSG_CHIP_DIR)/current_build/ptsi_xray/$(TOP_HIER_BLOCK)/$(corner)_$(rc_corner)/results/$(TOP_HIER_BLOCK).sdf.gz
 VCS_OPTIONS += -sdfretain
 
 EXPAND_VERILOG = $(BSG_DESIGNS_DIR)/util/expand_verilog_hierarchy.py
