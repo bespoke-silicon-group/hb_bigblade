@@ -2,7 +2,12 @@
 import math
 import sys
 
-cfg_base_addr          = 0x2000000
+# BlackParrot EPA map
+# 3-bit device ID, 12-bit device address
+# device 0 - CFG
+# device 1 - CLINT
+# device 2 - DRAM Base Address Register
+cfg_base_addr          = 0x0000
 cfg_reg_unused         = 0x0004
 cfg_reg_freeze         = 0x0008
 cfg_reg_hio_mask       = 0x001c
@@ -10,6 +15,10 @@ cfg_reg_icache_id      = 0x0200
 cfg_reg_icache_mode    = 0x0204
 cfg_reg_dcache_id      = 0x0400
 cfg_reg_dcache_mode    = 0x0404
+
+dram_offset_base_addr       = 0x2000
+dram_base_addr_reg          = 0x0000
+dram_hio_and_pod_offset_reg = 0x0004
 
 class NBF:
     # Initialize
@@ -26,6 +35,13 @@ class NBF:
 
         # Infinite memories are used so DRAM disabled by default
         self.dram_enable = 0
+
+        self.bp_dram_base = 0x80000000
+        # This is the base address in the manycore DRAM space where BP code lives
+        self.mc_dram_base = 0x81000000
+        # 2-bit pod x, 2-bit pod y and 6-bit hio addr
+        # Note: Only pod x and pod y parts of this value will be used
+        self.mc_dram_hio_and_pod_offset = 0x000
 
         self.cache_block_size_words = self.cache_block_size // 32
 
@@ -126,15 +142,15 @@ class NBF:
                 continue
 
             for word in stripped.split():
-                addr = curr_addr
+                addr = curr_addr - self.bp_dram_base + self.mc_dram_base
                 data = ""
                 for i in range(0, len(word), 2):
                     data = word[i:i+2] + data
                 data = int(data, 16)
                 bank = self.select_bits(addr, 2+vcache_word_offset_width, 2+vcache_word_offset_width+lg_banks-1)
                 index = self.select_bits(addr, 2+vcache_word_offset_width+lg_banks, 2+vcache_word_offset_width+lg_banks+index_width-1)
-                x = self.select_bits(bank, 0, lg_x-1)
-                y = self.select_bits(bank, lg_x, lg_x)
+                x = self.select_bits(bank, 0, lg_x-1) # + self.select_bits(self.mc_dram_hio_and_pod_offset, 0, 1)
+                y = self.select_bits(bank, lg_x, lg_x) # + self.select_bits(self.mc_dram_hio_and_pod_offset, 2, 3)
                 epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
                 
@@ -143,8 +159,8 @@ class NBF:
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
-    #  //      1 -- CCE ucode
-    #  //      2 -- CLINT
+    #  //      1 -- CLINT
+    #  //      2 -- DRAM Offset Register
     #  typedef struct packed
     #  {
     #    logic [3:0]  dev;
@@ -156,6 +172,19 @@ class NBF:
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_hio_mask, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
         self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
+
+        # The next few requests send acknowledgments immediately
+        # So get back all credits for previous requests before sending these out
+        # This will prevent multiple acks and there will be no overlap of acks
+        self.fence()
+
+        # Write to the DRAM offset registers in all the bridge modules
+        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
+        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
+        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
+        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
+        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
+        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
 
     # print finish
     def finish(self):
