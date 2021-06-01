@@ -11,7 +11,7 @@ void main(uint64_t argc, char * argv[]) {
     uint64_t x_coord = ((0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0) << (2 + HB_MC_TILE_EPA_WIDTH);
     uint64_t y_coord = ((1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 0) << (2 + HB_MC_TILE_EPA_WIDTH + HB_MC_X_COORD_WIDTH);
     // The EPA should ideally be shifted by 2 bits, but the I/O monitor in the host appends 2 zeros at the end of the
-    uint64_t *stdout_addr = (uint64_t *) (mc_tile_mmio | y_coord | x_coord | HB_MC_HOST_STDOUT_EPA);
+    uint32_t *stdout_addr = (uint32_t *) (mc_tile_mmio | y_coord | x_coord | HB_MC_HOST_STDOUT_EPA);
 
     // Print "Hello World!"
     // Don't use bp_cprint or bp_hprint because function call overhead can
