@@ -245,6 +245,24 @@ if NETLIST_EXPORT_MODE == 0:
   #    for f,s in zip(sdf_files,sdf_size):
   #      print(f'\t\t{f} ({s})')
 
+# Search for xray psti parasitic annotation logs (parasitics_command.log)
+if NETLIST_EXPORT_MODE == 0:
+  print('\tChecking for xray ptsi parasitics command log... ', end='')
+  parasitics_log_path = os.sep.join([BUILD_DIR, 'ptsi_xray/*/*/parasitics_command.log'])
+  (parasitics_log_found, parasitics_log_files, parasitics_log_size) = check_for_file(parasitics_log_path)
+  all_files.extend(parasitics_log_files)
+  if parasitics_log_found:
+    print(f'FOUND! ({parasitics_log_size[0]})')
+  else:
+    #print('NOT FOUND! (This is okay for leaf blocks but mid and top blocks should use xray files)')
+    print('NOT FOUND!')
+    if status_flag == 0:
+      #status_flag = 1
+      status_flag = 2
+  if parasitics_log_found:
+    for f,s in zip(parasitics_log_files,parasitics_log_size):
+      print(f'\t\t{f} ({s})')
+
 # Search for the fill/ directory
 if NETLIST_EXPORT_MODE == 0:
   print('\tChecking for fill gds... ', end='')
