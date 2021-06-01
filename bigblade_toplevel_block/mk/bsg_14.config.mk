@@ -32,3 +32,6 @@ export PTSI_FLOW_STRIP_PATH :=
 
 
 #export USE_ICC2_2020 := 1
+
+export ICC2_NUM_CORES := 32
+export DC_NUM_CORES   := 32
