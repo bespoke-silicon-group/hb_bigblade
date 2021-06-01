@@ -25,4 +25,8 @@ config bsg_config;
   cell bsg_manycore_link_wh_to_sdr_se liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_manycore_link_wh_to_sdr_sw liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
+  // bsg tie hi/lo
+  cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  
 endconfig
