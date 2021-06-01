@@ -14,11 +14,11 @@ void main(uint64_t argc, char * argv[]) {
     uint64_t tile_epa = INFMEM_EPA_ADDR << 2;
     uint64_t x_coord = ((1 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0) << (2 + HB_MC_TILE_EPA_WIDTH);
     uint64_t y_coord = ((0 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 7) << (2 + HB_MC_TILE_EPA_WIDTH + HB_MC_X_COORD_WIDTH);
-    uint64_t *infmem_mmio_addr = (uint64_t *) (mc_tile_mmio | y_coord | x_coord | tile_epa);
+    uint32_t *infmem_mmio_addr = (uint32_t *) (mc_tile_mmio | y_coord | x_coord | tile_epa);
 
     *infmem_mmio_addr = 0xdeadbeef;
 
-    uint64_t mmio_read_value = *infmem_mmio_addr;
+    uint32_t mmio_read_value = *infmem_mmio_addr;
     if (mmio_read_value != 0xdeadbeef)
       bp_finish(1);
 

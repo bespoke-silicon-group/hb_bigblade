@@ -177,6 +177,7 @@ module bsg_blackparrot_unicore_tile_sdr
      ,.data_o(io_resp_data_li)
      );
 
+  // All requests to the manycore must be strictly 32-bits or lower
   assign io_resp_li = '{header: hb_resp_li.header, data: {2{hb_resp_li.data}}};
   assign io_resp_v_li = hb_resp_v_li;
   assign hb_resp_yumi_lo = io_resp_yumi_lo;

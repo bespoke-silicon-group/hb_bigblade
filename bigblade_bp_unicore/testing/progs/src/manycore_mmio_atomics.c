@@ -24,14 +24,14 @@ void main(uint64_t argc, char * argv[]) {
                         ? ((0 << HB_MC_POD_Y_SUBCOORD_WIDTH) | (uint64_t) 7) << (2 + HB_MC_TILE_EPA_WIDTH + HB_MC_X_COORD_WIDTH)
                         : ((2 << HB_MC_POD_Y_SUBCOORD_WIDTH) | (uint64_t) 0) << (2 + HB_MC_TILE_EPA_WIDTH + HB_MC_X_COORD_WIDTH);
 
-    uint64_t *mmio_addr = (uint64_t *) (mc_tile_mmio | y_coord | x_coord | (addr << 2));
+    uint32_t *mmio_addr = (uint32_t *) (mc_tile_mmio | y_coord | x_coord | (addr << 2));
 
     // Perform atomic operations
     *mmio_addr = 0x000003E8;
     
     // Atomic operations use the uncached datapath which currently does not slice the result data correctly
     // to obtain the correct word. Therefore, perform only 64-bit loads
-    uint64_t result;
+    uint32_t result;
     __asm__ volatile ("amoswap.d %[result], %[val], 0(%[addr])" : [result] "=r"(result) : [val] "r"(0x000007D0), [addr] "r"(mmio_addr));
     __asm__ volatile ("amoadd.d  %[result], %[val], 0(%[addr])" : [result] "=r"(result) : [val] "r"(0x000000C8), [addr] "r"(mmio_addr));
     __asm__ volatile ("amoor.d   %[result], %[val], 0(%[addr])" : [result] "=r"(result) : [val] "r"(0xFFFF0000), [addr] "r"(mmio_addr));
