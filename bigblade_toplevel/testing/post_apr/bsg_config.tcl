@@ -16,8 +16,8 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_tile_fil
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_tile_include.tcl
 
 # clk_gen
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_clk_gen_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_clk_gen_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_include.tcl
 
 # io link ddr
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_io_link_ddr_filelist.tcl
