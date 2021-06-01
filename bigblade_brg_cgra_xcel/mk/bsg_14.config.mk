@@ -161,4 +161,5 @@ synth_fakeout:
 	touch current_build/touchfiles/synth.brg_cgra_pod
 
 export USE_ICC2_2020 :=1
-
+export ICC2_CTS_NDR_RULE_NAME icc2rm_2w2s
+export CALIBRE_DRC_USE_SHELL := 1
