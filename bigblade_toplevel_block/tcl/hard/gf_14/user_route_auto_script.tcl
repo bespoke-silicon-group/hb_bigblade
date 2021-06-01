@@ -415,7 +415,7 @@ foreach_in_collection cell $MUX_cell {
   append_to_collection -unique msc_nets [get_nets -of_object $cell -filter "(full_name!=VSS)&&(full_name!=VDD)"]
 }
 
-add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -respect_blockages $msc_nets $msc_buffer
+add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -first_distance 50.00 -respect_blockages $msc_nets $msc_buffer
 
 
 # Legalize buffer locations

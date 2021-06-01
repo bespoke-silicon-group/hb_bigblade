@@ -88,6 +88,8 @@ set cgra_start_x [expr $pod_row_start_x+$pod_width+0.5*$grid_width]
 set tag_cell_list [get_cells -of_object [get_nets -of_object [get_ports "pad_CT0_1_i_int"]]]
 set idx 0
 foreach_in_collection tag_cell $tag_cell_list {
+  # RESIZE CELL
+  size_cell $tag_cell -lib_cell [get_lib_cells */SC7P5T_CKAN2X16_SSC14R]
   set_attribute     $tag_cell orientation R0
   move_object       $tag_cell \
       -x [expr $core_llx+[round_down_to_nearest [expr 5112.742+$idx*5] [unit_width]]] \
