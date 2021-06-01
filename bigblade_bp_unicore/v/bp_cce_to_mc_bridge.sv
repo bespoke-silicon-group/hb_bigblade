@@ -90,6 +90,7 @@ module bp_cce_to_mc_bridge
   // BP EPA Map
   // dev: 0 -- CFG
   //      1 -- CLINT
+  //      2 -- DRAM BAR
   typedef struct packed
   {
     logic [3:0]  dev;
@@ -210,15 +211,48 @@ module bp_cce_to_mc_bridge
     ,.global_y_i(my_y_i)
     );
 
+  // DRAM base address register
+  logic dram_base_addr_w_v_li;
+  logic [hb_data_width_p-1:0] dram_base_addr, dram_base_addr_r;
+  bsg_dff_reset_en
+    #(.width_p(hb_data_width_p)
+     ,.reset_val_p(32'h80000000)
+     )
+    dram_base_addr_reg
+      (.clk_i(clk_i)
+      ,.reset_i(reset_i)
+      ,.en_i(dram_base_addr_w_v_li)
+      ,.data_i(dram_base_addr)
+      ,.data_o(dram_base_addr_r)
+      );
+
+  localparam hio_and_pod_addr_width_lp = paddr_width_p - hb_data_width_p;
+  logic dram_hio_and_pod_offset_w_v_li;
+  logic [hio_and_pod_addr_width_lp-1:0] dram_hio_and_pod_offset_addr, dram_hio_and_pod_offset_addr_r;
+  bsg_dff_reset_en
+    #(.width_p(hio_and_pod_addr_width_lp)
+     ,.reset_val_p(hio_and_pod_addr_width_lp'(0))
+     )
+    hio_and_pod_addr_reg
+    (.clk_i(clk_i)
+    ,.reset_i(reset_i)
+    ,.en_i(dram_hio_and_pod_offset_w_v_li)
+    ,.data_i(dram_hio_and_pod_offset_addr)
+    ,.data_o(dram_hio_and_pod_offset_addr_r)
+    );
+
   // DRAM hash function
   logic [hb_x_cord_width_p-1:0] dram_x_cord_lo;
   logic [hb_y_cord_width_p-1:0] dram_y_cord_lo;
   logic [hb_addr_width_p-1:0] dram_epa_lo;
 
-  wire [hb_data_width_p-1:0]         dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]};
+  wire [hb_data_width_p-1:0] dram_offset = dram_base_addr_r - hb_data_width_p'(32'h80000000);
+  wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_offset;
   // Need to stripe across mc_compute pods, 4x4
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = 1'b1 + io_cmd_li.header.addr[0+hb_data_width_p+:2];
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = 1'b1 + io_cmd_li.header.addr[0+hb_data_width_p+2+:2];
+  // wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_hio_and_pod_offset_addr_r[0+:2];
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[0+hb_data_width_p+:2];// + dram_pod_x_offset;
+  // wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_hio_and_pod_offset_addr_r[2+:2];
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[0+hb_data_width_p+2+:2];// + dram_pod_y_offset;
   bsg_manycore_dram_hash_function
    #(.data_width_p(hb_data_width_p)
      ,.addr_width_p(hb_addr_width_p)
@@ -313,7 +347,14 @@ module bp_cce_to_mc_bridge
      ,.r_data_o(mmio_header_lo)
      );
   bp_bedrock_cce_mem_msg_s mmio_resp_lo;
-  assign mmio_resp_lo = '{header: mmio_header_lo, data: mmio_resp_data_lo};
+  assign mmio_resp_lo.header = mmio_header_lo;
+  assign mmio_resp_lo.data = (mmio_header_lo.msg_type == e_bedrock_msg_size_4)
+                              ? mmio_resp_data_lo
+                              : (mmio_header_lo.msg_type == e_bedrock_msg_size_2)
+                                ? {2{mmio_resp_data_lo}}
+                                : (mmio_header_lo.msg_type == e_bedrock_msg_size_1)
+                                  ? {4{mmio_resp_data_lo}}
+                                  : mmio_resp_data_lo;
 
   logic [hb_data_width_p-1:0] store_payload;
   logic [bsg_manycore_reg_id_width_gp-1:0] store_reg_id;
@@ -631,36 +672,111 @@ module bp_cce_to_mc_bridge
       io_payload_lo.lce_id = 2'b10;
 
       io_cmd_cast_o = '0;
-      io_cmd_cast_o.header.msg_type = in_we_lo ? e_bedrock_mem_uc_wr : e_bedrock_mem_uc_rd;
 
-      if (in_epa_li.dev == 1)
-        io_cmd_cast_o.header.addr = clint_dev_base_addr_gp + in_epa_li.addr;
-      else // if (in_epa_li.dev == 0)
-        io_cmd_cast_o.header.addr = cfg_dev_base_addr_gp + in_epa_li.addr;
+      dram_base_addr_w_v_li = 1'b0;
+      io_cmd_v_o = 1'b0;
+      in_yumi_li = 1'b0;
 
-      // TODO: we only support 32-bit loads and stores to BP configuration addresses
-      io_cmd_cast_o.header.size = e_bedrock_msg_size_4;
-      io_cmd_cast_o.header.payload = io_payload_lo;
-      io_cmd_cast_o.data = in_data_lo;
-
-      io_cmd_v_o = in_v_lo;
-      in_yumi_li = io_cmd_yumi_i;
+      case (in_epa_li.dev)
+        4'h0:
+          begin
+            io_cmd_cast_o.header.addr = cfg_dev_base_addr_gp + in_epa_li.addr;
+            // TODO: we only support 32-bit loads and stores to BP configuration addresses
+            io_cmd_cast_o.header.size = e_bedrock_msg_size_4;
+            io_cmd_cast_o.header.msg_type = in_we_lo ? e_bedrock_mem_uc_wr : e_bedrock_mem_uc_rd;
+            io_cmd_cast_o.header.payload = io_payload_lo;
+            io_cmd_cast_o.data = in_data_lo;
+            io_cmd_v_o = in_v_lo;
+            in_yumi_li = io_cmd_yumi_i;
+          end
+        4'h1:
+          begin
+            io_cmd_cast_o.header.addr = clint_dev_base_addr_gp + in_epa_li.addr;
+            // TODO: we only support 32-bit loads and stores to BP configuration addresses
+            io_cmd_cast_o.header.size = e_bedrock_msg_size_4;
+            io_cmd_cast_o.header.msg_type = in_we_lo ? e_bedrock_mem_uc_wr : e_bedrock_mem_uc_rd;
+            io_cmd_cast_o.header.payload = io_payload_lo;
+            io_cmd_cast_o.data = in_data_lo;
+            io_cmd_v_o = in_v_lo;
+            in_yumi_li = io_cmd_yumi_i;
+          end
+        4'h2:
+          begin
+            if (in_epa_li.addr == 12'h0)
+              begin
+                dram_base_addr = in_data_lo;
+                dram_base_addr_w_v_li = in_we_lo & in_v_lo;
+                in_yumi_li = dram_base_addr_w_v_li;
+              end
+            else if (in_epa_li.addr == 12'h4)
+              begin
+                dram_base_addr = in_data_lo;
+                dram_base_addr_w_v_li = in_we_lo & in_v_lo;
+                in_yumi_li = dram_base_addr_w_v_li;
+              end
+            else
+              begin
+                // Must never come here
+                // Ack the request but don't do anything
+                in_yumi_li = in_v_lo;
+              end
+          end
+        default:
+          begin
+            // Must never come here
+            // Ack the request but don't do anything
+            in_yumi_li = in_v_lo;
+          end
+      endcase
     end
 
   //////////////////////////////////////////////
   // Return to incoming packet
   //////////////////////////////////////////////
+  logic dram_base_addr_w_v_r;
+  bsg_dff
+    #(.width_p(1))
+    dram_base_addr_w_v_reg
+      (.clk_i(clk_i)
+      ,.data_i(dram_base_addr_w_v_li)
+      ,.data_o(dram_base_addr_w_v_r)
+      );
+
+  logic dram_hio_and_pod_offset_w_v_r;
+  bsg_dff
+    #(.width_p(1))
+    dram_hio_and_pod_offset_w_v_reg
+      (.clk_i(clk_i)
+      ,.data_i(dram_hio_and_pod_offset_w_v_li)
+      ,.data_o(dram_hio_and_pod_offset_w_v_r)
+      );
+
   always_comb
     begin
-      returning_data_li = (io_resp_cast_i.header.size == e_bedrock_msg_size_4)
-                          ? io_resp_cast_i.data[0+:32]
-                          : (io_resp_cast_i.header.size == e_bedrock_msg_size_2)
-                            ? io_resp_cast_i.data[0+:16]
-                            : io_resp_cast_i.data[0+:8];
-      returning_v_li = io_resp_v_i;
-
       // Returning data is always "ready" (but please don't randomly respond)
       io_resp_ready_o = 1'b1;
+      returning_v_li = 1'b0;
+      returning_data_li = '0;
+
+      if (io_resp_v_i)
+        begin
+          returning_data_li = (io_resp_cast_i.header.size == e_bedrock_msg_size_4)
+                                ? io_resp_cast_i.data[0+:32]
+                                : (io_resp_cast_i.header.size == e_bedrock_msg_size_2)
+                                  ? io_resp_cast_i.data[0+:16]
+                                  : (io_resp_cast_i.header.size == e_bedrock_msg_size_1)
+                                    ? io_resp_cast_i.data[0+:8]
+                                    : io_resp_cast_i.data[0+:32];
+          returning_v_li = io_resp_v_i;
+        end
+      else if (dram_base_addr_w_v_r)
+        begin
+          returning_v_li = dram_base_addr_w_v_r;
+        end
+      else if (dram_hio_and_pod_offset_w_v_r)
+        begin
+          returning_v_li = dram_hio_and_pod_offset_w_v_r;
+        end
     end
 
   ////synopsys translate_off
