@@ -8,7 +8,8 @@ export BSG_PADMAPPING           :=default
 
 export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json 
 
-export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
+#export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM := false
 
 export BSG_POWER_GRID := bigblade_toplevel_block
 export BSG_CAD_SETUP := default
