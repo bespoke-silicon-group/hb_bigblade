@@ -13,9 +13,13 @@ module bsg_chip_block_core_complex
   ,parameter total_num_tiles_x_lp = (hb_num_pods_x_gp*hb_num_tiles_x_gp)
   )
 
-  (input  [hb_num_pods_y_gp-1:0]   mc_clk_i
-  ,input                           tag_clk_i
+  (input                           tag_clk_i
   ,input                           tag_data_i
+  ,input                           async_output_disable_i
+
+  ,input  [hb_num_pods_y_gp-1:0]   mc_ext_clk_i
+
+  ,output [hb_num_pods_y_gp-1:0]   mc_clk_monitor_o
 
   ,output                          mc_fwd_link_clk_o
   ,output [mc_fwd_width_lp-1:0]    mc_fwd_link_data_o
@@ -81,13 +85,26 @@ module bsg_chip_block_core_complex
   wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0]                      hor_io_rev_link_clk_li, hor_io_rev_link_v_li, hor_io_rev_link_token_lo;
   wire [hb_num_pods_y_gp-1:0][E:W][hb_num_tiles_y_gp-1:0][mc_rev_width_lp-1:0] hor_io_rev_link_data_li;
 
+  wire [hb_num_pods_y_gp-1:0] mc_clk_lo;
+  wire [hb_num_pods_y_gp-1:0][tag_lg_els_gp-1:0] mc_clk_tag_node_id_offset_li;
 
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
   begin: core
 
+    bigblade_clk_gen clk_gen
+    (.tag_clk_i             (tag_clk_i                      )
+    ,.tag_data_i            (tag_data_i                     )
+    ,.tag_node_id_offset_i  (mc_clk_tag_node_id_offset_li[i])
+    ,.ext_clk_i             (mc_ext_clk_i                [i])
+    ,.async_output_disable_i(async_output_disable_i         )
+    ,.clk_o                 (mc_clk_lo                   [i])
+    ,.clk_monitor_o         (mc_clk_monitor_o            [i])
+    );
+
+
     bsg_manycore_pod_row_sdr podrow
 
-    (.ext_clk_i                       (mc_clk_i                         [i])
+    (.ext_clk_i                       (mc_clk_lo                        [i])
     ,.pod_tag_clk_i                   ({(hb_num_pods_x_gp){tag_clk_i}}     )
     ,.pod_tag_data_i                  ({(hb_num_pods_x_gp){tag_data_i}}    )
     ,.pod_tag_node_id_offset_i        (pod_tag_node_id_offset_li        [i])
@@ -172,6 +189,9 @@ module bsg_chip_block_core_complex
     // assign pod tag offset
     for (genvar j = 0; j < hb_num_pods_x_gp; j++)
         assign pod_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_mc_reset_offset_gp+(i*hb_num_pods_x_gp+j)*1);
+
+    // assign mc clk_gen tag offset
+    assign mc_clk_tag_node_id_offset_li[i] = (tag_lg_els_gp)'(tag_mc_clk_offset_gp+i*tag_clk_gen_local_els_gp);
 
     // assign global x coordinates
     assign global_x_li[i][0] = {(hb_pod_x_cord_width_gp)'(0), (hb_x_subcord_width_gp)'((1<<hb_x_subcord_width_gp)-1)};

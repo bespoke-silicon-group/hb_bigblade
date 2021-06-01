@@ -5,6 +5,22 @@
 `define MC_CLK_PERIOD  10000
 `define TAG_CLK_PERIOD 20000
 
+// Slow down core clocks when tag is programming, divide clock speed by the given ratio
+//
+// We cannot slow down the clock too much, since we'll need time for reset signals to
+// go through the synchronizers. Shortest tag packet can be 16-bits long, which takes
+// 16 cycles to be sent out. Since the synchronizer we use takes 2 cycles to sync, the
+// maximum possible slowdown ratio is (16*TAG_CLK_PERIOD)/(2*CLK_PERIOD).
+//
+// Note that we use DDR clock for off-chip links, so the maximum ratio for IO is
+// (16*TAG_CLK_PERIOD)/(2*2*IO_CLK_PERIOD).
+//
+// The downsampler in this testbench supports slowdown ratio up to 1024
+//
+`define IO_SLOWDOWN_RATIO  8
+`define NOC_SLOWDOWN_RATIO 16
+`define MC_SLOWDOWN_RATIO  16
+
 module bsg_gateway_chip
 
  import bsg_chip_pkg::*;
@@ -20,39 +36,40 @@ module bsg_gateway_chip
   // Control Wires Hub
   //
 
-  wire p_tag_clk_lo, p_tag_data_lo, p_tag_en_lo;
-  assign p_pad_ML0_0_o = p_tag_clk_lo;
-  assign p_pad_ML0_1_o = p_tag_data_lo;
-  assign p_pad_ML0_2_o = p_tag_en_lo;
-
   wire p_async_output_disable_lo;
-  wire p_io_clk_lo, p_noc_clk_lo, p_mc_clk_lo;
+  wire p_tag_clk_lo, p_tag_data_lo, p_tag_en_lo;
   assign p_pad_CT0_v_o = p_async_output_disable_lo;
-  assign p_pad_CT0_0_o = p_io_clk_lo;
-  assign p_pad_CT0_1_o = p_noc_clk_lo;
-  assign p_pad_CT0_2_o = p_mc_clk_lo;
+  assign p_pad_CT0_0_o = p_tag_clk_lo;
+  assign p_pad_CT0_1_o = p_tag_data_lo;
+  assign p_pad_CT0_2_o = p_tag_en_lo;
 
-  //wire p_sel_0_o, p_sel_1_o, p_clk_o_reset_o;
-  //assign p_pad_CT0_6_o = p_sel_0_o;
-  //assign p_pad_CT0_7_o = p_sel_1_o;
-  //assign p_pad_CT0_clk_o = p_clk_o_reset_o;
-  //
-  //wire p_clk_i = p_pad_CT0_0_i;
+  wire p_io_clk_lo, p_noc_clk_lo, p_mc_clk_lo;
+  assign p_pad_CT0_clk_o = p_io_clk_lo;
+  assign p_pad_CT0_tkn_o = p_noc_clk_lo;
+  assign {p_pad_ML0_3_o, p_pad_ML0_2_o, p_pad_ML0_1_o, p_pad_ML0_0_o} = {(hb_num_pods_y_gp){p_mc_clk_lo}};
 
+  wire p_mc_clk_monitor_li = p_pad_CT0_0_i;
+  wire p_noc_io_clk_monitor_li = p_pad_CT0_1_i;
+  wire p_noc_mem_clk_monitor_li = p_pad_CT0_2_i;
+
+  assign {p_pad_CT0_4_o, p_pad_CT0_3_o} = 2'b00; // mc clk monitor sel
+  assign {p_pad_CT0_7_o, p_pad_CT0_6_o, p_pad_CT0_5_o} = 3'b000; // noc mem clk monitor sel
 
   //////////////////////////////////////////////////
   //
   // Nonsynth Clock Generator(s)
   //
+  // 2x clocks generated for downsamplers
+  //
   
-  logic io_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD)) io_clk_gen (.o(io_clk));
+  logic io_clk, io_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`IO_CLK_PERIOD/2)) io_clk_gen (.o(io_clk_2x));
   
-  logic noc_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD)) noc_clk_gen (.o(noc_clk));
+  logic noc_clk, noc_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`NOC_CLK_PERIOD/2)) noc_clk_gen (.o(noc_clk_2x));
 
-  logic mc_clk;
-  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD)) mc_clk_gen (.o(mc_clk));
+  logic mc_clk, mc_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD/2)) mc_clk_gen (.o(mc_clk_2x));
 
   logic tag_clk, tag_clk_raw;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
@@ -77,13 +94,6 @@ module bsg_gateway_chip
       ,.async_reset_o(tag_reset)
       );
 
-  //bsg_nonsynth_reset_gen #(.num_clocks_p(1),.reset_cycles_lo_p(10),.reset_cycles_hi_p(5))
-  //  clk_o_reset_gen
-  //    (.clk_i(p_clk_i)
-  //    ,.async_reset_o(p_clk_o_reset_o)
-  //    );
-
-  assign p_async_output_disable_lo = 1'b0;
 
   //////////////////////////////////////////////////
   //
@@ -139,7 +149,26 @@ module bsg_gateway_chip
 
   assign p_tag_en_lo = tag_trace_en_r_lo[1] & tag_trace_valid_lo;
 
+  // Shutdown tag clk after programming to speedup simulation
   assign tag_clk = (tag_trace_done_lo === 1'b1)? 1'b1 : tag_clk_raw;
+
+  // When tag is programming, slow down other clocks to speed up simulation
+  // With dynamic downsampler, there will be no glitch and no double-edges
+  // problem in simulation
+  //
+  // output_freq = input_freq/((ds_val+1)*2)
+  //
+  wire [9:0] io_ds_val, noc_ds_val, mc_ds_val;
+  assign io_ds_val  = (tag_trace_done_lo)? 0 : `IO_SLOWDOWN_RATIO-1;
+  assign noc_ds_val = (tag_trace_done_lo)? 0 : `NOC_SLOWDOWN_RATIO-1;
+  assign mc_ds_val  = (tag_trace_done_lo)? 0 : `MC_SLOWDOWN_RATIO-1;
+
+  bsg_counter_clock_downsample #(.width_p(10)) io_ds
+  (.clk_i(io_clk_2x),.reset_i(tag_reset),.val_i(io_ds_val),.clk_r_o(io_clk));
+  bsg_counter_clock_downsample #(.width_p(10)) noc_ds
+  (.clk_i(noc_clk_2x),.reset_i(tag_reset),.val_i(noc_ds_val),.clk_r_o(noc_clk));
+  bsg_counter_clock_downsample #(.width_p(10)) mc_ds
+  (.clk_i(mc_clk_2x),.reset_i(tag_reset),.val_i(mc_ds_val),.clk_r_o(mc_clk));
 
 
   //////////////////////////////////////////////////
@@ -147,20 +176,21 @@ module bsg_gateway_chip
   // BSG Tag Master Instance
   //
 
-  //// All tag lines from the btm
-  //bsg_tag_s [tag_els_gp-1:0] tag_lines_raw_lo;
-  //wire bsg_chip_tag_lines_s tag_lines_lo = tag_lines_raw_lo;
-  //
-  //// BSG tag master instance
-  //bsg_tag_master #(.els_p( tag_els_gp )
-  //                ,.lg_width_p( tag_lg_width_gp )
-  //                )
-  //  btm
-  //    (.clk_i      ( tag_clk )
-  //    ,.data_i     ( tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_bsg_tag_data_o : 1'b0 )
-  //    ,.en_i       ( 1'b1 )
-  //    ,.clients_r_o( tag_lines_raw_lo )
-  //    );
+  bsg_tag_s tag_lines_lo;
+  bsg_tag_master_decentralized
+ #(.els_p      (tag_els_gp)
+  ,.local_els_p(1)
+  ,.lg_width_p (tag_lg_width_gp)
+  ) btm
+  (.clk_i           (tag_clk)
+  ,.data_i          (tag_trace_en_r_lo[0] & tag_trace_valid_lo ? p_tag_data_lo : 1'b0)
+  ,.node_id_offset_i((tag_lg_els_gp)'(2))
+  ,.clients_o       (tag_lines_lo)
+  );
+
+  bsg_tag_client_unsync #(.width_p(1)) btc
+  (.bsg_tag_i     (tag_lines_lo)
+  ,.data_async_r_o(p_async_output_disable_lo));
 
 
   //////////////////////////////////////////////////

@@ -4,5 +4,7 @@ bsg_manycore/
 bsg_packaging/
 bsg_cadenv/
 bsg_14/
+bsg_replicant/
+hb_bigblade_netlists/
 *.swp
 *.pyc

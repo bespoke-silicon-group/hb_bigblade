@@ -16,7 +16,11 @@ basejump_stl:
 bsg_14:
 	git clone git@github.com:bespoke-silicon-group/bsg_14.git $@
 	cd $@ ; git checkout $(commit) ;
+
 bsg_manycore:
 	git clone git@github.com:bespoke-silicon-group/bsg_manycore.git $@
 	cd $@ ; git checkout $(commit) ;
 	cd $@ ; git submodule update --init imports/HardFloat;
+
+include ../common/exporter/Makefile.include
+

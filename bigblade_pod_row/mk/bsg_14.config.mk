@@ -2,6 +2,8 @@
 #                                           DESIGN VARS                                            #
 ####################################################################################################
 
+export CALIBRE_DRC_USE_SHELL=1
+
 # Select the design type for the toplevel. If set to 'block' then the toplevel will not have IO
 # drivers but rather pins (good for creating hard-macros or for doing apr runs before the toplevel
 # is ready). If set to 'chip_*' the toplevel will have IO drivers, and the die size is determined by

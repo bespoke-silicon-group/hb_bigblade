@@ -11,6 +11,7 @@ package bsg_chip_pkg;
 
   localparam bsg_link_clk_gen_ds_width_gp      = 6;
   localparam bsg_link_clk_gen_num_adgs_gp      = 1;
+  localparam bsg_link_clk_gen_lg_monitor_ds_gp = 5;
 
 
   //////////////////////////////////////////////////
@@ -118,6 +119,7 @@ package bsg_chip_pkg;
   localparam tag_lg_width_gp = `BSG_SAFE_CLOG2(tag_max_payload_width_gp + 1);
 
   typedef struct packed {
+    bsg_tag_s monitor_reset;
     bsg_tag_s sel;
     bsg_tag_s ds;
     bsg_tag_s osc_trigger;

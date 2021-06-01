@@ -65,6 +65,7 @@ constraint_input_ports  $tag_clk_name    $tag_in_ports     4000   100
 set_false_path -from [get_ports async_output_disable_i]
 set_false_path -from [get_ports tag_node_id_offset_i]
 
+set_load [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] [get_ports noc_clk_monitor_o]
 
 # Source-sync link constraints
 set link_clk_period_ps        800
