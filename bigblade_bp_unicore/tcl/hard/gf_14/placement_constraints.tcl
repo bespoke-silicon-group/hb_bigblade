@@ -8,18 +8,15 @@ current_design ${DESIGN_NAME}
 set_locked_objects -unlock [get_cells -hier]
 remove_edit_groups -all
 remove_bounds -all
+remove_placement_blockages -all
 
 set tile_height [core_height]
 set tile_width  [core_width]
 
 set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
+# left, bottom, right top
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
-
-set bound_to_rf_pin  0.058
-set bound_to_rf_side 0.020
-set bound_to_rf_top  0.140
-set bound_to_rf_bot  0.140
 
 set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
 set icache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 0 3]
@@ -45,8 +42,17 @@ set stat_mem_width    [lindex [get_attribute [get_cell -hier $dcache_stat_mem] w
 set btb_mem_height    [lindex [get_attribute [get_cell -hier $btb_mem] height] 0]
 set btb_mem_width     [lindex [get_attribute [get_cell -hier $btb_mem] width] 0]
 
+# Set up boundary cells
 set bound_width 0.672
 set bound_height 0.480
+
+set bound_to_rf_pin  0.058
+set bound_to_rf_side 0.020
+set bound_to_rf_top  0.140
+set bound_to_rf_bot  0.140
+
+create_bound -name "bound_bound" -boundary [list [list [expr $bound_width+$bound_to_rf_side] [expr $bound_height+$bound_to_rf_bot]] [list [expr $tile_width-$bound_width-$bound_to_rf_side] [expr $tile_height-$bound_height-$bound_to_rf_top]]]
+set bound_bound [get_bounds "bound_bound"]
 
 #####################################
 ### I CACHE TAG
@@ -61,14 +67,16 @@ set icache_tag_ma [create_macro_array \
   -orientation FN \
   $icache_tag_mems]
 
-create_keepout_margin -type hard -outer $keepout_margins $icache_tag_mems
+set ko [list $bound_to_rf_side $keepout_margin_y $keepout_margin_x $bound_to_rf_top]
+create_keepout_margin -type hard -outer $ko $icache_tag_mems 
 
 set_macro_relative_location \
   -target_object $icache_tag_ma \
   -target_corner tl \
   -target_orientation R0 \
   -anchor_corner tl \
-  -offset [list $keepout_margin_x -$keepout_margin_y]
+  -anchor_object $bound_bound \
+  -offset [list 0 0]
 
 #####################################
 ### I CACHE DATA
@@ -102,14 +110,16 @@ set icache_data_ma_east [create_macro_array \
   -orientation N \
   $icache_data_mems_east]
 
-create_keepout_margin -type hard -outer $keepout_margins $icache_data_mems_east
+set ko [list $keepout_margin_x $keepout_margin_y $bound_to_rf_side $bound_to_rf_top]
+create_keepout_margin -type hard -outer $ko $icache_data_mems_east
 
 set_macro_relative_location \
   -target_object $icache_data_ma_east \
   -target_corner tr \
   -target_orientation R0 \
   -anchor_corner tr \
-  -offset [list -$keepout_margin_x -$keepout_margin_y]
+  -anchor_object $bound_bound \
+  -offset [list 0 0]
 
 #####################################
 ### D CACHE TAG
@@ -131,7 +141,8 @@ set_macro_relative_location \
   -target_corner bl \
   -target_orientation R0 \
   -anchor_corner bl \
-  -offset [list $keepout_margin_x $keepout_margin_y]
+  -anchor_object $bound_bound \
+  -offset [list 0 0]
 
 #####################################
 ### D CACHE DATA
@@ -143,9 +154,10 @@ set dcache_data_ma_west [create_macro_array \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation [list FN FN FN FN] \
+  -orientation FN \
   $dcache_data_mems_west]
 
+set ko [list $keepout_margin_x $keepout_margin_y [expr 10.68/2] $keepout_margin_y]
 create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_west
 
 set_macro_relative_location \
@@ -162,17 +174,19 @@ set dcache_data_ma_east [create_macro_array \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
   -vertical_channel_width [expr 2*$keepout_margin_x] \
-  -orientation [list N N N N] \
+  -orientation N \
   $dcache_data_mems_east]
 
-create_keepout_margin -type hard -outer $keepout_margins $dcache_data_mems_east
+set ko [list [expr 10.68/2] $keepout_margin_y $bound_to_rf_side $bound_to_rf_top]
+create_keepout_margin -type hard -outer $ko $dcache_data_mems_east
 
 set_macro_relative_location \
   -target_object $dcache_data_ma_east \
   -target_corner br \
   -target_orientation R0 \
   -anchor_corner br \
-  -offset [list -$keepout_margin_x $keepout_margin_y]
+  -anchor_object $bound_bound \
+  -offset [list 0 0]
 
 #####################################
 ### BTB Memory
@@ -268,7 +282,7 @@ set_macro_relative_location \
   -target_orientation N \
   -anchor_object $icache_data_ma_east \
   -anchor_corner br \
-  -offset [list -$keepout_margin_x 0]
+  -offset [list 0 -$keepout_margin_y]
 
 create_keepout_margin -type hard -outer $keepout_margins $bht_mem
 
