@@ -16,7 +16,7 @@ config bsg_config;
   cell bsg_chip_noc_mem_link liblist `BIGBLADE_NOC_MEM_LINK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
   cell bsg_manycore_pod_row_sdr liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-
+ 
   cell bsg_manycore_link_ruche_to_sdr_east liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_manycore_link_ruche_to_sdr_west liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 

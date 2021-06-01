@@ -12,36 +12,32 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
 # bsg_manycore_tile source files
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_tile_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_tile_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_tile_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_tile_include.tcl
 
 # clk_gen
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_clk_gen_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_clk_gen_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_clk_gen_include.tcl
 
 # io link ddr
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_io_link_ddr_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_io_link_ddr_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_io_link_ddr_include.tcl
 
 # noc io link
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_io_link_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_io_link_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_noc_io_link_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_noc_io_link_include.tcl
 
 # noc mem link
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_link_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bigblade_noc_mem_link_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_noc_mem_link_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_noc_mem_link_include.tcl
 
 # sdr link
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_manycore_link_sdr_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_link_sdr_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_link_sdr_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
-
-# bsg tie hi/lo
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_tiehilo_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_tiehilo_include.tcl
 
 #########################
 # list of hardened rams #
@@ -122,17 +118,6 @@ bsg_create_library $::env(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)\
     $::env(BSG_MANYCORE_LINK_SDR_LIBRARY) \
     $BSG_MANYCORE_LINK_SDR_SOURCE_FILES \
     $BSG_MANYCORE_LINK_SDR_INCLUDE_PATHS
-
-
-# tie hi/lo filelist
-bsg_create_filelist $::env(BSG_TIEHILO_FILELIST) \
-    $BSG_TIEHILO_SOURCE_FILES
-
-# tie hi/lo library
-bsg_create_library $::env(BSG_TIEHILO_LIBRARY_NAME)\
-    $::env(BSG_TIEHILO_LIBRARY) \
-    $BSG_TIEHILO_SOURCE_FILES \
-    $BSG_TIEHILO_INCLUDE_PATHS
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \
