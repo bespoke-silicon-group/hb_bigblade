@@ -24,23 +24,23 @@ set tag_clk_uncertainty_ps 20
 create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports pad_CT0_0_i_int]
 set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 
-set osc_period_ps         250.0 ;# Raw oscillator frequency
-set osc_uncertainty_ps    20
-set ds_uncertainty_ps     20
-
-set ext_io_clk_name           "ext_io_clk"
-create_clock -period $osc_period_ps -name $ext_io_clk_name [get_ports pad_CT0_clk_i_int]
-set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_io_clk_name]
-
-set ext_noc_clk_name           "ext_noc_clk"
-create_clock -period $osc_period_ps -name $ext_noc_clk_name [get_ports pad_CT0_tkn_i_int]
-set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_noc_clk_name]
-
-for {set i 0} {$i < 4} {incr i} {
-  set ext_mc_clk_name           "ext_mc_clk_${i}"
-  create_clock -period 1000.0 -name $ext_mc_clk_name [get_ports "pad_ML0_${i}_i_int"]
-  set_clock_uncertainty 20  [get_clocks $ext_mc_clk_name]
-}
+#set osc_period_ps         250.0 ;# Raw oscillator frequency
+#set osc_uncertainty_ps    20
+#set ds_uncertainty_ps     20
+#
+#set ext_io_clk_name           "ext_io_clk"
+#create_clock -period $osc_period_ps -name $ext_io_clk_name [get_ports pad_CT0_clk_i_int]
+#set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_io_clk_name]
+#
+#set ext_noc_clk_name           "ext_noc_clk"
+#create_clock -period $osc_period_ps -name $ext_noc_clk_name [get_ports pad_CT0_tkn_i_int]
+#set_clock_uncertainty $osc_uncertainty_ps  [get_clocks $ext_noc_clk_name]
+#
+#for {set i 0} {$i < 4} {incr i} {
+#  set ext_mc_clk_name           "ext_mc_clk_${i}"
+#  create_clock -period 1000.0 -name $ext_mc_clk_name [get_ports "pad_ML0_${i}_i_int"]
+#  set_clock_uncertainty 20  [get_clocks $ext_mc_clk_name]
+#}
 
 # tag constraints
 set tag_in_ports [get_ports {pad_CT0_1_i_int pad_CT0_2_i_int}]
@@ -143,7 +143,7 @@ set sdr_clocks [list]
 
 for {set i 0} {$i < 4} {incr i} {
   set wh_master_clk_name   "pod_row_${i}_master_clk"
-  create_clock -period 1000 -name $wh_master_clk_name [get_pins "core_complex/core[${i}].podrow/ext_clk_i"]
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "core_complex/core[${i}].clk_gen/clk_o"]
   set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 8} {incr j} {
     create_generated_clock \
@@ -221,7 +221,45 @@ bsg_chip_derate_cells
 bsg_chip_derate_mems
 #report_timing_derate
 
+
 # Disabled or false paths
+for {set i 0} {$i < 4} {incr i} {
+  for {set j 0} {$j < 8} {incr j} {
+    set x [expr $i+4*($j/4)]
+    set_false_path -from [get_clocks "wh_link_${i}_${j}_clk"] -to   [get_clocks "mem_link_${x}_master_clk"]
+    set_false_path -to   [get_clocks "wh_link_${i}_${j}_clk"] -from [get_clocks "mem_link_${x}_master_clk"]
+    set_false_path -from [get_clocks "wh_link_${i}_${j}_clk"] -to   [get_clocks "tag_clk"]
+    set_false_path -to   [get_clocks "wh_link_${i}_${j}_clk"] -from [get_clocks "tag_clk"]
+  }
+}
+
+for {set i 0} {$i < 8} {incr i} {
+  for {set j 0} {$j < 4} {incr j} {
+    set x [expr $i%4]
+    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "pod_row_${x}_master_clk"]
+    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "pod_row_${x}_master_clk"]
+    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "tag_clk"]
+    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "tag_clk"]
+  }
+}
+
+foreach {j} {"fwd" "rev"} {
+  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "pod_row_0_master_clk"]
+  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "pod_row_0_master_clk"]
+  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "tag_clk"]
+  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "tag_clk"]
+}
+
+set_false_path -from [get_clocks "west_link_rev_clk"] -to   [get_clocks "io_link_master_clk"]
+set_false_path -to   [get_clocks "west_link_rev_clk"] -from [get_clocks "io_link_master_clk"]
+set_false_path -from [get_clocks "west_link_rev_clk"] -to   [get_clocks "tag_clk"]
+set_false_path -to   [get_clocks "west_link_rev_clk"] -from [get_clocks "tag_clk"]
+
+set_false_path -from [get_clocks "north_link_fwd_clk"] -to   [get_clocks "io_link_master_clk"]
+set_false_path -to   [get_clocks "north_link_fwd_clk"] -from [get_clocks "io_link_master_clk"]
+set_false_path -from [get_clocks "north_link_fwd_clk"] -to   [get_clocks "tag_clk"]
+set_false_path -to   [get_clocks "north_link_fwd_clk"] -from [get_clocks "tag_clk"]
+
 
 
 puts "BSG-info: Completed script [info script]\n"

@@ -235,6 +235,12 @@ for {set i 0} {$i < 4} {incr i} {
           -name "ver_link_${i}_${j}_${k}_clk" \
           [get_pins "core_complex_core_${i}__podrow/ver_io_${k}_link_clk_o[${j}]"]
       set_propagated_clock [get_clocks "ver_link_${i}_${j}_${k}_clk"] 
+
+      set x [expr {$j < $num_ver_links} ? {$i-1} : {$i+1}]
+      set_false_path -from [get_clocks "ver_link_${i}_${j}_${k}_clk"] -to   [get_clocks "pod_row_${x}_master_clk"]
+      set_false_path -to   [get_clocks "ver_link_${i}_${j}_${k}_clk"] -from [get_clocks "pod_row_${x}_master_clk"]
+      set_false_path -from [get_clocks "ver_link_${i}_${j}_${k}_clk"] -to   [get_clocks "tag_clk"]
+      set_false_path -to   [get_clocks "ver_link_${i}_${j}_${k}_clk"] -from [get_clocks "tag_clk"]
     }
   }
 }
