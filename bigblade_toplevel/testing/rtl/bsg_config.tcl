@@ -11,69 +11,6 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/chip_include.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/gateway_include.tcl
 
-##################################
-# bsg_manycore_tile source files #
-##################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_tile-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_tile-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_TILE_SOURCE_FILES]
-
-######################################
-# bsg_manycore_link_sdr source files #
-######################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bsg_manycore_link_sdr-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bsg_manycore_link_sdr-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BSG_MANYCORE_LINK_SDR_SOURCE_FILES]
-
-
-#####################################
-# bigblade_io_link_ddr source files #
-#####################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_io_link_ddr-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_io_link_ddr-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_IO_LINK_DDR_SOURCE_FILES]
-
-#####################################
-# bigblade_noc_io_link source files #
-#####################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_io_link-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_io_link-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_IO_LINK_SOURCE_FILES]
-
-
-######################################
-# bigblade_noc_mem_link source files #
-######################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_mem_link-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_noc_mem_link-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_NOC_MEM_LINK_SOURCE_FILES]
-
-
-######################################
-# bigblade_clk_gen source files      #
-######################################
-# comment this out to use post_synth netlist
-#source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_clk_gen-post-synth_filelist.tcl
-# comment this out to use rtl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_clk_gen-rtl_filelist.tcl
-
-set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_CLK_GEN_SOURCE_FILES]
-
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES

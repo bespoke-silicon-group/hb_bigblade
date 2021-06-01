@@ -171,6 +171,8 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
+  $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
+  $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
@@ -237,13 +239,27 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_block.v
   $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_block_core_complex.v
 
+  $bsg_designs_target_dir/../bigblade_io_link_ddr/v/bsg_chip_io_link_ddr.v
+
+  $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_chip_noc_mem_link.v
   $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_ready_and_link_round_robin_static.v
 
+  $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_chip_noc_io_link.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_then_ready_link_round_robin_static.v
   $bsg_designs_target_dir/../bigblade_noc_io_link/v/bsg_wide_link_to_then_ready_link.v
 
   $bsg_designs_target_dir/../bigblade_pod_row/v/bsg_manycore_pod_row_sdr.v
 
+  $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_west.v
+  $bsg_designs_target_dir/../common/sdr/sdr_horizontal/v/bsg_manycore_link_ruche_to_sdr_east.v
+  $bsg_designs_target_dir/../common/sdr/sdr_vertical/v/bsg_manycore_link_to_sdr_north.v
+  $bsg_designs_target_dir/../common/sdr/sdr_vertical/v/bsg_manycore_link_to_sdr_south.v
+  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_ne.v
+  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_nw.v
+  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_sw.v
+  $bsg_designs_target_dir/../common/sdr/sdr_corner/v/bsg_manycore_link_wh_to_sdr_se.v
+
+  $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen.v
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor.v
   $bsg_designs_target_dir/../bigblade_clk_gen/v/bigblade_clk_gen_monitor_clk_buf.v
 
