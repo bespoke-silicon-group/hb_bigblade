@@ -19,9 +19,9 @@ set_pg_via_master_rule KH_pg_stack_via_rule -contact_code KH_VH_45_18_0_45_KH   
 set c5_starting_x 146.40   ;# the offset for the center of the first patch strap
 set c5_pitch_x    147.84   ;# the distance between patch straps in the x direction
 
-set c5_low_end    104.56
-set c5_high_end   111.44
-set c5_pitch_y    190.08
+set c5_low_end    104.56   ;# where the bottom of the strap stops (based on the bottom row of patches)
+set c5_high_end   111.44   ;# where the top of the strap stops (based on the bottom row of patches)
+set c5_pitch_y    190.08   ;# the distance to go north for the next row of patches
 
 # We only need this for the 15 channels between blocks, we have a VDD and VSS power strap on the right side of the file vcache block.
 for {set i 0} {$i < 15} {incr i} {
