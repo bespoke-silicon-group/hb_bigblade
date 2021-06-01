@@ -200,6 +200,8 @@ set_ungroup [get_designs -filter "hdl_template==bp_mmu"                         
 set_ungroup [get_designs -filter "hdl_template==bp_be_ptw"                       ] true
 set_ungroup [get_designs -filter "hdl_template==bp_tlb"                          ] true
 
+set_ungroup [get_designs -filter "hdl_template==bsg_bus_pack"                    ] true
+
 set_ungroup [get_designs -filter "hdl_template==compareRecFN"                    ] true 
 set_ungroup [get_designs -filter "hdl_template==divSqrtRecFNToRaw_small"         ] true
 set_ungroup [get_designs -filter "hdl_template==fNToRecFN"                       ] true

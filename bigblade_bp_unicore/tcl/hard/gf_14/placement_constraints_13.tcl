@@ -15,11 +15,7 @@ set tile_width  [core_width]
 set keepout_margin_x [expr 6*[unit_width]]
 set keepout_margin_y [expr 1*[unit_height]]
 set keepout_margins [list $keepout_margin_x $keepout_margin_y $keepout_margin_x $keepout_margin_y]
-
-set bound_to_rf_pin  0.058
-set bound_to_rf_side 0.020
-set bound_to_rf_top  0.140
-set bound_to_rf_bot  0.140
+set keepout_margins_wide [list [expr 4*$keepout_margin_x] $keepout_margin_y [expr 4*$keepout_margin_x] $keepout_margin_y]
 
 set icache_tag_mems [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*tag_mem*"]
 set icache_data_mems_west [index_collection [get_cells -hier -filter "ref_name=~gf14_* && full_name=~*icache*data_mem*"] 0 3]
@@ -45,8 +41,6 @@ set stat_mem_width    [lindex [get_attribute [get_cell -hier $dcache_stat_mem] w
 set btb_mem_height    [lindex [get_attribute [get_cell -hier $btb_mem] height] 0]
 set btb_mem_width     [lindex [get_attribute [get_cell -hier $btb_mem] width] 0]
 
-set bound_width 0.672
-set bound_height 0.480
 
 #####################################
 ### I CACHE TAG
@@ -79,7 +73,7 @@ set icache_data_ma_west [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation FN \
   $icache_data_mems_west]
 
@@ -98,7 +92,7 @@ set icache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation N \
   $icache_data_mems_east]
 
@@ -142,7 +136,7 @@ set dcache_data_ma_west [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation [list FN FN FN FN] \
   $dcache_data_mems_west]
 
@@ -161,7 +155,7 @@ set dcache_data_ma_east [create_macro_array \
   -num_cols 2 \
   -align bottom \
   -horizontal_channel_height [expr 2*$keepout_margin_y] \
-  -vertical_channel_width [expr 2*$keepout_margin_x] \
+  -vertical_channel_width [expr 4*$keepout_margin_x] \
   -orientation [list N N N N] \
   $dcache_data_mems_east]
 
@@ -268,7 +262,7 @@ set_macro_relative_location \
   -target_orientation N \
   -anchor_object $icache_data_ma_east \
   -anchor_corner br \
-  -offset [list -$keepout_margin_x 0]
+  -offset [list 0 0]
 
 create_keepout_margin -type hard -outer $keepout_margins $bht_mem
 

@@ -167,8 +167,17 @@ module bsg_blackparrot_unicore_tile_sdr
   assign hb_cmd_v_lo = io_cmd_v_lo;
   assign io_cmd_ready_li = hb_cmd_ready_li;
 
-  //assign io_resp_li = '{header: hb_resp_li.header, data: {2{hb_resp_li.data}}};
-  assign io_resp_li = '{header: hb_resp_li.header, data: {1{hb_resp_li.data}}};
+  logic [dword_width_gp-1:0] io_resp_data_li;
+  bsg_bus_pack
+   #(.width_p(dword_width_gp))
+   resp_pack
+    (.data_i(dword_width_gp'(hb_resp_li.data))
+     ,.sel_i(hb_resp_li.header.size[0+:3])
+     ,.size_i(hb_resp_li.header.addr[0+:2])
+     ,.data_o(io_resp_data_li)
+     );
+
+  assign io_resp_li = '{header: hb_resp_li.header, data: {2{hb_resp_li.data}}};
   assign io_resp_v_li = hb_resp_v_li;
   assign hb_resp_yumi_lo = io_resp_yumi_lo;
 
