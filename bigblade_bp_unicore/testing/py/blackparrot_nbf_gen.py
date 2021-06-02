@@ -149,8 +149,8 @@ class NBF:
                 data = int(data, 16)
                 bank = self.select_bits(addr, 2+vcache_word_offset_width, 2+vcache_word_offset_width+lg_banks-1)
                 index = self.select_bits(addr, 2+vcache_word_offset_width+lg_banks, 2+vcache_word_offset_width+lg_banks+index_width-1)
-                x = self.select_bits(bank, 0, lg_x-1) # + self.select_bits(self.mc_dram_hio_and_pod_offset, 0, 1)
-                y = self.select_bits(bank, lg_x, lg_x) # + self.select_bits(self.mc_dram_hio_and_pod_offset, 2, 3)
+                x = self.select_bits(bank, 0, lg_x-1) + self.select_bits(self.mc_dram_hio_and_pod_offset, 0, 1)
+                y = self.select_bits(bank, lg_x, lg_x) + self.select_bits(self.mc_dram_hio_and_pod_offset, 2, 3)
                 epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
                 
@@ -180,11 +180,14 @@ class NBF:
 
         # Write to the DRAM offset registers in all the bridge modules
         self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
-        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
         self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
-        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
         self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_base_addr_reg, 0x81000000)
-        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x1)
+
+        self.fence()
+        
+        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x5)
+        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x5)
+        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_hio_and_pod_offset_reg, 0x5)
 
     # print finish
     def finish(self):
