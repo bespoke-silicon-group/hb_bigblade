@@ -226,20 +226,20 @@ module bp_cce_to_mc_bridge
       ,.data_o(dram_base_addr_r)
       );
 
-  localparam hio_and_pod_addr_width_lp = paddr_width_p - hb_data_width_p;
-  logic dram_hio_and_pod_offset_w_v_li;
-  logic [hio_and_pod_addr_width_lp-1:0] dram_hio_and_pod_offset_addr, dram_hio_and_pod_offset_addr_r;
+  localparam pod_addr_width_lp = paddr_width_p - hb_data_width_p;
+  logic dram_pod_offset_w_v_li;
+  logic [pod_addr_width_lp-1:0] dram_pod_offset_addr, dram_pod_offset_addr_r;
   bsg_dff_reset_en
-    #(.width_p(hio_and_pod_addr_width_lp)
+    #(.width_p(pod_addr_width_lp)
      // Pod X = 1, Pod Y = 1
-     ,.reset_val_p(hio_and_pod_addr_width_lp'(5))
+     ,.reset_val_p(pod_addr_width_lp'(5))
      )
-    hio_and_pod_addr_reg
+    pod_addr_reg
     (.clk_i(clk_i)
     ,.reset_i(reset_i)
-    ,.en_i(dram_hio_and_pod_offset_w_v_li)
-    ,.data_i(dram_hio_and_pod_offset_addr)
-    ,.data_o(dram_hio_and_pod_offset_addr_r)
+    ,.en_i(dram_pod_offset_w_v_li)
+    ,.data_i(dram_pod_offset_addr)
+    ,.data_o(dram_pod_offset_addr_r)
     );
 
   // DRAM hash function
@@ -250,9 +250,9 @@ module bp_cce_to_mc_bridge
   wire [hb_data_width_p-1:0] dram_offset = dram_base_addr_r - hb_data_width_p'(32'h80000000);
   wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_offset;
   // Need to stripe across mc_compute pods, 4x4
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_hio_and_pod_offset_addr_r[0+:2];
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_pod_offset_addr_r[0+:2];
   wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[0+hb_data_width_p+:2] + dram_pod_x_offset;
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_hio_and_pod_offset_addr_r[2+:2];
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_pod_offset_addr_r[2+:2];
   wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[0+hb_data_width_p+2+:2] + dram_pod_y_offset;
   bsg_manycore_dram_hash_function
    #(.data_width_p(hb_data_width_p)
@@ -348,14 +348,7 @@ module bp_cce_to_mc_bridge
      ,.r_data_o(mmio_header_lo)
      );
   bp_bedrock_cce_mem_msg_s mmio_resp_lo;
-  assign mmio_resp_lo.header = mmio_header_lo;
-  assign mmio_resp_lo.data = (mmio_header_lo.msg_type == e_bedrock_msg_size_4)
-                              ? mmio_resp_data_lo
-                              : (mmio_header_lo.msg_type == e_bedrock_msg_size_2)
-                                ? {2{mmio_resp_data_lo}}
-                                : (mmio_header_lo.msg_type == e_bedrock_msg_size_1)
-                                  ? {4{mmio_resp_data_lo}}
-                                  : mmio_resp_data_lo;
+  assign mmio_resp_lo = '{header: mmio_header_lo, data: mmio_resp_data_lo};
 
   logic [hb_data_width_p-1:0] store_payload;
   logic [bsg_manycore_reg_id_width_gp-1:0] store_reg_id;
@@ -675,7 +668,7 @@ module bp_cce_to_mc_bridge
       io_cmd_cast_o = '0;
 
       dram_base_addr_w_v_li = 1'b0;
-      dram_hio_and_pod_offset_w_v_li = 1'b0;
+      dram_pod_offset_w_v_li = 1'b0;
       io_cmd_v_o = 1'b0;
       in_yumi_li = 1'b0;
 
@@ -712,9 +705,9 @@ module bp_cce_to_mc_bridge
               end
             else if (in_epa_li.addr == 12'h4)
               begin
-                dram_hio_and_pod_offset_addr = in_data_lo;
-                dram_hio_and_pod_offset_w_v_li = in_we_lo & in_v_lo;
-                in_yumi_li = dram_hio_and_pod_offset_w_v_li;
+                dram_pod_offset_addr = in_data_lo;
+                dram_pod_offset_w_v_li = in_we_lo & in_v_lo;
+                in_yumi_li = dram_pod_offset_w_v_li;
               end
             else
               begin
@@ -744,13 +737,13 @@ module bp_cce_to_mc_bridge
       ,.data_o(dram_base_addr_w_v_r)
       );
 
-  logic dram_hio_and_pod_offset_w_v_r;
+  logic dram_pod_offset_w_v_r;
   bsg_dff
     #(.width_p(1))
-    dram_hio_and_pod_offset_w_v_reg
+    dram_pod_offset_w_v_reg
       (.clk_i(clk_i)
-      ,.data_i(dram_hio_and_pod_offset_w_v_li)
-      ,.data_o(dram_hio_and_pod_offset_w_v_r)
+      ,.data_i(dram_pod_offset_w_v_li)
+      ,.data_o(dram_pod_offset_w_v_r)
       );
 
   always_comb
@@ -766,18 +759,16 @@ module bp_cce_to_mc_bridge
                                 ? io_resp_cast_i.data[0+:32]
                                 : (io_resp_cast_i.header.size == e_bedrock_msg_size_2)
                                   ? io_resp_cast_i.data[0+:16]
-                                  : (io_resp_cast_i.header.size == e_bedrock_msg_size_1)
-                                    ? io_resp_cast_i.data[0+:8]
-                                    : io_resp_cast_i.data[0+:32];
+                                  : io_resp_cast_i.data[0+:8];
           returning_v_li = io_resp_v_i;
         end
       else if (dram_base_addr_w_v_r)
         begin
           returning_v_li = dram_base_addr_w_v_r;
         end
-      else if (dram_hio_and_pod_offset_w_v_r)
+      else if (dram_pod_offset_w_v_r)
         begin
-          returning_v_li = dram_hio_and_pod_offset_w_v_r;
+          returning_v_li = dram_pod_offset_w_v_r;
         end
     end
 
