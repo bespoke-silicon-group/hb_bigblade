@@ -37,7 +37,7 @@ module bsg_chip_block
   wire ext_io_clk_i           = pad_CT0_clk_i_int;
   wire ext_noc_clk_i          = pad_CT0_tkn_i_int;
   wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_ML0_3_i_int, pad_ML0_2_i_int, pad_ML0_1_i_int, pad_ML0_0_i_int};
-  //wire ext_bp_clk_i           = pad_ML0_4_i_int;
+  wire ext_bp_clk_i           = pad_ML0_4_i_int;
   //wire ext_cgra_clk_i         = pad_MR0_0_i_int;
 
   // There are 4 manycore clocks and 8 noc_mem clocks to monitor
@@ -50,7 +50,8 @@ module bsg_chip_block
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
-  // wire [2*hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
+  // TODO: BP only on the west side? or both?
+  wire [hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
   // wire [2*hb_num_pods_y_gp-1:0] cgra_clk_monitor_o;
 
   // mux for manycore monitor clock
@@ -266,8 +267,10 @@ module bsg_chip_block
   ,.async_output_disable_i (async_output_disable_i)
 
   ,.mc_ext_clk_i           (mc_ext_clk_i        )
-
   ,.mc_clk_monitor_o       (mc_clk_monitor_o    )
+
+  ,.bp_ext_clk_i           (ext_bp_clk_i        )
+  ,.bp_clk_monitor_o       (bp_clk_monitor_o    )
                            
   ,.mc_fwd_link_clk_o      (mc_fwd_link_clk_li  )
   ,.mc_fwd_link_data_o     (mc_fwd_link_data_li )
