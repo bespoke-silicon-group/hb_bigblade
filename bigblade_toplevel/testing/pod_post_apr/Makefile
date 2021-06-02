@@ -184,6 +184,16 @@ VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SD
 VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
 
+########################################
+# BSG Tie HI/LO filelists and liblists #
+########################################
+export BSG_TIEHILO_LIBRARY_NAME = bsg_tiehilo
+export BSG_TIEHILO_FILELIST = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).filelist
+export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
@@ -262,6 +272,7 @@ IP_BLOCKS += bigblade_noc_mem_link
 IP_BLOCKS += bsg_manycore_tile
 IP_BLOCKS += bigblade_io_link_ddr
 IP_BLOCKS += bsg_manycore_link_sdr
+IP_BLOCKS += bsg_tiehilo
 
 IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)

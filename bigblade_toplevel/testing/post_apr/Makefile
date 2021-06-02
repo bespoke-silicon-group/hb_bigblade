@@ -187,11 +187,10 @@ VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
 ########################################
 # BSG Tie HI/LO filelists and liblists #
 ########################################
-export BSG_TIEHILO_LIBRARY_NAME = bsg_manycore_link_sdr
+export BSG_TIEHILO_LIBRARY_NAME = bsg_tiehilo
 export BSG_TIEHILO_FILELIST = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).filelist
 export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
 
-# Currently empty library, uncomment if populated
 VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
