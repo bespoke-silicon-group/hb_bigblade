@@ -2,6 +2,9 @@ puts "BSG-info: Running script [info script]\n"
 
 source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
 
+# patch the power grid before routing clock wires
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/patch_pg.tcl
+
 set_app_options -name clock_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name clock_opt.flow.enable_ccd -value false
