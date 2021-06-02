@@ -74,6 +74,15 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/bigblade_clk_gen-rtl_filelist.
 
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $BIGBLADE_CLK_GEN_SOURCE_FILES]
 
+###############################
+# black_parrot source files   #
+###############################
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/blackparrot_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/tcl/blackparrot_include.tcl
+
+set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES [bsg_list_diff $BP_SVERILOG_SOURCE_FILES $SVERILOG_SOURCE_FILES]]
+set SVERILOG_INCLUDE_PATHS [concat $SVERILOG_INCLUDE_PATHS [bsg_list_diff $BP_SVERILOG_INCLUDE_PATHS $SVERILOG_INCLUDE_PATHS]]
+
 # chip filelist
 bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES
