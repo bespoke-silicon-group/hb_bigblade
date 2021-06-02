@@ -6,6 +6,8 @@ bsg_packaging/
 bsg_manycore/
 bsg_replicant/
 hb_bigblade_netlists/
+black_parrot/
+black_parrot_sdk/
 out/
 vc_hdrs.h
 simv*

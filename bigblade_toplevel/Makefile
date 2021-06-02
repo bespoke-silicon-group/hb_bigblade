@@ -45,6 +45,14 @@ bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(GITHUB)bespoke-silicon-group/bsg_packaging
 bsg_packaging_commit :=basejump_fcbga_785
 
+black_parrot_dir     :=$(THIS_DIR)/black_parrot
+black_parrot_url     :=$(GITHUB)black-parrot/black-parrot
+black_parrot_commit  :=tapeout_bigblade_rc1
+
+black_parrot_sdk_dir    :=$(THIS_DIR)/black_parrot_sdk
+black_parrot_sdk_url    :=$(GITHUB)black-parrot-sdk/black-parrot-sdk
+black_parrot_sdk_commit :=master
+
 prep_dir := .pdk_prep
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))
@@ -71,6 +79,9 @@ basejump_stl.init: basejump_stl.init
 
 hb_bigblade_netlists.init: hb_bigblade_netlists.repo
 	$(MAKE) -C $(hb_bigblade_netlists_dir)
+
+black_parrot.init: black_parrot.repo black_parrot_sdk.repo
+	$(MAKE) -j4 -C $(black_parrot_sdk_dir) panic_room
 
 summaries=$(subst .repo,.summary,$(all_repos))
 .PHONY: $(summaries)
