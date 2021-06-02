@@ -231,7 +231,8 @@ module bp_cce_to_mc_bridge
   logic [hio_and_pod_addr_width_lp-1:0] dram_hio_and_pod_offset_addr, dram_hio_and_pod_offset_addr_r;
   bsg_dff_reset_en
     #(.width_p(hio_and_pod_addr_width_lp)
-     ,.reset_val_p(hio_and_pod_addr_width_lp'(0))
+     // Pod X = 1, Pod Y = 1
+     ,.reset_val_p(hio_and_pod_addr_width_lp'(5))
      )
     hio_and_pod_addr_reg
     (.clk_i(clk_i)
@@ -249,10 +250,10 @@ module bp_cce_to_mc_bridge
   wire [hb_data_width_p-1:0] dram_offset = dram_base_addr_r - hb_data_width_p'(32'h80000000);
   wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_offset;
   // Need to stripe across mc_compute pods, 4x4
-  // wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_hio_and_pod_offset_addr_r[0+:2];
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[0+hb_data_width_p+:2];// + dram_pod_x_offset;
-  // wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_hio_and_pod_offset_addr_r[2+:2];
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[0+hb_data_width_p+2+:2];// + dram_pod_y_offset;
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_hio_and_pod_offset_addr_r[0+:2];
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[0+hb_data_width_p+:2] + dram_pod_x_offset;
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_hio_and_pod_offset_addr_r[2+:2];
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[0+hb_data_width_p+2+:2] + dram_pod_y_offset;
   bsg_manycore_dram_hash_function
    #(.data_width_p(hb_data_width_p)
      ,.addr_width_p(hb_addr_width_p)
@@ -674,6 +675,7 @@ module bp_cce_to_mc_bridge
       io_cmd_cast_o = '0;
 
       dram_base_addr_w_v_li = 1'b0;
+      dram_hio_and_pod_offset_w_v_li = 1'b0;
       io_cmd_v_o = 1'b0;
       in_yumi_li = 1'b0;
 
@@ -710,9 +712,9 @@ module bp_cce_to_mc_bridge
               end
             else if (in_epa_li.addr == 12'h4)
               begin
-                dram_base_addr = in_data_lo;
-                dram_base_addr_w_v_li = in_we_lo & in_v_lo;
-                in_yumi_li = dram_base_addr_w_v_li;
+                dram_hio_and_pod_offset_addr = in_data_lo;
+                dram_hio_and_pod_offset_w_v_li = in_we_lo & in_v_lo;
+                in_yumi_li = dram_hio_and_pod_offset_w_v_li;
               end
             else
               begin
