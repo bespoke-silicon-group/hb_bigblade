@@ -244,8 +244,10 @@ module bp_cce_to_mc_bridge
 
   wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_addr_offset_r;
   // Need to stripe across mc_compute pods, 4x4
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = dram_pod_r[0+:hb_pod_x_cord_width_p];
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = dram_pod_r[hb_pod_x_cord_width_p+:hb_pod_y_cord_width_p];
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li =
+    (dram_pod_r[0+:hb_pod_x_cord_width_p] + io_cmd_li.header.addr[0+hb_data_width_p+:2] % 4);
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li =
+    (dram_pod_r[hb_pod_x_cord_width_p+:hb_pod_y_cord_width_p] + io_cmd_li.header.addr[0+hb_data_width_p+2+:2] % 4);
   bsg_manycore_dram_hash_function
    #(.data_width_p(hb_data_width_p)
      ,.addr_width_p(hb_addr_width_p)
