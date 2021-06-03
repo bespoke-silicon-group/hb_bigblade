@@ -26,7 +26,7 @@ bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
 
 black_parrot_dir     :=$(THIS_DIR)/black-parrot
-black_parrot_url     :=$(GITHUB)black-parrot/bloack-parrot
+black_parrot_url     :=$(GITHUB)black-parrot/black-parrot
 black_parrot_commit  :=tapeout_bigblade_rc1
 
 bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
