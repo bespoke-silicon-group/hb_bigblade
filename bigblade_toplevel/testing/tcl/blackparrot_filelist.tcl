@@ -7,7 +7,7 @@ set basejump_stl_dir        $::env(BASEJUMP_STL_DIR)
 set bigblade_bp_unicore_dir $::env(BSG_DESIGNS_DIR)/bigblade_bp_unicore
 set blackparrot_dir         $::env(BLACKPARROT_DIR)
 set bsg_manycore_dir        $::env(BSG_MANYCORE_DIR)
-# set hardfloat_dir           $::env(BLACKPARROT_DIR)/external/HardFloat
+set hardfloat_dir           $::env(BLACKPARROT_DIR)/external/HardFloat
 
 set bsg_packaging_dir $::env(BSG_PACKAGING_DIR)
 set bsg_package       $::env(BSG_PACKAGE)
@@ -19,21 +19,6 @@ set bp_top_dir    ${blackparrot_dir}/bp_top
 set bp_fe_dir     ${blackparrot_dir}/bp_fe
 set bp_be_dir     ${blackparrot_dir}/bp_be
 set bp_me_dir     ${blackparrot_dir}/bp_me
-
-# $hardfloat_dir/source/addRecFN.v
-# $hardfloat_dir/source/compareRecFN.v
-# $hardfloat_dir/source/divSqrtRecFN_small.v
-# $hardfloat_dir/source/fNToRecFN.v
-# $hardfloat_dir/source/HardFloat_primitives.v
-# $hardfloat_dir/source/HardFloat_rawFN.v
-# $hardfloat_dir/source/iNToRecFN.v
-# $hardfloat_dir/source/isSigNaNRecFN.v
-# $hardfloat_dir/source/mulAddRecFN.v
-# $hardfloat_dir/source/mulRecFN.v
-# $hardfloat_dir/source/recFNToFN.v
-# $hardfloat_dir/source/recFNToIN.v
-# $hardfloat_dir/source/recFNToRecFN.v
-# $hardfloat_dir/source/RISCV/HardFloat_specialize.v
 
 set BP_SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_cache/bsg_cache_pkg.v
@@ -162,7 +147,10 @@ set BP_SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_adapter_out.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_decoder_dor.v
   $basejump_stl_dir/bsg_noc/bsg_wormhole_router_input_control.v  
-  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v 
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_output_control.v
+  $hardfloat_dir/source/addRecFN.v
+  $hardfloat_dir/source/mulRecFN.v
+  $hardfloat_dir/source/recFNToRecFN.v
   $bp_common_dir/src/v/bp_mmu.sv
   $bp_common_dir/src/v/bp_pma.sv
   $bp_common_dir/src/v/bp_tlb.sv

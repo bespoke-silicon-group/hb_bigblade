@@ -197,7 +197,6 @@ module bsg_chip_block_core_complex
 
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
     begin : bp
-      // Q: Only 1 external clock across all BPs in all pods?
       bigblade_clk_gen clk_gen
       (.tag_clk_i             (tag_clk_i                      )
       ,.tag_data_i            (tag_data_i                     )

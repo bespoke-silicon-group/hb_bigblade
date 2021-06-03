@@ -50,7 +50,6 @@ module bsg_chip_block
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
-  // TODO: BP only on the west side? or both?
   wire [hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
   // wire [2*hb_num_pods_y_gp-1:0] cgra_clk_monitor_o;
 

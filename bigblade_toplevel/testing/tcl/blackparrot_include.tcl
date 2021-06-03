@@ -14,8 +14,6 @@ set bp_fe_dir     $::env(BLACKPARROT_FE_DIR)
 set bp_be_dir     $::env(BLACKPARROT_BE_DIR)
 set bp_me_dir     $::env(BLACKPARROT_ME_DIR)
 
-# $bp_dir/external/HardFloat/source
-# $bp_dir/external/HardFloat/source/RISCV
 
 set BP_SVERILOG_INCLUDE_PATHS [join "
   $bsg_packaging_dir/common/verilog
@@ -36,4 +34,6 @@ set BP_SVERILOG_INCLUDE_PATHS [join "
   $bp_be_dir/src/include/bp_be_dcache
   $bp_me_dir/src/include
   $bp_top_dir/src/include
+  $bp_dir/external/HardFloat/source
+  $bp_dir/external/HardFloat/source/RISCV
 "]
