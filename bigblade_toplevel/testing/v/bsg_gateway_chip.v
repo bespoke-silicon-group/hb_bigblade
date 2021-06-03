@@ -212,9 +212,11 @@ module bsg_gateway_chip
   ,.clients_o       (tag_lines_lo)
   );
 
+  wire async_output_disable_lo;
+  assign p_async_output_disable_lo = (async_output_disable_lo === 1'bX)? 1'b1 : async_output_disable_lo;
   bsg_tag_client_unsync #(.width_p(1)) btc
   (.bsg_tag_i     (tag_lines_lo)
-  ,.data_async_r_o(p_async_output_disable_lo));
+  ,.data_async_r_o(async_output_disable_lo));
 
 
   //////////////////////////////////////////////////
