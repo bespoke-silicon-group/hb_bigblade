@@ -87,10 +87,10 @@ module bsg_blackparrot_halfpod
   (.bsg_tag_i     (tag_lines_lo.core_reset)
   ,.data_async_r_o(async_core_reset));
 
-  assign async_fwd_link_i_disable_o = {3{sdr_disable_lo};
-  assign async_fwd_link_o_disable_o = {3{sdr_disable_lo};
-  assign async_rev_link_i_disable_o = {3{sdr_disable_lo};
-  assign async_rev_link_o_disable_o = {3{sdr_disable_lo};
+  assign async_fwd_link_i_disable_o = {3{sdr_disable_lo}};
+  assign async_fwd_link_o_disable_o = {3{sdr_disable_lo}};
+  assign async_rev_link_i_disable_o = {3{sdr_disable_lo}};
+  assign async_rev_link_o_disable_o = {3{sdr_disable_lo}};
 
   bsg_blackparrot_unicore_tile_sdr
    tile
