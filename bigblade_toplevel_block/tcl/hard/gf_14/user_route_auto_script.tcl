@@ -410,6 +410,10 @@ append_to_collection msc_nets [get_nets -of_object [get_ports "pad_ML0_1_i_int"]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_ML0_2_i_int"]]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_ML0_3_i_int"]]
 
+append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_0_o_int"]]
+append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_1_o_int"]]
+append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_2_o_int"]]
+
 set MUX_cell [get_cells -hier -filter "full_name=~*mux*BSG_DONT_TOUCH*"]
 foreach_in_collection cell $MUX_cell {
   append_to_collection -unique msc_nets [get_nets -of_object $cell -filter "(full_name!=VSS)&&(full_name!=VDD)"]
