@@ -224,6 +224,11 @@ bsg_chip_derate_mems
 
 # Disabled or false paths
 for {set i 0} {$i < 4} {incr i} {
+  set_false_path -from [get_clocks "pod_row_${i}_master_clk"] -to   [get_clocks "tag_clk"]
+  set_false_path -to   [get_clocks "pod_row_${i}_master_clk"] -from [get_clocks "tag_clk"]
+}
+
+for {set i 0} {$i < 4} {incr i} {
   for {set j 0} {$j < 8} {incr j} {
     set x [expr $i+4*($j/4)]
     set_false_path -from [get_clocks "wh_link_${i}_${j}_clk"] -to   [get_clocks "mem_link_${x}_master_clk"]
