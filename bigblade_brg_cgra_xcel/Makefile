@@ -21,7 +21,7 @@ bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
 bsg_14_commit        :=master
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
-bsg_cadenv_url       :=$(BITBUCKET)taylor-bsg/bsg_cadenv
+bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
 bsg_cadenv_commit    :=master
 
 board_dir            :=$(THIS_DIR)/board
