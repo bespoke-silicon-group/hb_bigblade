@@ -212,34 +212,29 @@ module bp_cce_to_mc_bridge
     );
 
   // DRAM base address register
-  logic dram_base_addr_w_v_li;
-  logic [hb_data_width_p-1:0] dram_base_addr, dram_base_addr_r;
+  logic dram_addr_offset_w_v_li;
+  logic [hb_data_width_p-2:0] dram_addr_offset_n, dram_addr_offset_r;
   bsg_dff_reset_en
-    #(.width_p(hb_data_width_p)
-     ,.reset_val_p(32'h80000000)
-     )
-    dram_base_addr_reg
+    #(.width_p(hb_data_width_p-1))
+    dram_addr_offset_reg
       (.clk_i(clk_i)
       ,.reset_i(reset_i)
-      ,.en_i(dram_base_addr_w_v_li)
-      ,.data_i(dram_base_addr)
-      ,.data_o(dram_base_addr_r)
+      ,.en_i(dram_addr_offset_w_v_li)
+      ,.data_i(dram_addr_offset_n)
+      ,.data_o(dram_addr_offset_r)
       );
 
   localparam pod_addr_width_lp = paddr_width_p - hb_data_width_p;
   logic dram_pod_offset_w_v_li;
-  logic [pod_addr_width_lp-1:0] dram_pod_offset_addr, dram_pod_offset_addr_r;
+  logic [hb_pod_y_cord_width_p+hb_pod_x_cord_width_p-1:0] dram_pod_n, dram_pod_r;
   bsg_dff_reset_en
-    #(.width_p(pod_addr_width_lp)
-     // Pod X = 1, Pod Y = 1
-     ,.reset_val_p(pod_addr_width_lp'(5))
-     )
+   #(.width_p(hb_pod_y_cord_width_p+hb_pod_x_cord_width_p))
     pod_addr_reg
     (.clk_i(clk_i)
     ,.reset_i(reset_i)
     ,.en_i(dram_pod_offset_w_v_li)
-    ,.data_i(dram_pod_offset_addr)
-    ,.data_o(dram_pod_offset_addr_r)
+    ,.data_i(dram_pod_n)
+    ,.data_o(dram_pod_r)
     );
 
   // DRAM hash function
@@ -247,13 +242,10 @@ module bp_cce_to_mc_bridge
   logic [hb_y_cord_width_p-1:0] dram_y_cord_lo;
   logic [hb_addr_width_p-1:0] dram_epa_lo;
 
-  wire [hb_data_width_p-1:0] dram_offset = dram_base_addr_r - hb_data_width_p'(32'h80000000);
-  wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_offset;
+  wire [hb_data_width_p-1:0] dram_eva_li = {1'b1, io_cmd_li.header.addr[0+:hb_data_width_p-1]} + dram_addr_offset_r;
   // Need to stripe across mc_compute pods, 4x4
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_offset = dram_pod_offset_addr_r[0+:2];
-  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = io_cmd_li.header.addr[0+hb_data_width_p+:2] + dram_pod_x_offset;
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_offset = dram_pod_offset_addr_r[2+:2];
-  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = io_cmd_li.header.addr[0+hb_data_width_p+2+:2] + dram_pod_y_offset;
+  wire [hb_pod_x_cord_width_p-1:0] dram_pod_x_li = dram_pod_r[0+:hb_pod_x_cord_width_p];
+  wire [hb_pod_y_cord_width_p-1:0] dram_pod_y_li = dram_pod_r[hb_pod_x_cord_width_p+:hb_pod_y_cord_width_p];
   bsg_manycore_dram_hash_function
    #(.data_width_p(hb_data_width_p)
      ,.addr_width_p(hb_addr_width_p)
@@ -667,7 +659,7 @@ module bp_cce_to_mc_bridge
 
       io_cmd_cast_o = '0;
 
-      dram_base_addr_w_v_li = 1'b0;
+      dram_addr_offset_w_v_li = 1'b0;
       dram_pod_offset_w_v_li = 1'b0;
       io_cmd_v_o = 1'b0;
       in_yumi_li = 1'b0;
@@ -695,32 +687,14 @@ module bp_cce_to_mc_bridge
             io_cmd_v_o = in_v_lo;
             in_yumi_li = io_cmd_yumi_i;
           end
-        4'h2:
-          begin
-            if (in_epa_li.addr == 12'h0)
-              begin
-                dram_base_addr = in_data_lo;
-                dram_base_addr_w_v_li = in_we_lo & in_v_lo;
-                in_yumi_li = dram_base_addr_w_v_li;
-              end
-            else if (in_epa_li.addr == 12'h4)
-              begin
-                dram_pod_offset_addr = in_data_lo;
-                dram_pod_offset_w_v_li = in_we_lo & in_v_lo;
-                in_yumi_li = dram_pod_offset_w_v_li;
-              end
-            else
-              begin
-                // Must never come here
-                // Ack the request but don't do anything
-                in_yumi_li = in_v_lo;
-              end
-          end
         default:
           begin
-            // Must never come here
-            // Ack the request but don't do anything
+            // Always ack other requests to prevent deadlock
             in_yumi_li = in_v_lo;
+            dram_addr_offset_n = in_data_lo;
+            dram_pod_n = in_data_lo;
+            dram_addr_offset_w_v_li = in_we_lo & in_v_lo & (in_epa_li.addr == 12'h0);
+            dram_pod_offset_w_v_li = in_we_lo & in_v_lo & (in_epa_li.addr == 12'h4);
           end
       endcase
     end
@@ -728,23 +702,10 @@ module bp_cce_to_mc_bridge
   //////////////////////////////////////////////
   // Return to incoming packet
   //////////////////////////////////////////////
-  logic dram_base_addr_w_v_r;
-  bsg_dff
-    #(.width_p(1))
-    dram_base_addr_w_v_reg
-      (.clk_i(clk_i)
-      ,.data_i(dram_base_addr_w_v_li)
-      ,.data_o(dram_base_addr_w_v_r)
-      );
-
-  logic dram_pod_offset_w_v_r;
-  bsg_dff
-    #(.width_p(1))
-    dram_pod_offset_w_v_reg
-      (.clk_i(clk_i)
-      ,.data_i(dram_pod_offset_w_v_li)
-      ,.data_o(dram_pod_offset_w_v_r)
-      );
+  // Need to ack bridge CSRs 1 cycle later
+  logic bridge_csr_w_v_r;
+  always_ff @(posedge clk_i)
+    bridge_csr_w_v_r <= dram_addr_offset_w_v_li | dram_pod_offset_w_v_li;
 
   always_comb
     begin
@@ -762,13 +723,9 @@ module bp_cce_to_mc_bridge
                                   : io_resp_cast_i.data[0+:8];
           returning_v_li = io_resp_v_i;
         end
-      else if (dram_base_addr_w_v_r)
+      else
         begin
-          returning_v_li = dram_base_addr_w_v_r;
-        end
-      else if (dram_pod_offset_w_v_r)
-        begin
-          returning_v_li = dram_pod_offset_w_v_r;
+          returning_v_li = bridge_csr_w_v_r;
         end
     end
 
