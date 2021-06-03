@@ -25,6 +25,10 @@ bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
 
+black_parrot_dir     :=$(THIS_DIR)/black-parrot
+black_parrot_url     :=$(GITHUB)black-parrot/bloack-parrot
+black_parrot_commit  :=tapeout_bigblade_rc1
+
 bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
 bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
 bsg_replicant_commit :=bigblade-tapeout
@@ -65,6 +69,10 @@ all: $(all_repos) $(prep_dir) $(init_repos)
 
 bsg_manycore.init: bsg_manycore.repo
 	$(MAKE) -C $(bsg_manycore_dir) checkout_submodules
+
+black_parrot.init: black_parrot.repo
+	$(MAKE) -C $(black_parrot_dir) libs
+
 
 basejump_stl.init: basejump_stl.init
 	cd $(basejump_stl_dir) && git submodule update --init --recursive

@@ -37,21 +37,23 @@ module bsg_chip_block
   wire ext_io_clk_i           = pad_CT0_clk_i_int;
   wire ext_noc_clk_i          = pad_CT0_tkn_i_int;
   wire [hb_num_pods_y_gp-1:0] mc_ext_clk_i = {pad_ML0_3_i_int, pad_ML0_2_i_int, pad_ML0_1_i_int, pad_ML0_0_i_int};
-  //wire ext_bp_clk_i           = pad_ML0_4_i_int;
-  //wire ext_cgra_clk_i         = pad_MR0_0_i_int;
+  wire bp_ext_clk_i           = pad_ML0_4_i_int;
+  wire cgra_ext_clk_i         = pad_MR0_0_i_int;
 
   // There are 4 manycore clocks and 8 noc_mem clocks to monitor
   // Wires below select which clock to monitor
   wire [1:0] mc_clk_monitor_sel_i      = {pad_CT0_4_i_int, pad_CT0_3_i_int};
   wire [2:0] noc_mem_clk_monitor_sel_i = {pad_CT0_7_i_int, pad_CT0_6_i_int, pad_CT0_5_i_int};
+  wire [2:0] bp_clk_monitor_sel_i      = {pad_CB0_2_i_int, pad_CB0_1_i_int, pad_CB0_0_i_int};
+  wire [2:0] cgra_clk_monitor_sel_i    = {pad_CB0_5_i_int, pad_CB0_4_i_int, pad_CB0_3_i_int};
 
   // Generated clocks to be monitored
   // They are (2^bsg_link_clk_gen_lg_monitor_ds_gp) times slower compared to the actual clocks
   wire [hb_num_pods_y_gp-1:0] mc_clk_monitor_o;
   wire [mem_link_conc_num_gp-1:0] noc_mem_clk_monitor_o;
   wire noc_io_clk_monitor_o;
-  // wire [2*hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
-  // wire [2*hb_num_pods_y_gp-1:0] cgra_clk_monitor_o;
+  wire [2*hb_num_pods_y_gp-1:0] bp_clk_monitor_o;
+  wire [2*hb_num_pods_y_gp-1:0] cgra_clk_monitor_o;
 
   // mux for manycore monitor clock
   wire [3:0] mc_mux_data_li = {'0, mc_clk_monitor_o};
@@ -69,6 +71,26 @@ module bsg_chip_block
   (.data_i(noc_mem_clk_monitor_o[7:4]),.sel_i(noc_mem_clk_monitor_sel_i[1:0]),.data_o(noc_mem_clk_monitor_mid[1]));
   bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) noc_mem_mux2
   (.data_i({2'b00, noc_mem_clk_monitor_mid}),.sel_i({1'b0, noc_mem_clk_monitor_sel_i[2]}),.data_o(pad_CT0_2_o_int));
+
+  // mux for bp monitor clock
+  wire [7:0] bp_mux_data_li = {'0, bp_clk_monitor_o};
+  wire [1:0] bp_clk_monitor_mid;
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) bp_mux0
+  (.data_i(bp_mux_data_li[3:0]),.sel_i(bp_clk_monitor_sel_i[1:0]),.data_o(bp_clk_monitor_mid[0]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) bp_mux1
+  (.data_i(bp_mux_data_li[7:4]),.sel_i(bp_clk_monitor_sel_i[1:0]),.data_o(bp_clk_monitor_mid[1]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) bp_mux2
+  (.data_i({2'b00, bp_clk_monitor_mid}),.sel_i({1'b0, bp_clk_monitor_sel_i[2]}),.data_o(pad_CB0_0_o_int));
+
+  // mux for cgra monitor clock
+  wire [7:0] cgra_mux_data_li = {'0, cgra_clk_monitor_o};
+  wire [1:0] cgra_clk_monitor_mid;
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) cgra_mux0
+  (.data_i(cgra_mux_data_li[3:0]),.sel_i(cgra_clk_monitor_sel_i[1:0]),.data_o(cgra_clk_monitor_mid[0]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) cgra_mux1
+  (.data_i(cgra_mux_data_li[7:4]),.sel_i(cgra_clk_monitor_sel_i[1:0]),.data_o(cgra_clk_monitor_mid[1]));
+  bsg_mux #(.width_p(1),.els_p(4),.balanced_p(1),.harden_p(1)) cgra_mux2
+  (.data_i({2'b00, cgra_clk_monitor_mid}),.sel_i({1'b0, cgra_clk_monitor_sel_i[2]}),.data_o(pad_CB0_1_o_int));
 
 
   //////////////////////////////////////////////////
@@ -266,8 +288,12 @@ module bsg_chip_block
   ,.async_output_disable_i (async_output_disable_i)
 
   ,.mc_ext_clk_i           (mc_ext_clk_i        )
+  ,.bp_ext_clk_i           (bp_ext_clk_i        )
+  ,.cgra_ext_clk_i         (cgra_ext_clk_i      )
 
   ,.mc_clk_monitor_o       (mc_clk_monitor_o    )
+  ,.bp_clk_monitor_o       (bp_clk_monitor_o    )
+  ,.cgra_clk_monitor_o     (cgra_clk_monitor_o  )
                            
   ,.mc_fwd_link_clk_o      (mc_fwd_link_clk_li  )
   ,.mc_fwd_link_data_o     (mc_fwd_link_data_li )

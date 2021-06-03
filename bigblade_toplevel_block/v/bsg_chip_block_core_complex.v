@@ -18,8 +18,12 @@ module bsg_chip_block_core_complex
   ,input                           async_output_disable_i
 
   ,input  [hb_num_pods_y_gp-1:0]   mc_ext_clk_i
+  ,input                           bp_ext_clk_i
+  ,input                           cgra_ext_clk_i
 
-  ,output [hb_num_pods_y_gp-1:0]   mc_clk_monitor_o
+  ,output [hb_num_pods_y_gp-1:0]      mc_clk_monitor_o
+  ,output [hb_num_pods_y_gp-1:0][1:0] bp_clk_monitor_o
+  ,output [hb_num_pods_y_gp-1:0][1:0] cgra_clk_monitor_o
 
   ,output                          mc_fwd_link_clk_o
   ,output [mc_fwd_width_lp-1:0]    mc_fwd_link_data_o
@@ -87,6 +91,48 @@ module bsg_chip_block_core_complex
 
   wire [hb_num_pods_y_gp-1:0] mc_clk_lo;
   wire [hb_num_pods_y_gp-1:0][tag_lg_els_gp-1:0] mc_clk_tag_node_id_offset_li;
+
+
+
+  wire [hb_num_pods_y_gp-1:0][1:0][tag_lg_els_gp-1:0] bp_tag_node_id_offset_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_async_fwd_link_i_disable_lo, bp_async_fwd_link_o_disable_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_async_rev_link_i_disable_lo, bp_async_rev_link_o_disable_lo;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_io_fwd_link_clk_lo, bp_io_fwd_link_v_lo, bp_io_fwd_link_token_li;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0][mc_fwd_width_lp-1:0] bp_io_fwd_link_data_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_io_fwd_link_clk_li, bp_io_fwd_link_v_li, bp_io_fwd_link_token_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0][mc_fwd_width_lp-1:0] bp_io_fwd_link_data_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_io_rev_link_clk_lo, bp_io_rev_link_v_lo, bp_io_rev_link_token_li;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0][mc_rev_width_lp-1:0] bp_io_rev_link_data_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0]                      bp_io_rev_link_clk_li, bp_io_rev_link_v_li, bp_io_rev_link_token_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][2:0][mc_rev_width_lp-1:0] bp_io_rev_link_data_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0] bp_clk_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][tag_lg_els_gp-1:0] bp_clk_tag_node_id_offset_li;
+
+
+
+  wire [hb_num_pods_y_gp-1:0][1:0][tag_lg_els_gp-1:0] cgra_tag_node_id_offset_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_async_fwd_link_i_disable_lo, cgra_async_fwd_link_o_disable_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_async_rev_link_i_disable_lo, cgra_async_rev_link_o_disable_lo;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_io_fwd_link_clk_lo, cgra_io_fwd_link_v_lo, cgra_io_fwd_link_token_li;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0][mc_fwd_width_lp-1:0] cgra_io_fwd_link_data_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_io_fwd_link_clk_li, cgra_io_fwd_link_v_li, cgra_io_fwd_link_token_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0][mc_fwd_width_lp-1:0] cgra_io_fwd_link_data_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_io_rev_link_clk_lo, cgra_io_rev_link_v_lo, cgra_io_rev_link_token_li;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0][mc_rev_width_lp-1:0] cgra_io_rev_link_data_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0]                      cgra_io_rev_link_clk_li, cgra_io_rev_link_v_li, cgra_io_rev_link_token_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][3:0][mc_rev_width_lp-1:0] cgra_io_rev_link_data_li;
+
+  wire [hb_num_pods_y_gp-1:0][1:0] cgra_clk_lo;
+  wire [hb_num_pods_y_gp-1:0][1:0][tag_lg_els_gp-1:0] cgra_clk_tag_node_id_offset_li;
+
+
 
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
   begin: core
@@ -177,7 +223,106 @@ module bsg_chip_block_core_complex
     ,.io_wh_link_token_o  ({wh_link_token_o[i+hb_num_pods_y_gp], wh_link_token_o[i]})
     );
 
+
+    for (genvar j = 0; j < 2; j++)
+      begin: bp
+
+        bigblade_clk_gen clk_gen
+        (.tag_clk_i             (tag_clk_i                         )
+        ,.tag_data_i            (tag_data_i                        )
+        ,.tag_node_id_offset_i  (bp_clk_tag_node_id_offset_li[i][j])
+        ,.ext_clk_i             (bp_ext_clk_i                      )
+        ,.async_output_disable_i(async_output_disable_i            )
+        ,.clk_o                 (bp_clk_lo                   [i][j])
+        ,.clk_monitor_o         (bp_clk_monitor_o            [i][j])
+        );
+
+        bsg_blackparrot_halfpod halfpod
+
+        (.clk_i                     (bp_clk_lo                     [i][j])
+
+        ,.tag_clk_i                 (tag_clk_i                           )
+        ,.tag_data_i                (tag_data_i                          )
+        ,.tag_node_id_offset_i      (bp_tag_node_id_offset_li      [i][j])
+
+        ,.io_fwd_link_clk_o         (bp_io_fwd_link_clk_lo         [i][j])
+        ,.io_fwd_link_data_o        (bp_io_fwd_link_data_lo        [i][j])
+        ,.io_fwd_link_v_o           (bp_io_fwd_link_v_lo           [i][j])
+        ,.io_fwd_link_token_i       (bp_io_fwd_link_token_li       [i][j])
+        ,.async_fwd_link_o_disable_o(bp_async_fwd_link_o_disable_lo[i][j])
+
+        ,.io_fwd_link_clk_i         (bp_io_fwd_link_clk_li         [i][j])
+        ,.io_fwd_link_data_i        (bp_io_fwd_link_data_li        [i][j])
+        ,.io_fwd_link_v_i           (bp_io_fwd_link_v_li           [i][j])
+        ,.io_fwd_link_token_o       (bp_io_fwd_link_token_lo       [i][j])
+        ,.async_fwd_link_i_disable_o(bp_async_fwd_link_i_disable_lo[i][j])
+
+        ,.io_rev_link_clk_o         (bp_io_rev_link_clk_lo         [i][j])
+        ,.io_rev_link_data_o        (bp_io_rev_link_data_lo        [i][j])
+        ,.io_rev_link_v_o           (bp_io_rev_link_v_lo           [i][j])
+        ,.io_rev_link_token_i       (bp_io_rev_link_token_li       [i][j])
+        ,.async_rev_link_o_disable_o(bp_async_rev_link_o_disable_lo[i][j])
+
+        ,.io_rev_link_clk_i         (bp_io_rev_link_clk_li         [i][j])
+        ,.io_rev_link_data_i        (bp_io_rev_link_data_li        [i][j])
+        ,.io_rev_link_v_i           (bp_io_rev_link_v_li           [i][j])
+        ,.io_rev_link_token_o       (bp_io_rev_link_token_lo       [i][j])
+        ,.async_rev_link_i_disable_o(bp_async_rev_link_i_disable_lo[i][j])
+        );
+
+      end
+
+
+    for (genvar j = 0; j < 2; j++)
+      begin: cgra
+
+        bigblade_clk_gen clk_gen
+        (.tag_clk_i             (tag_clk_i                           )
+        ,.tag_data_i            (tag_data_i                          )
+        ,.tag_node_id_offset_i  (cgra_clk_tag_node_id_offset_li[i][j])
+        ,.ext_clk_i             (cgra_ext_clk_i                      )
+        ,.async_output_disable_i(async_output_disable_i              )
+        ,.clk_o                 (cgra_clk_lo                   [i][j])
+        ,.clk_monitor_o         (cgra_clk_monitor_o            [i][j])
+        );
+
+        brg_cgra_pod halfpod
+        
+        (.clk_i                     (cgra_clk_lo                     [i][j])
+        
+        ,.tag_clk_i                 (tag_clk_i                             )
+        ,.tag_data_i                (tag_data_i                            )
+        ,.tag_node_id_offset_i      (cgra_tag_node_id_offset_li      [i][j])
+        
+        ,.io_fwd_link_clk_o         (cgra_io_fwd_link_clk_lo         [i][j])
+        ,.io_fwd_link_data_o        (cgra_io_fwd_link_data_lo        [i][j])
+        ,.io_fwd_link_v_o           (cgra_io_fwd_link_v_lo           [i][j])
+        ,.io_fwd_link_token_i       (cgra_io_fwd_link_token_li       [i][j])
+        ,.async_fwd_link_o_disable_o(cgra_async_fwd_link_o_disable_lo[i][j])
+        
+        ,.io_fwd_link_clk_i         (cgra_io_fwd_link_clk_li         [i][j])
+        ,.io_fwd_link_data_i        (cgra_io_fwd_link_data_li        [i][j])
+        ,.io_fwd_link_v_i           (cgra_io_fwd_link_v_li           [i][j])
+        ,.io_fwd_link_token_o       (cgra_io_fwd_link_token_lo       [i][j])
+        ,.async_fwd_link_i_disable_o(cgra_async_fwd_link_i_disable_lo[i][j])
+        
+        ,.io_rev_link_clk_o         (cgra_io_rev_link_clk_lo         [i][j])
+        ,.io_rev_link_data_o        (cgra_io_rev_link_data_lo        [i][j])
+        ,.io_rev_link_v_o           (cgra_io_rev_link_v_lo           [i][j])
+        ,.io_rev_link_token_i       (cgra_io_rev_link_token_li       [i][j])
+        ,.async_rev_link_o_disable_o(cgra_async_rev_link_o_disable_lo[i][j])
+        
+        ,.io_rev_link_clk_i         (cgra_io_rev_link_clk_li         [i][j])
+        ,.io_rev_link_data_i        (cgra_io_rev_link_data_li        [i][j])
+        ,.io_rev_link_v_i           (cgra_io_rev_link_v_li           [i][j])
+        ,.io_rev_link_token_o       (cgra_io_rev_link_token_lo       [i][j])
+        ,.async_rev_link_i_disable_o(cgra_async_rev_link_i_disable_lo[i][j])
+        );
+
+      end
+
   end
+
 
   // hard-wire constants
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
@@ -204,50 +349,138 @@ module bsg_chip_block_core_complex
     for (genvar j = 0; j < total_num_tiles_x_lp; j++)
         assign global_y_li[i][j+1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-2)};
     assign global_y_li[i][2+total_num_tiles_x_lp-1] = {(hb_pod_y_cord_width_gp)'(i*2), (hb_y_subcord_width_gp)'((1<<hb_y_subcord_width_gp)-1)};
+
+    // assign bp tag offset
+    for (genvar j = 0; j < 2; j++)
+        assign bp_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_bp_hp_offset_gp+(i*2+j)*tag_halfpod_local_els_gp);
+
+    // assign bp clk_gen tag offset
+    for (genvar j = 0; j < 2; j++)
+        assign bp_clk_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_bp_clk_offset_gp+(i*2+j)*tag_clk_gen_local_els_gp);
+
+    // assign cgra tag offset
+    for (genvar j = 0; j < 2; j++)
+        assign cgra_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_cgra_hp_offset_gp+(i*2+j)*tag_halfpod_local_els_gp);
+
+    // assign cgra clk_gen tag offset
+    for (genvar j = 0; j < 2; j++)
+        assign cgra_clk_tag_node_id_offset_li[i][j] = (tag_lg_els_gp)'(tag_cgra_clk_offset_gp+(i*2+j)*tag_clk_gen_local_els_gp);
   end
 
 
-  // tieoff hor links
+  // attach west links
   for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
   begin
-    for (genvar j = W ; j <= E; j++)
+    for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
       begin
-        for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
+        // Attach to west sdr link (top-left corner)
+        // Requests from host to chip (route X then Y)
+        // Responses from chip to host (route Y then X)
+        if ((i == 0) && (k == 0))
           begin
-            // Attach to west sdr link (top-left corner)
-            // Requests from host to chip (route X then Y)
-            // Responses from chip to host (route Y then X)
-            if ((i == 0) && (j == W) && (k == 0))
-              begin
-                assign async_hor_fwd_link_i_disable_li[i][j][k] = '0;
-                assign async_hor_rev_link_o_disable_li[i][j][k] = '0;
+            assign async_hor_fwd_link_i_disable_li[i][W][k] = '0;
+            assign async_hor_rev_link_o_disable_li[i][W][k] = '0;
 
-                assign hor_io_fwd_link_clk_li  [i][j][k] = mc_fwd_link_clk_i;
-                assign hor_io_fwd_link_data_li [i][j][k] = mc_fwd_link_data_i;
-                assign hor_io_fwd_link_v_li    [i][j][k] = mc_fwd_link_v_i;
-                assign mc_fwd_link_token_o = hor_io_fwd_link_token_lo[i][j][k];
+            assign hor_io_fwd_link_clk_li  [i][W][k] = mc_fwd_link_clk_i;
+            assign hor_io_fwd_link_data_li [i][W][k] = mc_fwd_link_data_i;
+            assign hor_io_fwd_link_v_li    [i][W][k] = mc_fwd_link_v_i;
+            assign mc_fwd_link_token_o = hor_io_fwd_link_token_lo[i][W][k];
 
-                assign mc_rev_link_clk_o   = hor_io_rev_link_clk_lo  [i][j][k];
-                assign mc_rev_link_data_o  = hor_io_rev_link_data_lo [i][j][k];
-                assign mc_rev_link_v_o     = hor_io_rev_link_v_lo    [i][j][k];
-                assign hor_io_rev_link_token_li[i][j][k] = mc_rev_link_token_i;
-              end
-            else
-              begin
-                assign async_hor_fwd_link_i_disable_li[i][j][k] = '1;
-                assign async_hor_rev_link_o_disable_li[i][j][k] = '1;
-                assign hor_io_fwd_link_clk_li  [i][j][k] = '0;
-                assign hor_io_fwd_link_data_li [i][j][k] = '0;
-                assign hor_io_fwd_link_v_li    [i][j][k] = '0;
-                assign hor_io_rev_link_token_li[i][j][k] = '0;
-              end
-            assign async_hor_rev_link_i_disable_li[i][j][k] = '1;
-            assign async_hor_fwd_link_o_disable_li[i][j][k] = '1;
-            assign hor_io_rev_link_clk_li  [i][j][k] = '0;
-            assign hor_io_rev_link_data_li [i][j][k] = '0;
-            assign hor_io_rev_link_v_li    [i][j][k] = '0;
-            assign hor_io_fwd_link_token_li[i][j][k] = '0;
+            assign mc_rev_link_clk_o   = hor_io_rev_link_clk_lo  [i][W][k];
+            assign mc_rev_link_data_o  = hor_io_rev_link_data_lo [i][W][k];
+            assign mc_rev_link_v_o     = hor_io_rev_link_v_lo    [i][W][k];
+            assign hor_io_rev_link_token_li[i][W][k] = mc_rev_link_token_i;
+
+            assign async_hor_rev_link_i_disable_li[i][W][k] = '1;
+            assign async_hor_fwd_link_o_disable_li[i][W][k] = '1;
+            assign hor_io_rev_link_clk_li  [i][W][k] = '0;
+            assign hor_io_rev_link_data_li [i][W][k] = '0;
+            assign hor_io_rev_link_v_li    [i][W][k] = '0;
+            assign hor_io_fwd_link_token_li[i][W][k] = '0;
           end
+        else if ((k != 0) && (k != 4))
+          begin
+            localparam j = k / 4;
+            localparam l = (4 - 1) - (k % 4);
+
+            assign async_hor_fwd_link_i_disable_li[i][W][k] = bp_async_fwd_link_i_disable_lo[i][j][l];
+            assign async_hor_rev_link_o_disable_li[i][W][k] = bp_async_rev_link_o_disable_lo[i][j][l];
+
+            assign hor_io_fwd_link_clk_li  [i][W][k] = bp_io_fwd_link_clk_lo [i][j][l];
+            assign hor_io_fwd_link_data_li [i][W][k] = bp_io_fwd_link_data_lo[i][j][l];
+            assign hor_io_fwd_link_v_li    [i][W][k] = bp_io_fwd_link_v_lo   [i][j][l];
+            assign bp_io_fwd_link_token_li[i][j][l] = hor_io_fwd_link_token_lo[i][W][k];
+
+            assign bp_io_rev_link_clk_li [i][j][l] = hor_io_rev_link_clk_lo  [i][W][k];
+            assign bp_io_rev_link_data_li[i][j][l] = hor_io_rev_link_data_lo [i][W][k];
+            assign bp_io_rev_link_v_li   [i][j][l] = hor_io_rev_link_v_lo    [i][W][k];
+            assign hor_io_rev_link_token_li[i][W][k] = bp_io_rev_link_token_lo[i][j][l];
+
+            assign async_hor_rev_link_i_disable_li[i][W][k] = bp_async_rev_link_i_disable_lo[i][j][l];
+            assign async_hor_fwd_link_o_disable_li[i][W][k] = bp_async_fwd_link_o_disable_lo[i][j][l];
+
+            assign hor_io_rev_link_clk_li  [i][W][k] = bp_io_rev_link_clk_lo [i][j][l];
+            assign hor_io_rev_link_data_li [i][W][k] = bp_io_rev_link_data_lo[i][j][l];
+            assign hor_io_rev_link_v_li    [i][W][k] = bp_io_rev_link_v_lo   [i][j][l];
+            assign bp_io_rev_link_token_li[i][j][l] = hor_io_rev_link_token_lo[i][W][k];
+
+            assign bp_io_fwd_link_clk_li [i][j][l] = hor_io_fwd_link_clk_lo  [i][W][k];
+            assign bp_io_fwd_link_data_li[i][j][l] = hor_io_fwd_link_data_lo [i][W][k];
+            assign bp_io_fwd_link_v_li   [i][j][l] = hor_io_fwd_link_v_lo    [i][W][k];
+            assign hor_io_fwd_link_token_li[i][W][k] = bp_io_fwd_link_token_lo[i][j][l];
+          end
+        else
+          begin
+            assign async_hor_fwd_link_i_disable_li[i][W][k] = '1;
+            assign async_hor_rev_link_o_disable_li[i][W][k] = '1;
+            assign hor_io_fwd_link_clk_li  [i][W][k] = '0;
+            assign hor_io_fwd_link_data_li [i][W][k] = '0;
+            assign hor_io_fwd_link_v_li    [i][W][k] = '0;
+            assign hor_io_rev_link_token_li[i][W][k] = '0;
+
+            assign async_hor_rev_link_i_disable_li[i][W][k] = '1;
+            assign async_hor_fwd_link_o_disable_li[i][W][k] = '1;
+            assign hor_io_rev_link_clk_li  [i][W][k] = '0;
+            assign hor_io_rev_link_data_li [i][W][k] = '0;
+            assign hor_io_rev_link_v_li    [i][W][k] = '0;
+            assign hor_io_fwd_link_token_li[i][W][k] = '0;
+          end
+      end
+  end
+
+  // attach east links
+  for (genvar i = 0 ; i < hb_num_pods_y_gp; i++)
+  begin
+    for (genvar k = 0 ; k < hb_num_tiles_y_gp; k++)
+      begin
+        localparam j = k / 4;
+        localparam l = (4 - 1) - (k % 4);
+
+        assign async_hor_fwd_link_i_disable_li[i][E][k] = cgra_async_fwd_link_i_disable_lo[i][j][l];
+        assign async_hor_rev_link_o_disable_li[i][E][k] = cgra_async_rev_link_o_disable_lo[i][j][l];
+
+        assign hor_io_fwd_link_clk_li  [i][E][k] = cgra_io_fwd_link_clk_lo [i][j][l];
+        assign hor_io_fwd_link_data_li [i][E][k] = cgra_io_fwd_link_data_lo[i][j][l];
+        assign hor_io_fwd_link_v_li    [i][E][k] = cgra_io_fwd_link_v_lo   [i][j][l];
+        assign cgra_io_fwd_link_token_li[i][j][l] = hor_io_fwd_link_token_lo[i][E][k];
+
+        assign cgra_io_rev_link_clk_li [i][j][l] = hor_io_rev_link_clk_lo  [i][E][k];
+        assign cgra_io_rev_link_data_li[i][j][l] = hor_io_rev_link_data_lo [i][E][k];
+        assign cgra_io_rev_link_v_li   [i][j][l] = hor_io_rev_link_v_lo    [i][E][k];
+        assign hor_io_rev_link_token_li[i][E][k] = cgra_io_rev_link_token_lo[i][j][l];
+
+        assign async_hor_rev_link_i_disable_li[i][E][k] = cgra_async_rev_link_i_disable_lo[i][j][l];
+        assign async_hor_fwd_link_o_disable_li[i][E][k] = cgra_async_fwd_link_o_disable_lo[i][j][l];
+
+        assign hor_io_rev_link_clk_li  [i][E][k] = cgra_io_rev_link_clk_lo [i][j][l];
+        assign hor_io_rev_link_data_li [i][E][k] = cgra_io_rev_link_data_lo[i][j][l];
+        assign hor_io_rev_link_v_li    [i][E][k] = cgra_io_rev_link_v_lo   [i][j][l];
+        assign cgra_io_rev_link_token_li[i][j][l] = hor_io_rev_link_token_lo[i][E][k];
+
+        assign cgra_io_fwd_link_clk_li [i][j][l] = hor_io_fwd_link_clk_lo  [i][E][k];
+        assign cgra_io_fwd_link_data_li[i][j][l] = hor_io_fwd_link_data_lo [i][E][k];
+        assign cgra_io_fwd_link_v_li   [i][j][l] = hor_io_fwd_link_v_lo    [i][E][k];
+        assign hor_io_fwd_link_token_li[i][E][k] = cgra_io_fwd_link_token_lo[i][j][l];
       end
   end
 
