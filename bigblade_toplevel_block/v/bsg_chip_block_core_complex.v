@@ -287,31 +287,31 @@ module bsg_chip_block_core_complex
         );
 
         brg_cgra_pod halfpod
-        
+
         (.clk_i                     (cgra_clk_lo                     [i][j])
-        
+
         ,.tag_clk_i                 (tag_clk_i                             )
         ,.tag_data_i                (tag_data_i                            )
         ,.tag_node_id_offset_i      (cgra_tag_node_id_offset_li      [i][j])
-        
+
         ,.io_fwd_link_clk_o         (cgra_io_fwd_link_clk_lo         [i][j])
         ,.io_fwd_link_data_o        (cgra_io_fwd_link_data_lo        [i][j])
         ,.io_fwd_link_v_o           (cgra_io_fwd_link_v_lo           [i][j])
         ,.io_fwd_link_token_i       (cgra_io_fwd_link_token_li       [i][j])
         ,.async_fwd_link_o_disable_o(cgra_async_fwd_link_o_disable_lo[i][j])
-        
+
         ,.io_fwd_link_clk_i         (cgra_io_fwd_link_clk_li         [i][j])
         ,.io_fwd_link_data_i        (cgra_io_fwd_link_data_li        [i][j])
         ,.io_fwd_link_v_i           (cgra_io_fwd_link_v_li           [i][j])
         ,.io_fwd_link_token_o       (cgra_io_fwd_link_token_lo       [i][j])
         ,.async_fwd_link_i_disable_o(cgra_async_fwd_link_i_disable_lo[i][j])
-        
+
         ,.io_rev_link_clk_o         (cgra_io_rev_link_clk_lo         [i][j])
         ,.io_rev_link_data_o        (cgra_io_rev_link_data_lo        [i][j])
         ,.io_rev_link_v_o           (cgra_io_rev_link_v_lo           [i][j])
         ,.io_rev_link_token_i       (cgra_io_rev_link_token_li       [i][j])
         ,.async_rev_link_o_disable_o(cgra_async_rev_link_o_disable_lo[i][j])
-        
+
         ,.io_rev_link_clk_i         (cgra_io_rev_link_clk_li         [i][j])
         ,.io_rev_link_data_i        (cgra_io_rev_link_data_li        [i][j])
         ,.io_rev_link_v_i           (cgra_io_rev_link_v_li           [i][j])
