@@ -13,6 +13,11 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set BIGBLADE_NOC_MEM_LINK_SOURCE_FILES [join "
-  $bsg_designs_target_dir/../bigblade_noc_mem_link/v/bsg_chip_noc_mem_link.v
-"]
+# redirect to point to symlinks
+set bsg_designs_target $::env(BSG_DESIGNS_TARGET)
+set bsg_out_dir $::env(TESTING_BSG_OUT_DIR)
+
+set basejump_stl_dir "$bsg_out_dir/bigblade_noc_io_link/$bsg_designs_target/basejump_stl"
+set common_dir       "$bsg_out_dir/bigblade_noc_io_link/$bsg_designs_target/../common"
+
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_noc_io_link-post-apr_filelist.tcl
