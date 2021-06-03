@@ -3,6 +3,8 @@
 `define IO_CLK_PERIOD  10000
 `define NOC_CLK_PERIOD 10000
 `define MC_CLK_PERIOD  10000
+`define BP_CLK_PERIOD  10000
+`define CGRA_CLK_PERIOD 10000
 `define TAG_CLK_PERIOD 20000
 
 // Slow down core clocks when tag is programming, divide clock speed by the given ratio
@@ -20,6 +22,8 @@
 `define IO_SLOWDOWN_RATIO  8
 `define NOC_SLOWDOWN_RATIO 16
 `define MC_SLOWDOWN_RATIO  16
+`define BP_SLOWDOWN_RATIO  16
+`define CGRA_SLOWDOWN_RATIO 16
 
 module bsg_gateway_chip
 
@@ -43,17 +47,23 @@ module bsg_gateway_chip
   assign p_pad_CT0_1_o = p_tag_data_lo;
   assign p_pad_CT0_2_o = p_tag_en_lo;
 
-  wire p_io_clk_lo, p_noc_clk_lo, p_mc_clk_lo;
+  wire p_io_clk_lo, p_noc_clk_lo, p_mc_clk_lo, p_bp_clk_lo, p_cgra_clk_lo;
   assign p_pad_CT0_clk_o = p_io_clk_lo;
   assign p_pad_CT0_tkn_o = p_noc_clk_lo;
   assign {p_pad_ML0_3_o, p_pad_ML0_2_o, p_pad_ML0_1_o, p_pad_ML0_0_o} = {(hb_num_pods_y_gp){p_mc_clk_lo}};
+  assign p_pad_ML0_4_o = p_bp_clk_lo;
+  assign p_pad_MR0_0_o = p_cgra_clk_lo;
 
   wire p_mc_clk_monitor_li = p_pad_CT0_0_i;
   wire p_noc_io_clk_monitor_li = p_pad_CT0_1_i;
   wire p_noc_mem_clk_monitor_li = p_pad_CT0_2_i;
+  wire p_bp_clk_monitor_li = p_pad_CB0_0_i;
+  wire p_cgra_clk_monitor_li = p_pad_CB0_1_i;
 
   assign {p_pad_CT0_4_o, p_pad_CT0_3_o} = 2'b00; // mc clk monitor sel
   assign {p_pad_CT0_7_o, p_pad_CT0_6_o, p_pad_CT0_5_o} = 3'b000; // noc mem clk monitor sel
+  assign {p_pad_CB0_2_o, p_pad_CB0_1_o, p_pad_CB0_0_o} = 3'b000; // bp clk monitor sel
+  assign {p_pad_CB0_5_o, p_pad_CB0_4_o, p_pad_CB0_3_o} = 3'b000; // cgra mem clk monitor sel
 
   //////////////////////////////////////////////////
   //
@@ -71,12 +81,20 @@ module bsg_gateway_chip
   logic mc_clk, mc_clk_2x;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`MC_CLK_PERIOD/2)) mc_clk_gen (.o(mc_clk_2x));
 
+  logic bp_clk, bp_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`BP_CLK_PERIOD/2)) bp_clk_gen (.o(bp_clk_2x));
+
+  logic cgra_clk, cgra_clk_2x;
+  bsg_nonsynth_clock_gen #(.cycle_time_p(`CGRA_CLK_PERIOD/2)) cgra_clk_gen (.o(cgra_clk_2x));
+
   logic tag_clk, tag_clk_raw;
   bsg_nonsynth_clock_gen #(.cycle_time_p(`TAG_CLK_PERIOD)) tag_clk_gen (.o(tag_clk_raw));
 
   assign p_io_clk_lo  = io_clk;
   assign p_noc_clk_lo = noc_clk;
   assign p_mc_clk_lo  = mc_clk;
+  assign p_bp_clk_lo  = bp_clk;
+  assign p_cgra_clk_lo = cgra_clk;
   assign p_tag_clk_lo = ~tag_clk; // center-aligned output clock
   
   //assign p_sel_0_o = 1'b0;
@@ -158,10 +176,12 @@ module bsg_gateway_chip
   //
   // output_freq = input_freq/((ds_val+1)*2)
   //
-  wire [9:0] io_ds_val, noc_ds_val, mc_ds_val;
+  wire [9:0] io_ds_val, noc_ds_val, mc_ds_val, bp_ds_val, cgra_ds_val;
   assign io_ds_val  = (tag_trace_done_lo)? 0 : `IO_SLOWDOWN_RATIO-1;
   assign noc_ds_val = (tag_trace_done_lo)? 0 : `NOC_SLOWDOWN_RATIO-1;
   assign mc_ds_val  = (tag_trace_done_lo)? 0 : `MC_SLOWDOWN_RATIO-1;
+  assign bp_ds_val  = (tag_trace_done_lo)? 0 : `BP_SLOWDOWN_RATIO-1;
+  assign cgra_ds_val = (tag_trace_done_lo)? 0 : `CGRA_SLOWDOWN_RATIO-1;
 
   bsg_counter_clock_downsample #(.width_p(10)) io_ds
   (.clk_i(io_clk_2x),.reset_i(tag_reset),.val_i(io_ds_val),.clk_r_o(io_clk));
@@ -169,6 +189,10 @@ module bsg_gateway_chip
   (.clk_i(noc_clk_2x),.reset_i(tag_reset),.val_i(noc_ds_val),.clk_r_o(noc_clk));
   bsg_counter_clock_downsample #(.width_p(10)) mc_ds
   (.clk_i(mc_clk_2x),.reset_i(tag_reset),.val_i(mc_ds_val),.clk_r_o(mc_clk));
+  bsg_counter_clock_downsample #(.width_p(10)) bp_ds
+  (.clk_i(bp_clk_2x),.reset_i(tag_reset),.val_i(bp_ds_val),.clk_r_o(bp_clk));
+  bsg_counter_clock_downsample #(.width_p(10)) cgra_ds
+  (.clk_i(cgra_clk_2x),.reset_i(tag_reset),.val_i(cgra_ds_val),.clk_r_o(cgra_clk));
 
 
   //////////////////////////////////////////////////
@@ -188,9 +212,11 @@ module bsg_gateway_chip
   ,.clients_o       (tag_lines_lo)
   );
 
+  wire async_output_disable_lo;
+  assign p_async_output_disable_lo = (async_output_disable_lo === 1'bX)? 1'b1 : async_output_disable_lo;
   bsg_tag_client_unsync #(.width_p(1)) btc
   (.bsg_tag_i     (tag_lines_lo)
-  ,.data_async_r_o(p_async_output_disable_lo));
+  ,.data_async_r_o(async_output_disable_lo));
 
 
   //////////////////////////////////////////////////

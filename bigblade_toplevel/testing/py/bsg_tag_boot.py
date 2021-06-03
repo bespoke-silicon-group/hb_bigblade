@@ -17,11 +17,16 @@ if __name__ == "__main__":
   dly_num_clients_p  = 4
   link_num_clients_p = 2+2*clk_num_clients_p+2*dly_num_clients_p
   noc_num_clients_p  = 2*link_num_clients_p+sdr_num_clients_p+1
+  hp_num_clients_p   = 3+sdr_num_clients_p
 
   link_offset    = 0
   row_sdr_offset = link_offset+noc_num_clients_p*9
   row_pod_offset = row_sdr_offset+4*(2*sdr_num_clients_p)*4
   clk_gen_offset = row_pod_offset+4*1*4
+  bp_clk_offset   = clk_gen_offset +4*clk_num_clients_p
+  cgra_clk_offset = bp_clk_offset  +8*clk_num_clients_p
+  bp_hp_offset    = cgra_clk_offset+8*clk_num_clients_p
+  cgra_hp_offset  = bp_hp_offset   +8*hp_num_clients_p
 
   noc_local_offset = 2*link_num_clients_p
   dly_local_offset = 2+2*clk_num_clients_p
@@ -32,6 +37,18 @@ if __name__ == "__main__":
   # wait 64 cycles
   tg.wait(64)
 
+
+  # disable bp and cgra
+  for row in range(4):
+    for pos in range(2):
+      offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+  for row in range(4):
+    for pos in range(2):
+      offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
 
 
   # reset clk_gen

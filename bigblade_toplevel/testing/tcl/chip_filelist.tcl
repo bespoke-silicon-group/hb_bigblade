@@ -5,6 +5,8 @@
 
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
 set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
+set blackparrot_dir        $::env(BLACKPARROT_DIR)
+set hardfloat_dir          $::env(BLACKPARROT_DIR)/external/HardFloat
 set bsg_designs_dir        $::env(BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 set bsg_packaging_dir      $::env(BSG_PACKAGING_DIR)
@@ -12,6 +14,12 @@ set bsg_packaging_dir      $::env(BSG_PACKAGING_DIR)
 set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
+
+set bp_common_dir ${blackparrot_dir}/bp_common
+set bp_top_dir    ${blackparrot_dir}/bp_top
+set bp_fe_dir     ${blackparrot_dir}/bp_fe
+set bp_be_dir     ${blackparrot_dir}/bp_be
+set bp_me_dir     ${blackparrot_dir}/bp_me
 
 set SVERILOG_PACKAGE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_defines.v
@@ -24,6 +32,13 @@ set SVERILOG_PACKAGE_FILES [join "
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $bsg_manycore_dir/imports/HardFloat/source/bsg_hardfloat_pkg.v
+
+  $bp_common_dir/src/include/bp_common_pkg.sv
+  $bp_fe_dir/src/include/bp_fe_pkg.sv
+  $bp_be_dir/src/include/bp_be_pkg.sv
+  $bp_me_dir/src/include/bp_me_pkg.sv
+  $bp_top_dir/src/include/bp_top_pkg.sv
+
   $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 "]
 
@@ -171,11 +186,46 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_link/bsg_link_osdr_phy_phase_align.v
   $basejump_stl_dir/bsg_link/bsg_link_source_sync_upstream_sync.v
 
+
+  $basejump_stl_dir/bsg_dataflow/bsg_fifo_reorder.v
+  $basejump_stl_dir/bsg_dataflow/bsg_flow_counter.v
+  $basejump_stl_dir/bsg_dataflow/bsg_parallel_in_serial_out_dynamic.v
+  $basejump_stl_dir/bsg_dataflow/bsg_serial_in_parallel_out_dynamic.v
+  $basejump_stl_dir/bsg_dataflow/bsg_shift_reg.v
+  $basejump_stl_dir/bsg_mem/bsg_cam_1r1w.v
+  $basejump_stl_dir/bsg_mem/bsg_cam_1r1w_replacement.v
+  $basejump_stl_dir/bsg_mem/bsg_cam_1r1w_sync.v
+  $basejump_stl_dir/bsg_mem/bsg_cam_1r1w_tag_array.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_1r1w_one_hot.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync_mask_write_bit_banked.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_1rw_sync_mask_write_byte_banked.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync.v
+  $basejump_stl_dir/bsg_mem/bsg_mem_3r1w_sync_synth.v
+  $basejump_stl_dir/bsg_misc/bsg_adder_ripple_carry.v
+  $basejump_stl_dir/bsg_misc/bsg_adder_one_hot.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_clear_up_one_hot.v
+  $basejump_stl_dir/bsg_misc/bsg_counter_set_en.v
+  $basejump_stl_dir/bsg_misc/bsg_cycle_counter.v
+  $basejump_stl_dir/bsg_misc/bsg_dff_reset_set_clear.v
+  $basejump_stl_dir/bsg_misc/bsg_edge_detect.v
+  $basejump_stl_dir/bsg_misc/bsg_hash_bank.v
+  $basejump_stl_dir/bsg_misc/bsg_hash_bank_reverse.v
+  $basejump_stl_dir/bsg_misc/bsg_lfsr.v
+  $basejump_stl_dir/bsg_misc/bsg_mux_butterfly.v
+  $basejump_stl_dir/bsg_misc/bsg_rotate_left.v
+  $basejump_stl_dir/bsg_misc/bsg_rotate_right.v
+  $basejump_stl_dir/bsg_misc/bsg_swap.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_adapter.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_adapter_in.v
+  $basejump_stl_dir/bsg_noc/bsg_wormhole_router_adapter_out.v
+
+
   $bsg_manycore_dir/v/bsg_manycore_tile_compute_ruche.v
   $bsg_manycore_dir/v/bsg_manycore_tile_vcache.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_reg_id_encode.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
   $bsg_manycore_dir/v/bsg_manycore_pod_ruche_array.v
   $bsg_manycore_dir/v/bsg_manycore_link_sif_tieoff.v
@@ -234,7 +284,119 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma.v
   $bsg_manycore_dir/v/vanilla_bean/fpu_float_fma_round.v
 
+  $hardfloat_dir/source/addRecFN.v
+  $hardfloat_dir/source/mulRecFN.v
+  $hardfloat_dir/source/recFNToRecFN.v
+  $bp_common_dir/src/v/bp_mmu.sv
+  $bp_common_dir/src/v/bp_pma.sv
+  $bp_common_dir/src/v/bp_tlb.sv
+  $bp_common_dir/src/v/bsg_fifo_1r1w_rolly.sv
+  $bp_common_dir/src/v/bsg_bus_pack.sv
+  $bp_be_dir/src/v/bp_be_top.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_calculator_top.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_csr.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_fp_to_rec.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_ctl.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_int.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_long.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_mem.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_sys.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_fma.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_pipe_aux.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_ptw.sv
+  $bp_be_dir/src/v/bp_be_calculator/bp_be_rec_to_fp.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_cmd_queue.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_detector.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_director.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_instr_decoder.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_issue_queue.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_regfile.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_scheduler.sv
+  $bp_be_dir/src/v/bp_be_checker/bp_be_scoreboard.sv
+  $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache.sv
+  $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_decoder.sv
+  $bp_be_dir/src/v/bp_be_dcache/bp_be_dcache_wbuf.sv
+  $bp_fe_dir/src/v/bp_fe_bht.sv
+  $bp_fe_dir/src/v/bp_fe_btb.sv
+  $bp_fe_dir/src/v/bp_fe_icache.sv
+  $bp_fe_dir/src/v/bp_fe_instr_scan.sv
+  $bp_fe_dir/src/v/bp_fe_pc_gen.sv
+  $bp_fe_dir/src/v/bp_fe_top.sv
+  $bp_me_dir/src/v/cache/bp_me_cce_to_cache.sv
+  $bp_me_dir/src/v/cce/bp_uce.sv
+  $bp_me_dir/src/v/lce/bp_lce.sv
+  $bp_me_dir/src/v/lce/bp_lce_req.sv
+  $bp_me_dir/src/v/lce/bp_lce_cmd.sv
+  $bp_me_dir/src/v/cce/bp_cce.sv
+  $bp_me_dir/src/v/cce/bp_cce_alu.sv
+  $bp_me_dir/src/v/cce/bp_cce_arbitrate.sv
+  $bp_me_dir/src/v/cce/bp_cce_branch.sv
+  $bp_me_dir/src/v/cce/bp_cce_dir.sv
+  $bp_me_dir/src/v/cce/bp_cce_dir_lru_extract.sv
+  $bp_me_dir/src/v/cce/bp_cce_dir_segment.sv
+  $bp_me_dir/src/v/cce/bp_cce_dir_tag_checker.sv
+  $bp_me_dir/src/v/cce/bp_cce_gad.sv
+  $bp_me_dir/src/v/cce/bp_cce_inst_decode.sv
+  $bp_me_dir/src/v/cce/bp_cce_inst_predecode.sv
+  $bp_me_dir/src/v/cce/bp_cce_inst_ram.sv
+  $bp_me_dir/src/v/cce/bp_cce_inst_stall.sv
+  $bp_top_dir/src/v/bp_loopback.sv
+  $bp_me_dir/src/v/cce/bp_cce_msg.sv
+  $bp_me_dir/src/v/cce/bp_cce_pending_bits.sv
+  $bp_me_dir/src/v/cce/bp_cce_pma.sv
+  $bp_me_dir/src/v/cce/bp_cce_reg.sv
+  $bp_me_dir/src/v/cce/bp_cce_spec_bits.sv
+  $bp_me_dir/src/v/cce/bp_cce_src_sel.sv
+  $bp_me_dir/src/v/cce/bp_cce_wrapper.sv
+  $bp_me_dir/src/v/cce/bp_cce_fsm.sv
+  $bp_me_dir/src/v/cce/bp_io_cce.sv
+  $bp_me_dir/src/v/wormhole/bp_me_addr_to_cce_id.sv
+  $bp_me_dir/src/v/wormhole/bp_me_cce_id_to_cord.sv
+  $bp_me_dir/src/v/wormhole/bp_me_cce_to_mem_link_bidir.sv
+  $bp_me_dir/src/v/wormhole/bp_me_cce_to_mem_link_client.sv
+  $bp_me_dir/src/v/wormhole/bp_me_cce_to_mem_link_master.sv
+  $bp_me_dir/src/v/wormhole/bp_me_cord_to_id.sv
+  $bp_me_dir/src/v/wormhole/bp_me_lce_id_to_cord.sv
+  $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_lce_req.sv
+  $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_lce_cmd.sv
+  $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_lce_resp.sv
+  $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_mem_cmd.sv
+  $bp_me_dir/src/v/wormhole/bp_me_wormhole_packet_encode_mem_resp.sv
+  $bp_me_dir/src/v/wormhole/bp_burst_to_lite.sv
+  $bp_me_dir/src/v/wormhole/bp_lite_to_burst.sv
+  $bp_common_dir/src/v/bsg_async_noc_link.sv
+  $bp_common_dir/src/v/bsg_dff_reset_half.v
+  $bp_top_dir/src/v/bp_cacc_complex.sv
+  $bp_top_dir/src/v/bp_cfg.sv
+  $bp_top_dir/src/v/bp_clint_slice.sv
+  $bp_top_dir/src/v/bp_core.sv
+  $bp_top_dir/src/v/bp_core_minimal.sv
+  $bp_top_dir/src/v/bp_core_complex.sv
+  $bp_top_dir/src/v/bp_io_complex.sv
+  $bp_top_dir/src/v/bp_io_link_to_lce.sv
+  $bp_top_dir/src/v/bp_io_tile.sv
+  $bp_top_dir/src/v/bp_io_tile_node.sv
+  $bp_top_dir/src/v/bp_mem_complex.sv
+  $bp_top_dir/src/v/bp_nd_socket.sv
+  $bp_top_dir/src/v/bp_multicore.sv
+  $bp_top_dir/src/v/bp_sacc_complex.sv
+  $bp_top_dir/src/v/bp_tile.sv
+  $bp_top_dir/src/v/bp_tile_node.sv
+  $bp_top_dir/src/v/bp_unicore.sv
+  $bp_top_dir/src/v/bp_unicore_lite.sv
+
+
   $bsg_designs_target_dir/v/bsg_chip.v
+
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/bp_cce_to_mc_bridge.sv
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/bp_cce_splitter.sv
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/bp_cce_serializer.sv
+
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/blackparrot_chip_pkg.v
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/bsg_blackparrot_unicore_tile_sdr.sv
+  $bsg_designs_target_dir/../bigblade_bp_unicore/v/bsg_blackparrot_halfpod.sv
+  
+  $bsg_designs_target_dir/../bigblade_cgra_dummy/v/brg_cgra_pod.v
 
   $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_block.v
   $bsg_designs_target_dir/../bigblade_toplevel_block/v/bsg_chip_block_core_complex.v
