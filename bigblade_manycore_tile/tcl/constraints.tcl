@@ -158,8 +158,8 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset ports
-constraint_input_ports  $clk_name $reset_in_port  40 40
-constraint_output_ports $clk_name $reset_out_port 40 40
+constraint_input_ports  $clk_name $reset_in_port  500 -50
+constraint_output_ports $clk_name $reset_out_port 500 -50
 constraint_input_ports  $clk_name [get_ports global_*_i*] 40 40
 constraint_output_ports $clk_name [get_ports global_*_o*] 40 40
 
@@ -171,7 +171,6 @@ constraint_output_ports $clk_name [get_ports global_*_o*] 40 40
 set multicycle_cells [list]
 append_to_collection multicycle_cells [get_cells dff_x/data_r_reg*]
 append_to_collection multicycle_cells [get_cells dff_y/data_r_reg*]
-append_to_collection multicycle_cells [get_cells dff_reset/data_r_reg*]
 set_multicycle_path 2 -setup -to   $multicycle_cells
 set_multicycle_path 2 -hold  -to   $multicycle_cells
 set_multicycle_path 2 -setup -from $multicycle_cells

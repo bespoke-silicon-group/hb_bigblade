@@ -132,8 +132,8 @@ set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 
 
 # reset port
-constraint_input_ports  $clk_name $reset_in_port  20 20
-constraint_output_ports $clk_name $reset_out_port 20 20
+constraint_input_ports  $clk_name $reset_in_port  500 -50
+constraint_output_ports $clk_name $reset_out_port 500 -50
 constraint_input_ports  $clk_name [get_ports global_*_i*] 20 20
 constraint_output_ports $clk_name [get_ports global_*_o*] 20 20
 
@@ -141,10 +141,13 @@ constraint_output_ports $clk_name [get_ports global_*_o*] 20 20
 # The timing paths to/from these registers don't need a single-cycle requirement,
 # because the signals are mostly static. We relax the constraints by allowing double cycle.
 # The hold cycle is set to 2, so that it becomes much easier to meet hold check.
-set_multicycle_path 2 -setup -to   [get_cells *_dff/data_r_reg*] 
-set_multicycle_path 2 -hold  -to   [get_cells *_dff/data_r_reg*] 
-set_multicycle_path 2 -setup -from [get_cells *_dff/data_r_reg*] 
-set_multicycle_path 2 -hold  -from [get_cells *_dff/data_r_reg*] 
+set multicycle_cells [list]
+append_to_collection multicycle_cells [get_cells y_dff/data_r_reg*]
+append_to_collection multicycle_cells [get_cells x_dff/data_r_reg*]
+set_multicycle_path 2 -setup -to   $multicycle_cells
+set_multicycle_path 2 -hold  -to   $multicycle_cells
+set_multicycle_path 2 -setup -from $multicycle_cells
+set_multicycle_path 2 -hold  -from $multicycle_cells
 
 # ungrouping
 set_ungroup [get_designs -filter "hdl_template==bsg_mux"] true

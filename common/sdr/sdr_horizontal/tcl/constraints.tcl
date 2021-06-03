@@ -174,8 +174,8 @@ constraint_output_ports $core_clk_name $ruche_fwd_valid_out_ports  760 0
 constraint_input_ports  $core_clk_name $ruche_fwd_ready_in_ports   830 0
 
 # core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]       40 40
-constraint_output_ports $core_clk_name [get_ports core_reset_o]       40 40
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]       500 -50
+constraint_output_ports $core_clk_name [get_ports core_reset_o]       500 -50
 constraint_input_ports  $core_clk_name [get_ports core_global_*_i*]   40 40
 constraint_output_ports $core_clk_name [get_ports core_global_*_o*]   40 40
 
@@ -186,7 +186,6 @@ constraint_output_ports $core_clk_name [get_ports core_global_*_o*]   40 40
 set multicycle_cells [list]
 append_to_collection multicycle_cells [get_cells dff_global_x/data_r_reg*]
 append_to_collection multicycle_cells [get_cells dff_global_y/data_r_reg*]
-append_to_collection multicycle_cells [get_cells dff_core_reset/data_r_reg*]
 set_multicycle_path 2 -setup -to   $multicycle_cells
 set_multicycle_path 2 -hold  -to   $multicycle_cells
 set_multicycle_path 2 -setup -from $multicycle_cells
