@@ -7,3 +7,4 @@
 #set bbox [list [list [expr $bbox_llx-5] [expr $bbox_lly-5]] [list [expr $bbox_urx+5] [expr $bbox_ury+5]]]
 
 #remove_placement_blockages [get_placement_blockages -within $bbox]
+

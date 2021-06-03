@@ -45,9 +45,9 @@ for {set i 0} {$i < 3} {incr i} {
       if {[string length $pin] != [string length $pin_base]} {
         set pin_index [lindex [split $pin {\[.*\]}] 1]
         set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 3]
-        set true_pin_index [expr $i*$pin_len + $pin_index]
+        set true_pin_index [expr (2-$i)*$pin_len + $pin_index]
         set true_pin ${pin_base}[$true_pin_index]
-      } elseif {[string first "disable" $pin_base] == -1 || [expr $i == 0]} {
+      } elseif {[string first "disable" $pin_base] == -1} {
         set true_pin_index [expr $i]
         set true_pin ${pin_base}[$i]
       } else {

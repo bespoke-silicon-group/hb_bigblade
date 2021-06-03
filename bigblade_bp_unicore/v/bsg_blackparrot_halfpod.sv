@@ -27,25 +27,25 @@ module bsg_blackparrot_halfpod
    , output logic [2:0][fwd_width_lp-1:0]         io_fwd_link_data_o
    , output logic [2:0]                           io_fwd_link_v_o
    , input [2:0]                                  io_fwd_link_token_i
-   , output logic [0:0]                           async_fwd_link_o_disable_o
+   , output logic [2:0]                           async_fwd_link_o_disable_o
 
    , input [2:0]                                  io_fwd_link_clk_i
    , input [2:0][fwd_width_lp-1:0]                io_fwd_link_data_i
    , input [2:0]                                  io_fwd_link_v_i
    , output logic [2:0]                           io_fwd_link_token_o
-   , output logic [0:0]                           async_fwd_link_i_disable_o
+   , output logic [2:0]                           async_fwd_link_i_disable_o
 
    , output logic [2:0]                           io_rev_link_clk_o
    , output logic [2:0][rev_width_lp-1:0]         io_rev_link_data_o
    , output logic [2:0]                           io_rev_link_v_o
    , input [2:0]                                  io_rev_link_token_i
-   , output logic [0:0]                           async_rev_link_o_disable_o
+   , output logic [2:0]                           async_rev_link_o_disable_o
 
    , input [2:0]                                  io_rev_link_clk_i
    , input [2:0][rev_width_lp-1:0]                io_rev_link_data_i
    , input [2:0]                                  io_rev_link_v_i
    , output logic [2:0]                           io_rev_link_token_o
-   , output logic [0:0]                           async_rev_link_i_disable_o
+   , output logic [2:0]                           async_rev_link_i_disable_o
    );
 
   // tag master instance
@@ -87,10 +87,10 @@ module bsg_blackparrot_halfpod
   (.bsg_tag_i     (tag_lines_lo.core_reset)
   ,.data_async_r_o(async_core_reset));
 
-  assign async_fwd_link_i_disable_o = sdr_disable_lo;
-  assign async_fwd_link_o_disable_o = sdr_disable_lo;
-  assign async_rev_link_i_disable_o = sdr_disable_lo;
-  assign async_rev_link_o_disable_o = sdr_disable_lo;
+  assign async_fwd_link_i_disable_o = {3{sdr_disable_lo};
+  assign async_fwd_link_o_disable_o = {3{sdr_disable_lo};
+  assign async_rev_link_i_disable_o = {3{sdr_disable_lo};
+  assign async_rev_link_o_disable_o = {3{sdr_disable_lo};
 
   bsg_blackparrot_unicore_tile_sdr
    tile

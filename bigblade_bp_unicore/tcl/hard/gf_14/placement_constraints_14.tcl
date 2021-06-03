@@ -55,8 +55,7 @@ create_bound -name "outer_bound" -boundary [list [list [expr $bound_width] [expr
 create_bound -name "bound_bound" -boundary [list [list [expr $bound_width+$bound_to_rf_side] [expr $bound_height+$bound_to_rf_bot]] [list [expr $tile_width-$bound_width-$bound_to_rf_side] [expr $tile_height-$bound_height-$bound_to_rf_top]]]
 set bound_bound [get_bounds "bound_bound"]
 
-#set sram_front_to_back 0.084
-set sram_front_to_back 2*$keepout_margin_x
+set sram_front_to_back 0.084
 set sram_top_to_bot 0.000
 
 #####################################
@@ -118,10 +117,7 @@ set icache_data_ma_east [create_macro_array \
   $icache_data_mems_east]
 
 set ko [list $keepout_margin_x $keepout_margin_y $bound_to_rf_side $bound_to_rf_top]
-create_keepout_margin -type hard -outer $keepout_margins [index_collection $icache_data_mems_east 0]
-create_keepout_margin -type hard -outer $keepout_margins [index_collection $icache_data_mems_east 2]
-create_keepout_margin -type hard -outer $ko [index_collection $icache_data_mems_east 1]
-create_keepout_margin -type hard -outer $ko [index_collection $icache_data_mems_east 3]
+create_keepout_margin -type hard -outer $ko $icache_data_mems_east
 
 set_macro_relative_location \
   -target_object $icache_data_ma_east \
@@ -168,7 +164,7 @@ set dcache_data_ma_west [create_macro_array \
   -orientation FN \
   $dcache_data_mems_west]
 
-set ko [list $keepout_margin_x $bound_to_rf_top [expr 20/2] $keepout_margin_y]
+set ko [list $keepout_margin_x $bound_to_rf_top [expr 10.68/2] $keepout_margin_y]
 create_keepout_margin -type hard -outer $ko $dcache_data_mems_west
 
 set_macro_relative_location \
@@ -188,7 +184,7 @@ set dcache_data_ma_east [create_macro_array \
   -orientation N \
   $dcache_data_mems_east]
 
-set ko [list [expr 20/2] $bound_to_rf_top $bound_to_rf_side $keepout_margin_y]
+set ko [list [expr 10.68/2] $bound_to_rf_top $bound_to_rf_side $keepout_margin_y]
 create_keepout_margin -type hard -outer $ko $dcache_data_mems_east
 
 set_macro_relative_location \
