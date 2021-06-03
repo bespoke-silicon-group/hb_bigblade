@@ -13,6 +13,9 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set BIGBLADE_IO_LINK_DDR_SOURCE_FILES [join "
-  $bsg_designs_target_dir/../bigblade_io_link_ddr/v/bsg_chip_io_link_ddr.v
+set BIGBLADE_IO_LINK_DDR_INCLUDE_PATHS [ join "
+    $basejump_stl_dir/hard/gf_14/bsg_mem
+    $basejump_stl_dir/bsg_misc
+    $basejump_stl_dir/bsg_clk_gen
 "]
+
