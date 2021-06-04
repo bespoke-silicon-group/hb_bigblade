@@ -94,18 +94,23 @@ BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC
 
 # $1 = pod_x
 # $2 = pod_y
-# $3 = tile_x
-# $4 = tile_y
-BSG_TILE_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.mc_y[$(shell echo $4/2 | bc)].mc_x[0].mc.y[$(shell echo $4 % 2 | bc)].x[$3].tile
-# change these to select which tile in which pod is swapped with its synthesized netlist
-BSG_TILE_X ?= 0
-BSG_TILE_Y ?= 0
-BSG_POD_X  ?= 0
-BSG_POD_Y  ?= 0
+# $3 = subarray_x
+# $4 = subarray_y
+BSG_SUBARRAY_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.mc_y[$3].mc_x[0].mc
+
+# change these to select first subarray in which pod is swapped with its synthesized netlist
+BSG_SUBARRAY_Y_0 ?= 0
+BSG_POD_X_0      ?= 0
+BSG_POD_Y_0      ?= 0
+# change these to select second subarray in which pod is swapped with its synthesized netlist
+BSG_SUBARRAY_Y_1 ?= 1
+BSG_POD_X_1      ?= 0
+BSG_POD_Y_1      ?= 0
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
-VCS_OPTIONS += +define+BSG_TILE_PATH=$(call BSG_TILE_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y),$(BSG_TILE_X),$(BSG_TILE_Y))
+VCS_OPTIONS += +define+BSG_SUBARRAY_PATH_0=$(call BSG_SUBARRAY_INSTANCE_PATH,$(BSG_POD_X_0),$(BSG_POD_Y_0),$(BSG_SUBARRAY_Y_0))
+VCS_OPTIONS += +define+BSG_SUBARRAY_PATH_1=$(call BSG_SUBARRAY_INSTANCE_PATH,$(BSG_POD_X_1),$(BSG_POD_Y_1),$(BSG_SUBARRAY_Y_1))
 
 export BSG_CHIP_LIBRARY_NAME = bsg_chip
 export BSG_CHIP_FILELIST = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).filelist
