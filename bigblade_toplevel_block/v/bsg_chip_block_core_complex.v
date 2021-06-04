@@ -401,7 +401,7 @@ module bsg_chip_block_core_complex
         else if ((k != 0) && (k != 4))
           begin
             localparam j = k / 4;
-            localparam l = (4 - 1) - (k % 4);
+            localparam l = (k % 4) - 1;
 
             assign async_hor_fwd_link_i_disable_li[i][W][k] = bp_async_fwd_link_i_disable_lo[i][j][l];
             assign async_hor_rev_link_o_disable_li[i][W][k] = bp_async_rev_link_o_disable_lo[i][j][l];
