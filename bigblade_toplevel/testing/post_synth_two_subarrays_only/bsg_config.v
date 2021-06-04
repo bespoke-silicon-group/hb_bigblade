@@ -5,7 +5,7 @@ config bsg_config;
 
   // each ip block with its library
   //instance bsg_bigblade_pcb.IC.ASIC.block.core_complex.core[0].podrow.podrow.px[0].pod.mc_y[0].mc_x[0].mc.y[0].x[0].tile liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-  // swap out a specific tile instance with a synthesized netlist
+  // swap out two specific subarray instances with a synthesized netlist
   instance `BSG_SUBARRAY_PATH_0 liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   instance `BSG_SUBARRAY_PATH_1 liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
