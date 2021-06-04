@@ -6,7 +6,7 @@ const uint64_t mc_vcache_mmio = 0b100000000000000000000000000000000000000000;
 const uint64_t mc_tile_mmio   = 0b110000000000000000000000000000000000000000;
 const uint64_t mc_host_fifo   = 0b111000000000000000000000000000000000000000;
 
-const uint64_t mc_host_x_coord = ((0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0) << (HB_MC_TILE_EPA_WIDTH + 2);
+const uint64_t mc_host_x_coord = ((0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 15) << (HB_MC_TILE_EPA_WIDTH + 2);
 const uint64_t mc_host_y_coord = ((1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 0) << (HB_MC_X_COORD_WIDTH + HB_MC_TILE_EPA_WIDTH + 2);
 
 // Using the tile MMIO interface to communicate with the host as though it was a compute tile

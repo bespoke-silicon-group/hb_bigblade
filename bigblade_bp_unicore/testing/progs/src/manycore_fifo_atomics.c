@@ -14,7 +14,7 @@ int main(uint64_t argc, char *argv[]) {
   
   hb_mc_packet_t req_packet, resp_packet;
 
-  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0;
+  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 15;
   req_packet.request.y_src = (1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 1;
   req_packet.request.op_v2 = 2;
   req_packet.request.reg_id = 0xff;
@@ -39,7 +39,7 @@ int main(uint64_t argc, char *argv[]) {
     }
   }
 
-  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0;
+  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 15;
   req_packet.request.y_src = (1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 1;
   req_packet.request.op_v2 = 4; // AMOSWAP
   req_packet.request.reg_id = 0xff;
@@ -73,7 +73,7 @@ int main(uint64_t argc, char *argv[]) {
     }
   }
 
-  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0;
+  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 15;
   req_packet.request.y_src = (1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 1;
   req_packet.request.op_v2 = 5; // AMOADD
   req_packet.request.reg_id = 0xff;
@@ -107,7 +107,7 @@ int main(uint64_t argc, char *argv[]) {
     }
   }
 
-  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 0;
+  req_packet.request.x_src = (0 << HB_MC_POD_X_SUBCOORD_WIDTH) | 15;
   req_packet.request.y_src = (1 << HB_MC_POD_Y_SUBCOORD_WIDTH) | 1;
   req_packet.request.op_v2 = 8; // AMOOR
   req_packet.request.reg_id = 0xff;
@@ -141,7 +141,7 @@ int main(uint64_t argc, char *argv[]) {
     }
   }
 
-  req_packet.request.x_src = (0 << 4) | 0;
+  req_packet.request.x_src = (0 << 4) | 15;
   req_packet.request.y_src = (1 << 3) | 1;
   req_packet.request.op_v2 = 0; // Load
   req_packet.request.reg_id = 0xff;

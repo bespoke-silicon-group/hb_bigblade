@@ -127,9 +127,9 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_hio_mask, 1)
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_hio_mask, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
 
         # The next few requests send acknowledgments immediately
         # So get back all credits for previous requests before sending these out
@@ -137,15 +137,15 @@ class NBF:
         self.fence()
 
         # Write to the DRAM offset registers in all the bridge modules
-        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
-        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
-        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+        self.print_nbf(0x0f, 1 << 3 | 1, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+        self.print_nbf(0x0f, 1 << 3 | 2, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+        self.print_nbf(0x0f, 1 << 3 | 3, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
 
         self.fence()
         
-        self.print_nbf(0, 1 << 3 | 1, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
-        self.print_nbf(0, 1 << 3 | 2, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
-        self.print_nbf(0, 1 << 3 | 3, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
+        self.print_nbf(0x0f, 1 << 3 | 1, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
+        self.print_nbf(0x0f, 1 << 3 | 2, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
+        self.print_nbf(0x0f, 1 << 3 | 3, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
 
     # print finish
     def finish(self):
@@ -158,7 +158,7 @@ class NBF:
     # Dump the nbf
     def dump(self):
         # Freeze BP
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 1)
         # Initialize BP configuration registers
         self.init_config()
         self.fence()
@@ -166,7 +166,7 @@ class NBF:
         self.init_vcache()
         self.fence()
         # Unfreeze BP
-        self.print_nbf(0, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 0)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 0)
         self.fence()
         self.finish()
 
