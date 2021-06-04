@@ -253,7 +253,8 @@ set_macro_relative_location \
   -anchor_object $dcache_data_ma_east \
   -offset [list 0 [expr -2*$keepout_margin_y+$sram_top_to_bot]]
 
-create_keepout_margin -type hard -outer $keepout_margins $int_regfile_mems
+set ko [list $keepout_margin_x $keepout_margin_y $bound_to_rf_side $keepout_margin_y]
+create_keepout_margin -type hard -outer $ko $dcache_data_mems_east
 
 #####################################
 ### I CACHE STAT
