@@ -94,28 +94,29 @@ BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC
 
 # $1 = pod_x
 # $2 = pod_y
-# $3 = subarray_x
-# $4 = subarray_y
-BSG_TILE_SUBARRAY_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.mc_y[$3].mc_x[0].mc
+# $3 = tile_x
+# $4 = tile_y
+BSG_TILE_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.mc_y[$(shell echo $4/2 | bc)].mc_x[0].mc.y[$(shell echo $4 % 2 | bc)].x[$3].tile
 
 # $1 = pod_x
 # $2 = pod_y
-BSG_NORTH_CACHE_SUBARRAY_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.north_vc_x[0].north_vc_row
-BSG_SOUTH_CACHE_SUBARRAY_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.south_vc_x[0].south_vc_row
+# $3 = cache_x
+BSG_NORTH_CACHE_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.north_vc_x[0].north_vc_row.vc_y[0].vc_x[$3].vc
+BSG_SOUTH_CACHE_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$2].podrow.podrow.px[$1].pod.south_vc_x[0].south_vc_row.vc_y[0].vc_x[$3].vc
 
-# change these to select first tile_subarray in which pod is swapped with its synthesized netlist
-BSG_TILE_SUBARRAY_Y_0 ?= 0
-BSG_POD_X      ?= 0
-BSG_POD_Y      ?= 0
-
-# change these to select second tile_subarray in which pod is swapped with its synthesized netlist
-BSG_TILE_SUBARRAY_Y_1 ?= 1
+# change these to select which tile in which pod is swapped with its synthesized netlist
+BSG_TILE_X ?= 0
+BSG_TILE_Y ?= 0
+BSG_CACHE_X ?= 0
+BSG_POD_X  ?= 0
+BSG_POD_Y  ?= 0
 
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
-VCS_OPTIONS += +define+BSG_TILE_SUBARRAY_PATH_0=$(call BSG_TILE_SUBARRAY_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y),$(BSG_TILE_SUBARRAY_Y_0))
-VCS_OPTIONS += +define+BSG_TILE_SUBARRAY_PATH_1=$(call BSG_TILE_SUBARRAY_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y),$(BSG_TILE_SUBARRAY_Y_1))
-VCS_OPTIONS += +define+BSG_CACHE_SUBARRAY_PATH=$(call BSG_NORTH_CACHE_SUBARRAY_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y))
+
+# Swap targets: BSG_TILE_PATH, BSG_VCACHE_PATH
+VCS_OPTIONS += +define+BSG_TILE_PATH=$(call BSG_TILE_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y),$(BSG_TILE_X),$(BSG_TILE_Y))
+VCS_OPTIONS += +define+BSG_CACHE_PATH=$(call BSG_NORTH_CACHE_INSTANCE_PATH,$(BSG_POD_X),$(BSG_POD_Y),$(BSG_CACHE_X))
 
 export BSG_CHIP_LIBRARY_NAME = bsg_chip
 export BSG_CHIP_FILELIST = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).filelist
@@ -145,6 +146,15 @@ export BSG_MANYCORE_TILE_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NA
 VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BSG_MANYCORE_TILE_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_LIBRARY)
+
+# RTL Hard tile library (so that we can substitute some, but not all, with netlists)
+export BSG_MANYCORE_TILE_HARD_LIBRARY_NAME = bigblade_manycore_tile_hard
+export BSG_MANYCORE_TILE_HARD_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).filelist
+export BSG_MANYCORE_TILE_HARD_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_MANYCORE_TILE_HARD_LIBRARY_NAME=$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_HARD_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_HARD_LIBRARY)
 
 ###########################################
 # Bigblade clk_gen filelists and liblists #
