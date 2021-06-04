@@ -42,7 +42,7 @@ hardfloat_commit     :=master
 
 cgra_dir             :=$(THIS_DIR)/cgra
 cgra_url             :=$(GITHUB)cornell-brg/hb_bigblade_cgra
-cgra_commit          :=rc0_tagfix
+cgra_commit          :=rc0
 
 prep_dir := .pdk_prep
 
