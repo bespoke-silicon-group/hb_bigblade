@@ -55,7 +55,7 @@ export TESTING_BSG_OUT_DIR            ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
-export BSG_PACKAGING_FOUNDRY ?=portable
+export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk

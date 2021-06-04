@@ -40,8 +40,8 @@ source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
 
 # bsg tie hi/lo
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_tiehilo_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_synth/tcl/bsg_tiehilo_include.tcl
 
 #########################
 # list of hardened rams #
