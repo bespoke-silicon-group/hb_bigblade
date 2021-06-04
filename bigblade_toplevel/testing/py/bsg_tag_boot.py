@@ -371,7 +371,7 @@ if __name__ == "__main__":
       tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b0)
   for row in range(4):
     for pos in range(2):
-      if (row == 0 and pod == 0):
+      if (row == 0 and pos == 0):
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
 
