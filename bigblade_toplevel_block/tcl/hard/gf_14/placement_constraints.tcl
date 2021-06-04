@@ -46,6 +46,13 @@ for {set i 0} {$i < 4} {incr i} {
   set_attribute     $pod_row_cell orientation "R0"
   set_fixed_objects $pod_row_cell
 }
+# FIXME: remove for loop below when real accelerator is added
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$pod_height]
+  create_placement_blockage -name "pb_pod_west_${i}" -boundary "{{[expr $pod_row_start_x-4*[unit_width]] $lly} {$pod_row_start_x $ury}}"
+  create_placement_blockage -name "pb_pod_east_${i}" -boundary "{{[expr $pod_row_start_x+$pod_width] $lly} {[expr $pod_row_start_x+$pod_width+4*[unit_width]] $ury}}"
+}
 
 
 # clk gen placement
