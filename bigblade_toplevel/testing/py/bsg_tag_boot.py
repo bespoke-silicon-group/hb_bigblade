@@ -37,19 +37,17 @@ if __name__ == "__main__":
   # wait 64 cycles
   tg.wait(64)
 
-
-  # # disable bp and cgra
   # for row in range(4):
   #   for pos in range(2):
   #     offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
   #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
   #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+  # disable cgra
   for row in range(4):
     for pos in range(2):
       offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
       tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
       tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
-
 
   # reset clk_gen
   for noc in range(9):
@@ -74,18 +72,16 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
-      if (row == 0 and pos == 0):
-        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-        tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
-        tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
-        tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
-        tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
-        tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
-        tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
+      offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
+      tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+      tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
 
   # assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b1)
-
 
   # all clk_gen select zero output, reset monotor ds
   for noc in range(9):
@@ -102,14 +98,12 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
-      if (row == 0 and pos == 0):
-        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
-        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
+      offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+      tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
+      tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
 
   # de-assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b0)
-
 
   # config clk_gen output
   for noc in range(9):
@@ -274,19 +268,21 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
+      offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
+      # init sdr clients
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
+      tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b1)
       if (row == 0 and pos == 0):
-        offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
-        # init sdr clients
-        tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
-        tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b1)
-        tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
-        tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b1)
         # init sdr disable
         tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
-        # init cord
+        # init coord
         tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=0b0001001)
         # init core reset
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b1)
+      else:
+        tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
 
   # STEP 2: perform async token reset
   # async token reset for io_link
