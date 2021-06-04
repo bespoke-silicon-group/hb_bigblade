@@ -114,8 +114,8 @@ for {set rf 0} {$rf < $HB_WH_RUCHE_FACTOR_P} {incr rf} {
 
 
 # core reset
-constraint_input_ports  $core_clk_name [get_ports core_reset_i]     500 -50
-constraint_output_ports $core_clk_name [get_ports core_reset_o]     500 -50
+constraint_input_ports  $core_clk_name [get_ports core_reset_i]     700 -50
+constraint_output_ports $core_clk_name [get_ports core_reset_o]     500 -200
 constraint_input_ports  $core_clk_name [get_ports core_global_*_i*] 40 40
 constraint_output_ports $core_clk_name [get_ports core_global_*_o*] 40 40
 
