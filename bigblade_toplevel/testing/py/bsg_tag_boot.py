@@ -74,13 +74,14 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
-      offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
-      tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
-      tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
-      tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
-      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
-      tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
+      if (row == 0 and pos == 0):
+        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
+        tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
+        tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+        tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
 
   # assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b1)
@@ -101,9 +102,10 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
-      offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-      tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
-      tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
+      if (row == 0 and pos == 0):
+        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
+        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
 
   # de-assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b0)
@@ -166,11 +168,12 @@ if __name__ == "__main__":
 
   for row in range(4):
     for pos in range(2):
-      offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-      # select ext output clk
-      tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
-      # de-assert monitor ds reset
-      tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
+      if (row == 0 and pos == 0):
+        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+        # select ext output clk
+        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+        # de-assert monitor ds reset
+        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
 
   # reset noc blocks
   for noc in range(9):
@@ -336,9 +339,10 @@ if __name__ == "__main__":
       tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
   for row in range(4):
     for pos in range(2):
-      offset = bp_hp_offset+(row*2+pos)*(sdr_num_clients_p)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
+      if (row == 0 and pos == 0):
+        offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
 
   # STEP 8: SDR de-assert uplink reset
   for noc in range(9):
@@ -352,7 +356,7 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
       if (row == 0 and pos == 0):
-        offset = bp_hp_offset+(row*2+pos)*(sdr_num_clients_p)
+        offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b0)
 
 
@@ -368,7 +372,7 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
       if (row == 0 and pod == 0):
-        offset = bp_hp_offset+(row*2+pos)*(sdr_num_clients_p)
+        offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
 
 
@@ -384,7 +388,7 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
       if (row == 0 and pos == 0):
-        offset = bp_hp_offset+(row*2+pos)*(sdr_num_clients_p)
+        offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b0)
 
 
@@ -404,7 +408,7 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
       if (row == 0 and pos == 0):
-        offset = bp_hp_offset+(row*2+pos)*(sdr_num_clients_p)
+        offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b0)
 
 
