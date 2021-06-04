@@ -390,10 +390,10 @@ module bp_cce_to_mc_bridge
         end
       else
         begin
-          // Hardcoded host at right above this link
+          // Hardcoded host at top right of bigblade
           mmio_out_packet_li.addr   = io_cmd_eva_li.addr;
-          mmio_out_packet_li.y_cord = my_y_i - 1'b1;
-          mmio_out_packet_li.x_cord = my_x_i;
+          mmio_out_packet_li.y_cord = '0;
+          mmio_out_packet_li.x_cord = 31;
         end
 
       case (io_cmd_li.header.msg_type)
