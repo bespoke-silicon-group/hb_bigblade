@@ -159,9 +159,20 @@ module bsg_gateway_chip_core_complex
      ,.reset_i(~tag_trace_done_i)
      ,.ctr_r_o(cycle_counter)
      );
-   
+  always @(negedge mc_clk_i) begin
+    if(tag_trace_done_i && (cycle_counter % 1024 == 0)) begin
+      reg [63:0] t;
+      int fd;
+      t = 0;
+      $system("date +%s%3N > date.txt");
+      fd=$fopen("date.txt","r");
+      $fscanf(fd, "%d", t);
+      $fclose(fd);
+      $display("BSG SIM HEARTBEAT: %d manycore compute cycles completed @ %d ms", cycle_counter, t);
+    end
+  end
   final begin
-     $display("BSG INFO: %d cycles completed @ finish", cycle_counter);
+    $display("BSG INFO: %d cycles completed @ finish", cycle_counter);
   end
   // synopsys translate on
 endmodule
