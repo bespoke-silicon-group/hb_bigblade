@@ -251,7 +251,7 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner tr \
   -anchor_object $dcache_data_ma_east \
-  -offset [list 0 [expr -2*$keepout_margin_y+$sram_top_to_bot]]
+  -offset [list -$bound_to_rf_side [expr -$keepout_margin_y+$sram_top_to_bot]]
 
 set ko [list $keepout_margin_x $keepout_margin_y $bound_to_rf_side $keepout_margin_y]
 create_keepout_margin -type hard -outer $ko $dcache_data_mems_east
