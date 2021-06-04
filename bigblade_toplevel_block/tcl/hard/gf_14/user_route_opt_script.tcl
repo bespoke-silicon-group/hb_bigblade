@@ -219,9 +219,18 @@ route_eco
 
 
 # create vertical link clocks
+proc bsg_async_two_clocks {period clk0 clk1} {
+  set max_delay_ps [expr $period/2]
+  set_max_delay $max_delay_ps -from $clk0 -to $clk1 -ignore_clock_latency
+  set_min_delay 0             -from $clk0 -to $clk1 -ignore_clock_latency
+  set_max_delay $max_delay_ps -from $clk1 -to $clk0 -ignore_clock_latency
+  set_min_delay 0             -from $clk1 -to $clk0 -ignore_clock_latency
+}
+
 set num_ver_links [expr 64+2]
 for {set i 0} {$i < 4} {incr i} {
   set wh_master_clk_name   "pod_row_${i}_master_clk"
+  set pod_clk_period_ps [get_attribute [get_clocks $wh_master_clk_name] period]
   set start_idx [expr {$i == 0} ? {$num_ver_links} : {0}]
   set end_idx   [expr {$i == 3} ? {$num_ver_links} : {2*$num_ver_links}]
   for {set j $start_idx} {$j < $end_idx} {incr j} {
@@ -237,10 +246,8 @@ for {set i 0} {$i < 4} {incr i} {
       set_propagated_clock [get_clocks "ver_link_${i}_${j}_${k}_clk"] 
 
       set x [expr {$j < $num_ver_links} ? {$i-1} : {$i+1}]
-      set_false_path -from [get_clocks "ver_link_${i}_${j}_${k}_clk"] -to   [get_clocks "pod_row_${x}_master_clk"]
-      set_false_path -to   [get_clocks "ver_link_${i}_${j}_${k}_clk"] -from [get_clocks "pod_row_${x}_master_clk"]
-      set_false_path -from [get_clocks "ver_link_${i}_${j}_${k}_clk"] -to   [get_clocks "tag_clk"]
-      set_false_path -to   [get_clocks "ver_link_${i}_${j}_${k}_clk"] -from [get_clocks "tag_clk"]
+      bsg_async_two_clocks $pod_clk_period_ps [get_clocks "ver_link_${i}_${j}_${k}_clk"] [get_clocks "pod_row_${x}_master_clk"]
+      bsg_async_two_clocks $pod_clk_period_ps [get_clocks "ver_link_${i}_${j}_${k}_clk"] [get_clocks "tag_clk"]
     }
   }
 }

@@ -140,11 +140,13 @@ for {set j 0} {$j < 2} {incr j} {
 
 # SDR
 set sdr_clocks [list]
+set pod_clk_period_ps          1100.0
+set pod_clk_uncertainty_ps     20
 
 for {set i 0} {$i < 4} {incr i} {
   set wh_master_clk_name   "pod_row_${i}_master_clk"
-  create_clock -period 1000 -name $wh_master_clk_name [get_pins "core_complex/core[${i}].clk_gen/clk_o"]
-  set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+  create_clock -period $pod_clk_period_ps -name $wh_master_clk_name [get_pins "core_complex/core[${i}].clk_gen/clk_o"]
+  set_clock_uncertainty $pod_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 8} {incr j} {
     create_generated_clock \
         -divide_by 1 \
@@ -159,8 +161,8 @@ for {set i 0} {$i < 4} {incr i} {
 
 for {set i 0} {$i < 8} {incr i} {
   set wh_master_clk_name   "mem_link_${i}_master_clk"
-  create_clock -period 1000 -name $wh_master_clk_name [get_pins "mem_link*${i}*link/core_clk"]
-  set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+  create_clock -period $pod_clk_period_ps -name $wh_master_clk_name [get_pins "mem_link*${i}*link/core_clk"]
+  set_clock_uncertainty $pod_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 4} {incr j} {
     create_generated_clock \
         -divide_by 1 \
@@ -174,8 +176,8 @@ for {set i 0} {$i < 8} {incr i} {
 }
 
 set wh_master_clk_name   "io_link_master_clk"
-create_clock -period 1000 -name $wh_master_clk_name [get_pins "io_link/core_clk"]
-set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
+create_clock -period $pod_clk_period_ps -name $wh_master_clk_name [get_pins "io_link/core_clk"]
+set_clock_uncertainty $pod_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
 foreach {j} {"fwd" "rev"} {
   create_generated_clock \
       -divide_by 1 \
@@ -228,42 +230,42 @@ for {set i 0} {$i < 4} {incr i} {
   set_false_path -to   [get_clocks "pod_row_${i}_master_clk"] -from [get_clocks "tag_clk"]
 }
 
+
+proc bsg_async_two_clocks {period clk0 clk1} {
+  set max_delay_ps [expr $period/2]
+  set_max_delay $max_delay_ps -from $clk0 -to $clk1 -ignore_clock_latency
+  set_min_delay 0             -from $clk0 -to $clk1 -ignore_clock_latency
+  set_max_delay $max_delay_ps -from $clk1 -to $clk0 -ignore_clock_latency
+  set_min_delay 0             -from $clk1 -to $clk0 -ignore_clock_latency
+}
+
+
 for {set i 0} {$i < 4} {incr i} {
   for {set j 0} {$j < 8} {incr j} {
     set x [expr $i+4*($j/4)]
-    set_false_path -from [get_clocks "wh_link_${i}_${j}_clk"] -to   [get_clocks "mem_link_${x}_master_clk"]
-    set_false_path -to   [get_clocks "wh_link_${i}_${j}_clk"] -from [get_clocks "mem_link_${x}_master_clk"]
-    set_false_path -from [get_clocks "wh_link_${i}_${j}_clk"] -to   [get_clocks "tag_clk"]
-    set_false_path -to   [get_clocks "wh_link_${i}_${j}_clk"] -from [get_clocks "tag_clk"]
+    bsg_async_two_clocks $pod_clk_period_ps [get_clocks "wh_link_${i}_${j}_clk"] [get_clocks "mem_link_${x}_master_clk"]
+    bsg_async_two_clocks $pod_clk_period_ps [get_clocks "wh_link_${i}_${j}_clk"] [get_clocks "tag_clk"]
   }
 }
 
 for {set i 0} {$i < 8} {incr i} {
   for {set j 0} {$j < 4} {incr j} {
     set x [expr $i%4]
-    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "pod_row_${x}_master_clk"]
-    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "pod_row_${x}_master_clk"]
-    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "tag_clk"]
-    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "tag_clk"]
+    bsg_async_two_clocks $pod_clk_period_ps [get_clocks "mem_link_${i}_${j}_clk"] [get_clocks "pod_row_${x}_master_clk"]
+    bsg_async_two_clocks $pod_clk_period_ps [get_clocks "mem_link_${i}_${j}_clk"] [get_clocks "tag_clk"]
   }
 }
 
 foreach {j} {"fwd" "rev"} {
-  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "pod_row_0_master_clk"]
-  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "pod_row_0_master_clk"]
-  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "tag_clk"]
-  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "tag_clk"]
+  bsg_async_two_clocks $pod_clk_period_ps [get_clocks "io_link_${j}_clk"] [get_clocks "pod_row_0_master_clk"]
+  bsg_async_two_clocks $pod_clk_period_ps [get_clocks "io_link_${j}_clk"] [get_clocks "tag_clk"]
 }
 
-set_false_path -from [get_clocks "west_link_rev_clk"] -to   [get_clocks "io_link_master_clk"]
-set_false_path -to   [get_clocks "west_link_rev_clk"] -from [get_clocks "io_link_master_clk"]
-set_false_path -from [get_clocks "west_link_rev_clk"] -to   [get_clocks "tag_clk"]
-set_false_path -to   [get_clocks "west_link_rev_clk"] -from [get_clocks "tag_clk"]
+bsg_async_two_clocks $pod_clk_period_ps [get_clocks "west_link_rev_clk"] [get_clocks "io_link_master_clk"]
+bsg_async_two_clocks $pod_clk_period_ps [get_clocks "west_link_rev_clk"] [get_clocks "tag_clk"]
 
-set_false_path -from [get_clocks "north_link_fwd_clk"] -to   [get_clocks "io_link_master_clk"]
-set_false_path -to   [get_clocks "north_link_fwd_clk"] -from [get_clocks "io_link_master_clk"]
-set_false_path -from [get_clocks "north_link_fwd_clk"] -to   [get_clocks "tag_clk"]
-set_false_path -to   [get_clocks "north_link_fwd_clk"] -from [get_clocks "tag_clk"]
+bsg_async_two_clocks $pod_clk_period_ps [get_clocks "north_link_fwd_clk"] [get_clocks "io_link_master_clk"]
+bsg_async_two_clocks $pod_clk_period_ps [get_clocks "north_link_fwd_clk"] [get_clocks "tag_clk"]
 
 
 
