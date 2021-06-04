@@ -392,7 +392,7 @@ module bsg_gateway_chip
     ,.proc_link_sif_i(proc_link_in[0][0])
     ,.proc_link_sif_o(proc_link_out[0][0])
 
-    ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'(1'b0)})
+    ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'('1)})
     ,.global_y_i({hb_pod_y_cord_width_gp'(1'b0), hb_y_subcord_width_gp'(1'b0)})
     );
 
@@ -415,7 +415,7 @@ module bsg_gateway_chip
     ,.proc_link_sif_i(proc_link_in[num_links_y_lp-1][0])
     ,.proc_link_sif_o(proc_link_out[num_links_y_lp-1][0])
 
-    ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'(1'b0)})
+    ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'('1)})
     ,.global_y_i({hb_pod_y_cord_width_gp'(2'b10), hb_y_subcord_width_gp'(1'b0)})
     );
   
@@ -445,7 +445,7 @@ module bsg_gateway_chip
       ,.proc_link_sif_i(proc_link_in[i][0])
       ,.proc_link_sif_o(proc_link_out[i][0])
 
-      ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'(1'b0)})
+      ,.global_x_i({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'('1)})
       ,.global_y_i({hb_pod_y_cord_width_gp'(1'b1), hb_y_subcord_width_gp'(i-1)})
       );
     end
@@ -562,7 +562,7 @@ module bsg_gateway_chip
      ,.data_width_p(hb_data_width_gp)
      ,.x_cord_width_p(hb_x_cord_width_gp)
      ,.y_cord_width_p(hb_y_cord_width_gp)
-     ,.io_x_cord_p({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'(1'b0)})
+     ,.io_x_cord_p({hb_pod_x_cord_width_gp'(1'b0), hb_x_subcord_width_gp'('1)})
      ,.io_y_cord_p({hb_pod_y_cord_width_gp'(1'b1), hb_y_subcord_width_gp'(1'b0)})
      )
    io

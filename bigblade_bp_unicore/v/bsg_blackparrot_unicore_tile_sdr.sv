@@ -220,7 +220,7 @@ module bsg_blackparrot_unicore_tile_sdr
 
 
 
-  wire [hb_x_cord_width_gp-1:0] host_mmio_x_cord_li = '0;
+  wire [hb_x_cord_width_gp-1:0] host_mmio_x_cord_li = {hb_pod_x_cord_width_gp'('0), hb_x_subcord_width_gp'('1)};
   wire [hb_y_cord_width_gp-1:0] host_mmio_y_cord_li = global_y_cord_i;
   bp_cce_to_mc_bridge
    #(.bp_params_p(bp_params_p)
@@ -270,7 +270,7 @@ module bsg_blackparrot_unicore_tile_sdr
 
   for (genvar i = 0; i < 2; i++)
     begin : d
-      wire [hb_x_cord_width_gp-1:0] host_dram_x_cord_li = '0;
+      wire [hb_x_cord_width_gp-1:0] host_dram_x_cord_li = {hb_pod_x_cord_width_gp'('0), hb_x_subcord_width_gp'('1)};
       wire [hb_y_cord_width_gp-1:0] host_dram_y_cord_li = global_y_cord_i + 1'b1 + i;
       bp_cce_to_mc_bridge
        #(.bp_params_p(bp_params_p)
