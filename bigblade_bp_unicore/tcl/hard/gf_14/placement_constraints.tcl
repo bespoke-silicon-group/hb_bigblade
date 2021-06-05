@@ -56,7 +56,7 @@ create_bound -name "bound_bound" -boundary [list [list [expr $bound_width+$bound
 set bound_bound [get_bounds "bound_bound"]
 
 #set sram_front_to_back 0.084
-set sram_front_to_back 2*$keepout_margin_x
+set sram_front_to_back [expr 2*$keepout_margin_x]
 set sram_top_to_bot 0.000
 
 #####################################
@@ -251,10 +251,12 @@ set_macro_relative_location \
   -target_orientation R0 \
   -anchor_corner tr \
   -anchor_object $dcache_data_ma_east \
-  -offset [list -$bound_to_rf_side [expr -$keepout_margin_y+$sram_top_to_bot]]
+  -offset [list 0 [expr -2*$keepout_margin_y+$sram_top_to_bot]]
 
-set ko [list $keepout_margin_x $keepout_margin_y $bound_to_rf_side $keepout_margin_y]
-create_keepout_margin -type hard -outer $ko $dcache_data_mems_east
+set ko [list $keepout_margin_x $sram_top_to_bot $bound_to_rf_side $sram_top_to_bot]
+create_keepout_margin -type hard -outer $ko [index_collection $int_regfile_mems 1]
+set ko [list $keepout_margin_x $keepout_margin_y $sram_front_to_back $sram_top_to_bot]
+create_keepout_margin -type hard -outer $ko [index_collection $int_regfile_mems 0]
 
 #####################################
 ### I CACHE STAT

@@ -47,11 +47,9 @@ for {set i 0} {$i < 3} {incr i} {
         set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 3]
         set true_pin_index [expr (2-$i)*$pin_len + $pin_index]
         set true_pin ${pin_base}[$true_pin_index]
-      } elseif {[string first "disable" $pin_base] == -1} {
-        set true_pin_index [expr $i]
-        set true_pin ${pin_base}[$i]
       } else {
-        continue
+        set true_pin_index [expr (2-$i)]
+        set true_pin ${pin_base}[$i]
       }
       set pos [lindex [split $line ,] 1]
       set true_pos [expr $block_offset + $i*$mc_tile_pitch + $pos]
