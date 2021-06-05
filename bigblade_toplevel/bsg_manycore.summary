@@ -1,8 +1,8 @@
 Summary for repository bsg_manycore:
     EXPECTED COMMIT/BRANCH: ci_bigblade
-    CURRENT COMMIT: 9fc9807b
+    CURRENT COMMIT: 3bc1f4cc
     PASS: NO Uncommitted Files
-    PASS: commit 9fc9807b is in remote
+    PASS: commit 3bc1f4cc is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
     PASS: No Untracked Files
