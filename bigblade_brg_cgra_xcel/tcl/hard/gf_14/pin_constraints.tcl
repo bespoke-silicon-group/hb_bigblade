@@ -50,10 +50,10 @@ source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variabl
         if {[string length $pin] != [string length $pin_base]} {
           set pin_index [lindex [split $pin {\[.*\]}] 1]
           set pin_len [expr [sizeof_collection [get_ports $pin_base[*]]] / 4]
-          set true_pin_index [expr $i*$pin_len + $pin_index]
+          set true_pin_index [expr (3-$i)*$pin_len + $pin_index]
           set true_pin ${pin_base}[$true_pin_index]
         } else {
-          set true_pin_index [expr 2-$i]
+          set true_pin_index [expr 3-$i]
           set true_pin ${pin_base}[$i]
         }
         set pos [lindex [split $line ,] 1]
