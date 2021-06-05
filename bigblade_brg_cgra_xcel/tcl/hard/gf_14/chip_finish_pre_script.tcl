@@ -1,4 +1,3 @@
 
-remove_placement_blockage "cgra_blockage"
-optimize_routability -routes
-route_eco -reuse_existing_global_route true -max_detail_route_iterations 100
+optimize_routability -route
+route_eco

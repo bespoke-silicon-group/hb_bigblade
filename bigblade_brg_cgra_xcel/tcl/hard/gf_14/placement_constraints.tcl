@@ -6,6 +6,7 @@ current_design ${DESIGN_NAME}
 
 # Start script fresh
 set_locked_objects -unlock [get_cells -hier]
+remove_placement_blockages -all
 remove_edit_groups -all
 remove_bounds -all
 
@@ -149,8 +150,12 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
   set urx $tile_width
   set ury [get_attribute [get_cell -hier "PE_rc__56"] bounding_box.ur_y]
 
-  create_placement_blockage -name "cgra_blockage" -type allow_buffer_only -blocked_percentage 70  -boundary [list [list $llx $lly] [list $urx $ury]]
+  create_placement_blockage -name "cgra_blockage" -type allow_buffer_only -blocked_percentage 100 -boundary [list [list $llx $lly] [list $urx $ury]]
   #create_placement_blockage -name "cgra_blockage" -type hard -boundary [list [list $llx $lly] [list $urx $ury]]
+
+  set ko [list $keepout_margin_x $keepout_margin_y $pe_margin_x $keepout_margin_y]
+  set PEs [get_cells -hier "PE_rc__*"]
+  create_keepout_margin -type hard -outer $ko $PEs
 
   #set tag_bound [create_bound -name "btx" -type soft \
   #      -boundary [list [list 0 [expr $tile_height - 100]] [list $llx $tile_height]]]
