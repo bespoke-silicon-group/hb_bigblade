@@ -6,6 +6,7 @@
 set basejump_stl_dir       $::env(BASEJUMP_STL_DIR)
 set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set blackparrot_dir        $::env(BLACKPARROT_DIR)
+set cgra_dir               $::env(CGRA_DIR)
 set hardfloat_dir          $::env(BLACKPARROT_DIR)/external/HardFloat
 set bsg_designs_dir        $::env(BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
@@ -385,6 +386,11 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_unicore.sv
   $bp_top_dir/src/v/bp_unicore_lite.sv
 
+  
+  $cgra_dir/v/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
+  $cgra_dir/v/brg_8x8_cgra_xcel.v
+  $cgra_dir/v/brg_cgra_pod.v
+
 
   $bsg_designs_target_dir/v/bsg_chip.v
 
@@ -395,8 +401,6 @@ set SVERILOG_SOURCE_FILES [join "
   $bsg_designs_target_dir/../bigblade_bp_unicore/v/blackparrot_chip_pkg.v
   $bsg_designs_target_dir/../bigblade_bp_unicore/v/bsg_blackparrot_unicore_tile_sdr.sv
   $bsg_designs_target_dir/../bigblade_bp_unicore/v/bsg_blackparrot_halfpod.sv
-  
-  $bsg_designs_target_dir/../bigblade_cgra_dummy/v/brg_cgra_pod.v
 
   $bsg_designs_target_dir/../bigblade_toplevel_block_rc0/v/bsg_chip_block.v
   $bsg_designs_target_dir/../bigblade_toplevel_block_rc0/v/bsg_chip_block_core_complex.v
