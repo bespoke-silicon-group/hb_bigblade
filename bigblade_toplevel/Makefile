@@ -19,7 +19,7 @@ hb_bigblade_netlists_commit := main
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
-basejump_stl_commit  :=master
+basejump_stl_commit  :=bigblade-rc-alpha-rtlfreeze-3
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
@@ -31,11 +31,11 @@ bsg_replicant_commit :=bigblade-tapeout
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
-bsg_14_commit        :=master
+bsg_14_commit        :=36db7d27d612851ab65902526e915aa2df9515c5
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
-bsg_cadenv_commit    :=master
+bsg_cadenv_commit    :=7860120e1a2f4c7dcebeb730a4fabcc53f40777b
 
 board_dir            :=$(THIS_DIR)/board
 board_url            :=$(BITBUCKET)taylor-bsg/board
