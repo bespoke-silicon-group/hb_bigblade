@@ -17,9 +17,16 @@ set SVERILOG_PACKAGE_FILES [join "
 "]
 
 set SVERILOG_SOURCE_FILES [join "
-  $SVERILOG_PACKAGE_FILES
+  $bsg_designs_target_dir/v/bsg_chip.v
+  $bsg_designs_target_dir/v/bsg_chip_block_blackbox.v
 "]
 
 set SVERILOG_INCLUDE_PATHS [join "
+  $bsg_packaging_dir/common/verilog
+  $bsg_packaging_dir/common/foundry/portable/verilog
+  $bsg_packaging_dir/$bsg_package/pinouts/$bsg_pinout/common/verilog
+  $bsg_packaging_dir/$bsg_package/pinouts/$bsg_pinout/portable/verilog
+  $bsg_packaging_dir/$bsg_package/pinouts/$bsg_pinout/portable/verilog/padmappings/$bsg_padmapping
+  $bsg_designs_target_dir/../common/v
 "]
 

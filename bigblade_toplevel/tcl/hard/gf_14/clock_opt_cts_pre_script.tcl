@@ -1,0 +1,3 @@
+set REPORT_QOR false
+set REPORT_QOR_REPORT_CONGESTION false
+set TCL_USER_CLOCK_OPT_CTS_SCRIPT "$::env(BSG_DESIGNS_TARGET_TCL_HARD_DIR)/user_clock_opt_cts_script.tcl"
