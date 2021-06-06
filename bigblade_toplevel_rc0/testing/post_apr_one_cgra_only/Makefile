@@ -94,8 +94,16 @@ VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 BSG_TOP_SIM_MODULE = bsg_bigblade_pcb
 BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC
 
+# $1 = BSG_POD_Y
+# $2 = LOWER_HALF
+BRG_CGRA_HPOD_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$1].cgra[$2].halfpod
+# change these to select which cgra is swapped with its post-apr netlist
+BSG_POD_Y  ?= 0
+LOWER_HALF ?= 0
+
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
+VCS_OPTIONS += +define+BRG_CGRA_HPOD_PATH=$(call BRG_CGRA_HPOD_INSTANCE_PATH,$(BSG_POD_Y),$(LOWER_HALF))
 
 export BSG_CHIP_LIBRARY_NAME = bsg_chip
 export BSG_CHIP_FILELIST = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).filelist
@@ -198,6 +206,17 @@ export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
 VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
+
+###############################
+# CGRA filelists and liblists #
+###############################
+export BRG_CGRA_HPOD_LIBRARY_NAME = brg_cgra_hpod
+export BRG_CGRA_HPOD_FILELIST = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).filelist
+export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
+VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
