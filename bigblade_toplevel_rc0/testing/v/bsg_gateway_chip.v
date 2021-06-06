@@ -194,13 +194,6 @@ module bsg_gateway_chip
   bsg_counter_clock_downsample #(.width_p(10)) cgra_ds
   (.clk_i(cgra_clk_2x),.reset_i(tag_reset),.val_i(cgra_ds_val),.clk_r_o(cgra_clk));
 
-  initial begin
-    $assertoff();
-    @(posedge tag_clk);
-    @(posedge tag_trace_done_lo);
-    $asserton();
-  end
-
 
   //////////////////////////////////////////////////
   //
