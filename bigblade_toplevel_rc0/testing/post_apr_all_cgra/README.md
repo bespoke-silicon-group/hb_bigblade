@@ -1,6 +1,6 @@
-## Post-synth GL CGRA + RTL-hard chip simulation
+## Post-apr GL CGRA + RTL-hard chip simulation
 
-Files in this directory allow you to swap in eight post-synth GL CGRA
+Files in this directory allow you to swap in eight post-apr GL CGRA
 instances and simulate with RTL-hard chip. The diagram below shows
 the relative positions of all eight CGRA instances to the four pod
 rows.
