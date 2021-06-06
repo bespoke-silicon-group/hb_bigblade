@@ -52,7 +52,7 @@ source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
 
 ######################
-# Post-synth sources #
+# Post-apr sources   #
 ######################
 
 # cgra source files

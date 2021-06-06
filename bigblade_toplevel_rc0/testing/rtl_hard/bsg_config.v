@@ -35,5 +35,8 @@ config bsg_config;
   // bsg tie hi/lo
   cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
+  // cgra
+  cell brg_cgra_pod liblist `BRG_CGRA_HPOD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
 endconfig

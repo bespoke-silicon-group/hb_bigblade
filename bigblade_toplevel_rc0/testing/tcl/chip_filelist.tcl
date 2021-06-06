@@ -387,7 +387,7 @@ set SVERILOG_SOURCE_FILES [join "
   $bp_top_dir/src/v/bp_unicore_lite.sv
 
   
-  $cgra_dir/v/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
+  $cgra_dir/v/soft/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
   $cgra_dir/v/brg_8x8_cgra_xcel.v
   $cgra_dir/v/brg_cgra_pod.v
 
