@@ -43,11 +43,11 @@ if __name__ == "__main__":
   #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
   #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
   # disable cgra
-  for row in range(4):
-    for pos in range(2):
-      offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
-      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
-      tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+  # for row in range(4):
+  #   for pos in range(2):
+  #     offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
+  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
 
   # reset clk_gen
   for noc in range(9):
@@ -80,6 +80,16 @@ if __name__ == "__main__":
       tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
       tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
 
+  for row in range(4):
+    for pos in range(2):
+      offset = cgra_clk_offset+(row*2+pos)*clk_num_clients_p
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=5, data=0b11111)
+      tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=7, data=0b1111111)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=2, data=0b11)
+      tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=1, data=0b1)
+
   # assert output_disable signal
   tg.send(masters=0b01, client_id=2, data_not_reset=1, length=1, data=0b1)
 
@@ -99,6 +109,12 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
       offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+      tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
+      tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
+
+  for row in range(4):
+    for pos in range(2):
+      offset = cgra_clk_offset+(row*2+pos)*clk_num_clients_p
       tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b11)
       tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b1)
 
@@ -169,6 +185,15 @@ if __name__ == "__main__":
         # de-assert monitor ds reset
         tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
 
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_clk_offset+(row*2+pos)*clk_num_clients_p
+        # select ext output clk
+        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+        # de-assert monitor ds reset
+        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
+
   # reset noc blocks
   for noc in range(9):
     offset = link_offset+(noc*noc_num_clients_p)
@@ -214,6 +239,22 @@ if __name__ == "__main__":
   for row in range(4):
     for pos in range(2):
         offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
+        # reset sdr clients
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=2+offset, data_not_reset=0, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=3+offset, data_not_reset=0, length=1, data=0b1)
+        # reset sdr disable
+        tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+        # reset cord
+        tg.send(masters=0b11, client_id=5+offset, data_not_reset=0, length=7, data=0b0000000)
+        # reset core reset
+        tg.send(masters=0b11, client_id=6+offset, data_not_reset=0, length=1, data=0b1)
+
+  # reset cgra
+  for row in range(4):
+    for pos in range(2):
+        offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
         # reset sdr clients
         tg.send(masters=0b11, client_id=0+offset, data_not_reset=0, length=1, data=0b1)
         tg.send(masters=0b11, client_id=1+offset, data_not_reset=0, length=1, data=0b1)
@@ -284,6 +325,25 @@ if __name__ == "__main__":
       else:
         tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
 
+  for row in range(4):
+    for pos in range(2):
+      offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
+      # init sdr clients
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
+      tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b1)
+      if (row == 0 and pos == 0):
+        cord = ((row+1) << 4) | (0 if pos == 0 else 4)
+        # init sdr disable
+        tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b0)
+        # init coord
+        tg.send(masters=0b11, client_id=5+offset, data_not_reset=1, length=7, data=cord)
+        # init core reset
+        tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b1)
+      else:
+        tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+
   # STEP 2: perform async token reset
   # async token reset for io_link
   for noc in range(9):
@@ -339,6 +399,12 @@ if __name__ == "__main__":
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
         tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b1)
+        tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=1, data=0b0)
 
   # STEP 8: SDR de-assert uplink reset
   for noc in range(9):
@@ -353,6 +419,11 @@ if __name__ == "__main__":
     for pos in range(2):
       if (row == 0 and pos == 0):
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b0)
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=3+offset, data_not_reset=1, length=1, data=0b0)
 
 
@@ -370,6 +441,11 @@ if __name__ == "__main__":
       if (row == 0 and pos == 0):
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=2+offset, data_not_reset=1, length=1, data=0b0)
 
 
   # STEP 10: SDR de-assert downstream reset
@@ -385,6 +461,11 @@ if __name__ == "__main__":
     for pos in range(2):
       if (row == 0 and pos == 0):
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b0)
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=1, data=0b0)
 
 
@@ -405,6 +486,11 @@ if __name__ == "__main__":
     for pos in range(2):
       if (row == 0 and pos == 0):
         offset = bp_hp_offset+(row*2+pos)*(hp_num_clients_p)
+        tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b0)
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_hp_offset+(row*2+pos)*(hp_num_clients_p)
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b0)
 
 

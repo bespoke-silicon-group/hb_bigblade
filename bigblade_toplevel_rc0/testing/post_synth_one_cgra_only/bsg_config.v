@@ -36,7 +36,7 @@ config bsg_config;
   cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
-  // cgra
-  cell brg_cgra_pod liblist `BRG_CGRA_HPOD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  // post-synth GL CGRA #0 (CGRA #1~7 will be RTL)
+  instance `BRG_CGRA_HPOD_PATH liblist `BRG_CGRA_HPOD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
 endconfig

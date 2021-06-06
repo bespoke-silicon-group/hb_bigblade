@@ -39,6 +39,7 @@ export BSG_TARGET_PROCESS       ?=gf_14
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
 export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
+export CGRA_DIR               ?= $(BSG_DESIGNS_TARGET_DIR)/cgra
 export BSG_REPLICANT_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export BSG_F1_DIR             ?= $(BSG_REPLICANT_DIR)
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
@@ -197,6 +198,17 @@ export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
 VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
+
+###############################
+# CGRA filelists and liblists #
+###############################
+export BRG_CGRA_HPOD_LIBRARY_NAME = brg_cgra_hpod
+export BRG_CGRA_HPOD_FILELIST = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).filelist
+export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
+VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
