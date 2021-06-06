@@ -21,6 +21,12 @@ set bsg_padmapping    $::env(BSG_PADMAPPING)
 # same spec as core DMEMs. Since we are doing full-chip RTL sim the
 # hardened SRAMs are already included.
 set BRG_CGRA_HPOD_SOURCE_FILES [join "
+    $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_mux.v
+    $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
+    $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
+    $basejump_stl_dir/hard/gf_14/bsg_async/bsg_sync_sync.v
+    $basejump_stl_dir/hard/gf_14/bsg_async/bsg_launch_sync_sync.v
+
     $cgra_dir/v/hard/gf_14/sram/SramWrapper.v
     $cgra_dir/v/hard/gf_14/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
 "]

@@ -14,5 +14,7 @@ set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
 set BRG_CGRA_HPOD_INCLUDE_PATHS [ join "
+    $basejump_stl_dir/bsg_misc
+    $basejump_stl_dir/hard/gf_14/bsg_mem
 "]
 
