@@ -31,7 +31,7 @@ black_parrot_commit  :=tapeout_bigblade_rc1
 
 cgra_dir             :=$(THIS_DIR)/cgra
 cgra_url             :=$(GITHUB)cornell-brg/hb_bigblade_cgra
-cgra_commit          :=main
+cgra_commit          :=rc0
 
 bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
 bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
