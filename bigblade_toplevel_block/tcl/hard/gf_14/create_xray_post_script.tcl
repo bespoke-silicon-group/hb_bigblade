@@ -30,12 +30,43 @@ for {set i 0} {$i < 8} {incr i} {
   create_clock -period 1000 -name $wh_master_clk_name [get_pins "mem_link*${i}*link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
   set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
   set_propagated_clock [get_clocks $wh_master_clk_name]
+  for {set j 0} {$j < 4} {incr j} {
+    create_generated_clock \
+        -divide_by 1 \
+        -invert \
+        -master_clock $wh_master_clk_name \
+        -add \
+        -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+        -name "mem_link_${i}_${j}_clk" \
+        [get_pins "mem_link*${i}*link/io_wh_link_clk_o[${j}]"]
+    set_propagated_clock [get_clocks "mem_link_${i}_${j}_clk"]
+    set x [expr $i%4]
+    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "pod_row_${x}_master_clk"]
+    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "pod_row_${x}_master_clk"]
+    set_false_path -from [get_clocks "mem_link_${i}_${j}_clk"] -to   [get_clocks "tag_clk"]
+    set_false_path -to   [get_clocks "mem_link_${i}_${j}_clk"] -from [get_clocks "tag_clk"]
+  }
 }
 
 set wh_master_clk_name   "io_link_master_clk"
 create_clock -period 1000 -name $wh_master_clk_name [get_pins "io_link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
 set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
 set_propagated_clock [get_clocks $wh_master_clk_name]
+foreach {j} {"fwd" "rev"} {
+  create_generated_clock \
+      -divide_by 1 \
+      -invert \
+      -master_clock $wh_master_clk_name \
+      -add \
+      -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+      -name "io_link_${j}_clk" \
+      [get_pins "io_link/mc_${j}_link_clk_o"]
+  set_propagated_clock [get_clocks "io_link_${j}_clk"]
+  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "pod_row_0_master_clk"]
+  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "pod_row_0_master_clk"]
+  set_false_path -from [get_clocks "io_link_${j}_clk"] -to   [get_clocks "tag_clk"]
+  set_false_path -to   [get_clocks "io_link_${j}_clk"] -from [get_clocks "tag_clk"]
+}
 
 
 
@@ -99,14 +130,6 @@ set_multicycle_path 2 -hold  -from $multicycle_cells
 # false paths
 for {set i 0} {$i < 4} {incr i} {
   set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "pod_row_${i}_master_clk"]
-}
-for {set i 0} {$i < 8} {incr i} {
-  for {set j 0} {$j < 4} {incr j} {
-    set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "mem_link_${i}_${j}_clk"]
-  }
-}
-foreach {j} {"fwd" "rev"} {
-  set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "io_link_${j}_clk"]
 }
 set num_ver_links [expr 64+2]
 for {set i 0} {$i < 4} {incr i} {
