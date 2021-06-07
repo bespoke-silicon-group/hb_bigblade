@@ -1,8 +1,8 @@
 `timescale 1ps/1ps
 
-`define IO_CLK_PERIOD  10000
-`define NOC_CLK_PERIOD 10000
-`define MC_CLK_PERIOD  10000
+`define IO_CLK_PERIOD  1200
+`define NOC_CLK_PERIOD 1200
+`define MC_CLK_PERIOD  1200
 `define TAG_CLK_PERIOD 20000
 
 // Slow down core clocks when tag is programming, divide clock speed by the given ratio
@@ -17,9 +17,9 @@
 //
 // The downsampler in this testbench supports slowdown ratio up to 1024
 //
-`define IO_SLOWDOWN_RATIO  8
-`define NOC_SLOWDOWN_RATIO 16
-`define MC_SLOWDOWN_RATIO  16
+`define IO_SLOWDOWN_RATIO  64
+`define NOC_SLOWDOWN_RATIO 128
+`define MC_SLOWDOWN_RATIO  128
 
 module bsg_gateway_chip
 

@@ -139,22 +139,24 @@ set SVERILOG_SOURCE_FILES [join "
   $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
   $bsg_designs_dir/common/v/hard/gf_14/bsg_link_delay_line.v
 
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_tile/bsg_manycore_tile_compute_array_ruche_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_tile/bsg_manycore_tile_compute_ruche_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_tile/bsg_manycore_tile_vcache_array_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_tile/bsg_manycore_tile_vcache_chip_finish.v
 
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_to_sdr_north_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_to_sdr_south_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_to_sdr_north_row_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_to_sdr_south_row_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
-  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-1/post-apr/bsg_manycore_link_sdr/bsg_manycore_pod_row_sdr_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_manycore_tile_array_16x2/bsg_manycore_tile_compute_array_ruche_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_manycore_tile/bsg_manycore_tile_compute_ruche_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_vcache_array_16x1/bsg_manycore_tile_vcache_array_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_vcache/bsg_manycore_tile_vcache_chip_finish.v
+
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_east/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_west/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north/bsg_manycore_link_to_sdr_north_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south/bsg_manycore_link_to_sdr_south_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north_row/bsg_manycore_link_to_sdr_north_row_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south_row/bsg_manycore_link_to_sdr_south_row_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_ne/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_nw/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_se/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_sw/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_pod_row/bsg_manycore_pod_row_sdr_chip_finish.v
+
 
 "]
 

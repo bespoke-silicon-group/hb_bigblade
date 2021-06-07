@@ -146,6 +146,9 @@ VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 OVERRIDE_PODS_X ?= 4
 OVERRIDE_PODS_Y ?= 1
 
+export bsg_pods_X=4
+export bsg_pods_Y=1
+
 # Note: Overriding parameters in bsg_chip_pkg.v
 VCS_OPTIONS += -pvalue+hb_num_pods_x_gp=$(OVERRIDE_PODS_X)
 VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
