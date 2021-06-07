@@ -49,7 +49,7 @@ for {set i 0} {$i < 3} {incr i} {
         set true_pin ${pin_base}[$true_pin_index]
       } else {
         set true_pin_index [expr (2-$i)]
-        set true_pin ${pin_base}[$i]
+        set true_pin ${pin_base}[$true_pin_index]
       }
       set pos [lindex [split $line ,] 1]
       set true_pos [expr $block_offset + $i*$mc_tile_pitch + $pos]

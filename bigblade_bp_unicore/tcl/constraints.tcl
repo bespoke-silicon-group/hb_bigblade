@@ -34,7 +34,7 @@ set core_output_delay_min_ps [expr $core_clk_period_ps*$core_output_delay_min_pe
 set core_output_delay_max_per 20.0
 set core_output_delay_max_ps [expr $core_clk_period_ps*$core_output_delay_max_per/100.0]
 
-set link_clk_period_ps        1000
+set link_clk_period_ps        800
 set link_clk_uncertainty_per  3.0
 set link_clk_uncertainty_ps  [expr min([expr $link_clk_period_ps*($link_clk_uncertainty_per/100.0)], 20)]
 
