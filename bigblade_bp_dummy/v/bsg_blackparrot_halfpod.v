@@ -1,7 +1,7 @@
 
 // WARNING: THIS IS A DUMMY MODULE FOR RTL SIMULATION ONLY
 
-module brg_cgra_pod
+module bsg_blackparrot_halfpod
   import bsg_chip_pkg::*;
   import bsg_manycore_pkg::*;
   import bsg_noc_pkg::*; // {P=0, W, E, N, S}
@@ -18,29 +18,29 @@ module brg_cgra_pod
     , input                      tag_data_i
     , input  [tag_lg_els_gp-1:0] tag_node_id_offset_i
  
-    , output logic [3:0]                   io_fwd_link_clk_o
-    , output logic [3:0][fwd_width_lp-1:0] io_fwd_link_data_o
-    , output logic [3:0]                   io_fwd_link_v_o
-    , input [3:0]                          io_fwd_link_token_i
-    , output logic [3:0]                   async_fwd_link_o_disable_o
+    , output logic [2:0]                   io_fwd_link_clk_o
+    , output logic [2:0][fwd_width_lp-1:0] io_fwd_link_data_o
+    , output logic [2:0]                   io_fwd_link_v_o
+    , input [2:0]                          io_fwd_link_token_i
+    , output logic [2:0]                   async_fwd_link_o_disable_o
  
-    , input [3:0]                          io_fwd_link_clk_i
-    , input [3:0][fwd_width_lp-1:0]        io_fwd_link_data_i
-    , input [3:0]                          io_fwd_link_v_i
-    , output logic [3:0]                   io_fwd_link_token_o
-    , output logic [3:0]                   async_fwd_link_i_disable_o
+    , input [2:0]                          io_fwd_link_clk_i
+    , input [2:0][fwd_width_lp-1:0]        io_fwd_link_data_i
+    , input [2:0]                          io_fwd_link_v_i
+    , output logic [2:0]                   io_fwd_link_token_o
+    , output logic [2:0]                   async_fwd_link_i_disable_o
  
-    , output logic [3:0]                   io_rev_link_clk_o
-    , output logic [3:0][rev_width_lp-1:0] io_rev_link_data_o
-    , output logic [3:0]                   io_rev_link_v_o
-    , input [3:0]                          io_rev_link_token_i
-    , output logic [3:0]                   async_rev_link_o_disable_o
+    , output logic [2:0]                   io_rev_link_clk_o
+    , output logic [2:0][rev_width_lp-1:0] io_rev_link_data_o
+    , output logic [2:0]                   io_rev_link_v_o
+    , input [2:0]                          io_rev_link_token_i
+    , output logic [2:0]                   async_rev_link_o_disable_o
  
-    , input [3:0]                          io_rev_link_clk_i
-    , input [3:0][rev_width_lp-1:0]        io_rev_link_data_i
-    , input [3:0]                          io_rev_link_v_i
-    , output logic [3:0]                   io_rev_link_token_o
-    , output logic [3:0]                   async_rev_link_i_disable_o
+    , input [2:0]                          io_rev_link_clk_i
+    , input [2:0][rev_width_lp-1:0]        io_rev_link_data_i
+    , input [2:0]                          io_rev_link_v_i
+    , output logic [2:0]                   io_rev_link_token_o
+    , output logic [2:0]                   async_rev_link_i_disable_o
   );
 
   //=========================================================================
@@ -83,10 +83,10 @@ module brg_cgra_pod
   bsg_tag_client_unsync #(.width_p(1)) btc4
   (.bsg_tag_i     (tag_lines_lo.sdr_disable)
   ,.data_async_r_o(sdr_disable_lo));
-  assign async_fwd_link_i_disable_o = {4{sdr_disable_lo}};
-  assign async_fwd_link_o_disable_o = {4{sdr_disable_lo}};
-  assign async_rev_link_i_disable_o = {4{sdr_disable_lo}};
-  assign async_rev_link_o_disable_o = {4{sdr_disable_lo}};
+  assign async_fwd_link_i_disable_o = {3{sdr_disable_lo}};
+  assign async_fwd_link_o_disable_o = {3{sdr_disable_lo}};
+  assign async_rev_link_i_disable_o = {3{sdr_disable_lo}};
+  assign async_rev_link_o_disable_o = {3{sdr_disable_lo}};
 
   bsg_tag_client_unsync #(.width_p(hb_y_cord_width_gp)) btc5
   (.bsg_tag_i     (tag_lines_lo.global_y_cord)
@@ -100,7 +100,7 @@ module brg_cgra_pod
 
   `declare_bsg_manycore_link_sif_s(hb_addr_width_gp, hb_data_width_gp, hb_x_cord_width_gp, hb_y_cord_width_gp);
 
-  bsg_manycore_link_sif_s [3:0] proc_link_sif_li, proc_link_sif_lo;
+  bsg_manycore_link_sif_s [2:0] proc_link_sif_li, proc_link_sif_lo;
 
   //=========================================================================
   // Reset
@@ -137,7 +137,7 @@ module brg_cgra_pod
   // SDR
   //=========================================================================
 
-  for (genvar i = 0; i < 4; i++) begin : links
+  for (genvar i = 0; i < 3; i++) begin : links
     bsg_link_sdr #(
       .width_p(fwd_width_lp)
       ,.lg_fifo_depth_p(sdr_lg_fifo_depth_gp)
@@ -198,25 +198,6 @@ module brg_cgra_pod
       ,.link_token_o(io_rev_link_token_o[i])
     );
   end
-
-  //=========================================================================
-  // brg_8x8_cgra_xcel
-  //=========================================================================
-
-  // NOTE: the x cord is hard coded! we place the CGRA pods on the east side
-  // which has a POD cord of X=5
-  logic [hb_x_cord_width_gp-1:0] global_x_cord_li;
-  assign global_x_cord_li = { (hb_pod_x_cord_width_gp)'(5), (hb_x_subcord_width_gp)'(0) };
-
-  //brg_8x8_cgra_xcel pod (
-  //  .clk_i(clk_i)
-  //  ,.reset_i(sync_reset)
-  //  ,.link_sif_i(proc_link_sif_li)
-  //  ,.link_sif_o(proc_link_sif_lo)
-  //  ,.my_x_i(global_x_cord_li)
-  //  // TODO: use multiple endpoints
-  //  ,.my_y_i(async_global_y_cord)
-  //);
 
   // Loopback manycore links
   assign proc_link_sif_lo = proc_link_sif_li;

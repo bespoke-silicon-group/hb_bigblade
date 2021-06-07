@@ -23,7 +23,7 @@ bsg_manycore_commit  :=ci_bigblade
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
-bsg_14_commit        :=toplevel-runtime-experiment
+bsg_14_commit        :=master
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
@@ -35,7 +35,7 @@ board_commit         :=master
 
 bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(GITHUB)bespoke-silicon-group/bsg_packaging
-bsg_packaging_commit :=basejump_fcbga_785
+bsg_packaging_commit :=master
 
 prep_dir := .pdk_prep
 
