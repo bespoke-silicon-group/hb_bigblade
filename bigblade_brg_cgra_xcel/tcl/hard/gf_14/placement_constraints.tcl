@@ -155,7 +155,8 @@ if {${DESIGN_NAME} == "brg_cgra_pod"} {
 
   set ko [list $keepout_margin_x $keepout_margin_y $pe_margin_x $keepout_margin_y]
   set PEs [get_cells -hier "PE_rc__*"]
-  create_keepout_margin -type hard -outer $ko $PEs
+  #create_keepout_margin -type hard -outer $ko $PEs
+  #create_keepout_margin -type hard -inner $keepout_margins $PEs
 
   #set tag_bound [create_bound -name "btx" -type soft \
   #      -boundary [list [list 0 [expr $tile_height - 100]] [list $llx $tile_height]]]
