@@ -96,3 +96,26 @@ set_multicycle_path 2 -setup -from $multicycle_cells
 set_multicycle_path 2 -hold  -from $multicycle_cells
 
 
+# false paths
+for {set i 0} {$i < 4} {incr i} {
+  set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "pod_row_${i}_master_clk"]
+}
+for {set i 0} {$i < 8} {incr i} {
+  for {set j 0} {$j < 4} {incr j} {
+    set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "mem_link_${i}_${j}_clk"]
+  }
+}
+foreach {j} {"fwd" "rev"} {
+  set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "io_link_${j}_clk"]
+}
+set num_ver_links [expr 64+2]
+for {set i 0} {$i < 4} {incr i} {
+  set start_idx [expr {$i == 0} ? {$num_ver_links} : {0}]
+  set end_idx   [expr {$i == 3} ? {$num_ver_links} : {2*$num_ver_links}]
+  for {set j $start_idx} {$j < $end_idx} {incr j} {
+    foreach {k} {"fwd" "rev"} {
+      set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "ver_link_${i}_${j}_${k}_clk"]
+    }
+  }
+}
+
