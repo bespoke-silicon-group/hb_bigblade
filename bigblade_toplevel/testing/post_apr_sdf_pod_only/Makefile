@@ -36,7 +36,7 @@ export BSG_REPLICANT_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export BSG_F1_DIR             ?= $(BSG_REPLICANT_DIR)
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
 export BOARD_DIR              ?= $(BSG_DESIGNS_TARGET_DIR)/board
-export HB_BIGBLADE_NETLISTS_DIR ?= /nbu/ssd_extra/dcjung/build/hb_bigblade_netlists
+export HB_BIGBLADE_NETLISTS_DIR ?= $(BSG_DESIGNS_TARGET_DIR)/hb_bigblade_netlists
 
 export TESTING_BSG_DESIGNS_DIR        ?= $(BSG_OUT_DIR)/root/$(notdir $(BSG_DESIGNS_DIR))
 export TESTING_BSG_DESIGNS_TARGET_DIR ?= $(TESTING_BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
