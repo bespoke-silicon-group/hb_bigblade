@@ -199,8 +199,8 @@ $(eval POD_Y=$2)
 $(eval TILE_X=$3)
 $(eval TILE_Y=$4)
 $(eval TILE_PATH=$(call BSG_TILE_INSTANCE_PATH,$(POD_X),$(POD_Y),$(TILE_X),$(TILE_Y)))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/num_tiles_x_p=$(BSG_MACHINE_POD_TILES_X))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/num_tiles_y_p=$(BSG_MACHINE_POD_TILES_Y))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).num_tiles_x_p=$(BSG_MACHINE_POD_TILES_X))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).num_tiles_y_p=$(BSG_MACHINE_POD_TILES_Y))
 endef
 
 # set parameters foreach tile
@@ -294,8 +294,6 @@ IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 	ln -s $(BSG_DESIGNS_DIR) $@
 
-$(BSG_OUT_DIR)/parameters.txt
-
 #$(eval $(call tiles_set_parameters))
 .PHONY: debug-this
 debug-this:
@@ -303,11 +301,14 @@ debug-this:
 	@echo $(call range,10)
 	@echo $(VCS_PVALUES)
 
+VCS_OPTIONS += $(VCS_PVALUES)
+VCS_OPTIONS += -parameters $(BSG_OUT_DIR)/../parameters.txt
+
 build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
 debug: $(BSG_CUDA_DBG)
 $(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
 $(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
-	$(VCS) $(VCS_OPTIONS) $(VCS_PVALUES) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
 $(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
@@ -324,7 +325,7 @@ $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
 	echo $(VCS_OPTIONS) > $(BSG_OUT_DIR)/vcs_options.log
 	echo $(VCS_PVALUES) > $(BSG_OUT_DIR)/vcs_pvalues.log
-	$(VCS) $(VCS_OPTIONS) $(VCS_PVALUES) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
