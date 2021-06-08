@@ -1,10 +1,10 @@
-Summary for repository bsg_14:
-    EXPECTED COMMIT/BRANCH: master
-    CURRENT COMMIT: e04a592
+Summary for repository cgra:
+    EXPECTED COMMIT/BRANCH: rc0
+    CURRENT COMMIT: 2d6b92b
     PASS: NO Uncommitted Files
-    PASS: commit e04a592 is in remote
+    PASS: commit 2d6b92b is in remote
     PASS: Expected branch found match in remote
     PASS: Head of remote branch matches current commit
     PASS: No Untracked Files
-Summary for bsg_14 finished
+Summary for cgra finished
 

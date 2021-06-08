@@ -41,6 +41,10 @@ bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
 
+hb_bigblade_netlists:
+	git clone git@github.com:bespoke-silicon-group/hb_bigblade_netlists.git $@
+	cd $@ ; git checkout main; $(MAKE)
+
 prep_dir := .pdk_prep
 
 all_repos = $(subst _url,.repo,$(filter %_url,$(.VARIABLES)))

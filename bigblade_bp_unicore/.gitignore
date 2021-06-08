@@ -11,3 +11,5 @@ bsg_manycore/
 DVEfiles/
 .pdk_prep
 black-parrot-sdk/
+hb_bigblade_netlists/
+*.log
