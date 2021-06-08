@@ -9,6 +9,7 @@ generate_black_box:
 	mkdir -p $(BUILD_DIR)/black_box/$(DESIGN_NAME)
 	mv /tmp/temp_$(DESIGN_NAME).lef $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef.orig
 	cp $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef.orig $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
+	sed -i -e '/OBS/,/END/{/LAYER T1/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER G1/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER G2/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER C4/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
@@ -24,7 +25,6 @@ generate_black_box:
 	sed -i -e '/OBS/,/END/{/LAYER KH/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER N1/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER HG/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
-	sed -i -e '/OBS/,/END/{/LAYER T1/,/LAYER/{/RECT/d}}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER C4/d}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER C5/d}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
 	sed -i -e '/OBS/,/END/{/LAYER H1/d}' $(BUILD_DIR)/black_box/$(DESIGN_NAME)/$(DESIGN_NAME).lef
