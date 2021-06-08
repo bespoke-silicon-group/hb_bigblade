@@ -33,7 +33,6 @@ set core_height [expr $core_ury-$core_lly]
 set ver_shift 0
 set hor_gap [expr ($core_width-$bp_width-$cgra_width-$pod_width)/2]
 set bottom_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2-$ver_shift]
-set top_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2+$ver_shift]
 
 
 # pod row placement
@@ -41,9 +40,18 @@ set pod_row_start_x [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_wi
 set pod_row_start_y [expr $core_lly+[round_down_to_nearest $bottom_ver_gap $grid_height]]
 
 for {set i 0} {$i < 4} {incr i} {
-  set blockage_dim "{{$pod_row_start_x [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]} {[expr $pod_row_start_x+$pod_width] [expr $pod_row_start_y+$pod_height+$i*($pod_height+$pod_gap)]}}"
-  create_placement_blockage -boundary $blockage_dim
-  create_routing_blockage -layers [get_layers] -boundary $blockage_dim
+  set row [expr 4-1-$i]
+  set                pod_row_cell [get_cells "core_complex_core_${row}__podrow"]
+  move_object       $pod_row_cell -x $pod_row_start_x -y [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+  set_attribute     $pod_row_cell orientation "R0"
+  set_fixed_objects $pod_row_cell
+}
+# FIXME: remove for loop below when real accelerator is added
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$pod_height]
+  create_placement_blockage -name "pb_pod_west_${i}" -boundary "{{[expr $pod_row_start_x-4*[unit_width]] $lly} {$pod_row_start_x $ury}}"
+  create_placement_blockage -name "pb_pod_east_${i}" -boundary "{{[expr $pod_row_start_x+$pod_width] $lly} {[expr $pod_row_start_x+$pod_width+4*[unit_width]] $ury}}"
 }
 
 
@@ -53,7 +61,7 @@ set clk_gen_start_y [expr $pod_row_start_y+$pod_height+0.5*$grid_height]
 
 for {set i 0} {$i < 4} {incr i} {
   set row [expr 4-1-$i]
-  set                clk_gen_cell [get_cells "core_${row}__clk_gen"]
+  set                clk_gen_cell [get_cells "core_complex_core_${row}__clk_gen"]
   move_object       $clk_gen_cell -x $clk_gen_start_x -y [expr $clk_gen_start_y+$i*($pod_height+$pod_gap)]
   set_attribute     $clk_gen_cell orientation "R0"
   set_fixed_objects $clk_gen_cell
@@ -62,35 +70,52 @@ for {set i 0} {$i < 4} {incr i} {
 
 # bp blockages
 set bp_start_x [expr $core_llx+[round_down_to_nearest $hor_gap $grid_width]]
-for {set i 0} {$i < 4} {incr i} {
-  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
-  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
-  set blockage_dim "{{$bp_start_x $lly} {[expr $pod_row_start_x-0.5*$grid_width] $ury}}"
-  create_placement_blockage -boundary $blockage_dim
-  create_routing_blockage -layers [get_layers] -boundary $blockage_dim
-}
+#for {set i 0} {$i < 4} {incr i} {
+#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
+#  set blockage_dim "{{$bp_start_x $lly} {[expr $pod_row_start_x-0.5*$grid_width] $ury}}"
+#  create_placement_blockage -name "pb_bp_block_${i}" -boundary $blockage_dim
+#  create_routing_blockage -name rb_bp_block -net_types signal -layers [get_layers] -boundary $blockage_dim
+#}
 
 
 # cgra blockages
 set cgra_start_x [expr $pod_row_start_x+$pod_width+0.5*$grid_width]
-for {set i 0} {$i < 4} {incr i} {
-  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
-  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
-  set blockage_dim "{{$cgra_start_x $lly} {[expr $core_urx-$hor_gap] $ury}}"
-  create_placement_blockage -boundary $blockage_dim
-  create_routing_blockage -layers [get_layers] -boundary $blockage_dim
-}
+#for {set i 0} {$i < 4} {incr i} {
+#  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+#  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
+#  set blockage_dim "{{$cgra_start_x $lly} {[expr $core_urx-$hor_gap] $ury}}"
+#  create_placement_blockage -name "pb_cgra_block_${i}" -boundary $blockage_dim
+#  create_routing_blockage -name rb_cgra_block -net_types signal -layers [get_layers] -boundary $blockage_dim
+#}
 
 
 
 # tag_cell placement
-set                TAG_cell [get_cells -of_object [get_nets -of_object [get_ports "pad_ML0_1_i_int"]]]
-set_attribute     $TAG_cell orientation R0
-move_object       $TAG_cell \
-    -x [expr $core_llx+[round_down_to_nearest 1404.742 [unit_width]]] \
-    -y [expr $core_lly+[round_down_to_nearest [expr $core_height-2*[unit_height]] [unit_height]]]
-set_fixed_objects $TAG_cell
+set tag_cell_list [get_cells -of_object [get_nets -of_object [get_ports "pad_CT0_1_i_int"]]]
+set idx 0
+foreach_in_collection tag_cell $tag_cell_list {
+  # RESIZE CELL
+  size_cell $tag_cell -lib_cell [get_lib_cells */SC7P5T_CKAN2X16_SSC14R]
+  set_attribute     $tag_cell orientation R0
+  move_object       $tag_cell \
+      -x [expr $core_llx+[round_down_to_nearest [expr 5112.742+$idx*5] [unit_width]]] \
+      -y [expr $core_lly+[round_down_to_nearest [expr $core_height-2*[unit_height]] [unit_height]]]
+  set_fixed_objects $tag_cell
+  incr idx
+}
 
+# mux placement
+set mux_cell_list [get_cells -hier -filter "full_name=~*mux*BSG_DONT_TOUCH*"]
+set idx 0
+foreach_in_collection mux_cell $mux_cell_list {
+  set_attribute     $mux_cell orientation R0
+  move_object       $mux_cell \
+      -x [expr $core_llx+[round_down_to_nearest [expr 5112.742+$idx*5] [unit_width]]] \
+      -y [expr $core_lly+[round_down_to_nearest [expr $core_height-10*[unit_height]] [unit_height]]]
+  set_fixed_objects $mux_cell
+  incr idx
+}
 
 
 # noc_mem placement
@@ -131,46 +156,6 @@ set_fixed_objects $io_cell
 
 
 
-# sdr placement
-set noc_io_west_x  [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_width+$noc_mem_width-$grid_width] $grid_width]]
-set noc_io_east_x  [expr $core_llx+[round_up_to_nearest [expr $core_width-$hor_gap-$cgra_width-$noc_mem_width] $grid_width]]
-
-set                WEST_cell [get_cells "west_link"]
-move_object       $WEST_cell -x [expr $noc_io_west_x-$noc_mem_width] -y [expr $core_lly+[round_up_to_nearest [expr $core_height-$top_ver_gap-$vcache_height-$tile_height+$grid_height] $grid_height]]
-set_attribute     $WEST_cell orientation R0
-set_fixed_objects $WEST_cell
-
-set                NORTH_cell [get_cells "north_link"]
-move_object       $NORTH_cell -x [expr $core_llx+300*$grid_width] -y [expr $core_lly+[round_up_to_nearest [expr $core_height-$top_ver_gap-3*$grid_height] $grid_height]]
-set_attribute     $NORTH_cell orientation R0
-set_fixed_objects $NORTH_cell
-
-
-
-for {set i 0} {$i < 2} {incr i} {
-
-  set offset_x [expr {$i == 0} ? {$noc_io_west_x} : {$noc_io_east_x}]
-  set ori [expr {$i == 0} ? {"MY"} : {"R0"}]
-  set                wh_cell [get_cells "wh_link_[expr 0+$i*5]__link"]
-  move_object       $wh_cell -x $offset_x -y [expr $core_lly+[round_up_to_nearest [expr $core_height-$top_ver_gap-$vcache_height+2*$grid_height] $grid_height]]
-  set_attribute     $wh_cell orientation $ori
-  set_fixed_objects $wh_cell
-
-  for {set j 1} {$j < 4} {incr j} {
-    set                wh_cell [get_cells "wh_link_[expr $j+$i*5]__link"]
-    move_object       $wh_cell -x $offset_x -y [expr $core_lly+[round_up_to_nearest [expr $bottom_ver_gap+(4-$j)*($pod_height+$pod_gap)-0.5*$pod_gap-0.5*$noc_mem_height+19*$grid_height] $grid_height]]
-    set_attribute     $wh_cell orientation $ori
-    set_fixed_objects $wh_cell
-  }
-
-  set                wh_cell [get_cells "wh_link_[expr 4+$i*5]__link"]
-  move_object       $wh_cell -x $offset_x -y [expr $core_lly+[round_down_to_nearest [expr $bottom_ver_gap+$vcache_height-$noc_mem_height-$grid_height] $grid_height]]
-  set_attribute     $wh_cell orientation $ori
-  set_fixed_objects $wh_cell
-}
-
-
-
 # ===============================================
 # Create ESD and CDMM cells
 # ===============================================
@@ -194,7 +179,7 @@ set esd_height 53.00
 
 set esd_start_x    [expr $pod_row_start_x + 162.3]
 set esd_step_x     147.84
-set esd_start_y    [expr $pod_row_start_y - $esd_height - 3*[unit_height]]
+set esd_start_y    [expr $pod_row_start_y - $esd_height - 10*[unit_height]]
 set esd_step_y     [expr $pod_height+$pod_gap]
 
 set esd_curr_y $esd_start_y
@@ -232,7 +217,6 @@ for {set j 0} {$j < 5} {incr j} {
   set cdmm_curr_y [expr $cdmm_curr_y + $cdmm_step_y]
 }
 set_fixed_objects [get_cells bsg_cdmm_row_*_col_*]
-
 
 
 puts "BSG-info: Completed script [info script]\n"

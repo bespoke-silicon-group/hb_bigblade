@@ -13,6 +13,7 @@ set bsg_padmapping          $::env(BSG_PADMAPPING)
 set bsg_packaging_foundry   $::env(BSG_PACKAGING_FOUNDRY)
 
 set HARD_SWAP_FILELIST [join "
+  $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_mux.v
   $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_tielo.v
   $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_tiehi.v
 "]

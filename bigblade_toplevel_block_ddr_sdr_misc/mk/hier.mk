@@ -19,5 +19,6 @@ export ETM_BLOCKS := bsg_chip_noc_mem_link,$(BSG_DESIGNS_TARGET_DIR)/../bigblade
 export ETM_BLOCKS += bsg_chip_noc_io_link,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_noc_io_link/bsg_14/current_build
 export ETM_BLOCKS += bsg_manycore_link_ruche_to_sdr_west,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_ruche_to_sdr_west/bsg_14/current_build
 export ETM_BLOCKS += bsg_manycore_link_to_sdr_north,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_to_sdr_north/bsg_14/current_build
+export ETM_BLOCKS += bigblade_clk_gen,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_clk_gen/bsg_14/current_build
 
 export ADDITIONAL_LIBS += bsg_chip_io_link_ddr,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_io_link_ddr/bsg_14/current_build

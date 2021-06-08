@@ -8,16 +8,15 @@ export BSG_PADMAPPING           :=default
 
 export PREP_MEMGEN_JSON_FILE := $(BSG_DESIGNS_TARGET_DIR)/json/gf_14/memgen.json 
 
-export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
+#export BSG_FLOW_GENERATE_TOPLEVEL_ETM := true
+export BSG_FLOW_GENERATE_TOPLEVEL_ETM := false
 
-# TODO: change to default_wb for actual chip
-#export BSG_POWER_GRID := default_wb
 export BSG_POWER_GRID := bigblade_toplevel_block
 export BSG_CAD_SETUP := default
 export BSG_POWER_INTENT := sv_standard
 
 
-export DC_FLOW_RMPLUS_FLOW :=
+export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE := false
 export DC_FLOW_COMPILE_DISABLE_CLOCK_GATING := false
 export DC_FLOW_COMPILE_FLATTEN_DESIGN := false
@@ -33,3 +32,6 @@ export PTSI_FLOW_STRIP_PATH :=
 
 
 #export USE_ICC2_2020 := 1
+
+export ICC2_NUM_CORES := 32
+export DC_NUM_CORES   := 16

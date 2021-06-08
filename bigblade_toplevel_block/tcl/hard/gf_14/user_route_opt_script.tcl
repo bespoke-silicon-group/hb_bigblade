@@ -216,6 +216,42 @@ check_legality -cells [get_cells ${opt_prefix}*]
 
 # Step 4: Fix DRCs
 route_eco
+
+
+# create vertical link clocks
+proc bsg_async_two_clocks {period clk0 clk1} {
+  set max_delay_ps [expr $period/2]
+  set_max_delay $max_delay_ps -from $clk0 -to $clk1 -ignore_clock_latency
+  set_min_delay 0             -from $clk0 -to $clk1 -ignore_clock_latency
+  set_max_delay $max_delay_ps -from $clk1 -to $clk0 -ignore_clock_latency
+  set_min_delay 0             -from $clk1 -to $clk0 -ignore_clock_latency
+}
+
+set num_ver_links [expr 64+2]
+for {set i 0} {$i < 4} {incr i} {
+  set wh_master_clk_name   "pod_row_${i}_master_clk"
+  set pod_clk_period_ps [get_attribute [get_clocks $wh_master_clk_name] period]
+  set start_idx [expr {$i == 0} ? {$num_ver_links} : {0}]
+  set end_idx   [expr {$i == 3} ? {$num_ver_links} : {2*$num_ver_links}]
+  for {set j $start_idx} {$j < $end_idx} {incr j} {
+    foreach {k} {"fwd" "rev"} {
+      create_generated_clock \
+          -divide_by 1 \
+          -invert \
+          -master_clock $wh_master_clk_name \
+          -add \
+          -source [get_attribute [get_clocks $wh_master_clk_name] sources] \
+          -name "ver_link_${i}_${j}_${k}_clk" \
+          [get_pins "core_complex_core_${i}__podrow/ver_io_${k}_link_clk_o[${j}]"]
+      set_propagated_clock [get_clocks "ver_link_${i}_${j}_${k}_clk"] 
+
+      set x [expr {$j < $num_ver_links} ? {$i-1} : {$i+1}]
+      bsg_async_two_clocks $pod_clk_period_ps [get_clocks "ver_link_${i}_${j}_${k}_clk"] [get_clocks "pod_row_${x}_master_clk"]
+      bsg_async_two_clocks $pod_clk_period_ps [get_clocks "ver_link_${i}_${j}_${k}_clk"] [get_clocks "tag_clk"]
+    }
+  }
+}
+
 update_timing -full ;# Extract design again before report timing
 
 
