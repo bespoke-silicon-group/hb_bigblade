@@ -121,9 +121,6 @@ set_load -max [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_out
 set_load -min [load_of [get_lib_pin "*/SC7P5T_INVX8_SSC14R/A"]] $feedthrough_output_pins
 
 
-# reset port
-constraint_input_ports  $clk_name $reset_in_port  500 40
-constraint_output_ports $clk_name $reset_out_port 500 40
 
 
 

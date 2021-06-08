@@ -1,5 +1,6 @@
 # Source common scripts
 source -echo -verbose $::env(BASEJUMP_STL_DIR)/hard/gf_14/bsg_link/tcl/bsg_link_ddr.constraints.tcl
+source -echo -verbose $::env(BASEJUMP_STL_DIR)/hard/gf_14/bsg_link/tcl/bsg_link_sdr.constraints.tcl
 
 proc bsg_dont_touch_regexp {arg1} {
     set pattern "full_name=~$arg1";
@@ -30,3 +31,6 @@ set_dont_touch_network [get_pins "ddr_link*link/io_link_data_o*"]
 set_dont_touch_network [get_ports "io_link_clk_i*"]
 set_dont_touch_network [get_ports "io_link_v_i*"]
 set_dont_touch_network [get_ports "io_link_data_i*"]
+
+# set dont touch on SDR links
+bsg_link_sdr_dont_touch_constraints [get_ports {io_wh_link_data_i* io_wh_link_v_i*}]

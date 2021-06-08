@@ -1,31 +1,85 @@
 puts "BSG-info running [info script]"
 
 
-proc get_propagated_nets {port cell} {
+derive_pin_access_routing_guides -cells [get_cells "mem_link_*__link"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
 
-  set start_net  [get_nets  -of_object $port     ]
-  set start_cell [get_cells -of_object $start_net]
+#derive_pin_access_routing_guides -cells [get_cells "io_link"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
+#derive_pin_access_routing_guides -cells [get_cells "io_link"] -layers {K2 K4} -x_width 0.001 -y_width [expr 0.084*4]
 
-  set result [list]
-  append_to_collection result $start_net
+derive_pin_access_routing_guides -cells [get_cells "west_link"] -layers {K1 K3} -x_width [expr 0.084*4] -y_width 0.001
 
-  set curr_net_name  [get_attribute $start_net  name]
-  set curr_cell_name [get_attribute $start_cell name]
-  set end_cell_name  [get_attribute $cell       name]
 
-  while {$curr_cell_name != $end_cell_name} {
-    set curr_cell [get_cells $curr_cell_name]
-    set next_net  [get_nets -of_object $curr_cell -filter "(full_name!=$curr_net_name)&&(full_name!=VSS)&&(full_name!=VDD)"]
-    set next_cell [get_cells -of_object $next_net -filter "(full_name!=$curr_cell_name)"]
-    set curr_net_name  [get_attribute $next_net  name]
-    set curr_cell_name [get_attribute $next_cell name]
-    append_to_collection result $next_net
-  }
 
-  return $result
+source -echo -verbose $::env(BSG_DESIGNS_TARGET_DIR)/../common/hb_common_variables.tcl
+set_app_options -name plan.place.auto_generate_blockages -value false
+
+# Uncomment if you are sourcing this file many times interactively.
+#set_fixed_objects -unfix [get_flat_cells]
+
+
+
+# core area 
+set core_llx [get_attribute [get_core_area] bounding_box.ll_x]
+set core_lly [get_attribute [get_core_area] bounding_box.ll_y]
+set core_urx [get_attribute [get_core_area] bounding_box.ur_x]
+set core_ury [get_attribute [get_core_area] bounding_box.ur_y]
+
+
+
+# block dimensions
+set bp_width   295.68
+set cgra_width 510.72
+set pod_width  $pod_row_width
+
+set pod_height $pod_row_height
+set pod_gap    [expr 13.5*$grid_height]
+
+set noc_mem_width  [expr 8*$grid_width]
+set noc_mem_height [expr 27*$grid_height]
+
+set core_width  [expr $core_urx-$core_llx]
+set core_height [expr $core_ury-$core_lly]
+
+set ver_shift 0
+set hor_gap [expr ($core_width-$bp_width-$cgra_width-$pod_width)/2]
+set bottom_ver_gap [expr ($core_height-4*$pod_height-3*$pod_gap)/2-$ver_shift]
+
+
+# pod row placement
+set pod_row_start_x [expr $core_llx+[round_down_to_nearest [expr $hor_gap+$bp_width] $grid_width]]
+set pod_row_start_y [expr $core_lly+[round_down_to_nearest $bottom_ver_gap $grid_height]]
+
+#create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $core_lly} {5269 $pod_row_start_y}}"
+#for {set i 1} {$i < 4} {incr i} {
+#  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
+#  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+#  create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
+#}
+set lly $core_lly
+set ury [expr $pod_row_start_y+4*$pod_height+3*$pod_gap]
+create_routing_blockage -name rb_clk_gen -layers [get_layers {M2 C4 K1 K3 H1 G1}] -boundary "{{5225 $lly} {5269 $ury}}"
+
+
+# bp blockages
+set bp_start_x [expr $core_llx+[round_down_to_nearest $hor_gap $grid_width]]
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height+3.5*$tile_array_height+2*$grid_height]
+  # gap routing blockages
+  create_routing_blockage -name rb_bp_gap -layers [get_layers {M3 C5 K2 K4 H2 G2}] -boundary "{{[expr $pod_row_start_x-0.5*$grid_width] $lly} {$pod_row_start_x $ury}}"
 }
 
-reset_app_options custom.route.*
+
+# cgra blockages
+set cgra_start_x [expr $pod_row_start_x+$pod_width+0.5*$grid_width]
+for {set i 0} {$i < 4} {incr i} {
+  set lly [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$sdr_vert_row_height+$vcache_array_height]
+  set ury [expr $core_lly+$bottom_ver_gap+$i*($pod_height+$pod_gap)+$pod_height-$sdr_vert_row_height-$vcache_array_height]
+  # gap routing blockages
+  create_routing_blockage -name rb_cgra_gap -layers [get_layers {M3 C5 K2 K4 H2 G2}] -boundary "{{[expr $cgra_start_x-0.5*$grid_width] $lly} {$cgra_start_x $ury}}"
+}
+
+
 
 
 create_routing_rule ss_x2_ndr -multiplier_spacing 2
@@ -53,21 +107,69 @@ foreach {side} {"DL" "DR" "IT"} {
 }
 
 
+#set_app_options -name route.global.timing_driven -value false
+#set_app_options -name route.track.timing_driven -value false
+#set_app_options -name route.detail.timing_driven -value false
+#set_app_options -name route.global.crosstalk_driven -value false
+#set_app_options -name route.track.crosstalk_driven -value false
+
+# First, route vertical links and lock
+#set ver_nets [get_nets *ver_io_*_link_*_lo*]
+#route_group -nets $ver_nets
+
+
+
 # flow default timing_driven true
 #set_app_options -name route.global.timing_driven -value false
 #set_app_options -name route.track.timing_driven -value false
 #set_app_options -name route.detail.timing_driven -value false
 
 # disable crosstalk driven to avoid zigzag shaped routing
-set_app_options -name route.global.crosstalk_driven -value false
-set_app_options -name route.track.crosstalk_driven -value false
+if {[string match "R-2020.09*" [get_app_option_value -name shell.common.product_version]]} {
+  set_app_options -name route.global.crosstalk_driven -value true
+  set_app_options -name route.track.crosstalk_driven -value true
+} else {
+  set_app_options -name route.global.crosstalk_driven -value false
+  set_app_options -name route.track.crosstalk_driven -value false
+}
 
 # This option takes effect only if timing-driven routing is enabled
 #set_app_options -name route.common.rc_driven_setup_effort_level -value high
 
+
+# global route tag lines
+set tag_nets [get_nets {pad_ML0_0_i_int tag_data_lo pad_CT0_v_i_int}]
+route_group -nets $tag_nets
+remove_routing_blockages [get_routing_blockages {rb_clk_gen*}]
+
+
+# global route other nets
 route_global
+
+
+# track assignment
 route_track
+
+
+# detail routing
 route_detail
+
+
+for {set i 1} {$i < 4} {incr i} {
+  set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)-$pod_gap]
+  set ury [expr $pod_row_start_y+$i*($pod_height+$pod_gap)]
+  # gap placement blockages
+  create_placement_blockage -name "pb_pod_gap_${i}_start" -boundary "{{$pod_row_start_x $lly} {[expr $pod_row_start_x+39] $ury}}"
+  set curr_llx [expr $pod_row_start_x+95]
+  for {set j 0} {$j < 64} {incr j} {
+    create_placement_blockage -name "pb_pod_gap_${i}_${j}" -boundary "{{$curr_llx $lly} {[expr $curr_llx+60] $ury}}"
+    set curr_llx [expr $curr_llx+11*$grid_width]
+    if {[expr $j%16] == 15} { set curr_llx [expr $curr_llx+$grid_width] }
+  }
+  create_placement_blockage -name "pb_pod_gap_${i}_end" -boundary "{{[expr $pod_row_start_x+$pod_width-42] $lly} {[expr $pod_row_start_x+$pod_width] $ury}}"
+}
+
+
 
 
 # # First run, route wires
@@ -221,13 +323,27 @@ append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_1_i_int"]
 append_to_collection msc_nets [get_nets -of_object [get_ports "pad_CT0_2_i_int"]]
 add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -respect_blockages $msc_nets $msc_buffer
 
-
+# Legalize buffer locations
 legalize_placement -cells [get_cells {bsg_ss* bsg_msc*}]
 check_legality -cells [get_cells {bsg_ss* bsg_msc*}]
 
-
+# Connect wires to inserted buffers
 route_eco
-update_timing -full
+
+# Speed up wires, runtime long but significantly improve timing
+add_redundant_vias
+
+# Fix DRCs
+route_eco
+
+# Redo extraction if needed
+update_timing
+
+# remove routing blockages
+remove_routing_blockages [get_routing_blockages {rb_bp_gap* rb_cgra_gap*}]
+
+# remove placement blockages
+remove_placement_blockages [get_placement_blockages pb_pod_gap*]
 
 
 # set ss_nets [list]
@@ -300,3 +416,4 @@ update_timing -full
 #update_timing -full
 
 puts "BSG-info finished [info script]"
+

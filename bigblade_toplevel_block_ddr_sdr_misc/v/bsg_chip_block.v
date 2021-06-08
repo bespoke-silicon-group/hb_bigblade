@@ -7,6 +7,9 @@
 // inside bsg_packaging/basejump_fcbga_785.
 //
 
+`include "bsg_padmapping.v"
+`include "bsg_iopad_macros.v"
+
 module bsg_chip_block
 
  import bsg_chip_pkg::*;
@@ -15,6 +18,7 @@ module bsg_chip_block
  import bsg_manycore_pkg::*;
 
 `include "bsg_chip_block_pinout.v"
+`include "bsg_iopads_tie_cells.v"
 
   //////////////////////////////////////////////////
   //
@@ -56,9 +60,20 @@ module bsg_chip_block
   // BSG Clock Generator
   //
 
-  logic [hb_num_pods_y_gp-1:0] mc_clk_lo;
   for (genvar i = 0; i < hb_num_pods_y_gp; i++)
-    assign mc_clk_lo[i] = ext_mc_clk_i;
+  begin: core
+
+    bigblade_clk_gen clk_gen
+    (.tag_clk_i             (tag_clk_lo                      )
+    ,.tag_data_i            (tag_data_lo                     )
+    ,.tag_node_id_offset_i  ((tag_lg_els_gp)'(tag_mc_clk_offset_gp+i*tag_clk_gen_local_els_gp))
+    ,.ext_clk_i             (ext_mc_clk_i                    )
+    ,.async_output_disable_i(async_output_disable_i          )
+    ,.clk_o                 ()
+    ,.clk_monitor_o         ()
+    );
+
+  end
 
   //logic hb_clk_lo;
   //logic bp_clk_lo; // not used
@@ -331,6 +346,7 @@ module bsg_chip_block
 
   end
 
+
   logic [mem_link_conc_num_gp+2-1:0][S:N][wh_ruche_factor_gp-1:0] wh_link_local_clk_li, wh_link_local_v_li, wh_link_local_token_lo;
   logic [mem_link_conc_num_gp+2-1:0][S:N][wh_ruche_factor_gp-1:0][wh_flit_width_gp-1:0] wh_link_local_data_li;
   logic [mem_link_conc_num_gp+2-1:0][S:N][wh_ruche_factor_gp-1:0] wh_link_local_clk_lo, wh_link_local_v_lo, wh_link_local_token_li;
@@ -405,7 +421,7 @@ module bsg_chip_block
       ,.data_width_p        (hb_data_width_gp)
       ,.ruche_factor_X_p    (hb_ruche_factor_X_gp)
     ) west_link (
-      .core_clk_i       (mc_clk_lo[0])
+      .core_clk_i       (ext_mc_clk_i)
       ,.core_reset_i    ()
       ,.core_reset_o    ()
 
@@ -468,7 +484,7 @@ module bsg_chip_block
       ,.data_width_p                    (hb_data_width_gp)
 
     ) north_link (
-      .core_clk_i                 (mc_clk_lo[0])
+      .core_clk_i                 (ext_mc_clk_i)
       ,.core_reset_i              ()
       ,.core_reset_o              ()
 
