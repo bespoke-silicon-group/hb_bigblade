@@ -12,10 +12,11 @@ $ cd testing/rtl && make (5~10 minutes)
 # To run SPMD tests: (WAVE=1 flag must match generated simv)
 >> update software/mk/Makefile.paths, set BSG_MACHINE_PATH?=$(BSG_MANYCORE_DIR)/../testing/rtl/out
 >> run single test: cd software/spmd/hello; make bsg_pods_X=4 bsg_pods_Y=4
-  (bsg_pods_X=1 bsg_pods_Y=1 if you used OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1)
+  (bsg_pods_X=1 bsg_pods_Y=1 if you used OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1, HOST=bp if the program relies on BP)
 >> run regression: cd software/spmd; make -j16 recurse-all bsg_pods_X=4 bsg_pods_Y=4
-  (bsg_pods_X=1 bsg_pods_Y=1 if you used OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1)
+  (bsg_pods_X=1 bsg_pods_Y=1 if you used OVERRIDE_PODS_X=1 OVERRIDE_PODS_Y=1, HOST=bp does not work on this target)
 
 # To run cuda-lite tests
 >> run single test: cd examples/cuda/test_vec_add; make main.exec.log
 >> run regression: cd examples/cuda; make regression -j16
+  (HOST=bp unsupported)
