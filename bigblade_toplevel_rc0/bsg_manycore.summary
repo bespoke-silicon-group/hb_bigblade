@@ -1,10 +1,8 @@
 Summary for repository bsg_manycore:
     EXPECTED COMMIT/BRANCH: ci_bigblade
-    CURRENT COMMIT: 3bc1f4cc
-    PASS: NO Uncommitted Files
-    PASS: commit 3bc1f4cc is in remote
-    PASS: Expected branch found match in remote
-    PASS: Head of remote branch matches current commit
-    PASS: No Untracked Files
-Summary for bsg_manycore finished
+    CURRENT COMMIT: 4ca856d5
+    FAIL: UNCOMMITTED FILES EXIST
+    Uncommitted Files:
+        software/mk/Makefile.paths
+        software/riscv-tools/Makefile
 

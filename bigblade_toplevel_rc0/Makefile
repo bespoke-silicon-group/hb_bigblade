@@ -25,9 +25,9 @@ bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
 bsg_manycore_commit  :=ci_bigblade
 
-black_parrot_dir     :=$(THIS_DIR)/black-parrot
-black_parrot_url     :=$(GITHUB)black-parrot/black-parrot
-black_parrot_commit  :=tapeout_bigblade_rc1
+black-parrot_dir     :=$(THIS_DIR)/black-parrot
+black-parrot_url     :=$(GITHUB)black-parrot/black-parrot
+black-parrot_commit  :=tapeout_bigblade_rc1
 
 cgra_dir             :=$(THIS_DIR)/cgra
 cgra_url             :=$(GITHUB)cornell-brg/hb_bigblade_cgra
@@ -74,8 +74,8 @@ all: $(all_repos) $(prep_dir) $(init_repos)
 bsg_manycore.init: bsg_manycore.repo
 	$(MAKE) -C $(bsg_manycore_dir) checkout_submodules
 
-black_parrot.init: black_parrot.repo
-	$(MAKE) -C $(black_parrot_dir) libs
+black-parrot.init: black-parrot.repo
+	$(MAKE) -C $(black-parrot_dir) libs
 
 
 basejump_stl.init: basejump_stl.init

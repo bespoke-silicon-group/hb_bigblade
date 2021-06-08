@@ -14,3 +14,5 @@ DVEfiles/
 .pdk_prep
 *.swp
 *.pyc
+cgra/
+black-parrot-sdk
