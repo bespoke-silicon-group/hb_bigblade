@@ -172,35 +172,22 @@ $(eval POD_X=$1)
 $(eval POD_Y=$2)
 $(eval TILE_X=$3)
 $(eval TILE_Y=$4)
-$(eval TILE_PATH=$(subst .,/,$(call BSG_TILE_INSTANCE_PATH,$(POD_X),$(POD_Y),$(TILE_X),$(TILE_Y))))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/dmem_size_p=1024)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/vcache_size_p=$(echo $(BSG_MACHINE_VCACHE_WAY)*$(BSG_MACHINE_VCACHE_SET)*$(BSG_MACHINE_VCACHE_LINE_WORDS)))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/icache_entries_p=1024)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/icache_tag_width_p=12)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/x_cord_width_p=7)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/y_cord_width_p=7)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/pod_x_cord_width_p=3)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/pod_y_cord_width_p=4)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/num_tiles_x_p=$(BSG_MACHINE_POD_TILES_X))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/num_tiles_y_p=$(BSG_MACHINE_POD_TILES_Y))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/data_width_p=$(BSG_MACHINE_DATA_WIDTH))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/addr_width_p=$(BSG_MACHINE_MAX_EPA_WIDTH))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/num_vcache_rows_p=1)
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/vcache_block_size_in_words_p=$(BSG_MACHINE_VCACHE_LINE_WORDS))
-$(eval VCS_PVALUES += -pvalue+$(TILE_PATH)/vcache_sets_p=$(BSG_MACHINE_VCACHE_SET))
-endef
-
-define tile_set_parameters_dbg
-$(eval include $(BSG_DESIGNS_TARGET_DIR)/testing/machine/Makefile.machine.include)
-$(eval POD_X_CORD_WIDTH=$(echo $(BSG_MACHINE_X_CORD_WIDTH)-$(BSG_MACHINE_X_CORD_WIDTH)|bc))
-$(eval POD_Y_CORD_WIDTH=$(echo $(BSG_MACHINE_Y_CORD_WIDTH)-$(BSG_MACHINE_Y_CORD_WIDTH)|bc))
-$(eval POD_X=$1)
-$(eval POD_Y=$2)
-$(eval TILE_X=$3)
-$(eval TILE_Y=$4)
 $(eval TILE_PATH=$(call BSG_TILE_INSTANCE_PATH,$(POD_X),$(POD_Y),$(TILE_X),$(TILE_Y)))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).dmem_size_p=1024)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).vcache_size_p=$(echo $(BSG_MACHINE_VCACHE_WAY)*$(BSG_MACHINE_VCACHE_SET)*$(BSG_MACHINE_VCACHE_LINE_WORDS)))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).icache_entries_p=1024)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).icache_tag_width_p=12)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).x_cord_width_p=7)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).y_cord_width_p=7)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).pod_x_cord_width_p=3)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).pod_y_cord_width_p=4)
 $(eval VCS_PVALUES += -pvalue+$(TILE_PATH).num_tiles_x_p=$(BSG_MACHINE_POD_TILES_X))
 $(eval VCS_PVALUES += -pvalue+$(TILE_PATH).num_tiles_y_p=$(BSG_MACHINE_POD_TILES_Y))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).data_width_p=$(BSG_MACHINE_DATA_WIDTH))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).addr_width_p=$(BSG_MACHINE_MAX_EPA_WIDTH))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).num_vcache_rows_p=1)
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).vcache_block_size_in_words_p=$(BSG_MACHINE_VCACHE_LINE_WORDS))
+$(eval VCS_PVALUES += -pvalue+$(TILE_PATH).vcache_sets_p=$(BSG_MACHINE_VCACHE_SET))
 endef
 
 # set parameters foreach tile
@@ -208,7 +195,7 @@ define tiles_set_parameters
 $(eval include $(BSG_DESIGNS_TARGET_DIR)/testing/machine/Makefile.machine.include)
 $(foreach tx,$(call range,16),\
 $(foreach ty,$(call window,$(shell echo "2*$(BSG_SUBARRAY_Y)"|bc),$(shell echo "2*($(BSG_SUBARRAY_Y)+1)"|bc)),\
-$(eval $(call tile_set_parameters_dbg,$(BSG_SUBARRAY_POD_X),$(BSG_SUBARRAY_POD_Y),$(tx),$(ty)))))
+$(eval $(call tile_set_parameters,$(BSG_SUBARRAY_POD_X),$(BSG_SUBARRAY_POD_Y),$(tx),$(ty)))))
 endef
 
 ##################################
@@ -294,12 +281,8 @@ IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 	ln -s $(BSG_DESIGNS_DIR) $@
 
-#$(eval $(call tiles_set_parameters))
-.PHONY: debug-this
-debug-this:
-	@echo $(call window,0,10)
-	@echo $(call range,10)
-	@echo $(VCS_PVALUES)
+$(eval $(call tiles_set_parameters))
+
 
 VCS_OPTIONS += $(VCS_PVALUES)
 VCS_OPTIONS += -parameters $(BSG_OUT_DIR)/../parameters.txt
