@@ -15,5 +15,5 @@ export BOT_HIER_BLOCKS :=
 # is <design_name>,<build_dir>. These blocks should be previously built in a separate bsg_design
 # directory. Note: this does not include hardened SRAMs and RFs. Can be used in both flat and
 # hierarchical design flows.
-export ETM_BLOCKS := bsg_chip_block,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_toplevel_block_rc0/bsg_14/current_build
+#export ETM_BLOCKS := bsg_chip_block,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_toplevel_block_rc0/bsg_14/current_build
 
