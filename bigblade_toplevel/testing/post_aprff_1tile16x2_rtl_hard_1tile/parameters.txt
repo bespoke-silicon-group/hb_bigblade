@@ -1,0 +1,2 @@
+assign 16 bsg_bigblade_pcb/IC/ASIC/block/core_complex/core[0]/podrow/podrow/px[0]/pod/mc_y[0]/mc_x[0]/mc/y_0__x_0__tile/num_tiles_x_p
+assign 8  bsg_bigblade_pcb/IC/ASIC/block/core_complex/core[0]/podrow/podrow/px[0]/pod/mc_y[0]/mc_x[0]/mc/y_0__x_0__tile/num_tiles_y_p
