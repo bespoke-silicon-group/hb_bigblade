@@ -140,4 +140,15 @@ for {set i 0} {$i < 4} {incr i} {
     }
   }
 }
-
+foreach {blk} {"bp" "cgra"} {
+  for {set i 0} {$i < 4} {incr i} {
+    for {set j 0} {$j < 2} {incr j} {
+      set end_idx [expr {$blk == "bp"} ? {3} : {4}]
+      for {set l 0} {$l < $end_idx} {incr l} {
+        foreach {k} {"fwd" "rev"} {
+          set_false_path -from [get_clocks "tag_clk"] -to [get_clocks "${blk}_link_${i}_${j}_${k}_${l}_clk"]
+        }
+      }
+    }
+  }
+}
