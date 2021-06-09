@@ -55,7 +55,7 @@ export TESTING_BSG_OUT_DIR            ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
-export BSG_PACKAGING_FOUNDRY ?=portable
+export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
@@ -123,6 +123,15 @@ export BSG_MANYCORE_TILE_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_LIBRARY_NA
 VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BSG_MANYCORE_TILE_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_LIBRARY)
+
+# RTL Hard tile library (so that we can substitute some, but not all, with netlists)
+export BSG_MANYCORE_TILE_HARD_LIBRARY_NAME = bigblade_manycore_tile_hard
+export BSG_MANYCORE_TILE_HARD_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).filelist
+export BSG_MANYCORE_TILE_HARD_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BSG_MANYCORE_TILE_HARD_LIBRARY_NAME=$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_HARD_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_HARD_LIBRARY)
 
 ###########################################
 # Bigblade clk_gen filelists and liblists #
@@ -220,7 +229,7 @@ endef
 # $1 = root path
 # $2 = tile_y
 # $3 = tile_x
-BSG_TILE_INSTANCE_PATH_SUB = $1_mc_y_$2__x_$3__tile
+BSG_TILE_INSTANCE_PATH_SUB = $1.mc_y_$2__x_$3__tile
 define swap_tile
 $(eval SWAPSTRING += instance $(call BSG_TILE_INSTANCE_PATH_SUB,$1,$2,$3) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))
 endef
@@ -228,7 +237,7 @@ endef
 # $1 = root path
 # $2 = array y
 # $3 = array x
-BSG_SUBARRAY_INSTANCE_PATH_SUB = $1_mc_y_$2__mc_x_$3__mc
+BSG_SUBARRAY_INSTANCE_PATH_SUB = $1.mc_y_$2__mc_x_$3__mc
 define swap_array_tile
 $(eval ARRAY_TILE_CUR_ROOT=$(call BSG_SUBARRAY_INSTANCE_PATH_SUB,$1,$2,$3))
 $(eval SWAPSTRING += instance $(ARRAY_TILE_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
@@ -239,14 +248,14 @@ endef
 
 # $1 = root path
 # $2 = cache_x
-BSG_CACHE_INSTANCE_PATH_SUB = $1_vc_y_0__vc_x_$2__vc
+BSG_CACHE_INSTANCE_PATH_SUB = $1.vc_y_0__vc_x_$2__vc
 define swap_cache
 $(eval SWAPSTRING += instance $(call BSG_CACHE_INSTANCE_PATH_SUB,$1,$2) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))
 endef
 
 # $1 = root path
 # $2 = north/south
-BSG_CACHE_ARRAY_INSTANCE_PATH_SUB = $1_$2_vc_x_0__$2_vc_row
+BSG_CACHE_ARRAY_INSTANCE_PATH_SUB = $1.$2_vc_x_0__$2_vc_row
 define swap_array_cache
 $(eval ARRAY_CACHE_CUR_ROOT=$(call BSG_CACHE_ARRAY_INSTANCE_PATH_SUB,$1,$2))
 $(eval SWAPSTRING += instance $(ARRAY_CACHE_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
@@ -256,10 +265,10 @@ endef
 
 # $1 = root path
 # $2 = pod_x
-BSG_POD_INSTANCE_PATH_SUB = $1_px_$2__pod
+#$(eval SWAPSTRING += instance $(POD_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
+BSG_POD_INSTANCE_PATH_SUB = $1.px_$2__pod
 define swap_pod
 $(eval POD_CUR_ROOT=$(call BSG_POD_INSTANCE_PATH_SUB,$1,$2))
-#$(eval SWAPSTRING += instance $(POD_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 $(eval $(call swap_array_cache,$(POD_CUR_ROOT),north))
 $(eval $(foreach ay,$(call range,4),$(call swap_array_tile,$(POD_CUR_ROOT),$(ay),0)))
 $(eval $(call swap_array_cache,$(POD_CUR_ROOT),south))
@@ -267,11 +276,11 @@ endef
 
 # $1 = root path
 # $2 = row
-BSG_POD_ROW_INSTANCE_PATH_SUB = $1_core_$2__podrow_podrow
+BSG_POD_ROW_INSTANCE_PATH_SUB = $1_core_$2__podrow
 define swap_pod_row
 $(eval POD_ROW_CUR_ROOT=$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$1,$2))
 $(eval SWAPSTRING += instance $(POD_ROW_CUR_ROOT) liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
-$(eval $(foreach pod,$(call range,4),$(call swap_pod,$(POD_ROW_CUR_ROOT),$(pod),0)))
+$(eval $(foreach pod,$(call range,4),$(call swap_pod,$(POD_ROW_CUR_ROOT).podrow,$(pod),0)))
 endef
 
 $(eval $(call swap_pod_row,$(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex,0))
