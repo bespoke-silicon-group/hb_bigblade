@@ -82,7 +82,7 @@ for {set i 0} {$i < 4} {incr i} {
     set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_height+$vcache_array_height+0.25*$grid_height+0.5*$grid_height]
     set y_new [expr $lly+$j*2*($tile_array_height+0.5*$grid_height)] 
 
-    set clk_x [expr $bp_start_x-3*$grid_width]
+    set clk_x [expr $bp_start_x-8*$grid_width]
     set clk_y [expr $y_new+48*$grid_height]
 
     set                clk_gen_cell [get_cells "core_complex_core_${row}__bp_${pos}__clk_gen"]
@@ -112,7 +112,7 @@ for {set i 0} {$i < 4} {incr i} {
     set lly [expr $pod_row_start_y+$i*($pod_height+$pod_gap)+$sdr_vert_height+$vcache_array_height+0.25*$grid_height+0.5*$grid_height]
     set y_new [expr $lly+$j*2*($tile_array_height+0.5*$grid_height)] 
 
-    set clk_x [expr $cgra_start_x+$cgra_width+3*$grid_width]
+    set clk_x [expr $cgra_start_x+$cgra_width+8*$grid_width]
     set clk_y [expr $y_new+2*$tile_array_height]
 
     set                clk_gen_cell [get_cells "core_complex_core_${row}__cgra_${pos}__clk_gen"]
