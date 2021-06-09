@@ -229,7 +229,7 @@ endef
 # $1 = root path
 # $2 = tile_y
 # $3 = tile_x
-BSG_TILE_INSTANCE_PATH_SUB = $1.mc_y_$2__x_$3__tile
+BSG_TILE_INSTANCE_PATH_SUB = $1.y_$2__x_$3__tile
 define swap_tile
 $(eval SWAPSTRING += instance $(call BSG_TILE_INSTANCE_PATH_SUB,$1,$2,$3) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))
 endef
