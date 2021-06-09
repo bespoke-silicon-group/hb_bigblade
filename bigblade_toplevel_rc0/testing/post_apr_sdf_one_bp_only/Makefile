@@ -354,27 +354,27 @@ build-debug: $(MIN_SIMV_DEBUG) $(MAX_SIMV_DEBUG)
 
 SDF_PATH = /mnt/users/ssd3/homes/petrisko/tapeout/hb_bigblade/bigblade_bp_unicore/bsg_14_3/current_build/ptsi_xray/bsg_blackparrot_halfpod
 
-out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
+out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS} $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc   \
         -sdf min:$(POD_ROW_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_manycore_pod_row_sdr.sdf.gz \
         -l out/$*_min/vcs.log
 
-out/%_min/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
+out/%_min/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS} $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc-debug   \
     -sdf min:$(POD_ROW_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_manycore_pod_row_sdr.sdf.gz \
     -debug_pp +vcs+vcdpluson \
     -l out/$*_min/vcs-debug.log
 
-out/%_max/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
+out/%_max/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS} $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc   \
     -sdf max:$(POD_ROW_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_manycore_pod_row_sdr.sdf.gz \
     -l out/$*_max/vcs.log
 
 
-out/%_max/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
+out/%_max/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS} $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc-debug   \
     -sdf max:$(POD_ROW_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_manycore_pod_row_sdr.sdf.gz \
@@ -440,6 +440,8 @@ $(BSG_OUT_DIR):
 	@mkdir -p $@
 
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
+$(BSG_BLADERUNNER_GENERATED): $(BSG_OUT_DIR)/Makefile.machine.include
+	$(MAKE) -f bladerunner.mk $@ BSG_MACHINE_PATH=$(BSG_OUT_DIR)
 
 summary:
 	grep -R out/*/$(SPMD)/run.log --color -e "BSG_FINISH" -e "BSG_FAIL" -e "BSG_TIMEOUT" -e "Error"
