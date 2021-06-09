@@ -20,7 +20,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set core_clk_name "core_clk" ;# main clock running black parrot
-set core_clk_period_ps       1100
+set core_clk_period_ps       1000
 set core_clk_uncertainty_per 3.0
 set core_clk_uncertainty_ps  [expr min([expr $core_clk_period_ps*($core_clk_uncertainty_per/100.0)], 20)]
 
@@ -56,22 +56,25 @@ set tag_input_delay_max_ps 4000
 ## Reg2Reg
 create_clock -period $core_clk_period_ps -name $core_clk_name [get_ports clk_i]
 set_clock_uncertainty $core_clk_uncertainty_ps [get_clocks $core_clk_name]
+#set_input_transition 10 -min [get_ports clk_i]
+#set_input_transition 50 -max [get_ports clk_i]
 
 create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports tag_clk_i]
 set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
+#set_input_transition 75 [get_ports tag_clk_i]
 
 ########################################
 ## In2Reg
-#set core_input_pins input_pins [get_ports reset_i]
+#set core_input_pins [filter_collection [all_inputs] "full_name!~*clk_i*"]
 #set_input_delay -min $core_input_delay_min_ps -clock $core_clk_name $core_input_pins
 #set_input_delay -max $core_input_delay_max_ps -clock $core_clk_name $core_input_pins
-set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
-set tag_in_ports [get_ports tag_data_i]
-append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set tag_in_ports [filter_collection [get_ports tag*] "full_name!~*clk_i*"]
 set_input_delay -min $tag_input_delay_min_ps -clock $tag_clk_name $tag_in_ports
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
+
+set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
 
 ########################################
 ## Reg2Out
@@ -166,6 +169,7 @@ bsg_chip_derate_mems
 ## Disabled or false paths
 bsg_chip_disable_1r1w_paths {"*regfile*rf*"}
 bsg_chip_disable_1r1w_paths {"*btb*tag_mem*"}
+bsg_chip_disable_1r1w_paths {"*bht*bht_mem*"}
 
 ########################################
 ## Ungrouping

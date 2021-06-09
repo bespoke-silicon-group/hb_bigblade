@@ -199,6 +199,17 @@ VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
 
+#################################################
+# BlackParrot filelists and liblists #
+#################################################
+export BIGBLADE_BP_UNICORE_LIBRARY_NAME = bigblade_bp_unicore
+export BIGBLADE_BP_UNICORE_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).filelist
+export BIGBLADE_BP_UNICORE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_BP_UNICORE_LIBRARY_NAME=$(BIGBLADE_BP_UNICORE_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_BP_UNICORE_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_BP_UNICORE_LIBRARY)
+
 ###############################
 # CGRA filelists and liblists #
 ###############################

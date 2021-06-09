@@ -39,6 +39,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_link_sdr
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_include.tcl
 
+# BlackParrot
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_bp_unicore_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_bp_unicore_include.tcl
+
 # cgra
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/brg_cgra_hpod_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/brg_cgra_hpod_include.tcl
@@ -137,6 +141,16 @@ bsg_create_library $::env(BSG_TIEHILO_LIBRARY_NAME)\
     $::env(BSG_TIEHILO_LIBRARY) \
     $BSG_TIEHILO_SOURCE_FILES \
     $BSG_TIEHILO_INCLUDE_PATHS
+
+# blackparrot filelist
+bsg_create_filelist $::env(BIGBLADE_BP_UNICORE_FILELIST) \
+                    $BIGBLADE_BP_UNICORE_SOURCE_FILES
+
+# blackparrot library
+bsg_create_library $::env(BIGBLADE_BP_UNICORE_LIBRARY_NAME) \
+    $::env(BIGBLADE_BP_UNICORE_LIBRARY) \
+    $BIGBLADE_BP_UNICORE_SOURCE_FILES \
+    $BIGBLADE_BP_UNICORE_INCLUDE_PATHS
 
 # cgra filelist
 bsg_create_filelist $::env(BRG_CGRA_HPOD_FILELIST) \

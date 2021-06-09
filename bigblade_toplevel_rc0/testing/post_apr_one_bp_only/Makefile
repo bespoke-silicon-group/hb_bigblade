@@ -57,7 +57,7 @@ export TESTING_BSG_OUT_DIR            ?= $(BSG_OUT_DIR)
 
 export BSG_PACKAGE           ?=basejump_fcbga_785
 export BSG_PINOUT            ?=bsg_bigblade_v0
-export BSG_PACKAGING_FOUNDRY ?=portable
+export BSG_PACKAGING_FOUNDRY ?=gf_14_invecas_1p8v
 export BSG_PADMAPPING        ?=default
 
 include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
@@ -188,9 +188,9 @@ export BSG_MANYCORE_LINK_SDR_LIBRARY_NAME = bsg_manycore_link_sdr
 export BSG_MANYCORE_LINK_SDR_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).filelist
 export BSG_MANYCORE_LINK_SDR_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).library
 
-VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
-VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
+#VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
+#VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
+#VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
 
 ########################################
 # BSG Tie HI/LO filelists and liblists #
@@ -214,6 +214,17 @@ export BIGBLADE_BP_UNICORE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRAR
 VCS_OPTIONS += +define+BIGBLADE_BP_UNICORE_LIBRARY_NAME=$(BIGBLADE_BP_UNICORE_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BIGBLADE_BP_UNICORE_FILELIST)
 VCS_OPTIONS += -libmap $(BIGBLADE_BP_UNICORE_LIBRARY)
+
+###############################
+# CGRA filelists and liblists #
+###############################
+export BRG_CGRA_HPOD_LIBRARY_NAME = brg_cgra_hpod
+export BRG_CGRA_HPOD_FILELIST = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).filelist
+export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
+VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
