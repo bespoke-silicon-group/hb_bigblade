@@ -214,24 +214,21 @@ VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_
 VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_BLOCK_FILELIST)
 VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 
-###################################
-# Specify which modules to swap   #
-###################################
+##############################################
+# Specify which modules to swap for netlists #
+##############################################
 range  = $(shell echo {0..$(shell echo $1-1|bc)})
 window = $(shell echo {$1..$(shell echo $2-1|bc)})
-# bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__podrow.podrow.px_0__pod.mc_y_0__mc_x_0__mc
+
+# To create swaplist.vh, we create a huge string with all of the instances to swap.
 SWAPSTRING=
-define NL
 
-endef
-
-# I'm sure we could find a way to handle non-synth/synth better. But for now, this.
 # $1 = root path
 # $2 = tile_y
 # $3 = tile_x
 BSG_TILE_INSTANCE_PATH_SUB = $1.y_$2__x_$3__tile
 define swap_tile
-$(eval SWAPSTRING += instance $(call BSG_TILE_INSTANCE_PATH_SUB,$1,$2,$3) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))
+$(eval SWAPSTRING += instance $(call BSG_TILE_INSTANCE_PATH_SUB,$1,$2,$3) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 endef
 
 # $1 = root path
@@ -242,15 +239,15 @@ define swap_array_tile
 $(eval ARRAY_TILE_CUR_ROOT=$(call BSG_SUBARRAY_INSTANCE_PATH_SUB,$1,$2,$3))
 $(eval SWAPSTRING += instance $(ARRAY_TILE_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 $(eval SWAPSTRING += $(foreach ty,$(call range,2),\
-			$(foreach tx,$(call range,16),\
-			  instance $(call BSG_TILE_INSTANCE_PATH_SUB,$(ARRAY_TILE_CUR_ROOT),$(ty),$(tx)) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))))
+		       $(foreach tx,$(call range,16),\
+			 instance $(call BSG_TILE_INSTANCE_PATH_SUB,$(ARRAY_TILE_CUR_ROOT),$(ty),$(tx)) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)))
 endef
 
 # $1 = root path
 # $2 = cache_x
 BSG_CACHE_INSTANCE_PATH_SUB = $1.vc_y_0__vc_x_$2__vc
 define swap_cache
-$(eval SWAPSTRING += instance $(call BSG_CACHE_INSTANCE_PATH_SUB,$1,$2) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL))
+$(eval SWAPSTRING += instance $(call BSG_CACHE_INSTANCE_PATH_SUB,$1,$2) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 endef
 
 # $1 = root path
@@ -260,7 +257,7 @@ define swap_array_cache
 $(eval ARRAY_CACHE_CUR_ROOT=$(call BSG_CACHE_ARRAY_INSTANCE_PATH_SUB,$1,$2))
 $(eval SWAPSTRING += instance $(ARRAY_CACHE_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 $(eval SWAPSTRING += $(foreach tx,$(call range,16),\
-	instance $(call BSG_CACHE_INSTANCE_PATH_SUB,$(ARRAY_CACHE_CUR_ROOT),$(tx)) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;$(NL)))
+	               instance $(call BSG_CACHE_INSTANCE_PATH_SUB,$(ARRAY_CACHE_CUR_ROOT),$(tx)) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;))
 endef
 
 # $1 = root path
@@ -283,6 +280,7 @@ $(eval SWAPSTRING += instance $(POD_ROW_CUR_ROOT) liblist `BSG_MANYCORE_LINK_SDR
 $(eval $(foreach pod,$(call range,4),$(call swap_pod,$(POD_ROW_CUR_ROOT).podrow,$(pod),0)))
 endef
 
+# Swap podrow 0
 $(eval $(call swap_pod_row,$(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex,0))
 
 swaplist.vh:
