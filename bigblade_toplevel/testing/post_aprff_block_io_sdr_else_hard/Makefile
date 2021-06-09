@@ -210,7 +210,7 @@ VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 ###################################
 range  = $(shell echo {0..$(shell echo $1-1|bc)})
 window = $(shell echo {$1..$(shell echo $2-1|bc)})
-
+# bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__podrow.podrow.px_0__pod.mc_y_0__mc_x_0__mc
 SWAPSTRING=
 define NL
 
@@ -228,7 +228,7 @@ endef
 # $1 = root path
 # $2 = array y
 # $3 = array x
-BSG_SUBARRAY_INSTANCE_PATH_SUB = $1_mc_y_$2__mc_x_$3_
+BSG_SUBARRAY_INSTANCE_PATH_SUB = $1_mc_y_$2__mc_x_$3__mc
 define swap_array_tile
 $(eval ARRAY_TILE_CUR_ROOT=$(call BSG_SUBARRAY_INSTANCE_PATH_SUB,$1,$2,$3))
 $(eval SWAPSTRING += instance $(ARRAY_TILE_CUR_ROOT) liblist `BSG_MANYCORE_TILE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
@@ -267,7 +267,7 @@ endef
 
 # $1 = root path
 # $2 = row
-BSG_POD_ROW_INSTANCE_PATH_SUB = $1.core[$2]_podrow_podrow
+BSG_POD_ROW_INSTANCE_PATH_SUB = $1_core_$2__podrow_podrow
 define swap_pod_row
 $(eval POD_ROW_CUR_ROOT=$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$1,$2))
 $(eval SWAPSTRING += instance $(POD_ROW_CUR_ROOT) liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
