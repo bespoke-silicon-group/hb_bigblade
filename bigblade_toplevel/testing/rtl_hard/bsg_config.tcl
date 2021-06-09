@@ -39,6 +39,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_link_sdr
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_include.tcl
 
+# bigblade_toplevel_block
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_include.tcl
+
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
@@ -133,6 +137,16 @@ bsg_create_library $::env(BSG_TIEHILO_LIBRARY_NAME)\
     $::env(BSG_TIEHILO_LIBRARY) \
     $BSG_TIEHILO_SOURCE_FILES \
     $BSG_TIEHILO_INCLUDE_PATHS
+
+# bigblade_toplevel_block filelist
+bsg_create_filelist $::env(BIGBLADE_TOPLEVEL_BLOCK_FILELIST) \
+    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES
+
+# bigblade_toplevel_block library
+bsg_create_library $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)\
+    $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY) \
+    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES \
+    $BIGBLADE_TOPLEVEL_BLOCK_INCLUDE_PATHS
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \

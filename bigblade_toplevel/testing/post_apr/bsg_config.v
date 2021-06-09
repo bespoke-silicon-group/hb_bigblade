@@ -34,5 +34,7 @@ config bsg_config;
   // bsg tie hi/lo
   cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
+  cell bsg_chip_block liblist `BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
 endconfig
