@@ -213,6 +213,17 @@ VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_
 VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_BLOCK_FILELIST)
 VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 
+##################################################
+# Bigblade Toplevel filelists and liblists #
+#################################################
+export BIGBLADE_TOPLEVEL_LIBRARY_NAME = bigblade_toplevel
+export BIGBLADE_TOPLEVEL_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_LIBRARY_NAME).filelist
+export BIGBLADE_TOPLEVEL_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_LIBRARY)
+
 ##############################################
 # Specify which modules to swap for netlists #
 ##############################################
@@ -297,7 +308,7 @@ PODS_X := $(call range, 4)
 TILES_Y := $(call range, 8)
 TILES_X := $(call range, 16)
 
-BSG_CHIP_BLOCK_INSTANCE_PATH=$(BSG_TOP_SIM_MODULE).IC.ASIC.block
+BSG_CHIP_BLOCK_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH).block
 $(eval $(foreach r,$(POD_ROWS),$(call swap_pod_row,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$r)))
 
 swaplist.vh:
@@ -413,20 +424,20 @@ VCS_OPTIONS += +warn=noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,no
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
 SDF_CORNER=ffpg_0p88v_125c_sigcmin
-SDF_PATH=/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
+SDF_PATH=/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
 
 # Always this, for any corner
-VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_block_level_1.sdf.gz
-VCS_OPTIONS += -sdf min:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_block_noc_io.sdf.gz
+VCS_OPTIONS += -sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_level_2.sdf.gz
+VCS_OPTIONS += -sdf min:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_noc_io.sdf.gz
 # Then this, for each pod: 
 
 # $1 pod row
 # $2 corner
 define pod_row_add_sdf_options
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_podrow_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_clk_gen_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_podrow_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_clk_gen_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
 endef
 
 $(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$(SDF_CORNER))))
@@ -505,6 +516,7 @@ IP_BLOCKS += bigblade_io_link_ddr
 IP_BLOCKS += bsg_manycore_link_sdr
 IP_BLOCKS += bsg_tiehilo
 IP_BLOCKS += bigblade_toplevel_block
+IP_BLOCKS += bigblade_toplevel
 
 IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)

@@ -39,9 +39,13 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_manycore_link_sdr
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_tiehilo_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bsg_tiehilo_include.tcl
 
-# bigblade_toplevel 
+# bigblade_toplevel_block
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_block_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_block_include.tcl
+
+# bigblade_toplevel
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
@@ -163,6 +167,16 @@ bsg_create_library $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)\
     $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY) \
     $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES \
     $BIGBLADE_TOPLEVEL_BLOCK_INCLUDE_PATHS
+
+# bigblade_toplevel filelist
+bsg_create_filelist $::env(BIGBLADE_TOPLEVEL_FILELIST) \
+    $BIGBLADE_TOPLEVEL_SOURCE_FILES
+
+# bigblade_toplevel library
+bsg_create_library $::env(BIGBLADE_TOPLEVEL_LIBRARY_NAME)\
+    $::env(BIGBLADE_TOPLEVEL_LIBRARY) \
+    $BIGBLADE_TOPLEVEL_SOURCE_FILES \
+    $BIGBLADE_TOPLEVEL_INCLUDE_PATHS
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \

@@ -1,7 +1,6 @@
 config bsg_config;
   design `BSG_DESIGNS_TESTING_LIBRARY_NAME.`BSG_TOP_SIM_MODULE;
   default liblist `BSG_DESIGNS_TESTING_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME work;
-  instance `BSG_CHIP_INSTANCE_PATH liblist `BSG_CHIP_LIBRARY_NAME;
 
   // Swaplist is a list of instances to swap for ***netlists***. In this TB
   // it swaps out quadrapod 0, and enumerates the top qudrapod
@@ -23,6 +22,7 @@ config bsg_config;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
   cell bsg_chip_block liblist `BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;  
+  cell bsg_chip liblist `BIGBLADE_TOPLEVEL_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;  
 
   // Swap these for RTL hard (if they are not enumerated above -- this is the "else" clause)
   cell bsg_manycore_tile_compute_ruche liblist `BSG_MANYCORE_TILE_HARD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
