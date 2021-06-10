@@ -20,7 +20,7 @@ set_app_var case_analysis_propagate_through_icg true
 ########################################
 ## Clock Setup
 set xcel_clk_name "core_clk" ;# main clock running CGRA
-set xcel_clk_period_ps       1000 ; # feel free to loosen this to 1500 in the backend
+set xcel_clk_period_ps       1200 ; # feel free to loosen this to 1500 in the backend
 set xcel_clk_uncertainty_per 3.0
 set xcel_clk_uncertainty_ps  [expr min([expr $xcel_clk_period_ps*($xcel_clk_uncertainty_per/100.0)], 20)]
 
@@ -56,9 +56,12 @@ set tag_input_delay_max_ps 4000
 ## Reg2Reg
 create_clock -period $xcel_clk_period_ps -name $xcel_clk_name [get_ports clk_i]
 set_clock_uncertainty $xcel_clk_uncertainty_ps [get_clocks $xcel_clk_name]
+#set_input_transition 10 -min [get_ports clk_i]
+#set_input_transition 50 -max [get_ports clk_i]
 
 create_clock -period $tag_clk_period_ps -name $tag_clk_name [get_ports tag_clk_i]
 set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
+#set_input_transition 75 [get_ports tag_clk_i]
 
 ########################################
 ## In2Reg
@@ -66,13 +69,12 @@ set_clock_uncertainty $tag_clk_uncertainty_ps  [get_clocks $tag_clk_name]
 #set_input_delay -min $xcel_input_delay_min_ps -clock $xcel_clk_name $xcel_input_pins
 #set_input_delay -max $xcel_input_delay_max_ps -clock $xcel_clk_name $xcel_input_pins
 
-set tag_in_ports [get_ports tag_data_i]
-append_to_collection tag_in_ports [get_ports tag_node_id_offset_i[*]]
+set tag_in_ports [filter_collection [get_ports tag*] "full_name!~*clk_i*"]
 set_input_delay -min $tag_input_delay_min_ps -clock $tag_clk_name $tag_in_ports
 set_input_delay -max $tag_input_delay_max_ps -clock $tag_clk_name $tag_in_ports
 
-set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
+set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
 
 ########################################
 ## Reg2Out
@@ -173,9 +175,9 @@ bsg_chip_derate_mems
 # PP: ungroup this data path module and hopefully DC will stop inserting buffers
 # to the is_calc control signal...
 set_ungroup [get_designs *bsg_gf_14_reduce_and_* ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACoreCtrl__1736738b526e3fb9" ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACoreDpath__1736738b526e3fb9" ] true
-set_ungroup [get_designs -filter "hdl_template==CGRACore__1736738b526e3fb9" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACoreCtrl__*" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACoreDpath__*" ] true
+set_ungroup [get_designs -filter "hdl_template==CGRACore__*" ] true
 
 ########################################
 ## Flattening

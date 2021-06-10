@@ -38,17 +38,29 @@ set_app_var case_analysis_propagate_through_icg true
   set clock_name core_clk
   set clock_period 1000
   
+  set input_delay_min_per 2.0
+  set input_delay_min_ps [expr $clk_period_ps*$input_delay_min_per/100.0]
+  set input_delay_max_per 70.0
+  set input_delay_max_ps [expr $clk_period_ps*$input_delay_max_per/100.0]
+  
+  set output_delay_min_per 2.0
+  set output_delay_min_ps [expr $clk_period_ps*$output_delay_min_per/100.0]
+  set output_delay_max_per 20.0
+  set output_delay_max_ps [expr $clk_period_ps*$output_delay_max_per/100.0]
+
+
+
   create_clock -name ${clock_name} \
                -period ${clock_period} \
                [get_ports ${clock_net}]
   set_clock_uncertainty 20 [get_clocks $clock_name]
+  #set_input_transition 10 -min [get_ports clk]
+  #set_input_transition 50 -max [get_ports clk]
 
   # This constraint sets the load capacitance in picofarads of the
   # output pins of your design.
   
   #set_load -pin_load $ADK_TYPICAL_ON_CHIP_LOAD [all_outputs]
-  set load_lib_pin $LIB_CELLS(invx8,load_pin)
-  set_load [load_of [get_lib_pin */${load_lib_pin}]] [all_outputs]
   
   # This constraint sets the input drive strength of the input pins of
   # your design. We specifiy a specific standard cell which models what
@@ -59,20 +71,24 @@ set_app_var case_analysis_propagate_through_icg true
   #set_driving_cell -no_design_rule \
   #  -lib_cell $ADK_DRIVING_CELL [all_inputs]
 
-  set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
-  set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
-  set_driving_cell -no_design_rule -lib_cell "SC7P5T_CKBUFX1_SSC14R" [get_ports clk]
-  
   # set_input_delay constraints for input ports
   #
   # - make this non-zero to avoid hold buffers on input-registered designs
   
-  set_input_delay -clock ${clock_name} [expr ${clock_period}*0.3] [all_inputs]
+  set input_pins [filter_collection [all_inputs] "full_name!~*clk*"]
+  set_input_delay -min $input_delay_min_ps -clock $clk_name $input_pins
+  set_input_delay -max $input_delay_max_ps -clock $clk_name $input_pins
+  set_driving_cell -min -no_design_rule -lib_cell $LIB_CELLS(invx8) [all_inputs]
+  set_driving_cell -max -no_design_rule -lib_cell $LIB_CELLS(invx2) [all_inputs]
   
   # set_output_delay constraints for output ports
   
-  set_output_delay -clock ${clock_name} [expr ${clock_period}*0.6] [all_outputs]
-  
+  set output_pins [all_outputs]
+  set_output_delay -min $output_delay_min_ps -clock $clk_name $output_pins
+  set_output_delay -max $output_delay_max_ps -clock $clk_name $output_pins
+  set_load -min [load_of [get_lib_pin */$LIB_CELLS(invx2,load_pin)]] [all_outputs]
+  set_load -max [load_of [get_lib_pin */$LIB_CELLS(invx8,load_pin)]] [all_outputs]
+
   # Make all signals limit their fanout
   
   #set_max_fanout 20 $DESIGN_NAME
