@@ -572,6 +572,7 @@ $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_
 	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
 	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
 	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_CUDA_DBGS): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
@@ -590,8 +591,7 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP
 	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
 	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
 	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
-#$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/cuda/build.log
+	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
