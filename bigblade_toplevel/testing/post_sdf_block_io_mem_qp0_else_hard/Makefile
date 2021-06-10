@@ -51,10 +51,10 @@ BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
 BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
 BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
-BSG_CUDA_MIN_SIMS = $(addprefix out/cuda/, $(addsuffix _min/simv, $(SDF_CORNERS)))
-BSG_CUDA_MAX_SIMS = $(addprefix out/cuda/, $(addsuffix _max/simv, $(SDF_CORNERS)))
-BSG_CUDA_MIN_SIMS_DEBUG = $(addprefix out/cuda/, $(addsuffix _min/simv-debug, $(SDF_CORNERS)))
-BSG_CUDA_MAX_SIMS_DEBUG = $(addprefix out/cuda/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS = $(addprefix out/, $(addsuffix _max/cuda/simv, $(SDF_CORNERS)))
+BSG_CUDA_MIN_SIMS_DEBUG = $(addprefix out/, $(addsuffix _min/cuda/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/cuda/simv-debug, $(SDF_CORNERS)))
 BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS)
 BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS)
 BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS_DEBUG)
