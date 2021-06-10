@@ -480,7 +480,6 @@ endef
 
 $(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$(SDF_CORNER))))
 
-
 ##################################
 # Create filelists and libraries #
 ##################################
