@@ -400,7 +400,27 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 VCS_OPTIONS += +warn=noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
-VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block.sdf.gz
+# Chip block annotation (all levels)
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_level_1.sdf.gz
+VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_0.sdf.gz
+# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),1):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_1.sdf.gz
+# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),2):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_2.sdf.gz
+# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),3):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_3.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_0.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_1.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_2.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_3.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_level_1.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_io.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_0.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_1.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_2.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_3.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_4.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_5.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_6.sdf.gz
+# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_7.sdf.gz
 
 ##################################
 # Create filelists and libraries #
