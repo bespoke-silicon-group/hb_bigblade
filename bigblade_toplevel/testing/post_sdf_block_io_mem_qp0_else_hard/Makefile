@@ -51,6 +51,15 @@ BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
 BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
 BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
+BSG_CUDA_MIN_SIMS = $(addprefix out/cuda/, $(addsuffix _min/simv, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS = $(addprefix out/cuda/, $(addsuffix _max/simv, $(SDF_CORNERS)))
+BSG_CUDA_MIN_SIMS_DEBUG = $(addprefix out/cuda/, $(addsuffix _min/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS_DEBUG = $(addprefix out/cuda/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS)
+BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS)
+BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS_DEBUG)
+BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS_DEBUG)
+
 # sdf path
 SDFS_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
 
@@ -551,11 +560,30 @@ IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 	ln -s $(BSG_DESIGNS_DIR) $@
 
-build: $(BSG_SPMD_SIMS)
-debug: $(BSG_CUDA_DBG)
+build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
+debug: $(BSG_CUDA_DBGS)
 $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p $(dir $@)
-	$(eval VCS_OPTIONS += -Mdir=$(dir $@)/csrc)
+	$(eval DEBUG = $(findstring -debug,$@))
+	$(eval VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
+	$(eval MAX = $(subst _,,$(findstring _max,$@)))
+	$(eval MIN = $(subst _,,$(findstring _min,$@)))
+	$(eval MIN_OR_MAX = $(MIN)$(MAX))
+	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
+	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
+	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
+
+$(BSG_CUDA_DBGS): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
+	mkdir -p $(dir $@)
+	$(eval DEBUG = $(findstring -debug,$@))
+	$(eval VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
 	$(eval MAX = $(subst _,,$(findstring _max,$@)))
 	$(eval MIN = $(subst _,,$(findstring _min,$@)))
 	$(eval MIN_OR_MAX = $(MIN)$(MAX))
@@ -563,18 +591,7 @@ $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_
 	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
 	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
-
-$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
-$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
-$(BSG_CUDA_DBG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/cuda/build.log
+#$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/cuda/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
