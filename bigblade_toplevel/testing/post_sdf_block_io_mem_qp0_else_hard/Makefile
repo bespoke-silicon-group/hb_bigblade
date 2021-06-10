@@ -38,18 +38,12 @@ BSG_SPMD_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_C
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 ifeq ($(WAVE),1)
-  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv-debug
   BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
   BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
 else
-  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv
   BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
   BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
 endif
-
-BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
-BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
-BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 
 BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
 BSG_CUDA_MAX_SIMS = $(addprefix out/, $(addsuffix _max/cuda/simv, $(SDF_CORNERS)))
@@ -581,7 +575,7 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regres
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
-$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS)
 	mkdir -p $(dir $@)
 	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
@@ -600,7 +594,7 @@ $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
 	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
-$(BSG_OUT_DIR) $(BSG_CUDA_PATH):
+$(BSG_OUT_DIR):
 	@mkdir -p $@
 
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
