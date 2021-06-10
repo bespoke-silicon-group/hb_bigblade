@@ -273,11 +273,23 @@ endef
 # $1 = root path
 # $2 = row
 BSG_POD_ROW_INSTANCE_PATH_SUB = $1.core_complex_core_$2__podrow
+BSG_CLK_GEN_INSTANCE_PATH_SUB = $1.core_complex_core_$2__clk_gen
 define swap_pod_row
 $(eval POD_ROW_CUR_ROOT=$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$1,$2))
 $(eval SWAPSTRING += instance $(POD_ROW_CUR_ROOT) liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;)
 $(eval $(foreach pod,$(call range,4),$(call swap_pod,$(POD_ROW_CUR_ROOT).podrow,$(pod),0)))
 endef
+
+# $1 pod row
+BSG_MEM_LINK_EAST_INDEX_FROM_ROW =$(shell echo $1+4 | bc)
+
+# $1 = root path
+# $2 = row
+BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB = $1.mem_link_$2__link
+BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB = $1.mem_link_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$2)__link
+
+# $1 = root path
+BSG_NOC_IO_INSTANCE_PATH_SUB = $1.io_link
 
 # Swap podrows
 POD_ROWS := 0
@@ -400,27 +412,25 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 VCS_OPTIONS += +warn=noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
-# Chip block annotation (all levels)
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_level_1.sdf.gz
-VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_0.sdf.gz
-# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),1):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_1.sdf.gz
-# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),2):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_2.sdf.gz
-# VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),3):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_podrow_3.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_0.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_1.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_2.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_clk_gen_3.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_level_1.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_io.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_0.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_1.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_2.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_3.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_4.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_5.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_6.sdf.gz
-# VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final/ffpg_0p88v_125c_sigcmin/bsg_chip_block_noc_mem_7.sdf.gz
+SDF_CORNER=ffpg_0p88v_125c_sigcmin
+SDF_PATH=/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
+
+# Always this, for any corner
+VCS_OPTIONS += -sdf min:$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_block_level_1.sdf.gz
+VCS_OPTIONS += -sdf min:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_block_noc_io.sdf.gz
+# Then this, for each pod: 
+
+# $1 pod row
+# $2 corner
+define pod_row_add_sdf_options
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_podrow_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_clk_gen_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$1.sdf.gz)
+$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
+endef
+
+$(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$(SDF_CORNER))))
+
 
 ##################################
 # Create filelists and libraries #
