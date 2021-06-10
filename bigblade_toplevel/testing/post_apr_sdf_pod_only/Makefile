@@ -220,27 +220,14 @@ SDF_CORNERS = \
 EXPAND_VERILOG_PY = ${TOP_DIR}/util/expand_verilog_hierarchy.py
 CDC_INSTANCE_LIST_V = $(abspath ./out/cdc_instance_list.v)
 
-BSG_SDR_NE_V_GZ       = $(TOP_DIR)/bsg_manycore_link_wh_to_sdr_ne/bsg_14/current_build/pnr/bsg_manycore_link_wh_to_sdr_ne/results/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v.gz
-BSG_SDR_NW_V_GZ       = $(TOP_DIR)/bsg_manycore_link_wh_to_sdr_nw/bsg_14/current_build/pnr/bsg_manycore_link_wh_to_sdr_nw/results/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v.gz
-BSG_SDR_SE_V_GZ       = $(TOP_DIR)/bsg_manycore_link_wh_to_sdr_se/bsg_14/current_build/pnr/bsg_manycore_link_wh_to_sdr_se/results/bsg_manycore_link_wh_to_sdr_se_chip_finish.v.gz
-BSG_SDR_SW_V_GZ       = $(TOP_DIR)/bsg_manycore_link_wh_to_sdr_sw/bsg_14/current_build/pnr/bsg_manycore_link_wh_to_sdr_sw/results/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v.gz
-BSG_SDR_EAST_V_GZ     = $(TOP_DIR)/bsg_manycore_link_ruche_to_sdr_east/bsg_14/current_build/pnr/bsg_manycore_link_ruche_to_sdr_east/results/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v.gz
-BSG_SDR_WEST_V_GZ     = $(TOP_DIR)/bsg_manycore_link_ruche_to_sdr_west/bsg_14/current_build/pnr/bsg_manycore_link_ruche_to_sdr_west/results/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v.gz
-BSG_SDR_NORTH_V_GZ    = $(TOP_DIR)/bsg_manycore_link_to_sdr_north/bsg_14/current_build/pnr/bsg_manycore_link_to_sdr_north/results/bsg_manycore_link_to_sdr_north_chip_finish.v.gz
-BSG_SDR_SOUTH_V_GZ    = $(TOP_DIR)/bsg_manycore_link_to_sdr_south/bsg_14/current_build/pnr/bsg_manycore_link_to_sdr_south/results/bsg_manycore_link_to_sdr_south_chip_finish.v.gz
-BSG_SDR_NORTH_ROW_V_GZ    = $(TOP_DIR)/bsg_manycore_link_to_sdr_north_row/bsg_14/current_build/pnr/bsg_manycore_link_to_sdr_north_row/results/bsg_manycore_link_to_sdr_north_row_chip_finish.v.gz
-#BSG_SDR_SOUTH_ROW_V_GZ    = $(TOP_DIR)/bsg_manycore_link_to_sdr_south_row/bsg_14/current_build/pnr/bsg_manycore_link_to_sdr_south_row/results/bsg_manycore_link_to_sdr_south_row_chip_finish.v.gz
-
-BSG_SDR_NE_V          = out/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
-BSG_SDR_NW_V          = out/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
-BSG_SDR_SE_V          = out/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
-BSG_SDR_SW_V          = out/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
-BSG_SDR_EAST_V        = out/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
-BSG_SDR_WEST_V        = out/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
-BSG_SDR_NORTH_V       = out/bsg_manycore_link_to_sdr_north_chip_finish.v
-BSG_SDR_SOUTH_V       = out/bsg_manycore_link_to_sdr_south_chip_finish.v
-#BSG_SDR_NORTH_ROW_V   = out/bsg_manycore_link_to_sdr_north_row_chip_finish.v
-#BSG_SDR_SOUTH_ROW_V   = out/bsg_manycore_link_to_sdr_south_row_chip_finish.v
+BSG_SDR_NE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_ne/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
+BSG_SDR_NW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_nw/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
+BSG_SDR_SE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_se/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
+BSG_SDR_SW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_sw/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
+BSG_SDR_EAST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_east/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
+BSG_SDR_WEST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_west/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
+BSG_SDR_NORTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north/bsg_manycore_link_to_sdr_north_chip_finish.v
+BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south/bsg_manycore_link_to_sdr_south_chip_finish.v
 
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
@@ -254,16 +241,6 @@ MAX_SIMV_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
 
 $(CDC_INSTANCE_LIST_V):
 	mkdir -p out/
-	gzip -cd $(BSG_SDR_NE_V_GZ) > $(BSG_SDR_NE_V)
-	gzip -cd $(BSG_SDR_NW_V_GZ) > $(BSG_SDR_NW_V)
-	gzip -cd $(BSG_SDR_SE_V_GZ) > $(BSG_SDR_SE_V)
-	gzip -cd $(BSG_SDR_SW_V_GZ) > $(BSG_SDR_SW_V)
-	gzip -cd $(BSG_SDR_EAST_V_GZ) > $(BSG_SDR_EAST_V)
-	gzip -cd $(BSG_SDR_WEST_V_GZ) > $(BSG_SDR_WEST_V)
-	gzip -cd $(BSG_SDR_NORTH_V_GZ) > $(BSG_SDR_NORTH_V)
-	gzip -cd $(BSG_SDR_SOUTH_V_GZ) > $(BSG_SDR_SOUTH_V)
-#	gzip -cd $(BSG_SDR_NORTH_ROW_V_GZ) > $(BSG_SDR_NORTH_ROW_V)
-#	gzip -cd $(BSG_SDR_SOUTH_ROW_V_GZ) > $(BSG_SDR_SOUTH_ROW_V)
 	$(foreach path, ${BSG_SDR_NE_INSTANCE_PATHS}, \
 		python $(EXPAND_VERILOG_PY) $(BSG_SDR_NE_V) \
 			| grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
