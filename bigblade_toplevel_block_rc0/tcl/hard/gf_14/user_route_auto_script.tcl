@@ -428,7 +428,7 @@ foreach_in_collection cell $MUX_cell {
   append_to_collection -unique msc_nets [get_nets -of_object $cell -filter "(full_name!=VSS)&&(full_name!=VDD)"]
 }
 
-#append_to_collection -unique msc_nets [get_nets -of_object [get_pins "core_complex_core_*__bp_*__clk_gen/clk_o"]]
+append_to_collection -unique msc_nets [get_nets -of_object [get_pins "core_complex_core_*__bp_*__clk_gen/clk_o"]]
 append_to_collection -unique msc_nets [get_nets -of_object [get_pins "core_complex_core_*__cgra_*__clk_gen/clk_o"]]
 
 add_buffer_on_route -net_prefix bsg_msc -cell_prefix bsg_msc -repeater_distance 100.00 -first_distance 50.00 $msc_nets $msc_buffer
