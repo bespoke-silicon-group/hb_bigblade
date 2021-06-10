@@ -563,15 +563,16 @@ build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
 debug: $(BSG_CUDA_DBGS)
 $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p $(dir $@)
+	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
-	$(eval VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
+	$(eval EXTRA_VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
 	$(eval MAX = $(subst _,,$(findstring _max,$@)))
 	$(eval MIN = $(subst _,,$(findstring _min,$@)))
 	$(eval MIN_OR_MAX = $(MIN)$(MAX))
 	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
-	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
-	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
+	$(eval EXTRA_VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
+	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_CUDA_DBGS): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
@@ -582,15 +583,16 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
 	mkdir -p $(dir $@)
+	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
-	$(eval VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
+	$(eval EXTRA_VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
 	$(eval MAX = $(subst _,,$(findstring _max,$@)))
 	$(eval MIN = $(subst _,,$(findstring _min,$@)))
 	$(eval MIN_OR_MAX = $(MIN)$(MAX))
 	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
-	$(eval VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
-	@echo $(VCS_OPTIONS) > $(dir $@)/vcs_options.log
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
+	$(eval EXTRA_VCS_OPTIONS += -sdf $(MIN_OR_MAX):$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDFS_PATH)/$(CORNER)/bsg_chip_block_podrow_0.sdf.gz)
+	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
