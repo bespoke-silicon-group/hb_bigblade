@@ -32,9 +32,9 @@ set SVERILOG_PACKAGE_FILES [join "
 # in _pkg). The rest of the files should allowed in any order.
 set SVERILOG_SOURCE_FILES [join "
   $SVERILOG_PACKAGE_FILES
-  $bsg_designs_target_dir/v/bsg_chip.v
 
 
+  $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_toplevel/bsg_chip_chip_finish.v
   $hb_bigblade_netlists_dir/rc-alpha-rtlfreeze-3/post-apr/bigblade_toplevel_block/bsg_chip_block_chip_finish.v
 
 

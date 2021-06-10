@@ -233,7 +233,6 @@ VCS_OPTIONS += +optconfigfile+$(CDC_INSTANCE_LIST_V)
 ####################################
 SDF_CORNERS = \
 	sspg_0p72v_125c_sigrcmax 	\
-  ffpg_0p88v_125c_sigcmin 	\
   ffpg_0p88v_m40c_sigrcmin
 	
 #SDF_CORNERS = \
@@ -323,32 +322,32 @@ $(CDC_INSTANCE_LIST_V):
 build:       $(MIN_SIMV) $(MAX_SIMV)
 build-debug: $(MIN_SIMV_DEBUG) $(MAX_SIMV_DEBUG)
 
-SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
 
 out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc   \
-		-sdf min:$(CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip_block.sdf.gz \
+		-sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
 		-l out/$*_min/vcs.log
 
 out/%_min/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc-debug   \
-    -sdf min:$(CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip_block.sdf.gz \
+    -sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -debug_pp +vcs+vcdpluson \
     -l out/$*_min/vcs-debug.log
 
 out/%_max/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc   \
-    -sdf max:$(CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip_block.sdf.gz \
+    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -l out/$*_max/vcs.log
 
 
 out/%_max/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc-debug   \
-    -sdf max:$(CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip_block.sdf.gz \
+    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -debug_pp +vcs+vcdpluson \
     -l out/$*_max/vcs-debug.log
 
