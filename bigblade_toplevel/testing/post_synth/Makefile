@@ -206,6 +206,17 @@ VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_
 VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_BLOCK_FILELIST)
 VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 
+##################################################
+# Bigblade Toplevel filelists and liblists #
+#################################################
+export BIGBLADE_TOPLEVEL_LIBRARY_NAME = bigblade_toplevel
+export BIGBLADE_TOPLEVEL_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_LIBRARY_NAME).filelist
+export BIGBLADE_TOPLEVEL_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_LIBRARY)
+
 ##################################
 # Create filelists and libraries #
 ##################################
@@ -284,6 +295,7 @@ IP_BLOCKS += bigblade_io_link_ddr
 IP_BLOCKS += bsg_manycore_link_sdr
 IP_BLOCKS += bsg_tiehilo
 IP_BLOCKS += bigblade_toplevel_block
+IP_BLOCKS += bigblade_toplevel
 
 IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
