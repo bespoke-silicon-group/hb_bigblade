@@ -31,6 +31,7 @@ module bsg_mem_1r1w_sync
   `bsg_mem_1r1w_sync_macro(64,31,2) else
   // used by bigblade_bp_unicore
   `bsg_mem_1r1w_sync_macro(64,50,2) else    
+  `bsg_mem_1r1w_sync_macro(512,8,8) else
     begin: notmacro
     bsg_mem_1r1w_sync_synth #(
       .width_p(width_p)

@@ -15,7 +15,7 @@ endif
 
 hb_bigblade_netlists_dir    := $(THIS_DIR)/hb_bigblade_netlists
 hb_bigblade_netlists_url    := $(GITHUB)bespoke-silicon-group/hb_bigblade_netlists
-hb_bigblade_netlists_commit := main
+hb_bigblade_netlists_commit := rc0_accelerators
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl

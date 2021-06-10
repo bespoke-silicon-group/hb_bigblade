@@ -25,6 +25,8 @@ module bsg_mem_1rw_sync #( parameter width_p = -1
   `bsg_mem_1rw_sync_macro(1024,46,4) else
   // ct_fifo pseudo large FIFO
   `bsg_mem_1rw_sync_macro(64,32,2) else
+  // BlackParrot
+  `bsg_mem_1rw_sync_macro(512,64,2) else
   // no hardened version found
     begin : z
       // we substitute a 1r1w macro

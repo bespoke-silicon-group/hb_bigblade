@@ -49,7 +49,7 @@ set tag_clk_name "tag_clk"
 set tag_clk_period_ps      5000.0 ;# 200 MHz
 set tag_clk_uncertainty_ps 20
 
-set tag_input_delay_min_ps 100
+set tag_input_delay_min_ps 500
 set tag_input_delay_max_ps 4000
 
 ########################################
