@@ -1,13 +1,12 @@
 source ../tcl/bsg_config_util.tcl
 
-
 # chip source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_whole_thing/chip_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_whole_thing/chip_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_whole_thing/chip_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_whole_thing/chip_include.tcl
 
 # testing source (rtl) files and include paths list
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_whole_thing/gateway_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_whole_thing/gateway_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_whole_thing/gateway_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr_sdf_whole_thing/gateway_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
@@ -21,7 +20,7 @@ source $::env(HB_BIGBLADE_NETLISTS_DIR)/hardened_rams_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $HARDENED_RAMS_SOURCE_FILES]
 
 # chip filelist
-bsg_create_filelist $::env(BSG_CHIP_FILELIST)    \
+bsg_create_filelist $::env(BSG_CHIP_FILELIST) \
                     $SVERILOG_SOURCE_FILES
 
 # chip library
