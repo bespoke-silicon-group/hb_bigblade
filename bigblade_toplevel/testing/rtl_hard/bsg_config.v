@@ -38,4 +38,7 @@ config bsg_config;
   
   cell bsg_chip_block liblist `BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
+  // currently empty libs - no hardening
+  // cell bsg_chip liblist `BIGBLADE_TOPLEVEL_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
 endconfig
