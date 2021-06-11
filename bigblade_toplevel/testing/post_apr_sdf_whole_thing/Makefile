@@ -232,6 +232,7 @@ VCS_OPTIONS += +optconfigfile+$(CDC_INSTANCE_LIST_V)
 
 ####################################
 SDF_CORNERS = \
+	tt_0p80v_25c_nominal \
 	sspg_0p72v_125c_sigrcmax 	\
   ffpg_0p88v_m40c_sigrcmin
 	
