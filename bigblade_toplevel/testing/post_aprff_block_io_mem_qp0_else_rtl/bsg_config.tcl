@@ -78,21 +78,6 @@ bsg_create_library $::env(BSG_MANYCORE_TILE_LIBRARY_NAME) \
     $BSG_MANYCORE_TILE_SOURCE_FILES \
     $BSG_MANYCORE_TILE_INCLUDE_PATHS
 
-# bsg_manycore_tile source files, for RTL Hard. We're doing this so
-# that we can sub some tiles with netlists, and others with RTL hard.
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_tile_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_tile_include.tcl
-
-# tile_hard filelist
-bsg_create_filelist $::env(BSG_MANYCORE_TILE_HARD_FILELIST) \
-                    $BSG_MANYCORE_TILE_SOURCE_FILES
-
-# tile_hard library
-bsg_create_library $::env(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME) \
-    $::env(BSG_MANYCORE_TILE_HARD_LIBRARY) \
-    $BSG_MANYCORE_TILE_SOURCE_FILES \
-    $BSG_MANYCORE_TILE_INCLUDE_PATHS
-
 
 # clk_gen filelist
 bsg_create_filelist $::env(BIGBLADE_CLK_GEN_FILELIST) \

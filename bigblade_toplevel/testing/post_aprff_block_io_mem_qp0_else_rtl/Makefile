@@ -124,15 +124,6 @@ VCS_OPTIONS += +define+BSG_MANYCORE_TILE_LIBRARY_NAME=$(BSG_MANYCORE_TILE_LIBRAR
 VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_LIBRARY)
 
-# RTL Hard tile library (so that we can substitute some, but not all, with netlists)
-export BSG_MANYCORE_TILE_HARD_LIBRARY_NAME = bigblade_manycore_tile_hard
-export BSG_MANYCORE_TILE_HARD_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).filelist
-export BSG_MANYCORE_TILE_HARD_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BSG_MANYCORE_TILE_HARD_LIBRARY_NAME=$(BSG_MANYCORE_TILE_HARD_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BSG_MANYCORE_TILE_HARD_FILELIST)
-VCS_OPTIONS += -libmap $(BSG_MANYCORE_TILE_HARD_LIBRARY)
-
 ###########################################
 # Bigblade clk_gen filelists and liblists #
 ###########################################
