@@ -20,8 +20,8 @@ export ETM_BLOCKS := bsg_chip_noc_mem_link,$(BSG_DESIGNS_TARGET_DIR)/../bigblade
 export ETM_BLOCKS += bsg_chip_noc_io_link,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_noc_io_link/bsg_14/current_build
 export ETM_BLOCKS += bsg_manycore_pod_row_sdr,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_pod_row/bsg_14/current_build
 export ETM_BLOCKS += bigblade_clk_gen,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_clk_gen/bsg_14/current_build
-export ETM_BLOCKS += bsg_blackparrot_halfpod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_bp_dummy/bsg_14/current_build
-export ETM_BLOCKS += brg_cgra_pod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_cgra_dummy/bsg_14/current_build
+export ETM_BLOCKS += bsg_blackparrot_halfpod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_bp_unicore/bsg_14/current_build
+export ETM_BLOCKS += brg_cgra_pod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_brg_cgra_xcel/bsg_14/current_build
 
 
 export ADDITIONAL_LIBS := bsg_chip_io_link_ddr,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_io_link_ddr/bsg_14/current_build
@@ -41,3 +41,5 @@ export ADDITIONAL_LIBS += bsg_manycore_tile_vcache,$(BSG_DESIGNS_TARGET_DIR)/../
 export ADDITIONAL_LIBS += bsg_manycore_tile_compute_ruche,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_manycore_tile/bsg_14/current_build
 export ADDITIONAL_LIBS += bsg_manycore_link_to_sdr_north,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_to_sdr_north/bsg_14/current_build
 export ADDITIONAL_LIBS += bsg_manycore_link_to_sdr_south,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_to_sdr_south/bsg_14/current_build
+
+export ADDITIONAL_LIBS += ProcElement,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_brg_cgra_xcel/bsg_14/current_build

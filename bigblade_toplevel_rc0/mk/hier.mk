@@ -22,8 +22,9 @@ export BOT_HIER_BLOCKS :=
 #export ADDITIONAL_LIBS += bsg_chip_noc_io_link,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_noc_io_link/bsg_14/current_build
 #export ADDITIONAL_LIBS += bsg_manycore_pod_row_sdr,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_pod_row/bsg_14/current_build
 #export ADDITIONAL_LIBS += bigblade_clk_gen,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_clk_gen/bsg_14/current_build
-#export ADDITIONAL_LIBS += bsg_blackparrot_halfpod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_bp_dummy/bsg_14/current_build
-#export ADDITIONAL_LIBS += brg_cgra_pod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_cgra_dummy/bsg_14/current_build
+#export ADDITIONAL_LIBS += bsg_blackparrot_halfpod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_bp_unicore/bsg_14/current_build
+#export ADDITIONAL_LIBS += brg_cgra_pod,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_brg_cgra_xcel/bsg_14/current_build
+#export ADDITIONAL_LIBS += ProcElement,$(BSG_DESIGNS_TARGET_DIR)/../bigblade_brg_cgra_xcel/bsg_14/current_build
 #
 #export ADDITIONAL_LIBS += bsg_manycore_link_wh_to_sdr_nw,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_wh_to_sdr_nw/bsg_14/current_build
 #export ADDITIONAL_LIBS += bsg_manycore_link_wh_to_sdr_ne,$(BSG_DESIGNS_TARGET_DIR)/../bsg_manycore_link_wh_to_sdr_ne/bsg_14/current_build
