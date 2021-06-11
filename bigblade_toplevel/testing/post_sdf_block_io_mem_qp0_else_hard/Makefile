@@ -576,7 +576,7 @@ $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_
 	$(eval $(call add_sdf_options,$(CORNER),$(MIN_OR_MAX)))
 	$(eval EXTRA_VCS_OPTIONS += $(SDF_VCS_OPTIONS))
 	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
-	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ 2>&1 | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_CUDA_DBGS): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
@@ -597,7 +597,7 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP
 	$(eval $(call add_sdf_options,$(CORNER),$(MIN_OR_MAX)))
 	$(eval EXTRA_VCS_OPTIONS += $(SDF_VCS_OPTIONS))
 	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
-	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ 2>&1 | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
