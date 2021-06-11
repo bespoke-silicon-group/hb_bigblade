@@ -38,11 +38,11 @@ BSG_SPMD_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_C
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 ifeq ($(WAVE),1)
-  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
-  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
-else
   BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
   BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
+else
+  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
+  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
 endif
 
 BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
