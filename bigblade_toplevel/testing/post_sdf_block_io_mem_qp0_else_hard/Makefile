@@ -55,7 +55,7 @@ BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS_DEBUG)
 BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS_DEBUG)
 
 # sdf path
-SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -460,10 +460,10 @@ VCS_OPTIONS += -negdelay
 # $2 corner
 # $3 min/max
 define pod_row_add_sdf_options
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_podrow_$1.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_clk_gen_$1.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$1.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_podrow_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_clk_gen_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
 endef
 
 # sets sdf options to SDF_VCS_OPTIONS
@@ -472,9 +472,9 @@ endef
 define add_sdf_options
 $(eval SDF_VCS_OPTIONS = )
 # chip block level 1
-$(eval SDF_VCS_OPTIONS += -sdf $2:$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$1/bsg_chip_block_level_1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $2:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$1/bsg_chip_level_2.sdf.gz)
 # chip block noc io
-$(eval SDF_VCS_OPTIONS += -sdf $2:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$1/bsg_chip_block_noc_io.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $2:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$1/bsg_chip_noc_io.sdf.gz)
 # each pod
 $(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$1,$2)))
 endef
