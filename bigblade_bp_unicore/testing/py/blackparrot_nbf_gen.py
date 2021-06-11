@@ -2,13 +2,23 @@
 import math
 import sys
 
-cfg_base_addr          = 0x2000000
-cfg_reg_reset          = 0x01
-cfg_reg_freeze         = 0x02
-cfg_domain_mask        = 0x09
-cfg_sac_mask           = 0x0a
-cfg_reg_icache_mode    = 0x22
-cfg_reg_dcache_mode    = 0x43
+# BlackParrot EPA map
+# 3-bit device ID, 12-bit device address
+# device 0 - CFG
+# device 1 - CLINT
+# device 2 - DRAM Base Address Register
+cfg_base_addr          = 0x0000
+cfg_reg_unused         = 0x0004
+cfg_reg_freeze         = 0x0008
+cfg_reg_hio_mask       = 0x001c
+cfg_reg_icache_id      = 0x0200
+cfg_reg_icache_mode    = 0x0204
+cfg_reg_dcache_id      = 0x0400
+cfg_reg_dcache_mode    = 0x0404
+
+dram_offset_base_addr       = 0x2000
+dram_base_addr_reg          = 0x0000
+dram_pod_offset_reg = 0x0004
 
 class NBF:
     # Initialize
@@ -23,8 +33,10 @@ class NBF:
         self.num_tiles_x = 16
         self.num_tiles_y = 8
 
-        # Infinite memories are used so DRAM disabled by default
-        self.dram_enable = 0
+        # This is the base address in the manycore DRAM space where BP code lives
+        self.mc_dram_base = 0x81000000
+        # 4-bit pod y, 3-bit pod x
+        self.mc_dram_pod_offset = 0b0001001
 
         self.cache_block_size_words = self.cache_block_size // 32
 
@@ -61,51 +73,10 @@ class NBF:
         line += self.get_hexstr(data, 8)
         print(line)
 
-    # Initialize DRAMs
-    # Fixme: Check before use. Might be broken
-    def init_dram(self):
-        # Take into account left column
-        lg_x = self.safe_clog2(self.num_tiles_x)
-        lg_block_size = self.safe_clog2(self.cache_block_size_words)
-        index_width = self.addr_width-1-lg_block_size-1
-        
-        # Useful for no DRAM condition only
-        lg_set = self.safe_clog2(self.cache_set)
-        cache_size = self.cache_size
-
-        f = open(self.filename, "r")
-
-        curr_addr = 0
-
-        # hashing for power of 2 banks
-        for line in f.readlines():
-            stripped = line.strip()
-            if not stripped:
-                continue
-            elif stripped.startswith("@"):
-                curr_addr = int(stripped.strip("@"), 16)
-                continue
-
-            for word in stripped.split(): 
-                addr = curr_addr
-                data = ""
-                for i in range(0, len(word), 2):
-                    data = word[i:i+2] + data
-                data = int(data, 16)
-                x = self.select_bits(addr, lg_block_size, lg_block_size + lg_x - 1) + 1
-                y = self.select_bits(addr, lg_block_size + lg_x, lg_block_size + lg_x)
-                index = self.select_bits(addr, lg_block_size+lg_x+1, lg_block_size+lg_x+1+index_width-1)
-                epa = self.select_bits(addr, 0, lg_block_size-1) | (index << lg_block_size)
-                curr_addr += 4
-
-                if y == 0:
-                    self.print_nbf(x, 0, epa, data)
-                else:
-                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
-
     # Initialize V$ or infinite memories (Useful for no DRAM mode)
     # Emulates the hashing function in bsg_manycore/v/vanilla_bean/hash_function.v
     # Fixme: Works only for a power of 2 hash banks
+    # Fixme: doesn't work for other pod offsets
     def init_vcache(self):
         vcache_word_offset_width = self.safe_clog2(self.cache_block_size_words)
         lg_x = self.safe_clog2(self.num_tiles_x)
@@ -127,27 +98,27 @@ class NBF:
                 continue
 
             for word in stripped.split():
-                addr = curr_addr
+                addr = curr_addr + self.mc_dram_base
                 data = ""
                 for i in range(0, len(word), 2):
                     data = word[i:i+2] + data
                 data = int(data, 16)
                 bank = self.select_bits(addr, 2+vcache_word_offset_width, 2+vcache_word_offset_width+lg_banks-1)
                 index = self.select_bits(addr, 2+vcache_word_offset_width+lg_banks, 2+vcache_word_offset_width+lg_banks+index_width-1)
-                x = self.select_bits(bank, 0, lg_x-1) + 1
+                x = self.select_bits(bank, 0, lg_x-1)
+                #+ self.select_bits(self.mc_dram_pod_offset, 0, 1)
                 y = self.select_bits(bank, lg_x, lg_x)
+                #+ self.select_bits(self.mc_dram_pod_offset, 3, 4)
                 epa = (index << vcache_word_offset_width) | self.select_bits(addr, 2, 2+vcache_word_offset_width-1)
                 curr_addr += 4
-
-                if y == 0:
-                    self.print_nbf(x, 0, epa, data)
-                else:
-                    self.print_nbf(x, self.num_tiles_y+1, epa, data)
+                
+                # Fixme: This works only for only 1 north vcache pod and 1 south vcache pod
+                self.print_nbf(1<<4 | x, y<<4 | (7 - 7*y), epa, data)
 
     #  // BP EPA Map
     #  // dev: 0 -- CFG
-    #  //      1 -- CCE ucode
-    #  //      2 -- CLINT
+    #  //      1 -- CLINT
+    #  //      2 -- DRAM Offset Register
     #  typedef struct packed
     #  {
     #    logic [3:0]  dev;
@@ -156,10 +127,25 @@ class NBF:
 
     # BP core configuration
     def init_config(self):
-        self.print_nbf(0, 1, cfg_base_addr + cfg_domain_mask, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_sac_mask, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_icache_mode, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_hio_mask, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_icache_mode, 1)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_dcache_mode, 1)
+
+        # The next few requests send acknowledgments immediately
+        # So get back all credits for previous requests before sending these out
+        # This will prevent multiple acks and there will be no overlap of acks
+        self.fence()
+
+        # Write to the DRAM offset registers in all the bridge modules
+        self.print_nbf(0x0f, 1 << 3 | 1, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+        self.print_nbf(0x0f, 1 << 3 | 2, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+        self.print_nbf(0x0f, 1 << 3 | 3, dram_offset_base_addr + dram_base_addr_reg, self.mc_dram_base)
+
+        self.fence()
+        
+        self.print_nbf(0x0f, 1 << 3 | 1, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
+        self.print_nbf(0x0f, 1 << 3 | 2, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
+        self.print_nbf(0x0f, 1 << 3 | 3, dram_offset_base_addr + dram_pod_offset_reg, self.mc_dram_pod_offset)
 
     # print finish
     def finish(self):
@@ -172,20 +158,15 @@ class NBF:
     # Dump the nbf
     def dump(self):
         # Freeze BP
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 1)
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_reset, 0)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 1)
         # Initialize BP configuration registers
         self.init_config()
         self.fence()
         # Initialize memory
-        if (self.dram_enable == 0):
-            self.init_vcache()
-        else:
-            self.init_dram()
+        self.init_vcache()
         self.fence()
         # Unfreeze BP
-        self.print_nbf(0, 1, cfg_base_addr + cfg_reg_freeze, 0)
+        self.print_nbf(0x0f, 1 << 3 | 1, cfg_base_addr + cfg_reg_freeze, 0)
         self.fence()
         self.finish()
 

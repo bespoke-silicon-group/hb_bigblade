@@ -1,0 +1,2 @@
+set TAP_RULE_PATTERN  every_row
+set TAP_RULE_DISTANCE 48

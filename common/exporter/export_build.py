@@ -19,12 +19,12 @@ if len(sys.argv) > 2:
 
 # RELEASE name and directory for build export
 if NETLIST_EXPORT_MODE == 0:
-  RELEASE     = 'rc-alpha-rtlfreeze'
+  RELEASE     = 'rc-0'
   RELEASE_DIR = '/nbu/spin/share/gf14/bigblade_exports'
 
 # RELEASE name and directory for netlist export (check to make sure repo exists too!)
 elif NETLIST_EXPORT_MODE == 1 or NETLIST_EXPORT_MODE == 2:
-  RELEASE     = 'rc-alpha-rtlfreeze'
+  RELEASE     = 'rc-0'
   RELEASE_DIR = './hb_bigblade_netlists'
   if not os.path.exists(RELEASE_DIR):
     print('ERROR: please clone hb_bigblade_netlists before proceeding!')

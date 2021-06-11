@@ -1,0 +1,16 @@
+basejump_stl/
+board/
+bsg_14*/
+bsg_cadenv/
+bsg_packaging/
+black-parrot/
+out/
+vc_hdrs.h
+simv*
+bsg_manycore/
+DVEfiles/
+.pdk_prep
+HardFloat/
+cgra/
+hb_bigblade_netlists/
+*.log

@@ -1,0 +1,13 @@
+basejump_stl/
+board/
+bsg_14/
+bsg_cadenv/
+bsg_packaging/
+bsg_manycore/
+out/
+vc_hdrs.h
+simv*
+DVEfiles/
+.pdk_prep
+*.swp
+*.pyc

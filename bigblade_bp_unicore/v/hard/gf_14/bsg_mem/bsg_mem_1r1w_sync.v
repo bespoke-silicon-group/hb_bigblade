@@ -26,6 +26,7 @@ module bsg_mem_1r1w_sync
 
   // TODO: Define more hardened macro configs here
   `bsg_mem_1r1w_sync_macro(64,50,2) else
+  `bsg_mem_1r1w_sync_macro(512,8,8) else
     begin: notmacro
     bsg_mem_1r1w_sync_synth #(
       .width_p(width_p)
