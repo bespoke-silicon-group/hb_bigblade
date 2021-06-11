@@ -37,17 +37,17 @@ if __name__ == "__main__":
   # wait 64 cycles
   tg.wait(64)
 
-  # for row in range(4):
-  #   for pos in range(2):
-  #     offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
-  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
-  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+  for row in range(4):
+    for pos in range(2):
+      offset = bp_hp_offset+(row*2+pos)*hp_num_clients_p
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
   # disable cgra
-  # for row in range(4):
-  #   for pos in range(2):
-  #     offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
-  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
-  #     tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
+  for row in range(4):
+    for pos in range(2):
+      offset = cgra_hp_offset+(row*2+pos)*hp_num_clients_p
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=0, length=1, data=0b1)
+      tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
 
   # reset clk_gen
   for noc in range(9):
