@@ -12,8 +12,8 @@ TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
 export BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 
-# SDF_CORNERS += sspg_0p72v_125c_sigcmax
-# SDF_CORNERS += sspg_0p72v_125c_sigcmin
+SDF_CORNERS += sspg_0p72v_125c_sigcmax
+SDF_CORNERS += sspg_0p72v_125c_sigcmin
 SDF_CORNERS += sspg_0p72v_125c_sigrcmax
 # SDF_CORNERS += sspg_0p72v_125c_sigrcmin
 # SDF_CORNERS += sspg_0p72v_m40c_sigcmax
@@ -21,13 +21,13 @@ SDF_CORNERS += sspg_0p72v_125c_sigrcmax
 # SDF_CORNERS += sspg_0p72v_m40c_sigrcmin
 # SDF_CORNERS += sspg_0p72v_m40c_sigrcmax
 # SDF_CORNERS += ffpg_0p88v_125c_sigcmax
-# SDF_CORNERS += ffpg_0p88v_125c_sigcmin
+SDF_CORNERS += ffpg_0p88v_125c_sigcmin
 # SDF_CORNERS += ffpg_0p88v_125c_sigrcmax
 # SDF_CORNERS += ffpg_0p88v_125c_sigrcmin
 # SDF_CORNERS += ffpg_0p88v_m40c_sigrcmax
 SDF_CORNERS += ffpg_0p88v_m40c_sigrcmin
 # SDF_CORNERS += ffpg_0p88v_m40c_sigcmax
-# SDF_CORNERS += ffpg_0p88v_m40c_sigcmin
+SDF_CORNERS += ffpg_0p88v_m40c_sigcmin
 SDF_CORNERS += tt_0p80v_25c_nominal
 
 BSG_SPMD_MIN_SIMS = $(addprefix out/, $(addsuffix _min/simv, $(SDF_CORNERS)))
