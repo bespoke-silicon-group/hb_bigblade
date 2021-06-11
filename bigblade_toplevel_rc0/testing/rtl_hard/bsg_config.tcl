@@ -39,10 +39,6 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_manycore_link_sdr
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bsg_tiehilo_include.tcl
 
-# bigblade_toplevel_block
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_include.tcl
-
 # BlackParrot
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_bp_unicore_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_bp_unicore_include.tcl
@@ -50,6 +46,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_bp_unicore_i
 # cgra
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/brg_cgra_hpod_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/brg_cgra_hpod_include.tcl
+
+# bigblade_toplevel_block
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/rtl_hard/tcl/bigblade_toplevel_block_include.tcl
 
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
@@ -146,16 +146,6 @@ bsg_create_library $::env(BSG_TIEHILO_LIBRARY_NAME)\
     $BSG_TIEHILO_SOURCE_FILES \
     $BSG_TIEHILO_INCLUDE_PATHS
 
-# bigblade_toplevel_block filelist
-bsg_create_filelist $::env(BIGBLADE_TOPLEVEL_BLOCK_FILELIST) \
-    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES
-
-# bigblade_toplevel_block library
-bsg_create_library $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)\
-    $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY) \
-    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES \
-    $BIGBLADE_TOPLEVEL_BLOCK_INCLUDE_PATHS
-
 # blackparrot filelist
 bsg_create_filelist $::env(BIGBLADE_BP_UNICORE_FILELIST) \
                     $BIGBLADE_BP_UNICORE_SOURCE_FILES
@@ -175,6 +165,16 @@ bsg_create_library $::env(BRG_CGRA_HPOD_LIBRARY_NAME)\
     $::env(BRG_CGRA_HPOD_LIBRARY) \
     $BRG_CGRA_HPOD_SOURCE_FILES \
     $BRG_CGRA_HPOD_INCLUDE_PATHS
+
+# bigblade_toplevel_block filelist
+bsg_create_filelist $::env(BIGBLADE_TOPLEVEL_BLOCK_FILELIST) \
+    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES
+
+# bigblade_toplevel_block library
+bsg_create_library $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)\
+    $::env(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY) \
+    $BIGBLADE_TOPLEVEL_BLOCK_SOURCE_FILES \
+    $BIGBLADE_TOPLEVEL_BLOCK_INCLUDE_PATHS
 
 # testing filelist
 bsg_create_filelist $::env(BSG_DESIGNS_TESTING_FILELIST) \

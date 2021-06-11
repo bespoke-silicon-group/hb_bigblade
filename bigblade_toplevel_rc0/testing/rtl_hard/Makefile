@@ -187,18 +187,6 @@ export BSG_MANYCORE_LINK_SDR_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LI
 # VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
 # VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
 
-########################################
-# BSG Tie HI/LO filelists and liblists #
-########################################
-export BSG_TIEHILO_LIBRARY_NAME = bsg_tiehilo
-export BSG_TIEHILO_FILELIST = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).filelist
-export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
-
-# Currently empty library, uncomment if populated
-VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
-VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
-
 #################################################
 # BlackParrot filelists and liblists #
 #################################################
@@ -220,6 +208,29 @@ export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).libr
 VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
 VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
+
+########################################
+# BSG Tie HI/LO filelists and liblists #
+########################################
+export BSG_TIEHILO_LIBRARY_NAME = bsg_tiehilo
+export BSG_TIEHILO_FILELIST = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).filelist
+export BSG_TIEHILO_LIBRARY = $(BSG_OUT_DIR)/$(BSG_TIEHILO_LIBRARY_NAME).library
+
+# Currently empty library, uncomment if populated
+VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
+VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
+
+##################################################
+# Bigblade Toplevel Block filelists and liblists #
+#################################################
+export BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME = bigblade_toplevel_block
+export BIGBLADE_TOPLEVEL_BLOCK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME).filelist
+export BIGBLADE_TOPLEVEL_BLOCK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_BLOCK_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
@@ -291,7 +302,6 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ########################################
 
 # create symlinks foreach ip block
-
 IP_BLOCKS  = bigblade_clk_gen
 IP_BLOCKS += bigblade_noc_io_link
 IP_BLOCKS += bigblade_noc_mem_link
@@ -299,6 +309,7 @@ IP_BLOCKS += bsg_manycore_tile
 IP_BLOCKS += bigblade_io_link_ddr
 IP_BLOCKS += bsg_manycore_link_sdr
 IP_BLOCKS += bsg_tiehilo
+IP_BLOCKS += bigblade_toplevel_block
 
 IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
