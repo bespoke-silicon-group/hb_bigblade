@@ -54,6 +54,10 @@ BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS)
 BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS_DEBUG)
 BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS_DEBUG)
 
+BSG_SPMD_MACHINES := $(foreach simv,$(BSG_SPMD_SIMS),$(dir $(simv))/Makefile.machine.include)
+BSG_CUDA_MACHINES := $(foreach simv,$(BSG_CUDA_SIMS),$(dir $(simv))/Makefile.machine.include)
+BSG_MACHINES := $(BSG_SPMD_MACHINES) $(BSG_CUDA_MACHINES) $(BSG_OUT_DIR)/Makefile.machine.include
+
 # sdf path
 SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
 
@@ -560,7 +564,7 @@ $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 
 build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
 debug: $(BSG_CUDA_DBGS)
-$(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+$(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_MACHINES) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p $(dir $@)
 	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
@@ -581,7 +585,7 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regres
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
-$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS)
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) $(BSG_MACHINES)
 	mkdir -p $(dir $@)
 	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
@@ -598,8 +602,9 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
 
-$(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
-	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
+$(BSG_MACHINES): $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
+	@mkdir -p $(dir $@)
+	@cp $< $@
 
 $(BSG_OUT_DIR):
 	@mkdir -p $@
