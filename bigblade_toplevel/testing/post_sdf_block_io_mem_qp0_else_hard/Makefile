@@ -423,7 +423,7 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 VCS_OPTIONS += +warn=noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
-SDF_CORNER=ffpg_0p88v_125c_sigcmin
+SDF_CORNER=ffpg_0p88v_m40c_sigrcmin
 SDF_PATH=/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
 
 # Always this, for any corner
