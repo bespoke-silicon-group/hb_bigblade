@@ -113,7 +113,7 @@ VCS_OPTIONS += +noportcoerce
 VCS_OPTIONS += +vc
 #VCS_OPTIONS += +vcs+loopreport
 VCS_OPTIONS += -timescale=1ps/1ps
-#VCS_OPTIONS += -diag timescale 
+VCS_OPTIONS += -diag=sdf
 VCS_OPTIONS += -top bsg_config bsg_config.v
 VCS_OPTIONS += -licqueue
 VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
