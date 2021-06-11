@@ -8,22 +8,54 @@
 # Simulation run-time flags
 ########################################
 WAVE       ?= 0
-
 TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
 export BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 
+# SDF_CORNERS += sspg_0p72v_125c_sigcmax
+# SDF_CORNERS += sspg_0p72v_125c_sigcmin
+SDF_CORNERS += sspg_0p72v_125c_sigrcmax
+# SDF_CORNERS += sspg_0p72v_125c_sigrcmin
+# SDF_CORNERS += sspg_0p72v_m40c_sigcmax
+# SDF_CORNERS += sspg_0p72v_m40c_sigcmin
+# SDF_CORNERS += sspg_0p72v_m40c_sigrcmin
+# SDF_CORNERS += sspg_0p72v_m40c_sigrcmax
+# SDF_CORNERS += ffpg_0p88v_125c_sigcmax
+SDF_CORNERS += ffpg_0p88v_125c_sigcmin
+# SDF_CORNERS += ffpg_0p88v_125c_sigrcmax
+# SDF_CORNERS += ffpg_0p88v_125c_sigrcmin
+# SDF_CORNERS += ffpg_0p88v_m40c_sigrcmax
+SDF_CORNERS += ffpg_0p88v_m40c_sigrcmin
+# SDF_CORNERS += ffpg_0p88v_m40c_sigcmax
+# SDF_CORNERS += ffpg_0p88v_m40c_sigcmin
+SDF_CORNERS += tt_0p80v_25c_nominal
+
+BSG_SPMD_MIN_SIMS = $(addprefix out/, $(addsuffix _min/simv, $(SDF_CORNERS)))
+BSG_SPMD_MAX_SIMS = $(addprefix out/, $(addsuffix _max/simv, $(SDF_CORNERS)))
+BSG_SPMD_MIN_SIMS_DEBUG = $(addprefix out/, $(addsuffix _min/simv-debug, $(SDF_CORNERS)))
+BSG_SPMD_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
+
 BSG_WORK_DIR := $(abspath ./)
 BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
 ifeq ($(WAVE),1)
-  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv-debug
+  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
+  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
 else
-  BSG_SPMD_SIM  := $(BSG_OUT_DIR)/simv
+  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
+  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
 endif
 
-BSG_CUDA_PATH := $(BSG_OUT_DIR)/cuda
-BSG_CUDA_SIM  := $(BSG_CUDA_PATH)/simv
-BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
+BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS = $(addprefix out/, $(addsuffix _max/cuda/simv, $(SDF_CORNERS)))
+BSG_CUDA_MIN_SIMS_DEBUG = $(addprefix out/, $(addsuffix _min/cuda/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/cuda/simv-debug, $(SDF_CORNERS)))
+BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS)
+BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS)
+BSG_CUDA_SIMS += $(BSG_CUDA_MIN_SIMS_DEBUG)
+BSG_CUDA_SIMS += $(BSG_CUDA_MAX_SIMS_DEBUG)
+
+# sdf path
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-block-final
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -423,25 +455,29 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 VCS_OPTIONS += +warn=noSDFCOM_SWC,noSDFCOM_ANICD,noSDFCOM_IWSBA,noSDFCOM_NICD,noSDFCOM_INF
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
-SDF_CORNER=ffpg_0p88v_m40c_sigrcmin
-SDF_PATH=/nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
-
-# Always this, for any corner
-VCS_OPTIONS += -sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_level_2.sdf.gz
-VCS_OPTIONS += -sdf min:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$(SDF_CORNER)/bsg_chip_noc_io.sdf.gz
-# Then this, for each pod: 
 
 # $1 pod row
 # $2 corner
+# $3 min/max
 define pod_row_add_sdf_options
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_podrow_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_clk_gen_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
-$(eval VCS_OPTIONS += -sdf min:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_podrow_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_clk_gen_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_block_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
 endef
 
-$(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$(SDF_CORNER))))
-
+# sets sdf options to SDF_VCS_OPTIONS
+# $1 corner
+# $2 min/max
+define add_sdf_options
+$(eval SDF_VCS_OPTIONS = )
+# chip block level 1
+$(eval SDF_VCS_OPTIONS += -sdf $2:$(BSG_CHIP_BLOCK_INSTANCE_PATH):$(SDF_PATH)/$1/bsg_chip_block_level_1.sdf.gz)
+# chip block noc io
+$(eval SDF_VCS_OPTIONS += -sdf $2:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH)):$(SDF_PATH)/$1/bsg_chip_block_noc_io.sdf.gz)
+# each pod
+$(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$1,$2)))
+endef
 
 ##################################
 # Create filelists and libraries #
@@ -522,29 +558,42 @@ IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 	ln -s $(BSG_DESIGNS_DIR) $@
 
-$(eval $(call tiles_set_parameters))
+build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
+debug: $(BSG_CUDA_DBGS)
+$(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+	mkdir -p $(dir $@)
+	$(eval EXTRA_VCS_OPTIONS = )
+	$(eval DEBUG = $(findstring -debug,$@))
+	$(eval EXTRA_VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
+	$(eval MAX = $(subst _,,$(findstring _max,$@)))
+	$(eval MIN = $(subst _,,$(findstring _min,$@)))
+	$(eval MIN_OR_MAX = $(MIN)$(MAX))
+	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
+	$(eval $(call add_sdf_options,$(CORNER),$(MIN_OR_MAX)))
+	$(eval EXTRA_VCS_OPTIONS += $(SDF_VCS_OPTIONS))
+	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
-
-build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
-debug: $(BSG_CUDA_DBG)
-$(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
-$(BSG_SPMD_SIM): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
-
-$(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
-$(BSG_CUDA_DBG): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/debug
-
-$(BSG_CUDA_DBG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
-
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
-
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) | $(BSG_CUDA_PATH)
-	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/cuda/build.log
+$(BSG_CUDA_DBGS): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -L$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -Wl,-rpath=$(BSG_F1_DIR)/libraries/platforms/tapeout-vcs
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regression
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS)
+	mkdir -p $(dir $@)
+	$(eval EXTRA_VCS_OPTIONS = )
+	$(eval DEBUG = $(findstring -debug,$@))
+	$(eval EXTRA_VCS_OPTIONS += -Mdir=$(dir $@)/csrc$(DEBUG))
+	$(eval MAX = $(subst _,,$(findstring _max,$@)))
+	$(eval MIN = $(subst _,,$(findstring _min,$@)))
+	$(eval MIN_OR_MAX = $(MIN)$(MAX))
+	$(eval CORNER = $(filter $(SDF_CORNERS),$(subst _max,,$(subst _min,,$(subst /, ,$@)))))
+	$(eval $(call add_sdf_options,$(CORNER),$(MIN_OR_MAX)))
+	$(eval EXTRA_VCS_OPTIONS += $(SDF_VCS_OPTIONS))
+	@echo $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) > $(dir $@)/vcs_options.log
+	$(VCS) $(VCS_OPTIONS) $(EXTRA_VCS_OPTIONS) -o $@ | tee -i $(dir $@)/build$(DEBUG).log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 	ln -nsf $(ROOT_DIR) $@
@@ -552,7 +601,7 @@ $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
 $(BSG_OUT_DIR)/Makefile.machine.include: $(BSG_WORK_DIR)/../machine/Makefile.machine.include | $(BSG_OUT_DIR)
 	@cp $(BSG_WORK_DIR)/../machine/Makefile.machine.include $(BSG_OUT_DIR)
 
-$(BSG_OUT_DIR) $(BSG_CUDA_PATH):
+$(BSG_OUT_DIR):
 	@mkdir -p $@
 
 BSG_MACHINE_PATH := $(BSG_OUT_DIR)
