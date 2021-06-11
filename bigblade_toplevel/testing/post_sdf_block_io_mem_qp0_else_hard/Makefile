@@ -1,4 +1,4 @@
-.DEFAULT_GOAL=build
+.DEFAULT_GOAL=spmd
 
 # Note: most variables that are file/dir paths are ?= because they can be
 # overriden by the chip repo if this makefile is called from the chip
@@ -562,6 +562,7 @@ IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)
 	ln -s $(BSG_DESIGNS_DIR) $@
 
+spmd:  $(BSG_SPMD_SIMS)
 build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
 debug: $(BSG_CUDA_DBGS)
 $(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_MACHINES) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
