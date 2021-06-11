@@ -618,3 +618,4 @@ clean:
 	rm -f  inter.vpd
 	rm -f  ucli.key
 	rm -rf swaplist.vh
+	rm -f sdfAnnotateInfo
