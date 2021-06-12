@@ -110,7 +110,7 @@ for {set i 0} {$i < 8} {incr i} {
   for {set j 0} {$j < 2} {incr j} {
 
     set io_clk_name   "mem_link_${i}_${j}_io_clk"
-    create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "block/mem_link*${i}*link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*/Z"]
+    create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "block/mem_link*${i}*link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
     set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
     set_propagated_clock [get_clocks $io_clk_name]
     set_case_analysis 0 [get_pins "block/mem_link*${i}*link/ddr_link*${j}*delay/sig*mux*/S*"]
@@ -153,7 +153,7 @@ for {set i 0} {$i < 8} {incr i} {
 for {set j 0} {$j < 2} {incr j} {
 
   set io_clk_name   "io_link_${j}_io_clk"
-  create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "block/io_link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*/Z"]
+  create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "block/io_link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
   set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
   set_propagated_clock [get_clocks $io_clk_name]
   set_case_analysis 0 [get_pins "block/io_link/ddr_link*${j}*delay/sig*mux*/S*"]
@@ -197,7 +197,7 @@ set pod_clk_uncertainty_ps     20
 
 for {set i 0} {$i < 4} {incr i} {
   set wh_master_clk_name   "pod_row_${i}_master_clk"
-  create_clock -period $pod_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__clk_gen/clk_gen_inst/mux_inst/*/Z"]
+  create_clock -period $pod_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__clk_gen/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
   set_clock_uncertainty $pod_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
   set_propagated_clock [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 8} {incr j} {
@@ -216,7 +216,7 @@ for {set i 0} {$i < 4} {incr i} {
 
 for {set i 0} {$i < 8} {incr i} {
   set wh_master_clk_name   "mem_link_${i}_master_clk"
-  create_clock -period 1000 -name $wh_master_clk_name [get_pins "block/mem_link*${i}*link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "block/mem_link*${i}*link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
   set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
   set_propagated_clock [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 4} {incr j} {
@@ -240,7 +240,7 @@ for {set i 0} {$i < 8} {incr i} {
 }
 
 set wh_master_clk_name   "io_link_master_clk"
-create_clock -period 1000 -name $wh_master_clk_name [get_pins "block/io_link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
+create_clock -period 1000 -name $wh_master_clk_name [get_pins "block/io_link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
 set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
 set_propagated_clock [get_clocks $wh_master_clk_name]
 foreach {j} {"fwd" "rev"} {
@@ -287,7 +287,7 @@ set_propagated_clock [get_clocks "north_link_fwd_clk"]
 for {set i 0} {$i < 4} {incr i} {
   for {set j 0} {$j < 2} {incr j} {
     set wh_master_clk_name   "bp_${i}_${j}_master_clk"
-    create_clock -period $bp_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__bp_${j}__clk_gen/clk_gen_inst/mux_inst/*/Z"]
+    create_clock -period $bp_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__bp_${j}__clk_gen/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
     set_clock_uncertainty $bp_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
     set_propagated_clock [get_clocks $wh_master_clk_name]
     set_false_path -to [get_clocks $wh_master_clk_name] -from [get_clocks "tag_clk"]
@@ -299,7 +299,7 @@ for {set i 0} {$i < 4} {incr i} {
 for {set i 0} {$i < 4} {incr i} {
   for {set j 0} {$j < 2} {incr j} {
     set wh_master_clk_name   "cgra_${i}_${j}_master_clk"
-    create_clock -period $cgra_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__cgra_${j}__clk_gen/clk_gen_inst/mux_inst/*/Z"]
+    create_clock -period $cgra_clk_period_ps -name $wh_master_clk_name [get_pins "block/core_complex_core_${i}__cgra_${j}__clk_gen/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
     set_clock_uncertainty $cgra_clk_uncertainty_ps [get_clocks $wh_master_clk_name]
     set_propagated_clock [get_clocks $wh_master_clk_name]
     set_false_path -to [get_clocks $wh_master_clk_name] -from [get_clocks "tag_clk"]
@@ -399,15 +399,15 @@ foreach_in_collection cell [get_cells "block/io_link/tunnel/bcti/b1_ntf/*buff*fi
   set_disable_timing $cell -from CLKA -to CLKB
   set_disable_timing $cell -from CLKB -to CLKA
 }
-foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/be/scheduler/*regfile/*rf/macro_mem*"] {
+foreach_in_collection cell [get_cells "block/core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/be/scheduler/*regfile/*rf/macro_mem*"] {
   set_disable_timing $cell -from CLKA -to CLKB
   set_disable_timing $cell -from CLKB -to CLKA
 }
-foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_btb/tag_mem/macro_mem"] {
+foreach_in_collection cell [get_cells "block/core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_btb/tag_mem/macro_mem"] {
   set_disable_timing $cell -from CLKA -to CLKB
   set_disable_timing $cell -from CLKB -to CLKA
 }
-foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_bht/bht_mem/macro_mem"] {
+foreach_in_collection cell [get_cells "block/core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_bht/bht_mem/macro_mem"] {
   set_disable_timing $cell -from CLKA -to CLKB
   set_disable_timing $cell -from CLKB -to CLKA
 }

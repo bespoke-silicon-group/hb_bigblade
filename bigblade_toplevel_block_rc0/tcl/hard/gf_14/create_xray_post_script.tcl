@@ -10,7 +10,7 @@ set io_clk_uncertainty_ps     20
 for {set i 0} {$i < 8} {incr i} {
   for {set j 0} {$j < 2} {incr j} {
     set io_clk_name   "mem_link_${i}_${j}_io_clk"
-    create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "mem_link*${i}*link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*/Z"]
+    create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "mem_link*${i}*link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
     set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
     set_propagated_clock [get_clocks $io_clk_name]
     set_case_analysis 0 [get_pins "mem_link*${i}*link/ddr_link*${j}*delay/sig*mux*/S*"]
@@ -19,7 +19,7 @@ for {set i 0} {$i < 8} {incr i} {
 
 for {set j 0} {$j < 2} {incr j} {
   set io_clk_name   "io_link_${j}_io_clk"
-  create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "io_link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*/Z"]
+  create_clock -period $io_clk_period_ps -name $io_clk_name [get_pins "io_link/ddr_link*${j}*link/clk_gen_io/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
   set_clock_uncertainty $io_clk_uncertainty_ps  [get_clocks $io_clk_name]
   set_propagated_clock [get_clocks $io_clk_name]
   set_case_analysis 0 [get_pins "io_link/ddr_link*${j}*delay/sig*mux*/S*"]
@@ -27,7 +27,7 @@ for {set j 0} {$j < 2} {incr j} {
 
 for {set i 0} {$i < 8} {incr i} {
   set wh_master_clk_name   "mem_link_${i}_master_clk"
-  create_clock -period 1000 -name $wh_master_clk_name [get_pins "mem_link*${i}*link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
+  create_clock -period 1000 -name $wh_master_clk_name [get_pins "mem_link*${i}*link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
   set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
   set_propagated_clock [get_clocks $wh_master_clk_name]
   for {set j 0} {$j < 4} {incr j} {
@@ -49,7 +49,7 @@ for {set i 0} {$i < 8} {incr i} {
 }
 
 set wh_master_clk_name   "io_link_master_clk"
-create_clock -period 1000 -name $wh_master_clk_name [get_pins "io_link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*/Z"]
+create_clock -period 1000 -name $wh_master_clk_name [get_pins "io_link/ddr_link*0*link/clk_gen_noc/clk_gen_inst/mux_inst/*BSG_DONT_TOUCH/Z"]
 set_clock_uncertainty 20 [get_clocks $wh_master_clk_name]
 set_propagated_clock [get_clocks $wh_master_clk_name]
 foreach {j} {"fwd" "rev"} {
