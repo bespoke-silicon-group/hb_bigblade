@@ -83,6 +83,18 @@ foreach_in_collection cell [get_cells "io_link/tunnel/bcti/b1_ntf/*buff*fifo/*ha
   set_disable_timing $cell -from CLKA -to CLKB
   set_disable_timing $cell -from CLKB -to CLKA
 }
+foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/be/scheduler/*regfile/*rf/macro_mem*"] {
+  set_disable_timing $cell -from CLKA -to CLKB
+  set_disable_timing $cell -from CLKB -to CLKA
+}
+foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_btb/tag_mem/macro_mem"] {
+  set_disable_timing $cell -from CLKA -to CLKB
+  set_disable_timing $cell -from CLKB -to CLKA
+}
+foreach_in_collection cell [get_cells "core_complex_core_*__bp_*__halfpod/tile/blackparrot/core_minimal/fe/pc_gen_bht/bht_mem/macro_mem"] {
+  set_disable_timing $cell -from CLKA -to CLKB
+  set_disable_timing $cell -from CLKB -to CLKA
+}
 
 if { [sizeof [get_lib_cells */* -filter "is_memory_cell"]] > 0 } {
   set_timing_derate -cell_delay -early 0.97 [get_lib_cells */* -filter "is_memory_cell"]
