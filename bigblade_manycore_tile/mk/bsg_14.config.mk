@@ -17,6 +17,7 @@ export BSG_POWER_GRID := default_wb
 export BSG_CAD_SETUP := default
 export BSG_POWER_INTENT := sv_standard
 
+export ICC2_CTS_NDR_RULE_NAME := icc2rm_2w2s
 
 export DC_FLOW_RMPLUS_FLOW :=
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE := false
