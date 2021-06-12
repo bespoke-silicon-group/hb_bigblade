@@ -1,0 +1,8 @@
+Summary for repository bsg_manycore:
+    EXPECTED COMMIT/BRANCH: ci_bigblade
+    CURRENT COMMIT: 4ca856d5
+    FAIL: UNCOMMITTED FILES EXIST
+    Uncommitted Files:
+        software/mk/Makefile.paths
+        software/riscv-tools/Makefile
+

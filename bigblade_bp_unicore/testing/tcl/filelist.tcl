@@ -34,7 +34,7 @@ set TESTING_SOURCE_FILES [join "
 
   $bsg_manycore_dir/v/bsg_manycore_pkg.v
 
-  $bsg_designs_target_dir/v/bsg_chip_pkg.v
+  $bsg_designs_target_dir/../common/v/bsg_chip_pkg.v
 
   $basejump_stl_dir/bsg_async/bsg_async_fifo.v
   $basejump_stl_dir/bsg_async/bsg_async_ptr_gray.v
@@ -68,6 +68,9 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_misc/bsg_buf.v
   $basejump_stl_dir/bsg_misc/bsg_circular_ptr.v
   $basejump_stl_dir/bsg_misc/bsg_cycle_counter.v
+  $basejump_stl_dir/bsg_misc/bsg_array_concentrate_static.v
+  $basejump_stl_dir/bsg_misc/bsg_concentrate_static.v
+  $basejump_stl_dir/bsg_misc/bsg_unconcentrate_static.v
   $basejump_stl_dir/bsg_misc/bsg_counter_clear_up.v
   $basejump_stl_dir/bsg_misc/bsg_counter_up_down.v
   $basejump_stl_dir/bsg_misc/bsg_decode.v
@@ -99,15 +102,21 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_tag/bsg_tag_master.v
   
   $basejump_stl_dir/bsg_noc/bsg_router_crossbar_o_by_i.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_buffered.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_router_decoder_dor.v
+  $basejump_stl_dir/bsg_noc/bsg_mesh_stitch.v
+
+  $basejump_stl_dir/bsg_tag/bsg_tag_master_decentralized.v
+  $basejump_stl_dir/bsg_tag/bsg_tag_client_unsync.v
   
   $bsg_manycore_dir/v/bsg_manycore_addr_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/bsg_vanilla_pkg.v
   $bsg_manycore_dir/v/vanilla_bean/load_packer.v
 
   $bsg_manycore_dir/v/bsg_manycore_endpoint.v
+  $bsg_manycore_dir/v/bsg_manycore_endpoint_fc.v
   $bsg_manycore_dir/v/bsg_manycore_endpoint_standard.v
-  $bsg_manycore_dir/v/bsg_manycore_lock_ctrl.v
-  $bsg_manycore_dir/v/bsg_1hold.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_encode.v
   $bsg_manycore_dir/v/bsg_manycore_reg_id_decode.v
   $bsg_manycore_dir/v/bsg_manycore_hor_io_router_column.v
@@ -149,14 +158,17 @@ set TESTING_SOURCE_FILES [join "
   $basejump_stl_dir/bsg_async/bsg_launch_sync_sync.v
   $basejump_stl_dir/bsg_misc/bsg_gray_to_binary.v
   $basejump_stl_dir/bsg_misc/bsg_xor.v
+  $basejump_stl_dir/bsg_misc/bsg_mux2_gatestack.v
   $basejump_stl_dir/bsg_misc/bsg_mux_one_hot.v
   $basejump_stl_dir/bsg_misc/bsg_arb_round_robin.v
 
-  $bp_top_dir/test/common/dromajo_cosim.cpp
-  $bp_top_dir/test/common/bp_nonsynth_cosim.sv
+  $bsg_designs_target_dir/v/blackparrot_chip_pkg.v
+  #$bp_top_dir/test/common/dromajo_cosim.cpp
   $bp_top_dir/test/common/bp_nonsynth_watchdog.sv
   $bsg_designs_target_dir/testing/v/bp_cce_to_mc_bridge_tracer.sv
   
   $bsg_designs_target_dir/testing/v/bsg_gateway_chip.v
+  $bsg_designs_target_dir/testing/v/bsg_tag_boot_rom.v
 "]
 
+#$bp_top_dir/test/common/bp_nonsynth_cosim.sv

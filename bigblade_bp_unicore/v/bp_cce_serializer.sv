@@ -14,19 +14,19 @@ module bp_cce_serializer
 
    , input [cce_mem_msg_width_lp-1:0]               io_cmd_i
    , input                                          io_cmd_v_i
-   , output logic                                   io_cmd_ready_o
+   , output logic                                   io_cmd_ready_and_o
 
    , output logic [cce_mem_msg_width_lp-1:0]        io_resp_o
    , output logic                                   io_resp_v_o
-   , input                                          io_resp_yumi_i
+   , input                                          io_resp_ready_and_i
 
    , output logic [split_mem_msg_width_lp-1:0]      io_cmd_o
    , output logic                                   io_cmd_v_o
-   , input                                          io_cmd_ready_i
+   , input                                          io_cmd_ready_and_i
 
    , input [split_mem_msg_width_lp-1:0]             io_resp_i
    , input                                          io_resp_v_i
-   , output logic                                   io_resp_yumi_o
+   , output logic                                   io_resp_ready_and_o
    );
 
   `declare_bp_bedrock_mem_if(paddr_width_p, dword_width_gp, lce_id_width_p, lce_assoc_p, cce);
@@ -43,27 +43,27 @@ module bp_cce_serializer
   assign io_resp_cast_i = io_resp_i;
 
   logic [word_width_gp-1:0] io_cmd_data_li;
-  bsg_parallel_in_serial_out_passthrough
+  bsg_parallel_in_serial_out
    #(.width_p(word_width_gp), .els_p(2))
    pisop
     (.clk_i(clk_i)
      ,.reset_i(reset_i)
 
      ,.data_i(io_cmd_cast_i.data[0+:64])
-     ,.v_i(io_cmd_v_i)
-     ,.ready_and_o(io_cmd_ready_o)
+     ,.valid_i(io_cmd_v_i)
+     ,.ready_and_o(io_cmd_ready_and_o)
 
      ,.data_o(io_cmd_data_li)
-     ,.v_o(io_cmd_v_o)
-     ,.ready_and_i(io_cmd_ready_i)
+     ,.valid_o(io_cmd_v_o)
+     ,.yumi_i(io_cmd_ready_and_i & io_cmd_v_o)
      );
 
   bp_bedrock_cce_mem_msg_header_s io_cmd_header_li;
-  bsg_dff_en_bypass
+  bsg_dff_en
    #(.width_p($bits(bp_bedrock_cce_mem_msg_header_s)))
    wide_header_reg
     (.clk_i(clk_i)
-     ,.en_i(io_cmd_ready_o & io_cmd_v_i)
+     ,.en_i(io_cmd_ready_and_o & io_cmd_v_i)
      ,.data_i(io_cmd_cast_i.header)
      ,.data_o(io_cmd_header_li)
      );
@@ -77,7 +77,7 @@ module bp_cce_serializer
      ,.data_i(toggle_n)
      ,.data_o(toggle_r)
      );
-  assign toggle_n = toggle_r ^ (io_cmd_ready_i & io_cmd_v_o);
+  assign toggle_n = toggle_r ^ (io_cmd_ready_and_i & io_cmd_v_o);
 
   // Rebase changes
   always_comb
@@ -90,7 +90,7 @@ module bp_cce_serializer
 
   logic [dword_width_gp-1:0] io_resp_data_li;
   logic io_resp_ready_lo;
-  bsg_serial_in_parallel_out_passthrough
+  bsg_serial_in_parallel_out_full
    #(.width_p(word_width_gp), .els_p(2))
    sipop
     (.clk_i(clk_i)
@@ -98,20 +98,19 @@ module bp_cce_serializer
 
      ,.data_i(io_resp_cast_i.data)
      ,.v_i(io_resp_v_i)
-     ,.ready_and_o(io_resp_ready_lo)
+     ,.ready_o(io_resp_ready_and_o)
 
      ,.data_o(io_resp_data_li)
      ,.v_o(io_resp_v_o)
-     ,.ready_and_i(io_resp_yumi_i)
+     ,.yumi_i(io_resp_ready_and_i & io_resp_v_o)
      );
-  assign io_resp_yumi_o = io_resp_ready_lo & io_resp_v_i;
 
   bp_bedrock_cce_mem_msg_header_s io_resp_header_li;
-  bsg_dff_en_bypass
+  bsg_dff_en
    #(.width_p($bits(bp_bedrock_cce_mem_msg_header_s)))
    narrow_header_reg
     (.clk_i(clk_i)
-     ,.en_i(io_resp_v_i & io_resp_ready_lo & ~io_resp_v_o)
+     ,.en_i(io_resp_v_i & io_resp_ready_and_o)
      ,.data_i(io_resp_cast_i.header)
      ,.data_o(io_resp_header_li)
      );

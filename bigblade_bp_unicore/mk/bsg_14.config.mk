@@ -64,7 +64,7 @@ export BSG_PADMAPPING :=default
 
 # Select the target power grid. We have multiple power grid implementations
 # that can be used. Currently available power grids include none, default_wb
-export BSG_POWER_GRID :=none
+export BSG_POWER_GRID :=default_wb
 
 # Select the target power intent. The power intent contains the power ports
 # and nets that will be available as well as maps cells to power domains.
@@ -82,8 +82,8 @@ export BSG_POWER_INTENT :=sv_standard
 #     puts the CAD flow into the highest effort signoff quality mode we have.
 # - tt_only
 #     puts the CAD flow into a single scenario mode (typical corner).
-export BSG_CAD_SETUP :=tt_only
-#export BSG_CAD_SETUP :=default
+#export BSG_CAD_SETUP :=tt_only
+export BSG_CAD_SETUP :=default
 
 # Overrides the default memgen.json in bsg_14. Only these memories will be
 # generated when running make prep; however, SRAMs which have already been
@@ -103,7 +103,12 @@ export PREP_MEMGEN_JSON_FILE :=$(BSG_DESIGNS_TARGET_DIR)/scripts/harden/bsg_14.m
 # - rtm_exp
 #     Runtime exploration is designed to be quick and used for early experiments
 #export DC_FLOW_RMPLUS_FLOW :=hplp
-export DC_FLOW_RMPLUS_FLOW :=rtm_exp
+#export DC_FLOW_RMPLUS_FLOW :=hc
+#export DC_FLOW_RMPLUS_FLOW :=hc
+#export DC_FLOW_RMPLUS_FLOW :=rtm_exp
+export DC_FLOW_RMPLUS_FLOW :=hc
+#export DC_FLOW_RMPLUS_FLOW :=
+#export DC_FLOW_RMPLUS_FLOW :=
 #export DC_FLOW_RMPLUS_FLOW :=
 
 # Turns on topographical mode to take into physical design constraints and wire
@@ -113,7 +118,6 @@ export DC_FLOW_RMPLUS_FLOW :=rtm_exp
 export DC_FLOW_ENABLE_TOPOGRAPHICAL_MODE :=false
 
 # Turns off automatic clock gate insertion during synthesis compilation.
-export DC_FLOW_COMPILE_DISABLE_CLOCK_GATING :=false
 
 # Turns on design flattening during synthesis compilation,
 # removing all logical hierarchy in the design.
@@ -149,4 +153,7 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=$(foreach _,$(PTSI_FLOW_ACTIVITY_FILE), 1.0)
 # The module hierarchy to strip from the SAIF file.
 # Most often this is the path to the DUT starting from the testbench.
 export PTSI_FLOW_STRIP_PATH       :=bsg_gateway_chip/DUT
+
+export USE_ICC2_2020 := 1
+export CALIBRE_DRC_USE_SHELL := 1
 

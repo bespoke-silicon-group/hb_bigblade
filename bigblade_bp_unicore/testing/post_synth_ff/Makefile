@@ -40,6 +40,7 @@ export BSG_TARGET_PROCESS       ?=gf_14
 
 include $(BSG_DESIGNS_TARGET_DIR)/mk/bsg_14.config.mk
 include $(BSG_CHIP_DIR)/cad/setup/Makefile.include
+include $(BSG_CHIP_DIR)/Makefile.include
 
 ########################################
 ## VCS OPTIONS
@@ -167,7 +168,7 @@ endif
 
 PLUSARGS ?= +nbf_file=prog.nbf
 PLUSARGS += +max_cycle=1000000
-PLUSARGS += +num_pods=1
+PLUSARGS += +num_finish=1
 
 ########################################
 ## Run Targets
