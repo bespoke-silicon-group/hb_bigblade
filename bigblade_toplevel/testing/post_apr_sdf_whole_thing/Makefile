@@ -227,14 +227,17 @@ BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-ap
 VCS_OPTIONS += +sdfverbose +neg_tchk +overlap +multisource_int_delays -sdfretain
 VCS_OPTIONS += -negdelay
 VCS_OPTIONS += +optconfigfile+$(CDC_INSTANCE_LIST_V)
-
+VCS_OPTIONS += -diag=sdf
 
 
 ####################################
 SDF_CORNERS = \
-	tt_0p80v_25c_nominal \
-	sspg_0p72v_125c_sigrcmax 	\
-  ffpg_0p88v_m40c_sigrcmin
+  ffpg_0p88v_125c_sigcmin \
+  ffpg_0p88v_125c_sigrcmax \
+	sspg_0p72v_m40c_sigcmin \
+	sspg_0p72v_125c_sigcmax \
+	sspg_0p72v_m40c_sigcmax
+
 	
 #SDF_CORNERS = \
 	sspg_0p72v_125c_sigcmax \
