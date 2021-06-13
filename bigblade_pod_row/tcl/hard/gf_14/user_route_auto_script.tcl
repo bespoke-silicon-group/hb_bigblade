@@ -1,5 +1,5 @@
 #pin access guide
-derive_pin_access_routing_guides -cells [get_cels "podrow/px_*__pod/mc_y_*__mc_x_0__mc"] -layer {K1 K3} -x_width [expr 0.252] -y_width 0.001
+derive_pin_access_routing_guides -cells [get_cells "podrow/px_*__pod/mc_y_*__mc_x_0__mc"] -layer {K1 K3} -x_width [expr 0.252] -y_width 0.001
 
 set all_nets [list]
 # manycore
