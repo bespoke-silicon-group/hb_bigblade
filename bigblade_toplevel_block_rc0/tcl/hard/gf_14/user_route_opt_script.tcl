@@ -256,7 +256,7 @@ for {set i 0} {$i < 4} {incr i} {
 for {set i 0} {$i < 4} {incr i} {
   set wh_master_clk_name   "pod_row_${i}_master_clk"
   set pod_clk_period_ps [get_attribute [get_clocks $wh_master_clk_name] period]
-  for {set j 0} {$j < 8} {incr j} {
+  for {set j 0} {$j < 16} {incr j} {
     set blk [expr {$j < 8} ? {"bp"} : {"cgra"}]
     if {($j == 0) || ($j == 4)} { continue }
     foreach {k} {"fwd" "rev"} {
