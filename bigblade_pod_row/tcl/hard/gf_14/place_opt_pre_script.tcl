@@ -1,6 +1,7 @@
 puts "BSG-info: running place_opt_pre_script"
 
 set REPORT_QOR 0
+set REPORT_QOR_REPORT_CONGESTION 0
 set_app_options -name clock_opt.flow.enable_clock_power_recovery -value none
 set_app_options -name route_opt.flow.enable_clock_power_recovery -value none
 

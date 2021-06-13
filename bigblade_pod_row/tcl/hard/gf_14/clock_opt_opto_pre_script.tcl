@@ -1,5 +1,9 @@
 puts "BSG-info: Running script [info script]\n"
 
+
+set REPORT_QOR 0
+set REPORT_QOR_REPORT_CONGESTION 0
+
 #set_app_option -name clock_opt.flow.enable_clock_power_recovery -value none
 #set_app_option -name clock_opt.flow.enable_ccd -value false
 
