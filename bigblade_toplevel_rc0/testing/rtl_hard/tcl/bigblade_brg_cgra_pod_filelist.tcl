@@ -8,19 +8,26 @@ set bsg_manycore_dir       $::env(BSG_MANYCORE_DIR)
 set bsg_designs_dir        $::env(BSG_DESIGNS_DIR)
 set bsg_designs_target_dir $::env(BSG_DESIGNS_TARGET_DIR)
 set bsg_packaging_dir      $::env(BSG_PACKAGING_DIR)
+set cgra_dir               $::env(CGRA_DIR)
 
 set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
 # TODO: read netlist from HB_BIGBLADE_NETLIST
-# source $::env(HB_BIGBLADE_NETLISTS_DIR)/brg_cgra_pod-post-apr_filelist.tcl
+# source $::env(HB_BIGBLADE_NETLISTS_DIR)/brg_cgra_pod-post-synth_filelist.tcl
 
 # PP: I didn't add the SRAM models here because CGRA SRAMs have the
 # same spec as core DMEMs. Since we are doing full-chip RTL sim the
 # hardened SRAMs are already included.
-set BRG_CGRA_HPOD_SOURCE_FILES [join "
-    /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/pnr_brg_cgra_pod/results/brg_cgra_pod_chip_finish.v.gz
-    /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/pnr_ProcElement/results/ProcElement_chip_finish.v.gz
+set BIGBLADE_BRG_CGRA_XCEL_SOURCE_FILES [join "
+    $basejump_stl_dir/hard/gf_14/bsg_misc/bsg_mux.v
+    $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_osdr_phy.v
+    $basejump_stl_dir/hard/gf_14/bsg_link/bsg_link_isdr_phy.v
+    $basejump_stl_dir/hard/gf_14/bsg_async/bsg_sync_sync.v
+    $basejump_stl_dir/hard/gf_14/bsg_async/bsg_launch_sync_sync.v
+
+    $cgra_dir/v/hard/gf_14/sram/SramWrapper.v
+    $cgra_dir/v/hard/gf_14/HBEndpointCGRAXcel_8x8Array_4x4KBSpads__pickled.v
 "]
 

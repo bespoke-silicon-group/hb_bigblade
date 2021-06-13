@@ -13,6 +13,7 @@ set bsg_package       $::env(BSG_PACKAGE)
 set bsg_pinout        $::env(BSG_PINOUT)
 set bsg_padmapping    $::env(BSG_PADMAPPING)
 
-set BRG_CGRA_HPOD_INCLUDE_PATHS [ join "
-"]
+set bsg_out_dir       $::env(TESTING_BSG_OUT_DIR)
+
+source $::env(HB_BIGBLADE_NETLISTS_DIR)/bigblade_brg_cgra_pod-post-apr_filelist.tcl
 
