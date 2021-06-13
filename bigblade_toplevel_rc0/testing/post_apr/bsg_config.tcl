@@ -44,8 +44,8 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_f
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_include.tcl
 
 # cgra
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/brg_cgra_hpod_filelist.tcl
-source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/brg_cgra_hpod_include.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_brg_cgra_pod_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_brg_cgra_pod_include.tcl
 
 # bigblade_toplevel 
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_block_filelist.tcl
@@ -156,14 +156,14 @@ bsg_create_library $::env(BIGBLADE_BP_UNICORE_LIBRARY_NAME) \
     $BIGBLADE_BP_UNICORE_INCLUDE_PATHS
 
 # cgra filelist
-bsg_create_filelist $::env(BRG_CGRA_HPOD_FILELIST) \
-    $BRG_CGRA_HPOD_SOURCE_FILES
+bsg_create_filelist $::env(BIGBLADE_BRG_CGRA_POD_FILELIST) \
+    $BIGBLADE_BRG_CGRA_XCEL_SOURCE_FILES
 
 # cgra library
-bsg_create_library $::env(BRG_CGRA_HPOD_LIBRARY_NAME)\
-    $::env(BRG_CGRA_HPOD_LIBRARY) \
-    $BRG_CGRA_HPOD_SOURCE_FILES \
-    $BRG_CGRA_HPOD_INCLUDE_PATHS
+bsg_create_library $::env(BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME)\
+    $::env(BIGBLADE_BRG_CGRA_POD_LIBRARY) \
+    $BIGBLADE_BRG_CGRA_XCEL_SOURCE_FILES \
+    $BIGBLADE_BRG_CGRA_POD_INCLUDE_PATHS
 
 
 # bigblade_toplevel_block filelist
