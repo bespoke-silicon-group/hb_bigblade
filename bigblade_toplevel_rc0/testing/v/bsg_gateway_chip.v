@@ -1,5 +1,9 @@
 `timescale 1ps/1ps
 
+`ifndef UPTIME
+  `define UPTIME 0
+`endif
+
 `define IO_CLK_PERIOD  10000
 `define NOC_CLK_PERIOD 10000
 `define MC_CLK_PERIOD  10000
@@ -143,6 +147,7 @@ module bsg_gateway_chip
                         ,.num_masters_p      ( tag_num_masters_gp )
                         ,.num_clients_p      ( tag_els_gp )
                         ,.max_payload_width_p( tag_max_payload_width_gp )
+                        ,.uptime_p(`UPTIME)
                         )
     tag_trace_replay
       (.clk_i   ( tag_clk )

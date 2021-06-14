@@ -118,6 +118,8 @@ VCS_OPTIONS += -licqueue
 VCS_OPTIONS += +lint=all,noSVA-UA,noSVA-NSVU,noVCDE,noNS
 VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 VCS_OPTIONS += +warn=all,noOPD,noTMR,noTFIPC,noIWNF
+VCS_OPTIONS += +define+SPMD_VERBOSE=1
+VCS_OPTIONS += +define+UPTIME=1
 
 ########################################
 ## Chip and Testing Filelists and Liblists
