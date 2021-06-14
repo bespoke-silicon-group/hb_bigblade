@@ -39,7 +39,7 @@ BSG_SPMD_MIN_SIMS_DEBUG = $(addprefix out/, $(addsuffix _min/simv-debug, $(SDF_C
 BSG_SPMD_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
 BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
 BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
-BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
+BSG_SPMD_SIMS += $(BSG_SPMD_MIN_SIMS)
 BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
 
 BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
