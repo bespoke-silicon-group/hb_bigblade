@@ -47,6 +47,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_blo
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_include.tcl
 
+# blackparrot
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_include.tcl
+
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
@@ -172,3 +176,22 @@ bsg_create_library $::env(BSG_DESIGNS_TESTING_LIBRARY_NAME) \
                    [bsg_list_diff $TESTING_SOURCE_FILES $SVERILOG_SOURCE_FILES] \
                    $TESTING_INCLUDE_PATHS
 
+# blackparrot filelist
+bsg_create_filelist $::env(BIGBLADE_BP_UNICORE_FILELIST) \
+                    $BIGBLADE_BP_UNICORE_SOURCE_FILES
+
+# blackparrot library
+bsg_create_library $::env(BIGBLADE_BP_UNICORE_LIBRARY_NAME) \
+    $::env(BIGBLADE_BP_UNICORE_LIBRARY) \
+    $BIGBLADE_BP_UNICORE_SOURCE_FILES \
+    $BIGBLADE_BP_UNICORE_INCLUDE_PATHS
+
+# cgra filelist
+bsg_create_filelist $::env(BRG_CGRA_HPOD_FILELIST) \
+    $BRG_CGRA_HPOD_SOURCE_FILES
+
+# cgra library
+bsg_create_library $::env(BRG_CGRA_HPOD_LIBRARY_NAME)\
+    $::env(BRG_CGRA_HPOD_LIBRARY) \
+    $BRG_CGRA_HPOD_SOURCE_FILES \
+    $BRG_CGRA_HPOD_INCLUDE_PATHS

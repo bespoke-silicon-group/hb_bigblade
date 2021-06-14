@@ -23,6 +23,8 @@ config bsg_config;
 
   cell bsg_chip_block liblist `BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;  
   cell bsg_chip liblist `BIGBLADE_TOPLEVEL_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;  
-
+  cell bsg_blackparrot_halfpod liblist `BIGBLADE_BP_UNICORE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  cell brg_cgra_pod liblist `BRG_CGRA_HPOD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  
   // else RTL
 endconfig

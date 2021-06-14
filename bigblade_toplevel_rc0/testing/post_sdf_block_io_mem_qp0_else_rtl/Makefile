@@ -59,7 +59,7 @@ BSG_CUDA_MACHINES := $(foreach simv,$(BSG_CUDA_SIMS),$(dir $(simv))/Makefile.mac
 BSG_MACHINES := $(BSG_SPMD_MACHINES) $(BSG_CUDA_MACHINES) $(BSG_OUT_DIR)/Makefile.machine.include
 
 # sdf path
-SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-alpha-toplevel-final
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-0-final
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -251,6 +251,28 @@ VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_LIBRAR
 VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_FILELIST)
 VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_LIBRARY)
 
+#################################################
+# BlackParrot filelists and liblists #
+#################################################
+export BIGBLADE_BP_UNICORE_LIBRARY_NAME = bigblade_bp_unicore
+export BIGBLADE_BP_UNICORE_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).filelist
+export BIGBLADE_BP_UNICORE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_BP_UNICORE_LIBRARY_NAME=$(BIGBLADE_BP_UNICORE_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_BP_UNICORE_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_BP_UNICORE_LIBRARY)
+
+###############################
+# CGRA filelists and liblists #
+###############################
+export BRG_CGRA_HPOD_LIBRARY_NAME = brg_cgra_hpod
+export BRG_CGRA_HPOD_FILELIST = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).filelist
+export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
+VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
+
 ##############################################
 # Specify which modules to swap for netlists #
 ##############################################
@@ -328,6 +350,18 @@ BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB = $1.mem_link_$(call BSG_MEM_LINK_EAST_INDEX
 
 # $1 = root path
 BSG_NOC_IO_INSTANCE_PATH_SUB = $1.io_link
+
+# $1 = root path
+# $2 = row
+# $3 = core
+BSG_BP_UNICORE_INSTANCE_PATH = $1.core_complex_core_$2__bp_$3__halfpod
+BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH = $1.core_complex_core_$2__bp_$3__clk_gen
+
+# $1 = root path
+# $2 = row
+# $3 = core
+BRG_CGRA_INSTANCE_PATH = $1.core_complex_$2__cgra_$3__halfpod
+BRG_CGRA_CLK_GEN_INSTANCE_PATH = $1.core_complex_$2__cgra_$3__clk_gen
 
 # Swap podrows
 POD_ROWS := 0
@@ -466,6 +500,24 @@ define noc_mem_row_add_sdf_options
 $(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
 $(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
 endef
+
+# $1 bp row
+# $2 corner
+# $3 min/max
+define bp_row_add_sdf_options
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__clk_gen.sdf.gz)
+endef
+
+define cgra_row_add_sdf_options
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__clk_gen.sdf.gz)
+endef
+
 # sets sdf options to SDF_VCS_OPTIONS
 # $1 corner
 # $2 min/max
@@ -478,7 +530,12 @@ $(eval SDF_VCS_OPTIONS += -sdf $2:$(call BSG_NOC_IO_INSTANCE_PATH_SUB,$(BSG_CHIP
 # each pod to swap
 $(eval $(foreach r,$(POD_ROWS),$(call pod_row_add_sdf_options,$r,$1,$2)))
 # each row (there are 4)
+# noc memories e/w
 $(eval $(foreach r,$(call range,4),$(call noc_mem_row_add_sdf_options,$r,$1,$2)))
+# bp e/w
+$(eval $(foreach r,$(call range,4),$(call bp_row_add_sdf_options,$r,$1,$2)))
+# cgra e/w
+$(eval $(foreach r,$(call range,4),$(call cgra_row_add_sdf_options,$r,$1,$2)))
 endef
 
 ##################################
