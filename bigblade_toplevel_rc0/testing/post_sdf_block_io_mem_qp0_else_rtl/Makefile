@@ -56,7 +56,7 @@ BSG_CUDA_MACHINES := $(foreach simv,$(BSG_CUDA_SIMS),$(dir $(simv))/Makefile.mac
 BSG_MACHINES := $(BSG_SPMD_MACHINES) $(BSG_CUDA_MACHINES) $(BSG_OUT_DIR)/Makefile.machine.include
 
 # sdf path
-SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-0-final
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-0-final/ptsi_xray/bsg_chip
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
