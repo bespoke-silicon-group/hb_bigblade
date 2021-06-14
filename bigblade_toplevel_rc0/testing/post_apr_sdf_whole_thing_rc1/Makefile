@@ -119,7 +119,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 ########################################
 
 BSG_TRACE_NAME  := bsg_tag_boot_rom
-BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot.py
+BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pods_only.py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
 
@@ -275,23 +275,23 @@ VCS_OPTIONS += -diag=sdf
 
 ####################################
 SDF_CORNERS = \
-	sspg_0p72v_125c_sigcmax \
-	sspg_0p72v_125c_sigcmin \
 	sspg_0p72v_125c_sigrcmax \
 	sspg_0p72v_125c_sigrcmin \
-	sspg_0p72v_m40c_sigcmax \
-	sspg_0p72v_m40c_sigcmin \
 	sspg_0p72v_m40c_sigrcmin \
 	sspg_0p72v_m40c_sigrcmax \
-	ffpg_0p88v_125c_sigcmax \
-  ffpg_0p88v_125c_sigcmin \
-  ffpg_0p88v_125c_sigrcmax \
-  ffpg_0p88v_125c_sigrcmin \
-  ffpg_0p88v_m40c_sigrcmax \
-  ffpg_0p88v_m40c_sigrcmin \
-  ffpg_0p88v_m40c_sigcmax \
-  ffpg_0p88v_m40c_sigcmin
+  	ffpg_0p88v_125c_sigrcmax \
+  	ffpg_0p88v_125c_sigrcmin \
+  	ffpg_0p88v_m40c_sigrcmax \
+  	ffpg_0p88v_m40c_sigrcmin
 
+#	sspg_0p72v_125c_sigcmax \
+#	sspg_0p72v_125c_sigcmin \
+#	sspg_0p72v_m40c_sigcmax \
+#	sspg_0p72v_m40c_sigcmin \
+#	ffpg_0p88v_125c_sigcmax \
+#  	ffpg_0p88v_125c_sigcmin \
+#  	ffpg_0p88v_m40c_sigcmax \
+#  	ffpg_0p88v_m40c_sigcmin
 
 MIN_SIMV = $(addprefix out/, $(addsuffix _min/simv, $(SDF_CORNERS)))
 MAX_SIMV = $(addprefix out/, $(addsuffix _max/simv, $(SDF_CORNERS)))
@@ -363,7 +363,10 @@ $(CDC_INSTANCE_LIST_V):
 	$(foreach path, ${CGRA_CLK_GEN_PATHS}, \
     python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
       | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
-
+	$(foreach path, ${CGRA_HALFPOD_PATHS}, \
+    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+      | grep "bsg_SYNC_1_r_reg" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+	
 
 
 
@@ -372,32 +375,32 @@ $(CDC_INSTANCE_LIST_V):
 build:       $(MIN_SIMV) $(MAX_SIMV)
 build-debug: $(MIN_SIMV_DEBUG) $(MAX_SIMV_DEBUG)
 
-SDF_PATH = /nbu/spin_extra/gaozihou/rc0-final/ptsi_xray/bsg_chip
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-1-1-final/ptsi_xray/bsg_chip
 
 out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc   \
-		-sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_chip.sdf.gz \
+		-sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
 		-l out/$*_min/vcs.log
 
 out/%_min/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_min/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_min/csrc-debug   \
-    -sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_chip.sdf.gz \
+    -sdf min:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -debug_pp +vcs+vcdpluson \
     -l out/$*_min/vcs-debug.log
 
 out/%_max/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc   \
-    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_chip.sdf.gz \
+    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -l out/$*_max/vcs.log
 
 
 out/%_max/simv-debug: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_max/
 	$(VCS) $(VCS_OPTIONS) -o $@ -Mdir=out/$*_max/csrc-debug   \
-    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/results/bsg_chip.sdf.gz \
+    -sdf max:$(BSG_CHIP_INSTANCE_PATH):$(SDF_PATH)/$*/bsg_chip.sdf.gz \
     -debug_pp +vcs+vcdpluson \
     -l out/$*_max/vcs-debug.log
 
