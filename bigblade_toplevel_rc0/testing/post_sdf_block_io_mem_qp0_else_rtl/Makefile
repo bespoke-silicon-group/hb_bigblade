@@ -507,17 +507,17 @@ endef
 # $2 corner
 # $3 min/max
 define bp_row_add_sdf_options
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__halfpod.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__halfpod.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__clk_gen.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_0__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__bp_1__clk_gen.sdf.gz)
 endef
 
 define cgra_row_add_sdf_options
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__halfpod.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__halfpod.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__clk_gen.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__halfpod.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,0):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_0__clk_gen.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1,1):$(SDF_PATH)/$2/bsg_chip_core_$1__cgra_1__clk_gen.sdf.gz)
 endef
 
 # sets sdf options to SDF_VCS_OPTIONS
