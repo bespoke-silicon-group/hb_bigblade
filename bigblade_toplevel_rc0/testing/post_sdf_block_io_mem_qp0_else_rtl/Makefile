@@ -396,6 +396,8 @@ BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-ap
 BSG_SDR_NORTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north_row/bsg_manycore_link_to_sdr_north_row_chip_finish.v
 BSG_SDR_SOUTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south_row/bsg_manycore_link_to_sdr_south_row_chip_finish.v
 
+BRG_CGRA_V = $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_brg_cgra_xcel/brg_cgra_pod_chip_finish.v
+
 POD_ROW_INSTANCE_PATHS :=$(foreach r, $(POD_ROWS),$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$r))
 
 BSG_SDR_NE_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(PRIP).sdr_ne)
@@ -405,6 +407,9 @@ BSG_SDR_SW_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(PRIP).s
 
 BSG_SDR_WEST_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(foreach TY, $(TILES_Y),$(PRIP).sdr_w_y_${TY}__sdr_w))
 BSG_SDR_EAST_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(foreach TY, $(TILES_Y),$(PRIP).sdr_e_y_${TY}__sdr_e))
+
+BRG_CGRA_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
+BRG_CGRA_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
 
 # $1 root
 # $2 n/s
@@ -478,6 +483,10 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 	$(foreach path, ${BSG_SDR_SOUTH_ROW_INSTANCE_PATHS}, \
 		python $(EXPAND_VERILOG_PY) $(BSG_SDR_SOUTH_ROW_V) \
 			| grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${BRG_CGRA_INSTANCE_PATHS}, \
+		python $(EXPAND_VERILOG_PY) $(BRG_CGRA_V) \
+			| grep "bsg_SYNC_1_r_reg" | awk '{print "instance { $(path)." $$$$1 " } { noTiming };" }' | sort >> $@;)
 
 #########################
 # Set up SDF annotation #
