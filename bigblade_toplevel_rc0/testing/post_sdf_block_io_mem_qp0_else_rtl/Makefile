@@ -413,15 +413,13 @@ BSG_SDR_EAST_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(forea
 
 BRG_CGRA_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
 BRG_CGRA_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
-BRG_CGRA_CLK_GEN_INSTANCE_PATH := $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
-BRG_CGRA_CLK_GEN_INSTANCE_PATH += $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
+BRG_CGRA_CLK_GEN_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
+BRG_CGRA_CLK_GEN_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
 
 BSG_BP_INSTANCE_PATHS :=  $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
 BSG_BP_INSTANCE_PATHS +=  $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
 BSG_BP_CLK_GEN_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
 BSG_BP_CLK_GEN_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
-
-
 
 # $1 root
 # $2 n/s
@@ -511,6 +509,14 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 	$(foreach path, ${BSG_BP_INSTANCE_PATHS}, \
 		python $(EXPAND_VERILOG_PY) $(BSG_BP_V) \
 			| grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${BSG_BP_CLK_GEN_INSTANCE_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${BRG_CGRA_CLK_GEN_INSTANCE_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 	$(foreach path, ${BIGBLADE_CLK_GEN_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
