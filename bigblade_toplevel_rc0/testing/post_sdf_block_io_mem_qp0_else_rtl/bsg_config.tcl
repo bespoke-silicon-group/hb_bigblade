@@ -51,6 +51,10 @@ source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_toplevel_inc
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_filelist.tcl
 source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/bigblade_bp_unicore_include.tcl
 
+# cgra
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/brg_cgra_hpod_filelist.tcl
+source $::env(BSG_DESIGNS_TARGET_DIR)/testing/post_apr/tcl/brg_cgra_hpod_include.tcl
+
 # pdk source files
 source $::env(HB_BIGBLADE_NETLISTS_DIR)/pdk_stdlib_filelist.tcl
 set SVERILOG_SOURCE_FILES [concat $SVERILOG_SOURCE_FILES $PDK_SOURCE_FILES]
