@@ -237,36 +237,70 @@ module bsg_chip_block_core_complex
         ,.clk_monitor_o         (bp_clk_monitor_o            [i][j])
         );
 
+        wire _bp_clk_lo;
+
+        wire [2:0]                      _bp_io_fwd_link_clk_lo, _bp_io_fwd_link_v_lo, _bp_io_fwd_link_token_li;
+        wire [2:0][mc_fwd_width_lp-1:0] _bp_io_fwd_link_data_lo;
+        wire [2:0]                      _bp_io_fwd_link_clk_li, _bp_io_fwd_link_v_li, _bp_io_fwd_link_token_lo;
+        wire [2:0][mc_fwd_width_lp-1:0] _bp_io_fwd_link_data_li;
+
+        wire [2:0]                      _bp_io_rev_link_clk_lo, _bp_io_rev_link_v_lo, _bp_io_rev_link_token_li;
+        wire [2:0][mc_rev_width_lp-1:0] _bp_io_rev_link_data_lo;
+        wire [2:0]                      _bp_io_rev_link_clk_li, _bp_io_rev_link_v_li, _bp_io_rev_link_token_lo;
+        wire [2:0][mc_rev_width_lp-1:0] _bp_io_rev_link_data_li;
+
+        assign #50 _bp_clk_lo = bp_clk_lo[i][j];
+
+        assign #200 bp_io_fwd_link_clk_lo[i][j]    = _bp_io_fwd_link_clk_lo;
+        assign #200 bp_io_fwd_link_data_lo[i][j]   = _bp_io_fwd_link_data_lo;
+        assign #200 bp_io_fwd_link_v_lo[i][j]      = _bp_io_fwd_link_v_lo;
+        assign #200 _bp_io_fwd_link_token_li = bp_io_fwd_link_token_li[i][j];
+
+        assign #200 bp_io_rev_link_clk_lo[i][j]    = _bp_io_rev_link_clk_lo;
+        assign #200 bp_io_rev_link_data_lo[i][j]   = _bp_io_rev_link_data_lo;
+        assign #200 bp_io_rev_link_v_lo[i][j]      = _bp_io_rev_link_v_lo;
+        assign #200 _bp_io_rev_link_token_li = bp_io_rev_link_token_li[i][j];
+
+        assign #200 _bp_io_fwd_link_clk_li  = bp_io_fwd_link_clk_li[i][j];
+        assign #200 _bp_io_fwd_link_data_li = bp_io_fwd_link_data_li[i][j];
+        assign #200 _bp_io_fwd_link_v_li    = bp_io_fwd_link_v_li[i][j];
+        assign #200 bp_io_fwd_link_token_lo[i][j] = _bp_io_fwd_link_token_lo;
+
+        assign #200 _bp_io_rev_link_clk_li  = bp_io_rev_link_clk_li[i][j];
+        assign #200 _bp_io_rev_link_data_li = bp_io_rev_link_data_li[i][j];
+        assign #200 _bp_io_rev_link_v_li    = bp_io_rev_link_v_li[i][j];
+        assign #200 bp_io_rev_link_token_lo[i][j] = _bp_io_rev_link_token_lo;
+
         bsg_blackparrot_halfpod halfpod
 
-        (.clk_i                     (bp_clk_lo                     [i][j])
+        (.clk_i                     (_bp_clk_lo                    )
 
         ,.tag_clk_i                 (tag_clk_i                           )
         ,.tag_data_i                (tag_data_i                          )
         ,.tag_node_id_offset_i      (bp_tag_node_id_offset_li      [i][j])
 
-        ,.io_fwd_link_clk_o         (bp_io_fwd_link_clk_lo         [i][j])
-        ,.io_fwd_link_data_o        (bp_io_fwd_link_data_lo        [i][j])
-        ,.io_fwd_link_v_o           (bp_io_fwd_link_v_lo           [i][j])
-        ,.io_fwd_link_token_i       (bp_io_fwd_link_token_li       [i][j])
+        ,.io_fwd_link_clk_o         (_bp_io_fwd_link_clk_lo        )
+        ,.io_fwd_link_data_o        (_bp_io_fwd_link_data_lo       )
+        ,.io_fwd_link_v_o           (_bp_io_fwd_link_v_lo          )
+        ,.io_fwd_link_token_i       (_bp_io_fwd_link_token_li      )
         ,.async_fwd_link_o_disable_o(bp_async_fwd_link_o_disable_lo[i][j])
 
-        ,.io_fwd_link_clk_i         (bp_io_fwd_link_clk_li         [i][j])
-        ,.io_fwd_link_data_i        (bp_io_fwd_link_data_li        [i][j])
-        ,.io_fwd_link_v_i           (bp_io_fwd_link_v_li           [i][j])
-        ,.io_fwd_link_token_o       (bp_io_fwd_link_token_lo       [i][j])
+        ,.io_fwd_link_clk_i         (_bp_io_fwd_link_clk_li        )
+        ,.io_fwd_link_data_i        (_bp_io_fwd_link_data_li       )
+        ,.io_fwd_link_v_i           (_bp_io_fwd_link_v_li          )
+        ,.io_fwd_link_token_o       (_bp_io_fwd_link_token_lo      )
         ,.async_fwd_link_i_disable_o(bp_async_fwd_link_i_disable_lo[i][j])
 
-        ,.io_rev_link_clk_o         (bp_io_rev_link_clk_lo         [i][j])
-        ,.io_rev_link_data_o        (bp_io_rev_link_data_lo        [i][j])
-        ,.io_rev_link_v_o           (bp_io_rev_link_v_lo           [i][j])
-        ,.io_rev_link_token_i       (bp_io_rev_link_token_li       [i][j])
+        ,.io_rev_link_clk_o         (_bp_io_rev_link_clk_lo        )
+        ,.io_rev_link_data_o        (_bp_io_rev_link_data_lo       )
+        ,.io_rev_link_v_o           (_bp_io_rev_link_v_lo          )
+        ,.io_rev_link_token_i       (_bp_io_rev_link_token_li      )
         ,.async_rev_link_o_disable_o(bp_async_rev_link_o_disable_lo[i][j])
 
-        ,.io_rev_link_clk_i         (bp_io_rev_link_clk_li         [i][j])
-        ,.io_rev_link_data_i        (bp_io_rev_link_data_li        [i][j])
-        ,.io_rev_link_v_i           (bp_io_rev_link_v_li           [i][j])
-        ,.io_rev_link_token_o       (bp_io_rev_link_token_lo       [i][j])
+        ,.io_rev_link_clk_i         (_bp_io_rev_link_clk_li        )
+        ,.io_rev_link_data_i        (_bp_io_rev_link_data_li       )
+        ,.io_rev_link_v_i           (_bp_io_rev_link_v_li          )
+        ,.io_rev_link_token_o       (_bp_io_rev_link_token_lo      )
         ,.async_rev_link_i_disable_o(bp_async_rev_link_i_disable_lo[i][j])
         );
 
