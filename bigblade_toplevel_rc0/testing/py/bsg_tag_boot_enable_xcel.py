@@ -169,31 +169,6 @@ if __name__ == "__main__":
           # de-assert monitor ds reset
           tg.send(masters=0b10, client_id=7+offset, data_not_reset=1, length=1, data=0b0)
 
-  for row in range(4):
-    offset = clk_gen_offset+(row*clk_num_clients_p)
-    # select ext output clk
-    tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
-    # de-assert monitor ds reset
-    tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
-
-  for row in range(4):
-    for pos in range(2):
-      if (row == 0 and pos == 0):
-        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
-        # select ext output clk
-        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
-        # de-assert monitor ds reset
-        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
-
-  for row in range(4):
-    for pos in range(2):
-      if (row == 0 and pos == 0):
-        offset = cgra_clk_offset+(row*2+pos)*clk_num_clients_p
-        # select ext output clk
-        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
-        # de-assert monitor ds reset
-        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
-
   # reset noc blocks
   for noc in range(9):
     offset = link_offset+(noc*noc_num_clients_p)
@@ -290,6 +265,66 @@ if __name__ == "__main__":
         tg.send(masters=0b11, client_id=2+dly_local_offset+offset, data_not_reset=1, length=10, data=0b0000000000)
         tg.send(masters=0b11, client_id=3+dly_local_offset+offset, data_not_reset=1, length=2, data=0b00)
 
+  # STEP 2: perform async token reset
+  # async token reset for io_link
+  for noc in range(9):
+    for link in range(2):
+      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b111)
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b110)
+
+
+
+  # STEP 3: de-assert upstream io reset
+  # de-assert upstream reset for io_link
+  for noc in range(9):
+    for link in range(2):
+      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b010)
+
+
+
+  # STEP 4: de-assert downstream io reset
+  # de-assert downstream reset for io_link
+  for noc in range(9):
+    for link in range(2):
+      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
+      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b000)
+
+
+
+  # STEP 5/6: de-assert upstream/downstream core reset
+  # de-assert core reset for io_link
+  for noc in range(9):
+    for link in range(2):
+      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
+      tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=2, data=0b00)
+
+  for row in range(4):
+    offset = clk_gen_offset+(row*clk_num_clients_p)
+    # select ext output clk
+    tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+    # de-assert monitor ds reset
+    tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
+
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = bp_clk_offset+(row*2+pos)*clk_num_clients_p
+        # select ext output clk
+        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+        # de-assert monitor ds reset
+        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
+
+  for row in range(4):
+    for pos in range(2):
+      if (row == 0 and pos == 0):
+        offset = cgra_clk_offset+(row*2+pos)*clk_num_clients_p
+        # select ext output clk
+        tg.send(masters=0b10, client_id=4+offset, data_not_reset=1, length=2, data=0b10)
+        # de-assert monitor ds reset
+        tg.send(masters=0b10, client_id=5+offset, data_not_reset=1, length=1, data=0b0)
+
   for row in range(4):
     for corner in range(4):
       offset = row_sdr_offset+(row*4+corner)*(2*sdr_num_clients_p)
@@ -343,43 +378,6 @@ if __name__ == "__main__":
         tg.send(masters=0b11, client_id=6+offset, data_not_reset=1, length=1, data=0b1)
       else:
         tg.send(masters=0b11, client_id=4+offset, data_not_reset=1, length=1, data=0b1)
-
-  # STEP 2: perform async token reset
-  # async token reset for io_link
-  for noc in range(9):
-    for link in range(2):
-      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b111)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b110)
-
-
-
-  # STEP 3: de-assert upstream io reset
-  # de-assert upstream reset for io_link
-  for noc in range(9):
-    for link in range(2):
-      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b010)
-
-
-
-  # STEP 4: de-assert downstream io reset
-  # de-assert downstream reset for io_link
-  for noc in range(9):
-    for link in range(2):
-      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
-      tg.send(masters=0b11, client_id=0+offset, data_not_reset=1, length=3, data=0b000)
-
-
-
-  # STEP 5/6: de-assert upstream/downstream core reset
-  # de-assert core reset for io_link
-  for noc in range(9):
-    for link in range(2):
-      offset = link_offset+(noc*noc_num_clients_p)+(link*link_num_clients_p)
-      tg.send(masters=0b11, client_id=1+offset, data_not_reset=1, length=2, data=0b00)
-
-
 
   # STEP 7: SDR perform async token reset
   for noc in range(9):
