@@ -393,6 +393,11 @@ BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-ap
 BSG_SDR_NORTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north_row/bsg_manycore_link_to_sdr_north_row_chip_finish.v
 BSG_SDR_SOUTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south_row/bsg_manycore_link_to_sdr_south_row_chip_finish.v
 
+BIGBLADE_CLK_GEN_V 	= $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-2/post-apr/bigblade_clk_gen/bigblade_clk_gen_chip_finish.v
+IO_LINK_DDR_V 		= $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_io_link_ddr/bsg_chip_io_link_ddr_chip_finish.v
+NOC_IO_LINK_V		= $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_noc_io_link/bsg_chip_noc_io_link_chip_finish.v
+NOC_MEM_LINK_V		= $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_noc_mem_link/bsg_chip_noc_mem_link_chip_finish.v
+
 BRG_CGRA_V = $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_brg_cgra_xcel/brg_cgra_pod_chip_finish.v
 BSG_BP_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-1/post-apr/bigblade_bp_unicore/bsg_blackparrot_halfpod_chip_finish.v
 
@@ -408,9 +413,15 @@ BSG_SDR_EAST_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),$(forea
 
 BRG_CGRA_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
 BRG_CGRA_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BRG_CGRA_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
+BRG_CGRA_CLK_GEN_INSTANCE_PATH := $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
+BRG_CGRA_CLK_GEN_INSTANCE_PATH += $(foreach ROW,$(call range,4),$(call BRG_CGRA_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
 
 BSG_BP_INSTANCE_PATHS :=  $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
 BSG_BP_INSTANCE_PATHS +=  $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),1))
+BSG_BP_CLK_GEN_INSTANCE_PATHS := $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
+BSG_BP_CLK_GEN_INSTANCE_PATHS += $(foreach ROW,$(call range,4),$(call BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$(ROW),0))
+
+
 
 # $1 root
 # $2 n/s
@@ -439,6 +450,14 @@ BSG_SDR_NORTH_ROW_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),\
 BSG_SDR_SOUTH_ROW_INSTANCE_PATHS := $(foreach PRIP, $(POD_ROW_INSTANCE_PATHS),\
                                       $(foreach PX, $(PODS_X),\
                                         $(call BSG_POD_SDR_ROW_INSTANCE_PATH_SUB,$(PRIP),s,$(PX))))
+
+BIGBLADE_CLK_GEN_PATHS 	:= $(foreach PY,$(call range,4), $(BSG_CHIP_INSTANCE_PATH).block.core_complex_core_${PY}__clk_gen)
+NOC_IO_LINK_PATHS 	:= $(BSG_CHIP_INSTANCE_PATH).block.io_link
+NOC_MEM_LINK_PATHS 	:= $(foreach M,$(call range,8), $(BSG_CHIP_INSTANCE_PATH).block.mem_link_${M}__link)
+IO_LINK_DDR_PATHS 	:= $(BSG_CHIP_INSTANCE_PATH).block.io_link.ddr_link_0__link
+IO_LINK_DDR_PATHS	+= $(BSG_CHIP_INSTANCE_PATH).block.io_link.ddr_link_1__link
+IO_LINK_DDR_PATHS	+= $(foreach M,$(call range,8), $(BSG_CHIP_INSTANCE_PATH).block.mem_link_${M}__link.ddr_link_0__link)
+IO_LINK_DDR_PATHS	+= $(foreach M,$(call range,8), $(BSG_CHIP_INSTANCE_PATH).block.mem_link_${M}__link.ddr_link_1__link)
 
 # Create giant config file... I don't doubt there is a better way to
 # handle this, but time is a critical factor here. The challenge seems
@@ -493,6 +512,21 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 		python $(EXPAND_VERILOG_PY) $(BSG_BP_V) \
 			| grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
+	$(foreach path, ${BIGBLADE_CLK_GEN_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${NOC_IO_LINK_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(NOC_IO_LINK_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${NOC_MEM_LINK_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(NOC_MEM_LINK_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+
+	$(foreach path, ${IO_LINK_DDR_PATHS}, \
+	    python $(EXPAND_VERILOG_PY) $(IO_LINK_DDR_V) \
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 #########################
 # Set up SDF annotation #
