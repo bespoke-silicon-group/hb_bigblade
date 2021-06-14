@@ -491,16 +491,16 @@ VCS_OPTIONS += -negdelay
 # $2 corner
 # $3 min/max
 define pod_row_add_sdf_options
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_podrow_$1.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_clk_gen_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_POD_ROW_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1):$(SDF_PATH)/$2/bsg_chip_podrow_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_CLK_GEN_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1):$(SDF_PATH)/$2/bsg_chip_clk_gen_$1.sdf.gz)
 endef
 
 # $1 pod row
 # $2 corner
 # $3 min/max
 define noc_mem_row_add_sdf_options
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
-$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),0):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_WEST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1):$(SDF_PATH)/$2/bsg_chip_noc_mem_$1.sdf.gz)
+$(eval SDF_VCS_OPTIONS += -sdf $3:$(call BSG_MEM_LINK_EAST_INSTANCE_PATH_SUB,$(BSG_CHIP_BLOCK_INSTANCE_PATH),$1):$(SDF_PATH)/$2/bsg_chip_noc_mem_$(call BSG_MEM_LINK_EAST_INDEX_FROM_ROW,$1).sdf.gz)
 endef
 
 # $1 bp row
