@@ -362,8 +362,8 @@ BSG_BP_UNICORE_CLK_GEN_INSTANCE_PATH = $1.core_complex_core_$2__bp_$3__clk_gen
 # $1 = root path
 # $2 = row
 # $3 = core
-BRG_CGRA_INSTANCE_PATH = $1.core_complex_$2__cgra_$3__halfpod
-BRG_CGRA_CLK_GEN_INSTANCE_PATH = $1.core_complex_$2__cgra_$3__clk_gen
+BRG_CGRA_INSTANCE_PATH = $1.core_complex_core_$2__cgra_$3__halfpod
+BRG_CGRA_CLK_GEN_INSTANCE_PATH = $1.core_complex_core_$2__cgra_$3__clk_gen
 
 # Swap podrows
 POD_ROWS := 0
