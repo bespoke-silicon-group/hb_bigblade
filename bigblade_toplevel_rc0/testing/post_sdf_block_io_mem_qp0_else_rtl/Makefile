@@ -30,20 +30,17 @@ SDF_CORNERS += ffpg_0p88v_m40c_sigrcmax
 SDF_CORNERS += ffpg_0p88v_m40c_sigcmin
 # SDF_CORNERS += tt_0p80v_25c_nominal
 
+BSG_WORK_DIR := $(abspath ./)
+BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
+
 BSG_SPMD_MIN_SIMS = $(addprefix out/, $(addsuffix _min/simv, $(SDF_CORNERS)))
 BSG_SPMD_MAX_SIMS = $(addprefix out/, $(addsuffix _max/simv, $(SDF_CORNERS)))
 BSG_SPMD_MIN_SIMS_DEBUG = $(addprefix out/, $(addsuffix _min/simv-debug, $(SDF_CORNERS)))
 BSG_SPMD_MAX_SIMS_DEBUG = $(addprefix out/, $(addsuffix _max/simv-debug, $(SDF_CORNERS)))
-
-BSG_WORK_DIR := $(abspath ./)
-BSG_OUT_DIR  := $(BSG_WORK_DIR)/out
-ifeq ($(WAVE),1)
-  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
-  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
-else
-  BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
-  BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
-endif
+BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS_DEBUG)
+BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS_DEBUG)
+BSG_SPMD_SIMS := $(BSG_SPMD_MIN_SIMS)
+BSG_SPMD_SIMS += $(BSG_SPMD_MAX_SIMS)
 
 BSG_CUDA_MIN_SIMS = $(addprefix out/, $(addsuffix _min/cuda/simv, $(SDF_CORNERS)))
 BSG_CUDA_MAX_SIMS = $(addprefix out/, $(addsuffix _max/cuda/simv, $(SDF_CORNERS)))
