@@ -565,7 +565,7 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 BSG_TRACE_NAME  := bsg_tag_boot_pods_only
 BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
-BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
+BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
 
 ifeq ($(USE_CLK_GEN),1)
   BSG_TRACE_PY_OPTION := use_clk_gen
