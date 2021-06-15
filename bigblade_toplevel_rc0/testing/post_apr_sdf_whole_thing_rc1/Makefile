@@ -135,7 +135,7 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< bsg_tag_boot_rom > $@
 
-VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
+#VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
 
 ########################################
