@@ -1,3 +1,8 @@
+//
+// There are two ways to load trace file dynamically:
+// 1. When executing simv, append +trace_file=foo
+// 2. Create a trace file named bsg_tag_boot.tr, copy to dir of simv
+//
 
 module bsg_tag_boot_rom
 
