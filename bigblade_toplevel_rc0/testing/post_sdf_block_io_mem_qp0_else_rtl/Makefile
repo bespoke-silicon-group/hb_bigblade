@@ -12,9 +12,9 @@ TOP_DIR            ?= $(shell git rev-parse --show-toplevel)
 ROOT_DIR           ?= $(abspath $(TOP_DIR)/../)
 export BSG_DESIGNS_TARGET ?= $(notdir $(abspath ../../))
 
-# SDF_CORNERS += sspg_0p72v_125c_sigrcmax
-# SDF_CORNERS += ffpg_0p88v_125c_sigcmax
-# SDF_CORNERS += ffpg_0p88v_125c_sigrcmax
+SDF_CORNERS += sspg_0p72v_125c_sigrcmax
+SDF_CORNERS += ffpg_0p88v_125c_sigcmax
+SDF_CORNERS += ffpg_0p88v_125c_sigrcmax
 SDF_CORNERS += ffpg_0p88v_125c_sigcmin
 SDF_CORNERS += ffpg_0p88v_125c_sigrcmin
 SDF_CORNERS += ffpg_0p88v_m40c_sigcmax
@@ -56,7 +56,7 @@ BSG_CUDA_MACHINES := $(foreach simv,$(BSG_CUDA_SIMS),$(dir $(simv))/Makefile.mac
 BSG_MACHINES := $(BSG_SPMD_MACHINES) $(BSG_CUDA_MACHINES) $(BSG_OUT_DIR)/Makefile.machine.include
 
 # sdf path
-SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-0-final/ptsi_xray/bsg_chip
+SDF_PATH = /nbu/spin/share/gf14/bigblade_toplevel/rc-1-1-final/ptsi_xray/bsg_chip
 
 # Repository setup
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
@@ -384,16 +384,16 @@ EXPAND_VERILOG_PY = $(TOP_DIR)/util/expand_verilog_hierarchy.py
 CDC_INSTANCE_LIST_V = $(BSG_OUT_DIR)/cdc_instance_list.v
 VCS_OPTIONS += +optconfigfile+$(CDC_INSTANCE_LIST_V)
 
-BSG_SDR_NE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_ne/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
-BSG_SDR_NW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_nw/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
-BSG_SDR_SE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_se/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
-BSG_SDR_SW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_wh_to_sdr_sw/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
-BSG_SDR_EAST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_east/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
-BSG_SDR_WEST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_ruche_to_sdr_west/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
-BSG_SDR_NORTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north/bsg_manycore_link_to_sdr_north_chip_finish.v
-BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south/bsg_manycore_link_to_sdr_south_chip_finish.v
-BSG_SDR_NORTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_north_row/bsg_manycore_link_to_sdr_north_row_chip_finish.v
-BSG_SDR_SOUTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-3/post-apr/bsg_manycore_link_to_sdr_south_row/bsg_manycore_link_to_sdr_south_row_chip_finish.v
+BSG_SDR_NE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_wh_to_sdr_ne/bsg_manycore_link_wh_to_sdr_ne_chip_finish.v
+BSG_SDR_NW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_wh_to_sdr_nw/bsg_manycore_link_wh_to_sdr_nw_chip_finish.v
+BSG_SDR_SE_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_wh_to_sdr_se/bsg_manycore_link_wh_to_sdr_se_chip_finish.v
+BSG_SDR_SW_V          = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_wh_to_sdr_sw/bsg_manycore_link_wh_to_sdr_sw_chip_finish.v
+BSG_SDR_EAST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_ruche_to_sdr_east/bsg_manycore_link_ruche_to_sdr_east_chip_finish.v
+BSG_SDR_WEST_V        = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_ruche_to_sdr_west/bsg_manycore_link_ruche_to_sdr_west_chip_finish.v
+BSG_SDR_NORTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_to_sdr_north/bsg_manycore_link_to_sdr_north_chip_finish.v
+BSG_SDR_SOUTH_V       = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_to_sdr_south/bsg_manycore_link_to_sdr_south_chip_finish.v
+BSG_SDR_NORTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_to_sdr_north_row/bsg_manycore_link_to_sdr_north_row_chip_finish.v
+BSG_SDR_SOUTH_ROW_V   = $(HB_BIGBLADE_NETLISTS_DIR)/rc-1-1/post-apr/bsg_manycore_link_to_sdr_south_row/bsg_manycore_link_to_sdr_south_row_chip_finish.v
 
 BIGBLADE_CLK_GEN_V 	= $(HB_BIGBLADE_NETLISTS_DIR)/rc-alpha-rtlfreeze-2/post-apr/bigblade_clk_gen/bigblade_clk_gen_chip_finish.v
 IO_LINK_DDR_V 		= $(HB_BIGBLADE_NETLISTS_DIR)/rc-0-0/post-apr/bigblade_io_link_ddr/bsg_chip_io_link_ddr_chip_finish.v
