@@ -514,15 +514,21 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 
 	$(foreach path, ${BSG_BP_CLK_GEN_INSTANCE_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
-	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@; \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "bsg_SYNC_1_r" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 	$(foreach path, ${BRG_CGRA_CLK_GEN_INSTANCE_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
-	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@; \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "bsg_SYNC_1_r" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 	$(foreach path, ${BIGBLADE_CLK_GEN_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
-	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@; \
+	    python $(EXPAND_VERILOG_PY) $(BIGBLADE_CLK_GEN_V) \
+	      | grep "bsg_SYNC_1_r" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 	$(foreach path, ${NOC_IO_LINK_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(NOC_IO_LINK_V) \
@@ -534,7 +540,9 @@ $(CDC_INSTANCE_LIST_V): $(BSG_OUT_DIR)
 
 	$(foreach path, ${IO_LINK_DDR_PATHS}, \
 	    python $(EXPAND_VERILOG_PY) $(IO_LINK_DDR_V) \
-	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
+	      | grep "_hard_sync_int" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@; \
+	    python $(EXPAND_VERILOG_PY) $(IO_LINK_DDR_V) \
+	      | grep "bsg_SYNC_1_r" | awk '{ print "instance { $(path)." $$$$2 " } { noTiming };" }' | sort >> $@;)
 
 #########################
 # Set up SDF annotation #
