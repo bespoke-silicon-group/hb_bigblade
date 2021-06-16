@@ -14,6 +14,8 @@ TRACE_PATH        := $(SWEEP_RUNS_DIR)/$(TRACE_NAME).tr
 NBF_PATH          := $(CLK_GEN_SWEEP_DIR)/nbf/dummy.nbf
 BUILD_DIR         := $(BSG_DESIGNS_TARGET_DIR)/testing/post_sdf_block_io_mem_qp0_else_rtl/out
 
+include $(BSG_DESIGNS_TARGET_DIR)/bsg_cadenv/cadenv.mk
+
 PROCESSES   := ffpg_0p88v sspg_0p72v
 TEMPS       := 125c m40c
 RC_CORNERS  := sigcmax sigcmin sigrcmax sigrcmin
@@ -37,6 +39,9 @@ run-%: $(SWEEP_RUNS_DIR) $(TRACE_PATH) $(NBF_PATH)
 	            +trace_file=$(TRACE_PATH) \
 	            +max_cycle=10             \
 	            -l run.log
+
+view-%:
+	cd $(SWEEP_RUNS_DIR)/$*; $(VCS_BIN)/dve -full64 -vpd vcdplus.vpd
 
 $(SWEEP_RUNS_DIR):
 	mkdir -p $@
