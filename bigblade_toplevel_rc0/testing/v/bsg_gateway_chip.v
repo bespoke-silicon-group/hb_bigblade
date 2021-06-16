@@ -395,5 +395,11 @@ module bsg_gateway_chip
   `ifdef PRINT_TAG_CLK
   `clock_printer(tag_clk);
   `endif
-  
+
+  initial begin
+     force bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.state[1] = 1'b0;
+     @(posedge bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.reset);
+     @(negedge bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.reset);
+     release bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.state[1];
+  end
 endmodule

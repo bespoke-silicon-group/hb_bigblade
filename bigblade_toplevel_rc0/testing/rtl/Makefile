@@ -110,9 +110,11 @@ $(BSG_DESIGNS_TESTING_LIBRARY): $(BSG_OUT_DIR)/root
 ########################################
 
 BSG_TRACE_NAME  := bsg_tag_boot
-BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
+BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pods_only.py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
-BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
+BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
+BSG_TRACE_CGRA_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pod0_cgra0.py
+BSG_TRACE_CGRA_FILES := $(BSG_OUT_DIR)/bsg_tag_boot_pod0_cgra0.tr
 
 ifeq ($(USE_CLK_GEN),1)
   BSG_TRACE_PY_OPTION := use_clk_gen
@@ -125,6 +127,11 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
+
+$(BSG_TRACE_CGRA_FILES): $(BSG_TRACE_CGRA_PY) | $(BSG_OUT_DIR)
+	python $< $(BSG_TRACE_PY_OPTION) > $@
+
+cgra: $(BSG_TRACE_CGRA_FILES)
 
 #VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
