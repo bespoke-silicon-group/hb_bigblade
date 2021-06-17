@@ -395,5 +395,22 @@ module bsg_gateway_chip
   `ifdef PRINT_TAG_CLK
   `clock_printer(tag_clk);
   `endif
-  
+
+  `ifdef ENABLE_CGRA_X_INITIALIZATION_HACK
+  // Verilog has some issues when the state register is an enum. In
+  // theory, we could have solved this with //synopsys sync_set_reset,
+  // but we found the issue too late in the design process and this is
+  // the resolving hack.
+
+  // For any post-synthesis netlist, copy the four lines below for any
+  // CGRA that is planned to be used. Update the pod-row index, and
+  // the half-pod index as necessary
+   
+  initial begin
+     force bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.state[1] = 1'b0;
+     @(posedge bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.reset);
+     @(negedge bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.reset);
+     release bsg_bigblade_pcb.IC.ASIC.block.core_complex_core_0__cgra_0__halfpod.pod.hb_cgra_xcel.cgra_xcel.dpath.cgra.ctrl.state[1];
+  end
+  `endif
 endmodule

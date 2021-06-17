@@ -114,6 +114,13 @@ BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/$(BSG_TRACE_NAME).py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME)_rom.v
 
+# The CGRA is not booted by the bsg_tag_boot_pods_only, if you want to
+# boot the CGRA, then you need to tell the simulation to build this
+# trace script script, and then tell the simulator to read it during
+# runtime (see arguments in bsg_manycore Makefile.verilog)
+BSG_TRACE_CGRA_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pod0_cgra0.py
+BSG_TRACE_CGRA_FILES := $(BSG_OUT_DIR)/bsg_tag_boot_pod0_cgra0.tr
+
 ifeq ($(USE_CLK_GEN),1)
   BSG_TRACE_PY_OPTION := use_clk_gen
 else
@@ -125,6 +132,9 @@ $(BSG_TRACE_FILES): $(BSG_TRACE_PY) | $(BSG_OUT_DIR)
 
 $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 	$(BASEJUMP_STL_DIR)/bsg_mem/bsg_ascii_to_rom.py $< $(BSG_TRACE_NAME)_rom > $@
+
+$(BSG_TRACE_CGRA_FILES): $(BSG_TRACE_CGRA_PY) | $(BSG_OUT_DIR)
+	python $< $(BSG_TRACE_PY_OPTION) > $@
 
 #VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
@@ -165,7 +175,7 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 build: $(BSG_SPMD_SIM) $(BSG_CUDA_SIM)
 debug: $(BSG_CUDA_DBG)
 $(BSG_SPMD_SIM): VCS_OPTIONS += -Mdir=$(BSG_OUT_DIR)/spmd
-$(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+$(BSG_SPMD_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_FILES) $(BSG_TRACE_CGRA_FILES) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_CUDA_SIM): VCS_OPTIONS += -Mdir=$(BSG_CUDA_PATH)/exec
@@ -180,7 +190,7 @@ $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBG) $(BSG_CUDA_SIM): VCS_OPTIONS += +define+REPLICANT=1
 
-$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
+$(BSG_CUDA_DBG) $(BSG_CUDA_SIM): $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_FILES) $(BSG_TRACE_CGRA_FILES) $(BSG_BLADERUNNER_GENERATED) | $(BSG_CUDA_PATH)
 	$(VCS) $(VCS_OPTIONS) -o $@ | tee -i $(BSG_OUT_DIR)/build.log
 
 $(BSG_OUT_DIR)/root: | $(BSG_OUT_DIR)
