@@ -626,7 +626,7 @@ BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pods_only.py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
 
-# The CGRA is not booted by the bsg_tag_boog_pods_only, if you want to
+# The CGRA is not booted by the bsg_tag_boot_pods_only, if you want to
 # boot the CGRA, then you need to tell the simulation to build this
 # trace script script, and then tell the simulator to read it during
 # runtime (see arguments in bsg_manycore Makefile.verilog)
