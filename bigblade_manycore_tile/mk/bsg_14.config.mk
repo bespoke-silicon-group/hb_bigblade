@@ -36,7 +36,8 @@ export PTSI_FLOW_STRIP_PATH :=
 
 
 
-
+export ICC2_CTS_MAX_ROUTING_LAYER := K4
+export ICC2_MAX_ROUTING_LAYER     := K4
 
 
 time.pnr:
