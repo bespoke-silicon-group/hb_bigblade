@@ -625,6 +625,11 @@ BSG_TRACE_NAME  := bsg_tag_boot
 BSG_TRACE_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pods_only.py
 BSG_TRACE_FILES := $(BSG_OUT_DIR)/$(BSG_TRACE_NAME).tr
 BSG_TRACE_ROMS  := $(BSG_OUT_DIR)/bsg_tag_boot_rom.v
+
+# The CGRA is not booted by the bsg_tag_boog_pods_only, if you want to
+# boot the CGRA, then you need to tell the simulation to build this
+# trace script script, and then tell the simulator to read it during
+# runtime (see arguments in bsg_manycore Makefile.verilog)
 BSG_TRACE_CGRA_PY    := $(BSG_WORK_DIR)/../py/bsg_tag_boot_pod0_cgra0.py
 BSG_TRACE_CGRA_FILES := $(BSG_OUT_DIR)/bsg_tag_boot_pod0_cgra0.tr
 
@@ -642,8 +647,6 @@ $(BSG_TRACE_ROMS): $(BSG_TRACE_FILES) | $(BSG_OUT_DIR)
 
 $(BSG_TRACE_CGRA_FILES): $(BSG_TRACE_CGRA_PY) | $(BSG_OUT_DIR)
 	python $< $(BSG_TRACE_PY_OPTION) > $@
-
-cgra: $(BSG_TRACE_CGRA_FILES)
 
 #VCS_OPTIONS += $(addprefix -v ,$(BSG_TRACE_ROMS))
 
@@ -695,7 +698,7 @@ spmd:  $(BSG_SPMD_SIMS)
 build: $(BSG_SPMD_SIMS) $(BSG_CUDA_SIMS)
 debug: $(BSG_CUDA_DBGS)
 $(BSG_SPMD_SIMS_DEBUG): VCS_OPTIONS += -debug_pp +vcs+vcdpluson
-$(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(IP_ROOT_DIRS) $(BSG_MACHINES) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
+$(BSG_SPMD_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_FILES) $(BSG_TRACE_CGRA_FILES) $(IP_ROOT_DIRS) $(BSG_MACHINES) $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p $(dir $@)
 	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
@@ -716,7 +719,7 @@ $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_regres
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lbsg_manycore_runtime
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += -LDFLAGS -lm
 $(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): VCS_OPTIONS += +define+REPLICANT=1
-$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) $(BSG_MACHINES)
+$(BSG_CUDA_DBGS) $(BSG_CUDA_SIMS): $(CDC_INSTANCE_LIST_V) swaplist.vh $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_FILES) $(BSG_TRACE_CGRA_FILES) $(BSG_BLADERUNNER_GENERATED) $(IP_ROOT_DIRS) $(BSG_MACHINES)
 	mkdir -p $(dir $@)
 	$(eval EXTRA_VCS_OPTIONS = )
 	$(eval DEBUG = $(findstring -debug,$@))
