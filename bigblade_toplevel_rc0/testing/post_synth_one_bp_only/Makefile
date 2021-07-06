@@ -29,8 +29,6 @@ BSG_CUDA_DBG  := $(BSG_CUDA_PATH)/simv-debug
 export BSG_DESIGNS_DIR        ?= $(abspath ../../../)
 export BSG_DESIGNS_TARGET_DIR ?= $(BSG_DESIGNS_DIR)/$(BSG_DESIGNS_TARGET)
 export BSG_DESIGNS_TARGET_TCL_HARD_DIR ?= $(BSG_DESIGNS_TARGET_DIR)/tcl/hard/gf_14
-export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
-export CGRA_DIR               ?= $(BSG_DESIGNS_TARGET_DIR)/cgra
 
 # Additional setup for RTL-Hard
 export BSG_CHIP_DIR             ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_14
@@ -40,6 +38,8 @@ export BSG_TARGET_PROCESS       ?=gf_14
 
 export BASEJUMP_STL_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/basejump_stl
 export BSG_MANYCORE_DIR       ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_manycore
+export BLACKPARROT_DIR        ?= $(BSG_DESIGNS_TARGET_DIR)/black-parrot
+export CGRA_DIR               ?= $(BSG_DESIGNS_TARGET_DIR)/cgra
 export BSG_REPLICANT_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_replicant
 export BSG_F1_DIR             ?= $(BSG_REPLICANT_DIR)
 export BSG_PACKAGING_DIR      ?= $(BSG_DESIGNS_TARGET_DIR)/bsg_packaging
@@ -94,14 +94,8 @@ VCS_OPTIONS += +define+den2048Mb+sg5+x16+FULL_MEM
 BSG_TOP_SIM_MODULE = bsg_bigblade_pcb
 BSG_CHIP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC
 
-# change these to select which tile in which pod is swapped with its synthesized netlist
-BSG_HP_Y ?= 0
-
-BP_HP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$(shell echo $1/2 | bc)].bp[$(shell echo $1%2 | bc)].halfpod
-
 VCS_OPTIONS += +define+BSG_TOP_SIM_MODULE=$(BSG_TOP_SIM_MODULE)
 VCS_OPTIONS += +define+BSG_CHIP_INSTANCE_PATH=$(BSG_CHIP_INSTANCE_PATH)
-VCS_OPTIONS += +define+BSG_BP_PATH=$(call BP_HP_INSTANCE_PATH,$(BSG_HP_Y))
 
 export BSG_CHIP_LIBRARY_NAME = bsg_chip
 export BSG_CHIP_FILELIST = $(BSG_OUT_DIR)/$(BSG_CHIP_LIBRARY_NAME).filelist
@@ -188,9 +182,37 @@ export BSG_MANYCORE_LINK_SDR_LIBRARY_NAME = bsg_manycore_link_sdr
 export BSG_MANYCORE_LINK_SDR_FILELIST = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).filelist
 export BSG_MANYCORE_LINK_SDR_LIBRARY = $(BSG_OUT_DIR)/$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME).library
 
-#VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
-#VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
-#VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
+# Currently empty library, uncomment if populated
+# VCS_OPTIONS += +define+BSG_MANYCORE_LINK_SDR_LIBRARY_NAME=$(BSG_MANYCORE_LINK_SDR_LIBRARY_NAME)
+# VCS_OPTIONS += -f $(BSG_MANYCORE_LINK_SDR_FILELIST)
+# VCS_OPTIONS += -libmap $(BSG_MANYCORE_LINK_SDR_LIBRARY)
+
+#################################################
+# BlackParrot filelists and liblists #
+#################################################
+export BIGBLADE_BP_UNICORE_LIBRARY_NAME = bigblade_bp_unicore
+export BIGBLADE_BP_UNICORE_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).filelist
+export BIGBLADE_BP_UNICORE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).library
+
+# change these to select which tile in which pod is swapped with its synthesized netlist
+BSG_HP_Y ?= 0
+BP_HP_INSTANCE_PATH = $(BSG_TOP_SIM_MODULE).IC.ASIC.block.core_complex.core[$(shell echo $1/2 | bc)].bp[$(shell echo $1%2 | bc)].halfpod
+VCS_OPTIONS += +define+BSG_BP_PATH=$(call BP_HP_INSTANCE_PATH,$(BSG_HP_Y))
+
+VCS_OPTIONS += +define+BIGBLADE_BP_UNICORE_LIBRARY_NAME=$(BIGBLADE_BP_UNICORE_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_BP_UNICORE_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_BP_UNICORE_LIBRARY)
+
+###############################
+# CGRA filelists and liblists #
+###############################
+export BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME = bigblade_brg_cgra_pod
+export BIGBLADE_BRG_CGRA_POD_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME).filelist
+export BIGBLADE_BRG_CGRA_POD_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME).library
+
+VCS_OPTIONS += +define+BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME=$(BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_BRG_CGRA_POD_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_BRG_CGRA_POD_LIBRARY)
 
 ########################################
 # BSG Tie HI/LO filelists and liblists #
@@ -204,27 +226,16 @@ VCS_OPTIONS += +define+BSG_TIEHILO_LIBRARY_NAME=$(BSG_TIEHILO_LIBRARY_NAME)
 VCS_OPTIONS += -f $(BSG_TIEHILO_FILELIST)
 VCS_OPTIONS += -libmap $(BSG_TIEHILO_LIBRARY)
 
+##################################################
+# Bigblade Toplevel Block filelists and liblists #
 #################################################
-# BlackParrot filelists and liblists #
-#################################################
-export BIGBLADE_BP_UNICORE_LIBRARY_NAME = bigblade_bp_unicore
-export BIGBLADE_BP_UNICORE_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).filelist
-export BIGBLADE_BP_UNICORE_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_BP_UNICORE_LIBRARY_NAME).library
+export BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME = bigblade_toplevel_block
+export BIGBLADE_TOPLEVEL_BLOCK_FILELIST = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME).filelist
+export BIGBLADE_TOPLEVEL_BLOCK_LIBRARY = $(BSG_OUT_DIR)/$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME).library
 
-VCS_OPTIONS += +define+BIGBLADE_BP_UNICORE_LIBRARY_NAME=$(BIGBLADE_BP_UNICORE_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BIGBLADE_BP_UNICORE_FILELIST)
-VCS_OPTIONS += -libmap $(BIGBLADE_BP_UNICORE_LIBRARY)
-
-###############################
-# CGRA filelists and liblists #
-###############################
-export BRG_CGRA_HPOD_LIBRARY_NAME = brg_cgra_hpod
-export BRG_CGRA_HPOD_FILELIST = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).filelist
-export BRG_CGRA_HPOD_LIBRARY = $(BSG_OUT_DIR)/$(BRG_CGRA_HPOD_LIBRARY_NAME).library
-
-VCS_OPTIONS += +define+BRG_CGRA_HPOD_LIBRARY_NAME=$(BRG_CGRA_HPOD_LIBRARY_NAME)
-VCS_OPTIONS += -f $(BRG_CGRA_HPOD_FILELIST)
-VCS_OPTIONS += -libmap $(BRG_CGRA_HPOD_LIBRARY)
+VCS_OPTIONS += +define+BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME=$(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME)
+VCS_OPTIONS += -f $(BIGBLADE_TOPLEVEL_BLOCK_FILELIST)
+VCS_OPTIONS += -libmap $(BIGBLADE_TOPLEVEL_BLOCK_LIBRARY)
 
 ##################################
 # Create filelists and libraries #
@@ -296,7 +307,6 @@ VCS_OPTIONS += -pvalue+hb_num_pods_y_gp=$(OVERRIDE_PODS_Y)
 ########################################
 
 # create symlinks foreach ip block
-
 IP_BLOCKS  = bigblade_clk_gen
 IP_BLOCKS += bigblade_noc_io_link
 IP_BLOCKS += bigblade_noc_mem_link
@@ -304,6 +314,7 @@ IP_BLOCKS += bsg_manycore_tile
 IP_BLOCKS += bigblade_io_link_ddr
 IP_BLOCKS += bsg_manycore_link_sdr
 IP_BLOCKS += bsg_tiehilo
+IP_BLOCKS += bigblade_toplevel_block
 
 IP_ROOT_DIRS = $(foreach block,$(IP_BLOCKS),$(BSG_OUT_DIR)/$(block))
 $(IP_ROOT_DIRS): | $(BSG_OUT_DIR)

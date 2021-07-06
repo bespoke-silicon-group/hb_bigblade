@@ -31,6 +31,12 @@ config bsg_config;
   cell bsg_manycore_link_wh_to_sdr_se liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_manycore_link_wh_to_sdr_sw liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
+  // BlackParrot
+  cell bsg_blackparrot_halfpod liblist `BIGBLADE_BP_UNICORE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
+  // cgra
+  cell brg_cgra_pod liblist `BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
   // bsg tie hi/lo
   cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;

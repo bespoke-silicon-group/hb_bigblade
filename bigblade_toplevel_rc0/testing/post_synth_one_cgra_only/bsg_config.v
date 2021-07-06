@@ -32,11 +32,17 @@ config bsg_config;
   // cell bsg_manycore_link_wh_to_sdr_se liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   // cell bsg_manycore_link_wh_to_sdr_sw liblist `BSG_MANYCORE_LINK_SDR_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
 
+  // BlackParrot
+  cell bsg_blackparrot_halfpod liblist `BIGBLADE_BP_UNICORE_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
+  // cgra
+  //cell brg_cgra_pod liblist `BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+  instance `BSG_CGRA_PATH liblist `BIGBLADE_BRG_CGRA_POD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
   // bsg tie hi/lo
   cell bsg_tiehi liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   cell bsg_tielo liblist `BSG_TIEHILO_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
-
-  // post-synth GL CGRA #0 (CGRA #1~7 will be RTL)
-  instance `BRG_CGRA_HPOD_PATH liblist `BRG_CGRA_HPOD_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
   
+  cell bsg_chip_block liblist `BIGBLADE_TOPLEVEL_BLOCK_LIBRARY_NAME `BSG_CHIP_LIBRARY_NAME;
+
 endconfig
