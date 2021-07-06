@@ -4,8 +4,8 @@ from subprocess import run
 
 # The directoy to copy the design to.
 BUILD_DIR   = 'bsg_14'
-RELEASE     = 'rc-alpha-rtlfreeze'
-RELEASE_DIR = '/nbu/spin/share/gf14/bigblade_exports'
+RELEASE     = 'bigblade-final'
+RELEASE_DIR = '/nbu/spin/share/gf14/bigblade_logs/bigblade-final/builds'
 
 olddir = os.getcwd()
 
@@ -21,15 +21,16 @@ print()
 # (alphabetical and dictionary order so the newest version should be list in
 # the list).
 print(f'Searching for release "{RELEASE}" in directory "{RELEASE_DIR}":')
-release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
-for d in release_dirs:
-  print(f'\t{d}')
-print()
-
-# No releases found
-if len(release_dirs) == 0:
-  print(f'No release dirs found, exiting...')
-  sys.exit(1)
+#release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
+#for d in release_dirs:
+#  print(f'\t{d}')
+#print()
+#
+## No releases found
+#if len(release_dirs) == 0:
+#  print(f'No release dirs found, exiting...')
+#  sys.exit(1)
+release_dirs = [d for d in glob.glob(RELEASE_DIR + '*')]
 
 # Go through the release dirs from newest to oldest and look for the design.
 path_to_build = None
@@ -37,8 +38,9 @@ release_dir = None
 for d in release_dirs[::-1]:
   if os.path.exists(os.sep.join([d, project_name])):
     path_to_build = os.sep.join([d, project_name])
-    release_dir = d.split(os.sep)[-1]
+    #release_dir = d.split(os.sep)[-1]
     break
+release_dir = RELEASE
 
 if path_to_build is None:
   print(f'ERROR: Could not find design "{project_name}" in any of the release directories... exiting.')
@@ -63,7 +65,8 @@ if user_input.lower() != 'y':
   sys.exit(1)
 
 # Copy the build
-cmd = [ 'rsync', '-trav', os.sep.join([path_to_build, 'bsg_14', 'current_build/']), result_dir ]
+#cmd = [ 'rsync', '-trav', os.sep.join([path_to_build, 'bsg_14', 'current_build/']), result_dir ]
+cmd = [ 'rsync', '-trav', path_to_build + "/", result_dir ]
 print(f'Running cmd: {" ".join(cmd)}')
 subprocess.run(cmd)
 
