@@ -1,10 +1,9 @@
 Summary for repository bsg_replicant:
-    EXPECTED COMMIT/BRANCH: bigblade-tapeout
-    CURRENT COMMIT: 1e46672
+    EXPECTED COMMIT/BRANCH: f29dccb
+    CURRENT COMMIT: f29dccb
     PASS: NO Uncommitted Files
-    PASS: commit 1e46672 is in remote
-    PASS: Expected branch found match in remote
-    PASS: Head of remote branch matches current commit
+    PASS: commit f29dccb is in remote
+    PASS: Expected commit matches current commit
     PASS: No Untracked Files
 Summary for bsg_replicant finished
 

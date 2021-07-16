@@ -15,35 +15,43 @@ endif
 
 hb_bigblade_netlists_dir    := $(THIS_DIR)/hb_bigblade_netlists
 hb_bigblade_netlists_url    := $(GITHUB)bespoke-silicon-group/hb_bigblade_netlists
-hb_bigblade_netlists_commit := main
+# Commit from main on 7/16/2021
+hb_bigblade_netlists_commit := 99a45ad
 
 basejump_stl_dir     :=$(THIS_DIR)/basejump_stl
 basejump_stl_url     :=$(GITHUB)bespoke-silicon-group/basejump_stl
-basejump_stl_commit  :=master
+# Commit from master on 7/16/2021
+basejump_stl_commit  :=57553c5
 
 bsg_manycore_dir     :=$(THIS_DIR)/bsg_manycore
 bsg_manycore_url     :=$(GITHUB)bespoke-silicon-group/bsg_manycore
-bsg_manycore_commit  :=ci_bigblade
+# Commit from master on 7/16/2021 post-merge of ci_bigblade -> master
+bsg_manycore_commit  :=3a05e000
 
 black-parrot_dir     :=$(THIS_DIR)/black-parrot
 black-parrot_url     :=$(GITHUB)black-parrot/black-parrot
-black-parrot_commit  :=tapeout_bigblade_rc1
+# Commit from HEAD of branch tapeout_bigblade_rc1 on 7/16/2021
+black-parrot_commit  :=dc23cc70
 
 cgra_dir             :=$(THIS_DIR)/cgra
 cgra_url             :=$(GITHUB)cornell-brg/hb_bigblade_cgra
-cgra_commit          :=rc0
+# Commit from HEAD of branch rc0 on 7/16/2021, post-merge of bigblade-tapeout -> bigblade -> main
+cgra_commit          :=2d6b92b
 
 bsg_replicant_dir    :=$(THIS_DIR)/bsg_replicant
 bsg_replicant_url    :=$(GITHUB)bespoke-silicon-group/bsg_replicant
-bsg_replicant_commit :=bigblade-tapeout
+# Commit from HEAD of main 7/16/2021, post-merge of bigblade-tapeout -> bigblade -> main
+bsg_replicant_commit :=f29dccb
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
+# PRs incoming
 bsg_14_commit        :=master
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
-bsg_cadenv_commit    :=master
+# Commit from HEAD of master 7/16/2021
+bsg_cadenv_commit    :=7860120
 
 board_dir            :=$(THIS_DIR)/board
 board_url            :=$(BITBUCKET)taylor-bsg/board
@@ -51,7 +59,8 @@ board_commit         :=e2fec32
 
 bsg_packaging_dir    :=$(THIS_DIR)/bsg_packaging
 bsg_packaging_url    :=$(GITHUB)bespoke-silicon-group/bsg_packaging
-bsg_packaging_commit :=basejump_fcbga_785
+# Commit from HEAD of branch basejump_fcbga_785 on 7/16/2021
+bsg_packaging_commit :=d06b110
 
 prep_dir := .pdk_prep
 

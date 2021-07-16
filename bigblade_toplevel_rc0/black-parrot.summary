@@ -1,10 +1,9 @@
 Summary for repository black-parrot:
-    EXPECTED COMMIT/BRANCH: tapeout_bigblade_rc1
+    EXPECTED COMMIT/BRANCH: dc23cc70
     CURRENT COMMIT: dc23cc70
     PASS: NO Uncommitted Files
     PASS: commit dc23cc70 is in remote
-    PASS: Expected branch found match in remote
-    PASS: Head of remote branch matches current commit
+    PASS: Expected commit matches current commit
     PASS: No Untracked Files
 Summary for black-parrot finished
 
