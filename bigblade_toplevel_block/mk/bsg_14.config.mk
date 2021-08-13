@@ -25,13 +25,23 @@ export DC_FLOW_INCREMENTAL_COMPILE_DISABLE_CLOCK_GATING := false
 export DC_FLOW_INCREMENTAL_COMPILE_FLATTEN_DESIGN := false
 export DC_FLOW_INCREMENTAL_COMPILE_DISABLE_RETIMING := false
 
+# Disable compile optimization to speed-up synthesis
+export DC_FLOW_COMPILE_NO_OPTIMIZATION := true
+# Skip timing estimation to speed-up DP
+# (timing information is inaccurate before buffer insertion in PNR.route_auto)
+export ICC2_DP_SKIP_TIMING_ESTIMATION  := true
 
 export PTSI_FLOW_ACTIVITY_FILE :=
 export PTSI_FLOW_ACTIVITY_WEIGHTS :=
 export PTSI_FLOW_STRIP_PATH :=
 
+# Skip power analysis to speed-up PTSI and reduce RAM/disk usage
+export PTSI_FLOW_SKIP_POWER_ANALYSIS := true
 
-#export USE_ICC2_2020 := 1
+# Use ICC2 2018 for better PNR result
+export USE_ICC2_2020   := 0
+# Use StarRC 2020 to avoid crashing in RC extraction
+export USE_STARRC_2020 := 1
 
 export ICC2_NUM_CORES := 32
 export DC_NUM_CORES   := 16

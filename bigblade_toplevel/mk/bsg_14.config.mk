@@ -174,6 +174,12 @@ export PTSI_FLOW_ACTIVITY_WEIGHTS :=
 
 export PTSI_FLOW_STRIP_PATH :=
 
+# Skip power analysis to speed-up PTSI and reduce RAM/disk usage
+export PTSI_FLOW_SKIP_POWER_ANALYSIS := true
+
+# Use StarRC 2020 to avoid crashing in RC extraction
+export USE_STARRC_2020 := 1
+
 ####################################################################################################
 #                                           CUSTOM STEPS                                           #
 ####################################################################################################
