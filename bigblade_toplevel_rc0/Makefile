@@ -45,8 +45,8 @@ bsg_replicant_commit :=f29dccb
 
 bsg_14_dir           :=$(THIS_DIR)/bsg_14
 bsg_14_url           :=$(GITHUB)bespoke-silicon-group/bsg_14
-# PRs incoming
-bsg_14_commit        :=master
+# Commit from HEAD of master 8/18/2021, post-merge of Paul & Scott's flow updates
+bsg_14_commit        :=3a8afdc
 
 bsg_cadenv_dir       :=$(THIS_DIR)/bsg_cadenv
 bsg_cadenv_url       :=$(GITHUB)bespoke-silicon-group/bsg_cadenv
