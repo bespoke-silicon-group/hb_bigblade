@@ -24,7 +24,7 @@ if NETLIST_EXPORT_MODE == 0:
 
 # RELEASE name and directory for netlist export (check to make sure repo exists too!)
 elif NETLIST_EXPORT_MODE == 1 or NETLIST_EXPORT_MODE == 2:
-  RELEASE     = 'rc-0'
+  RELEASE     = 'bigblade-final'
   RELEASE_DIR = './hb_bigblade_netlists'
   if not os.path.exists(RELEASE_DIR):
     print('ERROR: please clone hb_bigblade_netlists before proceeding!')
@@ -84,21 +84,23 @@ print()
 # (alphabetical and dictionary order so the newest version should be list in
 # the list).
 print(f'Searching for release "{RELEASE}" in directory "{RELEASE_DIR}"')
-release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
-for d in release_dirs:
-  print(f'\t{d}')
-print()
-
-# No releases found
-if len(release_dirs) == 0:
-  release_dirs.append( os.sep.join([RELEASE_DIR, RELEASE + '-0']) )
-  current_release = release_dirs[-1]
-  print(f'No release dirs found, starting with: {current_release}')
-
-# Releases found
-else:
-  current_release = release_dirs[-1]
-  print(f'Current release: {current_release}')
+#release_dirs = sorted([d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')], key=lambda x : int(x[x.rfind('-'):]), reverse=True)
+#for d in release_dirs:
+#  print(f'\t{d}')
+#print()
+#
+## No releases found
+#if len(release_dirs) == 0:
+#  release_dirs.append( os.sep.join([RELEASE_DIR, RELEASE + '-0']) )
+#  current_release = release_dirs[-1]
+#  print(f'No release dirs found, starting with: {current_release}')
+#
+## Releases found
+#else:
+#  current_release = release_dirs[-1]
+#  print(f'Current release: {current_release}')
+release_dirs = [d for d in glob.glob(os.sep.join([RELEASE_DIR, RELEASE]) + '*')]
+current_release = release_dirs[-1]
 
 # The path where we are going to copy our build
 if NETLIST_EXPORT_MODE == 0:
