@@ -102,6 +102,43 @@ $(summaries): %.summary:
 
 summaries: $(summaries)
 
+# The following rules help with tagging all repositories
+# The typical (and rare) flow will be:
+# 1. Update the tagfile message
+# 2. make tags
+# 3. Verify everything looks good
+# 4. make push
+# 
+# This sequence will push a tag called TAG_STRING to all the sub-repositories
+TAG_STRING=bigblade-rc1-tapeout-final-closeout-final
+tagfile:
+	echo "Bigblade RC 1 Tapeout-Final, Closeout Final, June 2021 Tapeout, August 2021 closeout" >> $@
+	echo "Tapeout Final: Final RC1 tapeout RTL" >> $@
+	echo "Closeout Final: Includes flow changes from Paul/Scott" >> $@
+	echo "hb_bigblade_netlists_commit :=$(hb_bigblade_netlists_commit)" >> $@
+	echo "basejump_stl_commit         :=$(basejump_stl_commit)" >> $@
+	echo "bsg_manycore_commit         :=$(bsg_manycore_commit)" >> $@
+	echo "black-parrot_commit         :=$(black-parrot_commit)" >> $@
+	echo "cgra_commit                 :=$(cgra_commit)" >> $@
+	echo "bsg_replicant_commit        :=$(bsg_replicant_commit)" >> $@
+	echo "bsg_14_commit               :=$(bsg_14_commit)" >> $@
+	echo "bsg_cadenv_commit           :=$(bsg_cadenv_commit)" >> $@
+	echo "board_commit                :=$(board_commit)" >> $@
+	echo "bsg_packaging_commit        :=$(bsg_packaging_commit)" >> $@
+	echo "In addition, All repositories have been tagged with $(TAG_STRING)" >>$@
+
+tags=$(subst .repo,.tag,$(all_repos))
+black-parrot.tag: TAG_STRING := archive/$(TAG_STRING)
+$(tags): %.tag: tagfile
+	cd $*; git tag -a $(TAG_STRING) -F ../tagfile
+tags: $(tags)
+
+push=$(subst .repo,.push,$(all_repos))
+black-parrot.push: TAG_STRING := archive/$(TAG_STRING)
+$(push): %.push:
+	cd $*; git push origin $(TAG_STRING)
+push: $(push)
+
 clean: are_you_sure
 	rm -rf $(subst .repo,,$(all_repos))
 	rm -rf .pdk_prep
