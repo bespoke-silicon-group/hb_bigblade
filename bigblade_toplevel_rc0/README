@@ -1,3 +1,5 @@
+True top-level of taped out Bigblade RC0 chip
+
 
 # To build simv from RTL:
 $ make
