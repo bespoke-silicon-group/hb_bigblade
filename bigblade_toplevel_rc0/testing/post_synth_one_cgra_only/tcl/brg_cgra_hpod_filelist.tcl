@@ -19,8 +19,11 @@ set bsg_padmapping    $::env(BSG_PADMAPPING)
 # PP: I didn't add the SRAM models here because CGRA SRAMs have the
 # same spec as core DMEMs. Since we are doing full-chip RTL sim the
 # hardened SRAMs are already included.
-set BRG_CGRA_HPOD_SOURCE_FILES [join "
-    /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/synth_brg_cgra_pod/results/brg_cgra_pod.mapped.v
-    /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/synth_ProcElement/results/ProcElement.mapped.v
-"]
-
+if {0} {
+  set BRG_CGRA_HPOD_SOURCE_FILES [join "
+      /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/synth_brg_cgra_pod/results/brg_cgra_pod.mapped.v
+      /mnt/users/spin0/no_backup/share/gf14/brg_cgra_share/brg_handoff.2021_06_04_18_10_22/synth_ProcElement/results/ProcElement.mapped.v
+  "]
+} else {
+  error "You are trying to add CGRA netlists that are currently not staged into the global netlist repo -- please make sure this is the desired behavior!"
+}
