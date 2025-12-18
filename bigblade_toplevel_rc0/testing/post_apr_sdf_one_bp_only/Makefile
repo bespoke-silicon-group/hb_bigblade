@@ -352,7 +352,7 @@ $(CDC_INSTANCE_LIST_V):
 build:       $(MIN_SIMV) $(MAX_SIMV)
 build-debug: $(MIN_SIMV_DEBUG) $(MAX_SIMV_DEBUG)
 
-SDF_PATH = /mnt/users/ssd3/homes/petrisko/tapeout/hb_bigblade/bigblade_bp_unicore/bsg_14_3/current_build/ptsi_xray/bsg_blackparrot_halfpod
+SDF_PATH = /nbu/spin/share/gf14/bigblade_logs/bigblade-final/builds/bigblade_toplevel_rc0/ptsi_xray/bsg_chip
 
 out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS} $(BSG_OUT_DIR)/bsg_bladerunner_pkg.v
 	mkdir -p out/$*_min/

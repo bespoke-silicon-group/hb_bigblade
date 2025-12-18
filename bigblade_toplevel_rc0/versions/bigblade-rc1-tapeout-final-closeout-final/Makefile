@@ -133,11 +133,10 @@ $(tags): %.tag: tagfile
 	cd $*; git tag -a $(TAG_STRING) -F ../tagfile
 tags: $(tags)
 
-# Remove -n to push globally. This is a safety feature, not a bug
 push=$(subst .repo,.push,$(all_repos))
 black-parrot.push: TAG_STRING := archive/$(TAG_STRING)
 $(push): %.push:
-	cd $*; git push -n origin $(TAG_STRING)
+	cd $*; git push origin $(TAG_STRING)
 push: $(push)
 
 clean: are_you_sure

@@ -4,6 +4,7 @@ REPOSITORY_PATH=$1
 REPOSITORY_EXPECTED_COMMIT=$2
 REPOSITORY_URL=$3
 REPOSITORY_CURRENT_COMMIT=`cd $REPOSITORY_PATH && git rev-parse --short HEAD`
+REPOSITORY_CURRENT_TAGS=`cd $REPOSITORY_PATH && git tag --contains $REPOSITORY_CURRENT_COMMIT`
 REPOSITORY_CURRENT_BRANCHES=`cd $REPOSITORY_PATH && git branch -r --contains $REPOSITORY_CURRENT_COMMIT`
 REPOSITORY_UNCOMMITTED=`cd $REPOSITORY_PATH && git diff --name-only`
 REPOSITORY_UNTRACKED=`cd $REPOSITORY_PATH && git ls-files --others --exclude-standard`
@@ -26,7 +27,7 @@ fi
 
 # Check if the current commit is in a remote (i.e visible to others)
 # If it is not, fail.
-if [[ -z "$REPOSITORY_CURRENT_BRANCHES" ]]; then
+if [[ -z "$REPOSITORY_CURRENT_BRANCHES" ]] && [[ -z "$REPOSITORY_CURRENT_TAGS" ]]; then
     echo "    FAIL: CURRENT BRANCH/COMMIT IS NOT PUSHED"
     echo ""
     exit 1

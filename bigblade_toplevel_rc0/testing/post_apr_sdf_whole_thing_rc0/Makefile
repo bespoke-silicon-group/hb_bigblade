@@ -372,7 +372,7 @@ $(CDC_INSTANCE_LIST_V):
 build:       $(MIN_SIMV) $(MAX_SIMV)
 build-debug: $(MIN_SIMV_DEBUG) $(MAX_SIMV_DEBUG)
 
-SDF_PATH = /nbu/spin_extra/gaozihou/rc0-final/ptsi_xray/bsg_chip
+SDF_PATH = /nbu/spin/share/gf14/bigblade_logs/bigblade-final/builds/bigblade_toplevel_rc0/ptsi_xray/bsg_chip
 
 out/%_min/simv: $(BSG_CHIP_FILELIST) $(BSG_CHIP_LIBRARY) $(BSG_DESIGNS_TESTING_FILELIST) $(BSG_DESIGNS_TESTING_LIBRARY) $(BSG_TRACE_ROMS) $(CDC_INSTANCE_LIST_V) ${IP_ROOT_DIRS}
 	mkdir -p out/$*_min/
