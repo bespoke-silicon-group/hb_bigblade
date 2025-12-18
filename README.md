@@ -1,8 +1,8 @@
 # BSG Design: Big Blade
 
-This repository contains the release candidate designs for the "Big Blade"
+This repository contains the release candidate designs for the HammerBlade "Big Blade"
 tape-out, taped out as a Global Foundries 12nm 100mm^2 SoC in
-March 2020.
+March 2020, which contains 2048 compute-optimized RISC-V cores and 8 Linux capable cores.
 
 ## Important Documents
 - [Design Document](https://docs.google.com/document/d/14OIOw79bAd6mn5b3NaPaBeNOnvom8fPgYA3Vjex9pgs/edit?ts=5fc6cd97#heading=h.1558uex093zu)
