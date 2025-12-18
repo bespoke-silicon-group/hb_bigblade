@@ -14,4 +14,4 @@ bigblade_toplevel_block_rc0 is the core area, not including I/O and bumps
 
 ## We thank Synopsys for their support in our mission to train students to use Modern CAD tools
 
-Particularly by allowing the sharing of scripts per [this document](sara-univ-sw-program-guide2023.pdf).
+Particularly by allowing the sharing of TCL scripts per [this document](sara-univ-sw-program-guide2023.pdf).
