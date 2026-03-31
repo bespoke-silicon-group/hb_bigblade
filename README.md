@@ -12,6 +12,10 @@ bigblade_toplevel_rc0 is the toplevel module for the chip
 
 bigblade_toplevel_block_rc0 is the core area, not including I/O and bumps 
 
+## External Dependencies
+
+The final commit hashes of each external dependency used in the tapeout are summarized [here](https://github.com/bespoke-silicon-group/hb_bigblade/tree/master/bigblade_toplevel_rc0/versions). (They can also be found in each Makefile sub-block.
+
 ## We thank Synopsys for their support in our mission to train students to use Modern CAD tools
 
 Particularly by allowing the sharing of TCL scripts per [this document](sara-univ-sw-program-guide2023.pdf).
